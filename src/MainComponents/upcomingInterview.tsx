@@ -1,0 +1,773 @@
+import React, { useState, useEffect } from 'react'
+import {
+  Box,
+  Button,
+  Card,
+  CardContent,
+  Container,
+  FormControl,
+  Grid,
+  InputAdornment,
+  MenuItem,
+  Pagination,
+  Radio,
+  Select,
+  TextField,
+  Typography,
+  Dialog,
+  DialogTitle,
+  DialogContent,
+  DialogActions,
+  Chip,
+  Divider,
+  Paper,
+  IconButton,
+} from '@mui/material'
+import { AdapterDateFns } from '@mui/x-date-pickers/AdapterDateFns'
+import {
+  LocalizationProvider,
+  DatePicker,
+  TimePicker,
+} from '@mui/x-date-pickers'
+import {
+  CalendarIcon,
+  Clock,
+  SearchIcon,
+  Download,
+  Mail,
+  Phone,
+  X,
+} from 'lucide-react'
+import { useNavigate } from 'react-router-dom'
+
+// Enhanced candidate type with resume details
+export interface Candidate {
+  id: number
+  name: string
+  interviewDate: string
+  timeSlot: string
+  position: string
+  email: string
+  phone: string
+  experience: string
+  skills: string[]
+  education: string
+  avatarUrl?: string
+  currentCompany?: string
+  currentRole?: string
+}
+
+// Interface for filter state
+interface FilterState {
+  jobRole: string
+  experience: string
+  startDate: Date | null
+  endDate: Date | null
+  startTime: Date | null
+  endTime: Date | null
+}
+
+// Generate dummy candidate data with more details
+export const allCandidates: Candidate[] = Array(24)
+  .fill(null)
+  .map((_, index) => ({
+    id: index + 1,
+    name: `Priya Sharma ${index + 1}`,
+    interviewDate: '23 March 2025',
+    timeSlot: '10:00AM - 10:35 AM',
+    position: [
+      'Full-Stack Developer',
+      'Frontend Developer',
+      'Backend Developer',
+      'UI/UX Developer',
+    ][index % 4],
+    email: `priya.sharma${index + 1}@example.com`,
+    phone: `+1 (555) 123-456${index % 10}`,
+    experience: [
+      `${(index % 5) + 1} years`,
+      '2-3 years',
+      '5+ years',
+      'Fresh Graduate',
+    ][index % 4],
+    skills: [
+      'React',
+      'TypeScript',
+      'Node.js',
+      'MongoDB',
+      'AWS',
+      'JavaScript',
+      'HTML',
+      'CSS',
+      'Redux',
+      'Express',
+      'Java',
+      'Spring Boot',
+      'SQL',
+      'Docker',
+      'GraphQL',
+    ].slice(0, 5 + (index % 5)),
+    education: [
+      'B.Tech in Computer Science, IIT Delhi',
+      'M.S. in Computer Science, Stanford University',
+      'B.E. in Information Technology, MIT',
+      'MCA, Delhi University',
+    ][index % 4],
+    currentCompany: 'XYZ Company',
+    currentRole: [
+      'Full-Stack Developer',
+      'Frontend Developer',
+      'Backend Developer',
+      'UI/UX Developer',
+    ][index % 4],
+  }))
+
+const ImprovedInterviewScheduler: React.FC = () => {
+  // States
+  const navigate = useNavigate()
+  const [selectedCandidates, setSelectedCandidates] = useState<number[]>([])
+  const [page, setPage] = useState<number>(1)
+  const [searchTerm, setSearchTerm] = useState<string>('')
+  const [filters, setFilters] = useState<FilterState>({
+    jobRole: '',
+    experience: '',
+    startDate: null,
+    endDate: null,
+    startTime: null,
+    endTime: null,
+  })
+
+  // Dialog states
+  const [dateRangeOpen, setDateRangeOpen] = useState<boolean>(false)
+  const [timeSelectOpen, setTimeSelectOpen] = useState<boolean>(false)
+  const [detailDialogOpen, setDetailDialogOpen] = useState<boolean>(false)
+  const [selectedCandidate, setSelectedCandidate] = useState<Candidate | null>(
+    null,
+  )
+
+  // Filtered candidates
+  const [filteredCandidates, setFilteredCandidates] =
+    useState<Candidate[]>(allCandidates)
+
+  // Apply filters
+  useEffect(() => {
+    let results = [...allCandidates]
+
+    // Apply search filter
+    if (searchTerm) {
+      const searchLower = searchTerm.toLowerCase()
+      results = results.filter(
+        (candidate) =>
+          candidate.name.toLowerCase().includes(searchLower) ||
+          candidate.position.toLowerCase().includes(searchLower) ||
+          candidate.skills.some((skill) =>
+            skill.toLowerCase().includes(searchLower),
+          ),
+      )
+    }
+
+    // Apply job role filter
+    if (filters.jobRole) {
+      results = results.filter((candidate) =>
+        candidate.position
+          .toLowerCase()
+          .includes(filters.jobRole.toLowerCase()),
+      )
+    }
+
+    // Apply experience filter
+    if (filters.experience) {
+      results = results.filter((candidate) =>
+        candidate.experience
+          .toLowerCase()
+          .includes(filters.experience.toLowerCase()),
+      )
+    }
+
+    // Apply date range filter
+    if (filters.startDate && filters.endDate) {
+      results = results.filter((_, index) => index % 2 === 0)
+    }
+
+    // Apply time filter
+    if (filters.startTime && filters.endTime) {
+      results = results.filter((_, index) => index % 3 === 0)
+    }
+
+    setFilteredCandidates(results)
+  }, [searchTerm, filters])
+
+  // Calculate pagination
+  const itemsPerPage = 12
+  const pageCount = Math.ceil(filteredCandidates.length / itemsPerPage)
+  const displayedCandidates = filteredCandidates.slice(
+    (page - 1) * itemsPerPage,
+    page * itemsPerPage,
+  )
+
+  // Handlers
+  const handleCandidateSelect = (id: number) => {
+    if (selectedCandidates.includes(id)) {
+      setSelectedCandidates(
+        selectedCandidates.filter((candidateId) => candidateId !== id),
+      )
+    } else {
+      setSelectedCandidates([...selectedCandidates, id])
+    }
+  }
+
+  const handlePageChange = (
+    event: React.ChangeEvent<unknown>,
+    value: number,
+  ) => {
+    setPage(value)
+  }
+
+  const handleFilterChange = (field: keyof FilterState, value: any) => {
+    setFilters({
+      ...filters,
+      [field]: value,
+    })
+  }
+
+  const handleViewDetails = (candidate: Candidate) => {
+    navigate(`/interview-details/${candidate.id}`)
+  }
+
+  const resetFilters = () => {
+    setFilters({
+      jobRole: '',
+      experience: '',
+      startDate: null,
+      endDate: null,
+      startTime: null,
+      endTime: null,
+    })
+    setSearchTerm('')
+  }
+
+  return (
+    <LocalizationProvider dateAdapter={AdapterDateFns}>
+      <Container style={{ paddingTop: '20px' }}>
+        {/* Search and Filter Section */}
+        <Grid container spacing={2} sx={{ mb: 3 }}>
+          <Grid item xs={12} md={3}>
+            <TextField
+              placeholder="Search..."
+              size="small"
+              fullWidth
+              value={searchTerm}
+              autoComplete="off"
+              onChange={(e) => setSearchTerm(e.target.value)}
+              InputProps={{
+                startAdornment: (
+                  <InputAdornment position="start">
+                    <SearchIcon size={20} />
+                  </InputAdornment>
+                ),
+              }}
+            />
+          </Grid>
+
+          <Grid item xs={6} md={2}>
+            <FormControl size="small" fullWidth>
+              <Select
+                displayEmpty
+                value={filters.jobRole}
+                onChange={(e) => handleFilterChange('jobRole', e.target.value)}
+                renderValue={
+                  filters.jobRole !== '' ? undefined : () => 'Job Role'
+                }
+              >
+                <MenuItem value="">All Roles</MenuItem>
+                <MenuItem value="full-stack">Full-Stack Developer</MenuItem>
+                <MenuItem value="frontend">Frontend Developer</MenuItem>
+                <MenuItem value="backend">Backend Developer</MenuItem>
+                <MenuItem value="ui/ux">UI/UX Developer</MenuItem>
+              </Select>
+            </FormControl>
+          </Grid>
+
+          <Grid item xs={6} md={2}>
+            <FormControl size="small" fullWidth>
+              <Select
+                displayEmpty
+                value={filters.experience}
+                onChange={(e) =>
+                  handleFilterChange('experience', e.target.value)
+                }
+                renderValue={
+                  filters.experience !== '' ? undefined : () => 'Experience'
+                }
+              >
+                <MenuItem value="">All Experience</MenuItem>
+                <MenuItem value="1 year">1 Year</MenuItem>
+                <MenuItem value="2-3">2-3 Years</MenuItem>
+                <MenuItem value="5+">5+ Years</MenuItem>
+                <MenuItem value="fresh">Fresh Graduate</MenuItem>
+              </Select>
+            </FormControl>
+          </Grid>
+
+          <Grid item xs={6} md={2}>
+            <Button
+              variant="outlined"
+              color="inherit"
+              fullWidth
+              startIcon={<CalendarIcon size={20} />}
+              onClick={() => setDateRangeOpen(true)}
+            >
+              Date Range
+            </Button>
+          </Grid>
+
+          <Grid item xs={6} md={2}>
+            <Button
+              variant="outlined"
+              color="inherit"
+              fullWidth
+              startIcon={<Clock size={20} />}
+              onClick={() => setTimeSelectOpen(true)}
+            >
+              Select Time
+            </Button>
+          </Grid>
+
+          <Grid item xs={6} md={1}>
+            <Button
+              variant="outlined"
+              color="error"
+              fullWidth
+              onClick={resetFilters}
+            >
+              Reset
+            </Button>
+          </Grid>
+
+          <Grid
+            item
+            xs={6}
+            md={12}
+            sx={{ display: 'flex', justifyContent: 'flex-end' }}
+          >
+            <Button
+              variant="contained"
+              color="primary"
+              disabled={selectedCandidates.length === 0}
+            >
+              Schedule{' '}
+              {selectedCandidates.length > 0
+                ? `(${selectedCandidates.length})`
+                : ''}
+            </Button>
+          </Grid>
+        </Grid>
+
+        {/* Active Filters Display */}
+        {(filters.jobRole ||
+          filters.experience ||
+          filters.startDate ||
+          filters.startTime) && (
+          <Box sx={{ display: 'flex', flexWrap: 'wrap', gap: 1, mb: 2 }}>
+            <Typography variant="body2" sx={{ mr: 1, pt: 0.5 }}>
+              Active Filters:
+            </Typography>
+
+            {filters.jobRole && (
+              <Chip
+                label={`Job: ${filters.jobRole}`}
+                size="small"
+                onDelete={() => handleFilterChange('jobRole', '')}
+              />
+            )}
+
+            {filters.experience && (
+              <Chip
+                label={`Experience: ${filters.experience}`}
+                size="small"
+                onDelete={() => handleFilterChange('experience', '')}
+              />
+            )}
+
+            {filters.startDate && filters.endDate && (
+              <Chip
+                label={`Date: ${filters.startDate.toLocaleDateString()} - ${filters.endDate.toLocaleDateString()}`}
+                size="small"
+                onDelete={() => {
+                  handleFilterChange('startDate', null)
+                  handleFilterChange('endDate', null)
+                }}
+              />
+            )}
+
+            {filters.startTime && filters.endTime && (
+              <Chip
+                label={`Time: ${filters.startTime.toLocaleTimeString([], {
+                  hour: '2-digit',
+                  minute: '2-digit',
+                })} - ${filters.endTime.toLocaleTimeString([], {
+                  hour: '2-digit',
+                  minute: '2-digit',
+                })}`}
+                size="small"
+                onDelete={() => {
+                  handleFilterChange('startTime', null)
+                  handleFilterChange('endTime', null)
+                }}
+              />
+            )}
+          </Box>
+        )}
+
+        <Typography variant="h6" sx={{ mb: 2 }}>
+          Upcoming Interviews for Full-Stack Developer 24:
+          {filteredCandidates.length > 0 && (
+            <span style={{ fontWeight: 'normal', fontSize: '0.9rem' }}>
+              {' '}
+              ({filteredCandidates.length} candidates)
+            </span>
+          )}
+        </Typography>
+
+        {/* Candidates Grid */}
+        {displayedCandidates.length > 0 ? (
+          <Grid container spacing={2}>
+            {displayedCandidates.map((candidate) => (
+              <Grid item xs={12} sm={6} md={4} key={candidate.id}>
+                <Card
+                  sx={{
+                    boxShadow: 1,
+                    transition: 'transform 0.2s',
+                    '&:hover': { transform: 'translateY(-4px)', boxShadow: 3 },
+                  }}
+                >
+                  <CardContent>
+                    <Radio
+                      checked={selectedCandidates.includes(candidate.id)}
+                      onChange={() => handleCandidateSelect(candidate.id)}
+                      size="small"
+                      style={{ float: 'right' }}
+                    />
+                    <Box sx={{ display: 'flex', alignItems: 'flex-start' }}>
+                      <div
+                        style={{
+                          width: '48px',
+                          height: '48px',
+                          borderRadius: '50%',
+                          backgroundColor: '#e0e0e0',
+                          display: 'flex',
+                          alignItems: 'center',
+                          justifyContent: 'center',
+                          overflow: 'hidden',
+                        }}
+                      >
+                        <img
+                          src="https://plus.unsplash.com/premium_photo-1664474619075-644dd191935f?fm=jpg&q=60&w=3000&ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxzZWFyY2h8MXx8aW1hZ2V8ZW58MHx8MHx8fDA%3D"
+                          alt={candidate.name}
+                          style={{
+                            width: '100%',
+                            height: '100%',
+                            objectFit: 'cover',
+                          }}
+                        />
+                      </div>
+                      <Box sx={{ ml: 1, flex: 1 }}>
+                        <Typography
+                          variant="subtitle1"
+                          sx={{ fontWeight: 500 }}
+                        >
+                          {candidate.name}
+                        </Typography>
+                        <Typography variant="body2" color="text.secondary">
+                          {candidate.interviewDate} • {candidate.timeSlot}
+                        </Typography>
+                      </Box>
+                    </Box>
+
+                    <Box sx={{ pl: 7, mt: 1 }}>
+                      <Button
+                        fullWidth
+                        variant="outlined"
+                        sx={{
+                          mt: 1,
+                          background: '#1C1C1E1A',
+                          borderRadius: '6px',
+                          color: '#1C1C1E',
+                          textTransform: 'none',
+                          fontFamily: 'SF Pro Display',
+                          fontSize: '10px',
+                          fontWeight: 500,
+                        }}
+                      >
+                        <div
+                          style={{
+                            width: '10px',
+                            height: '10px',
+                            borderRadius: '50%',
+                            backgroundColor: '#ff9800',
+                            position: 'absolute',
+                            left: '8px',
+                          }}
+                        />
+                        {candidate.position}
+                      </Button>
+
+                      <Button
+                        fullWidth
+                        variant="outlined"
+                        onClick={() => handleViewDetails(candidate)}
+                        sx={{
+                          mt: 1,
+                          background: '#0284C726',
+                          borderRadius: '6px',
+                          color: '#0284C7',
+                          textTransform: 'none',
+                          fontFamily: 'SF Pro Display',
+                          fontSize: '10px',
+                          fontWeight: 500,
+                        }}
+                      >
+                        View Details
+                      </Button>
+                    </Box>
+                  </CardContent>
+                </Card>
+              </Grid>
+            ))}
+          </Grid>
+        ) : (
+          <Paper sx={{ p: 3, textAlign: 'center' }}>
+            <Typography variant="body1" color="text.secondary">
+              No candidates match your filters. Try adjusting your search
+              criteria.
+            </Typography>
+            <Button onClick={resetFilters} sx={{ mt: 2 }}>
+              Reset Filters
+            </Button>
+          </Paper>
+        )}
+
+        {/* Pagination */}
+        {pageCount > 1 && (
+          <Box sx={{ display: 'flex', justifyContent: 'center', mt: 4 }}>
+            <Pagination
+              count={pageCount}
+              page={page}
+              onChange={handlePageChange}
+              color="primary"
+              showFirstButton
+              showLastButton
+            />
+          </Box>
+        )}
+
+        {/* Date Range Dialog */}
+        <Dialog open={dateRangeOpen} onClose={() => setDateRangeOpen(false)}>
+          <DialogTitle>Select Date Range</DialogTitle>
+          <DialogContent sx={{ width: '300px' }}>
+            <Box
+              sx={{ display: 'flex', flexDirection: 'column', gap: 2, pt: 1 }}
+            >
+              <DatePicker
+                label="Start Date"
+                value={filters.startDate}
+                onChange={(date) => handleFilterChange('startDate', date)}
+              />
+              <DatePicker
+                label="End Date"
+                value={filters.endDate}
+                onChange={(date) => handleFilterChange('endDate', date)}
+                minDate={filters.startDate || undefined}
+              />
+            </Box>
+          </DialogContent>
+          <DialogActions>
+            <Button onClick={() => setDateRangeOpen(false)}>Cancel</Button>
+            <Button
+              variant="contained"
+              onClick={() => setDateRangeOpen(false)}
+              disabled={!filters.startDate || !filters.endDate}
+            >
+              Apply
+            </Button>
+          </DialogActions>
+        </Dialog>
+
+        {/* Time Selection Dialog */}
+        <Dialog open={timeSelectOpen} onClose={() => setTimeSelectOpen(false)}>
+          <DialogTitle>Select Time Range</DialogTitle>
+          <DialogContent sx={{ width: '300px' }}>
+            <Box
+              sx={{ display: 'flex', flexDirection: 'column', gap: 2, pt: 1 }}
+            >
+              <TimePicker
+                label="Start Time"
+                value={filters.startTime}
+                onChange={(time) => handleFilterChange('startTime', time)}
+              />
+              <TimePicker
+                label="End Time"
+                value={filters.endTime}
+                onChange={(time) => handleFilterChange('endTime', time)}
+                minTime={filters.startTime || undefined}
+              />
+            </Box>
+          </DialogContent>
+          <DialogActions>
+            <Button onClick={() => setTimeSelectOpen(false)}>Cancel</Button>
+            <Button
+              variant="contained"
+              onClick={() => setTimeSelectOpen(false)}
+              disabled={!filters.startTime || !filters.endTime}
+            >
+              Apply
+            </Button>
+          </DialogActions>
+        </Dialog>
+
+        {/* Candidate Details Dialog */}
+        <Dialog
+          open={detailDialogOpen}
+          onClose={() => setDetailDialogOpen(false)}
+          maxWidth="sm"
+          fullWidth
+        >
+          {selectedCandidate && (
+            <>
+              <DialogTitle
+                sx={{
+                  display: 'flex',
+                  justifyContent: 'space-between',
+                  alignItems: 'center',
+                }}
+              >
+                <Typography variant="h6">Candidate Details</Typography>
+                <IconButton onClick={() => setDetailDialogOpen(false)}>
+                  <X size={20} />
+                </IconButton>
+              </DialogTitle>
+              <DialogContent>
+                <Box sx={{ display: 'flex', alignItems: 'center', mb: 2 }}>
+                  <div
+                    style={{
+                      width: '64px',
+                      height: '64px',
+                      borderRadius: '50%',
+                      backgroundColor: '#e0e0e0',
+                      display: 'flex',
+                      alignItems: 'center',
+                      justifyContent: 'center',
+                      overflow: 'hidden',
+                    }}
+                  >
+                    <img
+                      src="https://plus.unsplash.com/premium_photo-1664474619075-644dd191935f?fm=jpg&q=60&w=3000&ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxzZWFyY2h8MXx8aW1hZ2V8ZW58MHx8MHx8fDA%3D"
+                      alt={selectedCandidate.name}
+                      style={{
+                        width: '100%',
+                        height: '100%',
+                        objectFit: 'cover',
+                      }}
+                    />
+                  </div>
+                  <Box sx={{ ml: 2 }}>
+                    <Typography variant="h6">
+                      {selectedCandidate.name}
+                    </Typography>
+                    <Typography variant="body1" color="primary">
+                      {selectedCandidate.position}
+                    </Typography>
+                  </Box>
+                </Box>
+
+                <Divider sx={{ mb: 2 }} />
+
+                <Grid container spacing={2} sx={{ mb: 2 }}>
+                  <Grid item xs={6}>
+                    <Box sx={{ display: 'flex', alignItems: 'center' }}>
+                      <Mail size={16} style={{ marginRight: 8 }} />
+                      <Typography variant="body2">
+                        {selectedCandidate.email}
+                      </Typography>
+                    </Box>
+                  </Grid>
+                  <Grid item xs={6}>
+                    <Box sx={{ display: 'flex', alignItems: 'center' }}>
+                      <Phone size={16} style={{ marginRight: 8 }} />
+                      <Typography variant="body2">
+                        {selectedCandidate.phone}
+                      </Typography>
+                    </Box>
+                  </Grid>
+                </Grid>
+
+                <Box sx={{ mb: 2 }}>
+                  <Typography variant="subtitle2">
+                    Interview Schedule
+                  </Typography>
+                  <Typography variant="body2">
+                    {selectedCandidate.interviewDate} •{' '}
+                    {selectedCandidate.timeSlot}
+                  </Typography>
+                </Box>
+
+                <Box sx={{ mb: 2 }}>
+                  <Typography variant="subtitle2">Experience</Typography>
+                  <Typography variant="body2">
+                    {selectedCandidate.experience}
+                  </Typography>
+                </Box>
+
+                <Box sx={{ mb: 2 }}>
+                  <Typography variant="subtitle2">Education</Typography>
+                  <Typography variant="body2">
+                    {selectedCandidate.education}
+                  </Typography>
+                </Box>
+
+                <Box sx={{ mb: 2 }}>
+                  <Typography variant="subtitle2">Skills</Typography>
+                  <Box
+                    sx={{ display: 'flex', flexWrap: 'wrap', gap: 0.5, mt: 1 }}
+                  >
+                    {selectedCandidate.skills.map((skill, idx) => (
+                      <Chip key={idx} label={skill} size="small" />
+                    ))}
+                  </Box>
+                </Box>
+
+                <Box sx={{ mt: 3 }}>
+                  <Button
+                    variant="outlined"
+                    startIcon={<Download size={16} />}
+                    fullWidth
+                  >
+                    Download Resume
+                  </Button>
+                </Box>
+              </DialogContent>
+              <DialogActions>
+                <Button onClick={() => setDetailDialogOpen(false)}>
+                  Close
+                </Button>
+                <Button
+                  variant="contained"
+                  color="primary"
+                  onClick={() => {
+                    handleCandidateSelect(selectedCandidate.id)
+                    setDetailDialogOpen(false)
+                  }}
+                >
+                  {selectedCandidates.includes(selectedCandidate.id)
+                    ? 'Unselect Candidate'
+                    : 'Select for Interview'}
+                </Button>
+              </DialogActions>
+            </>
+          )}
+        </Dialog>
+      </Container>
+    </LocalizationProvider>
+  )
+}
+
+export default ImprovedInterviewScheduler

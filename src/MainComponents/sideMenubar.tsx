@@ -39,17 +39,20 @@ function SideMenuBars() {
     },
     {
       text: 'CV Manager',
-      link: '/jobdescriptionuploading',
+       link: '/uploadCV',
+      // link: '/jobdescriptionuploading',
       icon: <DescriptionIcon />,
       subItems: [
         {
           text: 'Upload',
-          link: '/jobdescriptionuploading',
+           link: '/uploadCV',
+          // link: '/jobdescriptionuploading',
           icon: <DescriptionIcon />,
         },
         {
           text: 'Review',
-          link: '/jobdescriptionselection',
+          // link: '/jobdescriptionselection',
+         link: '/reviewCv',
           icon: <DescriptionIcon />,
         },
       ],
@@ -61,24 +64,25 @@ function SideMenuBars() {
       subItems: [
         {
           text: 'Create JD',
-          link: '/jobDescriptionForm',
+          link: '/AIJDCreator',
           icon: <WorkIcon />,
         },
         {
           text: 'JD Collection',
-          link: '/aiJdCreation',
+        
+           link: '/jdcollection',
           icon: <WorkIcon />,
         },
       ],
     },
     {
       text: 'Search Resumes',
-      link: '/collectiondefault',
+      link: '/',
       icon: <SearchIcon />,
     },
     {
       text: 'Collections',
-      link: '/collectionavailable',
+      link: '/collectiondefault',
       icon: <CollectionsIcon />,
     },
     {
@@ -105,7 +109,7 @@ function SideMenuBars() {
     },
     {
       text: 'Coding Assessment',
-      link: '/collectiondefault', // No direct match, using collectiondefault as placeholder
+      link: '/', // No direct match, using collectiondefault as placeholder
       icon: <CodeIcon />,
     },
     {
@@ -169,12 +173,13 @@ function SideMenuBars() {
         justifyContent: 'space-between',
         flexDirection: 'column',
         alignItems: 'center',
+        overflowY:'hidden',
         width: {
           xs: '200px',
           sm: '220px',
           md: '250px',
         },
-        overflowY: 'auto',
+        // overflowY: 'auto',
         zIndex: 1000,
       }}
     >

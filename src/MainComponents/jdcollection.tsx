@@ -10,6 +10,8 @@ import {
   Select,
   Typography,
 } from '@mui/material'
+import { useNavigate } from 'react-router-dom';
+
 import {
   Search,
   ExpandMore,
@@ -275,6 +277,7 @@ const JdCollection: React.FC = () => {
                 cursor: 'pointer',
                 fontFamily: 'SF Pro Display',
               }}
+onClick={()=>navigate('/collectionavailable')}
             >
               Quick View
             </button>
@@ -287,6 +290,7 @@ const JdCollection: React.FC = () => {
       </Grid>
     </Card>
   )
+const navigate = useNavigate();
 
   return (
     <div style={{ padding: '16px', maxWidth: '1280px', margin: '0 auto' }}>

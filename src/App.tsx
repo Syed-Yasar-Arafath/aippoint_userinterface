@@ -16,6 +16,9 @@ import JobDescriptionSelection from './MainComponents/jobdescriptionselection';
 import JobDescriptionUpload from './MainComponents/jobdescriptionuploading';
 import Settings from './MainComponents/settings';
 import UpcomingInterview from './MainComponents/upcomingInterview';
+import UploadCV from './MainComponents/uploadCV';
+import ReviewCV from './MainComponents/reviewCv';
+import AIJDCreator from './MainComponents/AIJDCreator';
 
 const drawerWidth = 250;
 
@@ -56,6 +59,9 @@ const AppContent: React.FC = () => {
           <Route path="/jobdescriptionselection" element={<JobDescriptionSelection />} />
           <Route path="/jobdescriptionuploading" element={<JobDescriptionUpload />} />
           <Route path="/settings" element={<Settings />} />
+           <Route path="/uploadCV" element={<UploadCV />} />
+            <Route path="/reviewCv" element={<ReviewCV />} />
+             <Route path="/AIJDCreator" element={<AIJDCreator />} />
           <Route path="/UpcomingInterview" element={<UpcomingInterview />} />
         </Routes>
       </Box>

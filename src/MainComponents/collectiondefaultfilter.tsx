@@ -16,116 +16,10 @@ import { DatePicker } from '@mui/x-date-pickers/DatePicker'
 import EventIcon from '@mui/icons-material/Event'
 import dayjs from 'dayjs'
 
-const ProfileCollectionDashboardf: React.FC = () => {
+const CollectionDefaultfilter: React.FC = () => {
   const collections = [
-    {
-      name: 'Software Engineer - Frontend',
-      profiles: 100,
-      addedBy: 'Rahul Sharma',
-      lastUpdated: '05-May-2025',
-      image: 'assets/static/images/Rectangle 34624281.png',
-      experience: '5 years',
-      status: 'Not interviewed',
-    },
-    {
-      name: 'Software Analyst',
-      profiles: 83,
-      addedBy: 'Kiran Naidu',
-      lastUpdated: '02-May-2025',
-      image: 'assets/static/images/Rectangle 34624282 (2).png',
-      experience: '3 years',
-      status: 'Scheduled',
-    },
-    {
-      name: 'Software Engineer - Full Stack',
-      profiles: 43,
-      addedBy: 'Samer Khan',
-      lastUpdated: '04-May-2025',
-      image: 'assets/static/images/Rectangle 34624282 (4).png',
-      experience: '4 years',
-      status: 'Interview Completed',
-    },
-    {
-      name: 'Senior Product Manager',
-      profiles: 83,
-      addedBy: 'Samer Khan',
-      lastUpdated: '02-Apr-2025',
-      image: 'assets/static/images/Rectangle 34624282.png',
-      experience: '7 years',
-      status: 'Not interviewed',
-    },
-    {
-      name: 'Software Engineer - Full Stack II',
-      profiles: 130,
-      addedBy: 'Samer Khan',
-      lastUpdated: '04-May-2025',
-      image: 'assets/static/images/Rectangle 34624282 (4).png',
-      experience: '6 years',
-      status: 'Scheduled',
-    },
-    {
-      name: 'DevOps Engineer',
-      profiles: 90,
-      addedBy: 'Samer Khan',
-      lastUpdated: '28-Mar-2025',
-      image: 'assets/static/images/Rectangle 34624282.png',
-      experience: '5 years',
-      status: 'Interview Completed',
-    },
-    {
-      name: 'Senior UI/UX Designer',
-      profiles: 160,
-      addedBy: 'Samer Khan',
-      lastUpdated: '06-May-2025',
-      image: 'assets/static/images/Rectangle 34624282 (4).png',
-      experience: '8 years',
-      status: 'Not interviewed',
-    },
-    {
-      name: 'Senior Software Engineer - Backend',
-      profiles: 100,
-      addedBy: 'Rahul Sharma',
-      lastUpdated: '27-Mar-2025',
-      image: 'assets/static/images/Rectangle 34624282.png',
-      experience: '9 years',
-      status: 'Scheduled',
-    },
-    {
-      name: 'Digital Marketing Intern',
-      profiles: 200,
-      addedBy: 'Rahul Sharma',
-      lastUpdated: '26-Mar-2025',
-      image: 'assets/static/images/Rectangle 34624281.png',
-      experience: '1 years',
-      status: 'Interview Completed',
-    },
-    {
-      name: 'Junior Sales Executive',
-      profiles: 200,
-      addedBy: 'Samer Khan',
-      lastUpdated: '26-Mar-2025',
-      image: 'https://picsum.photos/seed/samer6/24/24',
-      experience: '2 years',
-      status: 'Not interviewed',
-    },
-    {
-      name: 'Junior UI/UX Designer',
-      profiles: 160,
-      addedBy: 'Samer Khan',
-      lastUpdated: '26-Mar-2025',
-      image: 'https://picsum.photos/seed/samer7/24/24',
-      experience: '3 years',
-      status: 'Scheduled',
-    },
-    {
-      name: 'Junior Product Manager',
-      profiles: 96,
-      addedBy: 'Kiran Naidu',
-      lastUpdated: '25-Mar-2025',
-      image: 'https://picsum.photos/seed/kiran2/24/24',
-      experience: '4 years',
-      status: 'Interview Completed',
-    },
+   
+    
     {
       name: 'DevOps Engineer Intern',
       profiles: 35,
@@ -857,4 +751,4 @@ const ProfileCollectionDashboardf: React.FC = () => {
   )
 }
 
-export default ProfileCollectionDashboardf
+export default CollectionDefaultfilter

@@ -44,7 +44,7 @@ const tabs = [
   'Accessibility',
 ]
 
-const ProfileSettings: React.FC = () => {
+const Settings: React.FC = () => {
   const [activeTab, setActiveTab] = useState('General Settings')
   const [userName, setUserName] = useState('Alex Carter')
   const [appearancegeneral, setAppearancegeneral] = useState('System')
@@ -2134,4 +2134,4 @@ const ProfileSettings: React.FC = () => {
   )
 }
 
-export default ProfileSettings
+export default Settings

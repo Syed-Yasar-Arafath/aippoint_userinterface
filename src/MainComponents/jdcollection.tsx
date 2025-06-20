@@ -36,8 +36,8 @@ interface Job {
   newProfiles: number
 }
 
-const JobListPage: React.FC = () => {
-  const jobs: Job[] = Array(8)
+const JdCollection: React.FC = () => {
+  const jobs: Job[] = Array(2)
     .fill({
       id: 1,
       title: 'Full - Stack Developer',
@@ -424,4 +424,4 @@ const JobListPage: React.FC = () => {
   )
 }
 
-export default JobListPage
+export default JdCollection

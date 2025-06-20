@@ -121,7 +121,7 @@ export const allCandidates: Candidate[] = Array(24)
     ][index % 4],
   }))
 
-const ImprovedInterviewScheduler: React.FC = () => {
+const UpcomingInterview: React.FC = () => {
   // States
   const navigate = useNavigate()
   const [selectedCandidates, setSelectedCandidates] = useState<number[]>([])
@@ -770,4 +770,4 @@ const ImprovedInterviewScheduler: React.FC = () => {
   )
 }
 
-export default ImprovedInterviewScheduler
+export default UpcomingInterview

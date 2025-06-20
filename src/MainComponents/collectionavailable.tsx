@@ -35,67 +35,7 @@ interface Candidate {
 }
 
 const initialCandidates: Candidate[] = [
-  {
-    name: 'Nirav Patel',
-    position: 'DevOps Engineer',
-    experience: '04 Years 06 Months',
-    location: 'Pune, Maharashtra',
-    education: 'B.Tech - VIT',
-    contact: '+91-8888777766',
-    prevInterview: 'DevOps... +1',
-    about:
-      'As a DevOps specialist, I thrive in automation and CI/CD pipelines, ensuring smooth integration and delivery. My skills include managing cloud infrastructure, versioning, and orchestration processes for better efficiency with a strong background in container orchestration.',
-    keySkills: ['Docker', 'Kubernetes', 'Jenkins', 'GitLab', 'CI/CD'],
-    uploadedBy: 'Rucha Kulkarni',
-    profileImage: 'assets/static/images/Rectangle 3.png',
-    uploaderImage: 'assets/static/images/Rectangle 34624285.png',
-  },
-  {
-    name: 'Aisha Sharma',
-    position: 'Frontend Developer',
-    experience: '03 Years 02 Months',
-    location: 'Bangalore, Karnataka',
-    education: 'B.E. - NIT',
-    contact: '+91-9876543210',
-    prevInterview: 'React... +2',
-    about:
-      'Passionate about creating intuitive and responsive user interfaces. Proficient in React, TypeScript, and modern CSS frameworks. I focus on delivering pixel-perfect designs and optimizing frontend performance.',
-    keySkills: ['React', 'TypeScript', 'Tailwind CSS', 'Webpack', 'Redux'],
-    uploadedBy: 'Vikram Singh',
-    profileImage: 'assets/static/images/Rectangle 34624281 (1).png',
-    uploaderImage: 'assets/static/images/Ellipse 1034 (1).png',
-  },
-  {
-    name: 'Rahul Verma',
-    position: 'Backend Developer',
-    experience: '05 Years 08 Months',
-    location: 'Hyderabad, Telangana',
-    education: 'M.Tech - IIT',
-    contact: '+91-9123456789',
-    prevInterview: 'Node.js... +3',
-    about:
-      'Experienced in building scalable backend systems using Node.js and Python. Skilled in designing RESTful APIs, database optimization, and microservices architecture.',
-    keySkills: ['Node.js', 'Python', 'MongoDB', 'Express', 'AWS'],
-    uploadedBy: 'Priya Desai',
-    profileImage: 'assets/static/images/Ellipse 1034.png',
-    uploaderImage: 'assets/static/images/Ellipse 103.png',
-  },
-  {
-    name: 'Sneha Reddy',
-    position: 'Full Stack Developer',
-    experience: '04 Years 00 Months',
-    location: 'Chennai, Tamil Nadu',
-    education: 'B.Tech - Anna University',
-    contact: '+91-8765432109',
-    prevInterview: 'MERN... +1',
-    about:
-      'Versatile developer with expertise in both frontend and backend technologies. Proficient in the MERN stack and experienced in building end-to-end web applications.',
-    keySkills: ['MongoDB', 'Express', 'React', 'Node.js', 'GraphQL'],
-    uploadedBy: 'Arjun Mehta',
-    profileImage: 'assets/static/images/Ellipse 104.png',
-    uploaderImage: 'assets/static/images/Ellipse 1034 (2).png',
-  },
-  {
+ {
     name: 'Karan Singh',
     position: 'Data Scientist',
     experience: '03 Years 10 Months',
@@ -131,78 +71,7 @@ const initialCandidates: Candidate[] = [
     profileImage: 'https://picsum.photos/200/200?random=6',
     uploaderImage: 'https://picsum.photos/200/200?random=16',
   },
-  {
-    name: 'Vikrant Joshi',
-    position: 'Cloud Architect',
-    experience: '06 Years 03 Months',
-    location: 'Mumbai, Maharashtra',
-    education: 'B.Tech - IIT',
-    contact: '+91-8901234567',
-    prevInterview: 'AWS... +4',
-    about:
-      'Expert in designing and managing cloud infrastructure. Proficient in AWS, Azure, and Terraform for building secure and scalable cloud solutions.',
-    keySkills: ['AWS', 'Azure', 'Terraform', 'Kubernetes', 'Cloud Security'],
-    uploadedBy: 'Anita Sharma',
-    profileImage: 'https://picsum.photos/200/200?random=7',
-    uploaderImage: 'https://picsum.photos/200/200?random=17',
-  },
-  {
-    name: 'Pooja Malhotra',
-    position: 'Mobile App Developer',
-    experience: '03 Years 04 Months',
-    location: 'Gurgaon, Haryana',
-    education: 'B.E. - DTU',
-    contact: '+91-6789012345',
-    prevInterview: 'Flutter... +2',
-    about:
-      'Specialized in cross-platform mobile app development using Flutter and React Native. Experienced in delivering high-performance apps for iOS and Android.',
-    keySkills: ['Flutter', 'React Native', 'Dart', 'Firebase', 'REST APIs'],
-    uploadedBy: 'Rohit Kumar',
-    profileImage: 'https://picsum.photos/200/200?random=8',
-    uploaderImage: 'https://picsum.photos/200/200?random=18',
-  },
-  {
-    name: 'Aditya Roy',
-    position: 'Cybersecurity Analyst',
-    experience: '04 Years 09 Months',
-    location: 'Kolkata, West Bengal',
-    education: 'B.Tech - JU',
-    contact: '+91-5678901234',
-    prevInterview: 'Security... +3',
-    about:
-      'Proficient in identifying and mitigating security threats. Experienced in penetration testing, network security, and compliance with industry standards.',
-    keySkills: [
-      'Penetration Testing',
-      'Network Security',
-      'SIEM',
-      'Wireshark',
-      'ISO 27001',
-    ],
-    uploadedBy: 'Smita Banerjee',
-    profileImage: 'https://picsum.photos/200/200?random=9',
-    uploaderImage: 'https://picsum.photos/200/200?random=19',
-  },
-  {
-    name: 'Lakshmi Menon',
-    position: 'Product Manager',
-    experience: '05 Years 01 Month',
-    location: 'Ahmedabad, Gujarat',
-    education: 'MBA - IIM',
-    contact: '+91-4567890123',
-    prevInterview: 'Product... +2',
-    about:
-      'Skilled in product lifecycle management and agile methodologies. Experienced in leading cross-functional teams to deliver innovative products.',
-    keySkills: [
-      'Agile',
-      'Scrum',
-      'Product Roadmap',
-      'JIRA',
-      'Stakeholder Management',
-    ],
-    uploadedBy: 'Kunal Shah',
-    profileImage: 'https://picsum.photos/200/200?random=10',
-    uploaderImage: 'https://picsum.photos/200/200?random=20',
-  },
+ 
 ]
 
 // Skeleton loader component for a single profile card
@@ -326,7 +195,7 @@ const SkeletonCard = () => (
   </Card>
 )
 
-export default function ProfileListingPage() {
+export default function CollectionAvailable() {
   const [selectedJobRole, setSelectedJobRole] = useState<string>('')
   const [selectedExperience, setSelectedExperience] = useState<string>('')
   const [selectedUser, setSelectedUser] = useState<string>('')

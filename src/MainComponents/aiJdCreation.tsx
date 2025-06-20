@@ -11,7 +11,7 @@ import {
   Sparkles,
 } from 'lucide-react'
 
-export default function JobDescriptionCreator() {
+export default function AIjdCreation() {
   const [selectedTab, setSelectedTab] = useState('Job Title')
   const [jobTitle, setJobTitle] = useState('')
 

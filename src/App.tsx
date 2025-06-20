@@ -4,24 +4,18 @@ import { Box } from '@mui/material';
 import RecruitmentDashboard from './MainComponents/RecruitmentDashboard';
 import { useTheme, useMediaQuery } from '@mui/material';
 import SideMenuBars from './MainComponents/sideMenubar';
-
-// Placeholder components for routes
-const CVManager = () => <div>CV Manager Page</div>;
-const UploadFiles = () => <div>Upload Files Page</div>;
-const Review = () => <div>Review Page</div>;
-const JDManager = () => <div>JD Manager Page</div>;
-const CreateNewJobPost = () => <div>Create JD Page</div>;
-const JobDescriptionAI = () => <div>JD Collection Page</div>;
-const SearchResumes = () => <div>Search Resumes Page</div>;
-const CollectionAI = () => <div>Collections Page</div>;
-const AIInterviewSuite = () => <div>AI Interview Suite Page</div>;
-const ScheduleInterviewAI = () => <div>Schedule Interview Page</div>;
-const Upcoming = () => <div>Upcoming Interviews Page</div>;
-const FeedbackScore = () => <div>Interview Status Page</div>;
-const CodingAssessment = () => <div>Coding Assessment Page</div>;
-const Analytics = () => <div>Analytics Page</div>;
-const SettingGeneral = () => <div>Settings Page</div>;
-const Support = () => <div>Support Page</div>;
+import AIjdCreation from './MainComponents/aiJdCreation';
+import CollectionAvailable from './MainComponents/collectionavailable';
+import CollectionDefault from './MainComponents/collectiondefault';
+import CollectionDefaultfilter from './MainComponents/collectiondefaultfilter';
+import InterviewScheduler from './MainComponents/interviewSchedule';
+import JobDescriptionForm from './MainComponents/jobDescriptionForm';
+import JdCollection from './MainComponents/jdcollection';
+import JDPreview from './MainComponents/jdPreview';
+import JobDescriptionSelection from './MainComponents/jobdescriptionselection';
+import JobDescriptionUpload from './MainComponents/jobdescriptionuploading';
+import Settings from './MainComponents/settings';
+import UpcomingInterview from './MainComponents/upcomingInterview';
 
 const drawerWidth = 250;
 
@@ -30,7 +24,7 @@ const AppContent: React.FC = () => {
   const isSmallScreen = useMediaQuery(theme.breakpoints.down('sm'));
 
   return (
-    <Box sx={{ display: 'flex', width: '100%', overflow: 'hidden' }}>
+    <Box sx={{ display: 'flex', width: '100%', height: '100vh', overflow: 'hidden' }}>
       <SideMenuBars />
       <Box
         component="main"
@@ -42,31 +36,27 @@ const AppContent: React.FC = () => {
             easing: theme.transitions.easing.sharp,
             duration: theme.transitions.duration.enteringScreen,
           }),
-          overflowY: 'auto',
+          overflowY: 'auto', // Disable vertical scrollbar
           height: '100vh',
+          
           bgcolor: '#f5f5f5',
-          p: { xs: 2, sm: 3 },
+          p: { xs: 2, sm: 2 },
         }}
       >
         <Routes>
           <Route path="/RecruitmentDashboard" element={<RecruitmentDashboard />} />
-          <Route path="/cvmanager" element={<CVManager />} />
-          <Route path="/uploadfiles" element={<UploadFiles />} />
-          <Route path="/review" element={<Review />} />
-          <Route path="/jdmanager" element={<JDManager />} />
-          <Route path="/createnewjobpost" element={<CreateNewJobPost />} />
-          <Route path="/jobdescriptionai" element={<JobDescriptionAI />} />
-          <Route path="/jdccollection" element={<SearchResumes />} />
-          <Route path="/collectionai" element={<CollectionAI />} />
-          <Route path="/aiinterviewsuite" element={<AIInterviewSuite />} />
-          <Route path="/scheduleinterview_ai" element={<ScheduleInterviewAI />} />
-          <Route path="/upcoming" element={<Upcoming />} />
-          <Route path="/feedbackscore" element={<FeedbackScore />} />
-          <Route path="/codingassessment" element={<CodingAssessment />} />
-          <Route path="/analytics" element={<Analytics />} />
-          <Route path="/settinggeneral" element={<SettingGeneral />} />
-          <Route path="/support" element={<Support />} />
-          <Route path="/" element={<RecruitmentDashboard />} />
+          <Route path="/aiJdCreation" element={<AIjdCreation />} />
+          <Route path="/collectionavailable" element={<CollectionAvailable />} />
+          <Route path="/collectiondefault" element={<CollectionDefault />} />
+          <Route path="/collectiondefaultfilter" element={<CollectionDefaultfilter />} />
+          <Route path="/interviewSchedule" element={<InterviewScheduler />} />
+          <Route path="/jobDescriptionForm" element={<JobDescriptionForm />} />
+          <Route path="/jdcollection" element={<JdCollection />} />
+          <Route path="/jdPreview" element={<JDPreview />} />
+          <Route path="/jobdescriptionselection" element={<JobDescriptionSelection />} />
+          <Route path="/jobdescriptionuploading" element={<JobDescriptionUpload />} />
+          <Route path="/settings" element={<Settings />} />
+          <Route path="/UpcomingInterview" element={<UpcomingInterview />} />
         </Routes>
       </Box>
     </Box>

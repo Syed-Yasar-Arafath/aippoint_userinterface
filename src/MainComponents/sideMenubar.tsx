@@ -1,7 +1,6 @@
 import React, { useEffect, useState } from 'react'
-import { Link, useLocation, useNavigate } from 'react-router-dom'
+import { Link, useLocation } from 'react-router-dom'
 import { Diamond } from 'lucide-react'
-
 import {
   Box,
   Button,
@@ -24,21 +23,15 @@ import AnalyticsIcon from '@mui/icons-material/Analytics'
 import SettingsIcon from '@mui/icons-material/Settings'
 import HelpIcon from '@mui/icons-material/Help'
 import LogoutIcon from '@mui/icons-material/Logout'
-import { useDispatch } from 'react-redux'
-// import { loaderOn, logout, updaeToken, loaderOff } from '../../redux/actions'
 
 function SideMenuBars() {
   const [clickedItem, setClickedItem] = useState<number | null>(null)
   const [open, setOpen] = useState(false)
-  const dispatch = useDispatch()
-  const navigate = useNavigate()
-  const pathLocation = useLocation()
-
   const theme = useTheme()
   const isSmallScreen = useMediaQuery(theme.breakpoints.down('sm'))
-  const isMediumScreen = useMediaQuery(theme.breakpoints.between('sm', 'md'))
+  const pathLocation = useLocation()
 
-  const tempMenuItems = [
+  const menuItems = [
     {
       text: 'Dashboard',
       link: '/RecruitmentDashboard',
@@ -46,99 +39,99 @@ function SideMenuBars() {
     },
     {
       text: 'CV Manager',
-      link: '/cvmanager',
+      link: '/jobdescriptionuploading',
       icon: <DescriptionIcon />,
       subItems: [
         {
           text: 'Upload',
-          link: '/uploadfiles',
+          link: '/jobdescriptionuploading',
           icon: <DescriptionIcon />,
         },
         {
-          text:'Review',
-          link: '/review',
+          text: 'Review',
+          link: '/jobdescriptionselection',
           icon: <DescriptionIcon />,
         },
       ],
     },
     {
       text: 'JD Manager',
-      link: '/jdmanager',
+      link: '/jdcollection',
       icon: <WorkIcon />,
       subItems: [
         {
           text: 'Create JD',
-          link: '/createnewjobpost',
+          link: '/jobDescriptionForm',
           icon: <WorkIcon />,
         },
         {
           text: 'JD Collection',
-          link: '/jobdescriptionai',
+          link: '/aiJdCreation',
           icon: <WorkIcon />,
         },
       ],
     },
     {
       text: 'Search Resumes',
-      link: '/jdccollection',
+      link: '/collectiondefault',
       icon: <SearchIcon />,
     },
     {
-      text:'Collections',
-      link: '/collectionai',
+      text: 'Collections',
+      link: '/collectionavailable',
       icon: <CollectionsIcon />,
     },
     {
       text: 'AI Interview Suite',
-      link: '/aiinterviewsuite',
+      link: '/interviewSchedule',
       icon: <QuestionAnswerIcon />,
       subItems: [
         {
           text: 'Schedule Interview',
-          link: '/scheduleinterview_ai',
+          link: '/interviewSchedule',
           icon: <QuestionAnswerIcon />,
         },
         {
           text: 'Upcoming',
-          link: '/upcoming',
+          link: '/UpcomingInterview',
           icon: <QuestionAnswerIcon />,
         },
         {
           text: 'Interview Status',
-          link: '/feedbackscore',
+          link: '/collectiondefaultfilter',
           icon: <QuestionAnswerIcon />,
         },
       ],
     },
     {
       text: 'Coding Assessment',
-      link: '/codingassessment',
+      link: '/collectiondefault', // No direct match, using collectiondefault as placeholder
       icon: <CodeIcon />,
     },
     {
       text: 'Analytics',
-      link: '/analytics',
+      link: '/analytics', // No direct match in App.tsx, keeping as placeholder
       icon: <AnalyticsIcon />,
     },
     {
-      text:'Settings',
-      link: '/settinggeneral',
+      text: 'Settings',
+      link: '/settings',
       icon: <SettingsIcon />,
     },
     {
       text: 'Support',
-      link: '/support',
+      link: '/support', // No direct match in App.tsx, keeping as placeholder
       icon: <HelpIcon />,
     },
   ]
 
-  const handleClick = (index: any) => {
+  const handleClick = (index: number) => {
     setClickedItem(clickedItem === index ? null : index)
   }
 
   useEffect(() => {
     const currentPath = pathLocation.pathname
-    const menuIndex = tempMenuItems.findIndex(
+    const menuIndex = menuItems.findIndex(
       (item) =>
         item.link === currentPath ||
         (item.subItems &&
@@ -148,8 +141,6 @@ function SideMenuBars() {
       setClickedItem(menuIndex)
     }
   }, [pathLocation.pathname])
-
- 
 
   const handleOpen = () => setOpen(true)
   const handleClose = () => setOpen(false)
@@ -198,7 +189,7 @@ function SideMenuBars() {
             }}
           >
             <a
-              href="https://aippoint.ai/aippoint-userinterface/#/uploadfiles"
+              href="/jobdescriptionuploading"
               style={{ textDecoration: 'none' }}
             >
               <img
@@ -215,7 +206,7 @@ function SideMenuBars() {
               />
             </a>
           </Box>
-          {tempMenuItems.map((item, index) => (
+          {menuItems.map((item, index) => (
             <React.Fragment key={`menu-item-${index}`}>
               <Link
                 to={item.link}
@@ -319,7 +310,6 @@ function SideMenuBars() {
               </Link>
               {item.subItems && clickedItem === index && (
                 <div style={{ position: 'relative' }}>
-                  {/* Main vertical line */}
                   <div
                     style={{
                       position: 'absolute',
@@ -330,8 +320,6 @@ function SideMenuBars() {
                       backgroundColor: '#000000',
                     }}
                   />
-
-                  {/* Submenu items */}
                   {item.subItems.map((subItem, subIndex) => (
                     <div
                       key={`submenu-item-${subIndex}`}
@@ -343,7 +331,6 @@ function SideMenuBars() {
                         paddingLeft: '70px',
                       }}
                     >
-                      {/* Horizontal Line */}
                       <div
                         style={{
                           position: 'absolute',
@@ -355,14 +342,11 @@ function SideMenuBars() {
                           transform: 'translateY(-50%)',
                         }}
                       />
-
-                      {/* Diamond Icon */}
                       <div
                         style={{
                           position: 'absolute',
                           left: '55px',
                           top: '50%',
-                          // transform: 'translateY(-50%)',
                           width: '6px',
                           height: '6px',
                           backgroundColor:
@@ -372,25 +356,28 @@ function SideMenuBars() {
                           transform: 'translateY(-50%) rotate(45deg)',
                         }}
                       />
-
-                      {/* Label Text */}
-                      <div
-                        style={{
-                          color:
-                            pathLocation.pathname === subItem.link
-                              ? '#0284C7'
-                              : '#000000',
-                          fontFamily: 'SF Pro Display',
-                          lineHeight: '20.26px',
-                          marginLeft: '20px',
-                          fontSize: '16px',
-                          whiteSpace: 'nowrap',
-                          overflow: 'hidden',
-                          textOverflow: 'ellipsis',
-                        }}
+                      <Link
+                        to={subItem.link}
+                        style={{ textDecoration: 'none', color: 'inherit' }}
                       >
-                        {subItem.text}
-                      </div>
+                        <div
+                          style={{
+                            color:
+                              pathLocation.pathname === subItem.link
+                                ? '#0284C7'
+                                : '#000000',
+                            fontFamily: 'SF Pro Display',
+                            lineHeight: '20.26px',
+                            marginLeft: '20px',
+                            fontSize: '16px',
+                            whiteSpace: 'nowrap',
+                            overflow: 'hidden',
+                            textOverflow: 'ellipsis',
+                          }}
+                        >
+                          {subItem.text}
+                        </div>
+                      </Link>
                     </div>
                   ))}
                 </div>
@@ -441,10 +428,7 @@ function SideMenuBars() {
                     background: '#E33629',
                   },
                 }}
-                onClick={() => {
-                //   handleLogOut()
-                  handleClose()
-                }}
+                onClick={handleClose}
               >
                 Ok
               </Button>
@@ -459,7 +443,7 @@ function SideMenuBars() {
                 }}
                 onClick={handleClose}
               >
-              Cancel
+                Cancel
               </Button>
             </Box>
           </Box>

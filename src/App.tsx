@@ -19,6 +19,7 @@ import UpcomingInterview from './MainComponents/upcomingInterview';
 import UploadCV from './MainComponents/uploadCV';
 import ReviewCV from './MainComponents/reviewCv';
 import AIJDCreator from './MainComponents/AIJDCreator';
+import InterviewDetails from './MainComponents/interviewDetails';
 
 const drawerWidth = 250;
 
@@ -61,6 +62,7 @@ const AppContent: React.FC = () => {
           <Route path="/settings" element={<Settings />} />
            <Route path="/uploadCV" element={<UploadCV />} />
             <Route path="/reviewCv" element={<ReviewCV />} />
+            <Route path="/interviewDetails" element={<InterviewDetails />} />
              <Route path="/AIJDCreator" element={<AIJDCreator />} />
           <Route path="/UpcomingInterview" element={<UpcomingInterview />} />
         </Routes>

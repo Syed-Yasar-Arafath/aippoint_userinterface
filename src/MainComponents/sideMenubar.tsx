@@ -87,7 +87,7 @@ function SideMenuBars() {
     },
     {
       text: 'AI Interview Suite',
-      link: '/interviewSchedule',
+      link: '/UpcomingInterview',
       icon: <QuestionAnswerIcon />,
       subItems: [
         {

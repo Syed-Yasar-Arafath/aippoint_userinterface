@@ -31,9 +31,10 @@ import {
   useTheme,
 } from '@mui/material'
 import axios from 'axios'
-import React, { useRef, useState } from 'react'
+import React, { useEffect, useRef, useState } from 'react'
 import AddIcon from '@mui/icons-material/Add'
 import ExpandMoreIcon from '@mui/icons-material/ExpandMore'
+import { Email } from '@mui/icons-material'
 
 const tabs = [
   'General Settings',
@@ -46,14 +47,14 @@ const tabs = [
 
 const Settings: React.FC = () => {
   const [activeTab, setActiveTab] = useState('General Settings')
-  const [userName, setUserName] = useState('Alex Carter')
+  const [userName, setUserName] = useState('')
   const [appearancegeneral, setAppearancegeneral] = useState('System')
-  const [userEmail, setUserEmail] = useState('alex.carter@email.com')
+  const [userEmail, setUserEmail] = useState('')
   const [editField, setEditField] = useState<{ field: string | null }>({
     field: null,
   })
   const [profileImage, setProfileImage] = useState<string>(
-    'https://i.pravatar.cc/150?img=2',
+    'https://www.gravatar.com/avatar/?d=mp',
   )
   const [selectedImage, setSelectedImage] = useState<File | null>(null) // Store selected file
 
@@ -64,11 +65,11 @@ const Settings: React.FC = () => {
   }
 
   const handleReset = () => {
-    setUserName('Alex Carter')
-    setUserEmail('alex.carter@email.com')
+    setUserName('')
+    setUserEmail('')
     setAppearancegeneral('System')
     setEditField({ field: null })
-    setProfileImage('https://i.pravatar.cc/150?img=2') // Reset profile image
+    setProfileImage('https://www.gravatar.com/avatar/?d=mp') // Reset profile image
     setSelectedImage(null) // Reset selected image
   }
 
@@ -274,6 +275,72 @@ const Settings: React.FC = () => {
     // Logic to save all changes
     console.log('Saving changes')
   }
+  const token = localStorage.getItem('token')
+  const getUserData=async ()=>{
+    try{
+      const res=await axios.post('http://localost:8082/user',{
+        headers:{
+          Authorization:`Bearer ${token}`
+        }
+      })
+      if(res.status===200){
+        setUserName(res.data.userName)
+        setUserEmail(res.data.userEmail)
+      }
+    }catch(error){
+
+    }
+  }
+  useEffect(()=>{
+    getUserData()
+  },[])
+  const handleSaveChangesFirsttab = async () => {
+  try {
+    const formData = new FormData()
+    formData.append('name', userName)
+    formData.append('email', userEmail)
+    // formData.append('appearance', appearancegeneral)
+
+    if (selectedImage) {
+      formData.append('image', selectedImage)
+    }
+    const res = await axios.post('http://localhost:8082/user/update-profile', formData, {
+      headers: {
+        Authorization: `Bearer ${token}`,
+        'Content-Type': 'multipart/form-data',
+      },
+    })
+
+    if (res.status === 200) {
+      setProfileImage(`http://localhost:8082${res.data.imageUrl}`)
+      alert('Profile updated successfully!')
+    }
+  } catch (error) {
+    console.error('Error updating profile:', error)
+    alert('Failed to save profile.')
+  }
+}
+
+  // const handleSaveChangesFirsttab=async ()=>{
+  //   try{
+  //     const data={
+  //       name:userName,
+  //       email:userEmail,
+  //       appearance:appearance
+  //     }
+  //     const res=await axios.post('http://localhost:8082/user',data,{
+  //       headers:{
+  //         Authorization:`Bearer ${token}`
+  //       }
+  //     })
+  //     if(res.status===200){
+  //       console.log('data updated successfully')
+  //     }
+
+  //   }catch(error){
+
+  //   }
+  // }
   const handleSaveChangeSecondtab = () => {
     // Save all changes
     console.log('2FA settings saved:', twoFactorOptions)
@@ -872,7 +939,7 @@ const Settings: React.FC = () => {
                   fontFamily: 'SF Pro Display',
                   lineHeight: '100%',
                 }}
-                onClick={handleSaveChangesSecondtab}
+                onClick={handleSaveChangesFirsttab}
               >
                 Save Changes
               </Button>

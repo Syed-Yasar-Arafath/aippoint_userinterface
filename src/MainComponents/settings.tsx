@@ -65,12 +65,11 @@ const Settings: React.FC = () => {
   }
 
   const handleReset = () => {
-    setUserName('')
-    setUserEmail('')
     setAppearancegeneral('System')
     setEditField({ field: null })
     setProfileImage('https://www.gravatar.com/avatar/?d=mp') // Reset profile image
     setSelectedImage(null) // Reset selected image
+    getUserData();
   }
 
   const handleSaveChanges = async () => {
@@ -277,20 +276,47 @@ const Settings: React.FC = () => {
   }
   const token = localStorage.getItem('token')
   const getUserData=async ()=>{
+      const organisation=localStorage.getItem('organisation')
     try{
-      const res=await axios.post('http://localost:8082/user',{
+      const res=await axios.get(`http://localhost:8082/admin/getuserbytoken/${organisation}`,{
         headers:{
           Authorization:`Bearer ${token}`
         }
       })
       if(res.status===200){
-        setUserName(res.data.userName)
-        setUserEmail(res.data.userEmail)
+        setUserName(res.data.first_name)
+        setUserEmail(res.data.email)
       }
     }catch(error){
 
     }
   }
+
+  const updateUserData=async ()=>{
+      const organisation=localStorage.getItem('organisation')
+      const data={
+        first_name:userName,
+        email:userEmail
+      }
+    try{
+      const res=await axios.post(`http://localhost:8082/admin/updateuserbytoken/${organisation}`,
+        {
+          data
+        },
+        {
+        headers:{
+          Authorization:`Bearer ${token}`
+        }
+      })
+      if(res.status===200){
+        setUserName(res.data.first_name)
+        setUserEmail(res.data.email)
+      }
+    }catch(error){
+
+    }
+  }
+
   useEffect(()=>{
     getUserData()
   },[])
@@ -592,6 +618,7 @@ const Settings: React.FC = () => {
                     fontSize: '12px',
                     fontFamily: 'SF Pro Display',
                   }}
+                onClick={handleReset}
                 >
                   Delete
                 </span>

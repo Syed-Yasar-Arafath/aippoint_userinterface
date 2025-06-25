@@ -1,3 +1,4 @@
+
 import React, { useState, useEffect } from 'react'
 import {
   Box,
@@ -39,6 +40,7 @@ import {
   X,
 } from 'lucide-react'
 import { useNavigate } from 'react-router-dom'
+import axios from 'axios'
 
 // Enhanced candidate type with resume details
 export interface Candidate {
@@ -67,8 +69,22 @@ interface FilterState {
   endTime: Date | null
 }
 
+// Interface for InterviewDto (matches backend)
+interface InterviewDto {
+  email: string
+  candidateName: string
+  organisation: string
+  interviewStatus?: string
+  date?: string
+  meetingId?: string
+  password?: string
+  isInterviewLinkEmailSent?: boolean
+  isTokenGenerated?: boolean
+  warningCount?: number
+}
+
 // Generate dummy candidate data with more details
-export const allCandidates: Candidate[] = Array(24)
+export const allCandidates: Candidate[] = Array(1)
   .fill(null)
   .map((_, index) => ({
     id: index + 1,
@@ -81,7 +97,7 @@ export const allCandidates: Candidate[] = Array(24)
       'Backend Developer',
       'UI/UX Developer',
     ][index % 4],
-    email: `priya.sharma${index + 1}@example.com`,
+    email: `pragatika.r@iosyssoftware.com`,
     phone: `+1 (555) 123-456${index % 10}`,
     experience: [
       `${(index % 5) + 1} years`,
@@ -147,6 +163,46 @@ const UpcomingInterview: React.FC = () => {
   // Filtered candidates
   const [filteredCandidates, setFilteredCandidates] =
     useState<Candidate[]>(allCandidates)
+
+  // Backend API base URL
+  const API_BASE_URL = 'http://localhost:8080'
+
+  // Function to schedule interviews and send emails
+  const scheduleInterviews = async () => {
+    const selectedCandidateDetails = allCandidates.filter((candidate) =>
+      selectedCandidates.includes(candidate.id),
+    )
+
+    // Hardcode organisation for now (replace with dynamic value if needed)
+    const organisation = 'wipro'
+
+    try {
+      for (const candidate of selectedCandidateDetails) {
+        const interviewDto: InterviewDto = {
+          email: candidate.email,
+          candidateName: candidate.name,
+          organisation: organisation,
+          interviewStatus: 'Scheduled',
+          date: new Date(candidate.interviewDate).toISOString(),
+          isInterviewLinkEmailSent: false, // Ensure email is triggered
+        }
+
+        await axios.post(`${API_BASE_URL}/interview/${organisation}`, interviewDto, {
+          headers: {
+            'Content-Type': 'application/json',
+          },
+        })
+      }
+
+      alert(
+        `Successfully scheduled ${selectedCandidateDetails.length} interview(s)! Email(s) will be sent soon.`,
+      )
+      setSelectedCandidates([]) // Clear selection after scheduling
+    } catch (error:any) {
+      console.error('Error scheduling interviews:', error)
+      alert('Failed to schedule interviews: ' + error.message)
+    }
+  }
 
   // Apply filters
   useEffect(() => {
@@ -230,7 +286,7 @@ const UpcomingInterview: React.FC = () => {
   }
 
   const handleViewDetails = (candidate: Candidate) => {
-    navigate(`/interview-details/${candidate.id}`)
+    navigate(`/interviewDetails/${candidate.id}`)
   }
 
   const resetFilters = () => {
@@ -353,6 +409,7 @@ const UpcomingInterview: React.FC = () => {
               variant="contained"
               color="primary"
               disabled={selectedCandidates.length === 0}
+              onClick={scheduleInterviews}
             >
               Schedule{' '}
               {selectedCandidates.length > 0

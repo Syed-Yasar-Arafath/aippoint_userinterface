@@ -45,31 +45,31 @@ export function useSignUpForm() {
     },
   })
 
-  useEffect(() => {
-    setFormValues((prev) => ({
-      ...prev,
-      first_name: {
-        ...prev.first_name,
-        errorMessage: t('firstNameError'),
-      },
-      last_name: {
-        ...prev.last_name,
-        errorMessage: t('lastNameError'),
-      },
-      email: {
-        ...prev.email,
-        errorMessage: t('emailError'),
-      },
-      password: {
-        ...prev.password,
-        errorMessage: t('passwordError'),
-      },
-      confirm_password: {
-        ...prev.confirm_password,
-        errorMessage: t('confirmPasswordError'),
-      },
-    }))
-  }, [i18n.language])
+  // useEffect(() => {
+  //   setFormValues((prev) => ({
+  //     ...prev,
+  //     first_name: {
+  //       ...prev.first_name,
+  //       errorMessage: t('firstNameError'),
+  //     },
+  //     last_name: {
+  //       ...prev.last_name,
+  //       errorMessage: t('lastNameError'),
+  //     },
+  //     email: {
+  //       ...prev.email,
+  //       errorMessage: t('emailError'),
+  //     },
+  //     password: {
+  //       ...prev.password,
+  //       errorMessage: t('passwordError'),
+  //     },
+  //     confirm_password: {
+  //       ...prev.confirm_password,
+  //       errorMessage: t('confirmPasswordError'),
+  //     },
+  //   }))
+  // }, [i18n.language])
 
   return { formValues, setFormValues }
 }

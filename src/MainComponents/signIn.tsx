@@ -1,7 +1,9 @@
 import {
   Box,
   Button,
+  Checkbox,
   FormControl,
+  FormControlLabel,
   Grid,
   IconButton,
   InputAdornment,
@@ -736,12 +738,14 @@ const [keepLoggedIn, setKeepLoggedIn] = useState(false)
     // </div>
     <Box sx={{ display: 'flex', minHeight: '100vh' }}>
       {/* Left image */}
+      <Grid container spacing={0} sx={{paddingTop:'11px',paddingLeft:'9px'}}>
+      <Grid item lg={6}>
       <Box
         sx={{
-          flex: 1,
-          display: { xs: 'none', md: 'flex' },
-          justifyContent: 'center',
-          alignItems: 'center',
+          // flex: 1,
+          // display: { xs: 'none', md: 'flex' },
+          // justifyContent: 'center',
+          // alignItems: 'center',
           backgroundColor: '#fff',
         }}
       >
@@ -750,13 +754,16 @@ const [keepLoggedIn, setKeepLoggedIn] = useState(false)
           alt="login"
           style={{
             width: '100%',
-            height: '90vh',
-            paddingLeft:'9px'
+            height: '95vh',
+            
+            
           }}
         />
       </Box>
+      </Grid>
 
       {/* Right login form */}
+      <Grid item lg={5}>
       <Box
         sx={{
           flex: 1,
@@ -791,6 +798,7 @@ const [keepLoggedIn, setKeepLoggedIn] = useState(false)
             name="email"
             placeholder="Your email"
             variant="outlined"
+            size='small'
             value={formValues.email.value}
             onChange={(e) => {
               setEmail(e.target.value)
@@ -819,6 +827,7 @@ const [keepLoggedIn, setKeepLoggedIn] = useState(false)
           <TextField
             fullWidth
             name="password"
+            size='small'
             type={showPassword ? 'text' : 'password'}
             placeholder="Enter password"
             variant="outlined"
@@ -844,37 +853,46 @@ const [keepLoggedIn, setKeepLoggedIn] = useState(false)
            {formValues.password.error && (
               <Typography variant="body2" color="error">
                 {formValues.password.errorMessage.slice(0, 35)}
-                <br />
+                {/* <br /> */}
                 {formValues.password.errorMessage.slice(35, 70)}
-                <br />
+                {/* <br /> */}
                 {formValues.password.errorMessage.slice(70)}
               </Typography>
             )}
 
           {/* Forgot Password */}
-          <Box display="flex" alignItems="center" mt={2}>
-  {/* <input
-    type="checkbox"
-    checked={keepLoggedIn}
-    onChange={(e) => setKeepLoggedIn(e.target.checked)}
-    style={{ marginRight: 8 }}
-  />
-  <Typography fontSize={14} color="#0A0B5C">
-    Keep me logged in
-  </Typography> */}
-{/* </Box> */}
-          {/* <Box display="flex" justifyContent="flex-end" mt={1}> */}
-            <Link
-            to={'/forgotpassword_ai'}
-            style={{
-              ...text,
-              // paddingLeft: '110px',
-              color: '#E33629',
-            }}
+         <Box
+            display="flex"
+            justifyContent="space-between"
+            alignItems="center"
+            mt={2}
           >
-            Forgot Password ?
-            {/* {t('forgotPassword')} */}
-          </Link>
+            <FormControlLabel
+              control={
+                <Checkbox
+                  checked={keepLoggedIn}
+                  onChange={(e) => setKeepLoggedIn(e.target.checked)}
+                  sx={{
+                    color: '#0A0B5C',
+                    '&.Mui-checked': {
+                      color: '#0284C7',
+                    },
+                  }}
+                />
+              }
+              label={
+                <Typography fontSize={14} color="#0A0B5C">
+                  Keep me logged in
+                </Typography>
+              }
+            />
+
+            <Link
+              to="/forgotpassword_ai"
+              style={{ fontSize: 14, color: '#E33629', textDecoration: 'none' }}
+            >
+              Forgot Password?
+            </Link>
           </Box>
 
           {/* Submit */}
@@ -894,6 +912,8 @@ const [keepLoggedIn, setKeepLoggedIn] = useState(false)
           </Button>
         </Box>
       </Box>
+      </Grid>
+      </Grid>
     </Box>
   )
 }

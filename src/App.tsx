@@ -1,7 +1,7 @@
 
 
 import './App.css'
-import { Backdrop, CircularProgress, Snackbar } from '@mui/material'
+import { Backdrop, CircularProgress } from '@mui/material'
 import React, { useEffect, useState } from 'react';
 import { BrowserRouter as Router, Routes, Route, useLocation } from 'react-router-dom';
 import { Box } from '@mui/material';
@@ -31,6 +31,7 @@ import ScrollToTop from './MainComponents/scrollbartop';
 import InterviewInstructions from './MainComponents/ai_interview_ins';
 import InterviewAI from './MainComponents/interview_ai';
 import CandidateLogIn from './MainComponents/candidateLogIn';
+import Snackbar from './CommonComponents/snackbar';
 const drawerWidth = 240
 const AppContent: React.FC = () => {
   // const isAuthenticated = 'true'

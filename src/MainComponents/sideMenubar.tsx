@@ -109,12 +109,12 @@ function SideMenuBars() {
     },
     {
       text: 'Coding Assessment',
-      link: '/', // No direct match, using collectiondefault as placeholder
+      link: '/ai_interview_ins', // No direct match, using collectiondefault as placeholder
       icon: <CodeIcon />,
     },
     {
       text: 'Analytics',
-      link: '/analytics', // No direct match in App.tsx, keeping as placeholder
+      link: '/', // No direct match in App.tsx, keeping as placeholder
       icon: <AnalyticsIcon />,
     },
     {

@@ -276,17 +276,18 @@ function SignIn() {
           res.data === 'User not found' ||
           res.data === 'Invalid username or password'
         ) {
-          // dispatch(openSnackbar('Invalid Username or Password..!!', 'red'))
-          dispatch(openSnackbar(('invalidEmailAndPasswordSnackbar'), 'red'))
+          dispatch(openSnackbar('Invalid Username or Password..!!', 'red'))
+          // dispatch(openSnackbar(('invalidEmailAndPasswordSnackbar'), 'red'))
         } else {
-          // dispatch(
-          //   openSnackbar(
-          //     'Please enter your registered email and password.',
-          //     'red',
-          //   ),
           dispatch(
-            openSnackbar(('enterRegisterdEmailAndPasswordSnackbar'), 'red'),
+            openSnackbar(
+              'Please enter your registered email and password.',
+              'red',
+            ),
           )
+          // dispatch(
+          //   openSnackbar(('enterRegisterdEmailAndPasswordSnackbar'), 'red'),
+          // )
           // navigate('/creationjd')
           // dispatch(openSnackbar("Invalid Username or Password..!!", "red"));
         }

@@ -28,10 +28,11 @@ import SignIn from './MainComponents/signIn';
 import { Provider, useSelector } from 'react-redux';
 import store from './redux/store';
 import ScrollToTop from './MainComponents/scrollbartop';
-import InterviewInstructions from './MainComponents/ai_interview_ins';
-import InterviewAI from './MainComponents/interview_ai';
-import CandidateLogIn from './MainComponents/candidateLogIn';
+import InterviewInstructions from './MainComponents/interview/ai_interview_ins';
+import InterviewAI from './MainComponents/interview/interview_ai';
+import CandidateLogIn from './MainComponents/interview/candidateLogIn';
 import Snackbar from './CommonComponents/snackbar';
+
 const drawerWidth = 240
 const AppContent: React.FC = () => {
   // const isAuthenticated = 'true'
@@ -104,7 +105,7 @@ const AppContent: React.FC = () => {
             <Route path="/reviewCv" element={<ReviewCV />} />
             <Route path="/interviewDetails/:id" element={<InterviewDetails />} />
              <Route path="/AIJDCreator" element={<AIJDCreator />} />
-             <Route path="/ai_interview_ins" element={<InterviewInstructions />} />
+           <Route path="/ai_interview_ins/:organisation/:interviewId/:meetingId" element={<InterviewInstructions />} />
           <Route path="/UpcomingInterview" element={<UpcomingInterview />} />
             <Route path="/candidateLogIn" element={<CandidateLogIn />} /> {/* ✅ Add this */}
 

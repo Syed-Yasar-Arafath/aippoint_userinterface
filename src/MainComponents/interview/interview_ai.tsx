@@ -9,11 +9,53 @@ import { Box, Button, IconButton, Dialog, DialogTitle, DialogContent, DialogActi
 import { ReactMediaRecorder, ReactMediaRecorderRenderProps } from "react-media-recorder";
 import axios from 'axios';
 
+// Declare SpeechRecognition types for TypeScript
+interface SpeechRecognition extends EventTarget {
+  continuous: boolean;
+  interimResults: boolean;
+  lang: string;
+  onresult: (event: SpeechRecognitionEvent) => void;
+  onerror: (event: SpeechRecognitionErrorEvent) => void;
+  onend: () => void;
+  start: () => void;
+  stop: () => void;
+}
+
+interface SpeechRecognitionEvent {
+  resultIndex: number;
+  results: SpeechRecognitionResultList;
+}
+
+interface SpeechRecognitionErrorEvent {
+  error: string;
+}
+
+interface SpeechRecognitionResultList {
+  [index: number]: SpeechRecognitionResult;
+  length: number;
+}
+
+interface SpeechRecognitionResult {
+  isFinal: boolean;
+  [index: number]: SpeechRecognitionAlternative;
+}
+
+interface SpeechRecognitionAlternative {
+  transcript: string;
+}
+
+declare global {
+  interface Window {
+    SpeechRecognition: new () => SpeechRecognition;
+    webkitSpeechRecognition: new () => SpeechRecognition;
+  }
+}
+
 const questions = [
   "Imagine you're tasked with building a web application for an online bookstore. The application should allow users to browse books, add them to their cart, and complete purchases.",
   "Can you explain the concept of closures in JavaScript?",
   "How would you handle state management in a large React application?",
-  "What are the differences between REST and GraphQL APIs?",
+  "What are the differences between REST and GraphQL çekAPI?",
   "How would you optimize the performance of a React application?",
 ];
 
@@ -38,7 +80,6 @@ const RecorderView: React.FC<ReactMediaRecorderRenderProps> = ({
   const videoRef = useRef<HTMLVideoElement | null>(null);
   const editorRef = useRef<HTMLDivElement>(null);
   const navigate = useNavigate();
-
   const [currentQuestion, setCurrentQuestion] = useState(0);
   const [hasStarted, setHasStarted] = useState(false);
   const [showEditor, setShowEditor] = useState(false);
@@ -47,6 +88,8 @@ const RecorderView: React.FC<ReactMediaRecorderRenderProps> = ({
   const [openNextDialog, setOpenNextDialog] = useState(false);
   const [openSubmitDialog, setOpenSubmitDialog] = useState(false);
   const [isSubmitted, setIsSubmitted] = useState(false);
+  const [transcript, setTranscript] = useState(''); // State for speech-to-text transcript
+  const recognitionRef = useRef<SpeechRecognition | null>(null); // Ref for SpeechRecognition
 
   const location = useLocation();
   const { organisation, meetingId } = location.state || { organisation: "default-org", meetingId: "default-meeting" };
@@ -56,6 +99,68 @@ const RecorderView: React.FC<ReactMediaRecorderRenderProps> = ({
       videoRef.current.srcObject = previewStream;
     }
   }, [previewStream]);
+
+  // Initialize Speech Recognition
+  useEffect(() => {
+    const SpeechRecognition = window.SpeechRecognition || window.webkitSpeechRecognition;
+    if (SpeechRecognition) {
+      const recognition = new SpeechRecognition();
+      recognition.continuous = true; // Continuous listening
+      recognition.interimResults = true; // Show interim results
+      recognition.lang = 'en-US'; // Set language to English
+
+      recognition.onresult = (event: SpeechRecognitionEvent) => {
+        let interimTranscript = '';
+        let finalTranscript = '';
+
+        for (let i = event.resultIndex; i < event.results.length; i++) {
+          const transcriptPart = event.results[i][0].transcript;
+          if (event.results[i].isFinal) {
+            finalTranscript += transcriptPart + ' ';
+          } else {
+            interimTranscript += transcriptPart;
+          }
+        }
+
+        setTranscript(finalTranscript + interimTranscript);
+      };
+
+      recognition.onerror = (event: SpeechRecognitionErrorEvent) => {
+        console.error('Speech recognition error:', event.error);
+        if (event.error === 'no-speech') {
+          console.log('No speech detected, restarting recognition...');
+          recognition.start();
+        }
+      };
+
+      recognition.onend = () => {
+        if (status === 'recording') {
+          recognition.start(); // Restart recognition if still recording
+        }
+      };
+
+      recognitionRef.current = recognition;
+    } else {
+      console.warn('SpeechRecognition API is not supported in this browser.');
+    }
+
+    return () => {
+      if (recognitionRef.current) {
+        recognitionRef.current.stop();
+      }
+    };
+  }, [status]);
+
+  // Sync speech recognition with recording status
+  useEffect(() => {
+    if (recognitionRef.current) {
+      if (status === 'recording') {
+        recognitionRef.current.start();
+      } else {
+        recognitionRef.current.stop();
+      }
+    }
+  }, [status]);
 
   const apiBaseUrl = "http://localhost:8080";
 
@@ -68,6 +173,7 @@ const RecorderView: React.FC<ReactMediaRecorderRenderProps> = ({
 
       const formData = new FormData();
       formData.append('videoFile', file);
+      formData.append('transcript', transcript); // Optionally send transcript to backend
 
       const apiUrl = `${apiBaseUrl}/recordings/${organisation}/${meetingId}/${currentQuestion + 1}`;
       const result = await axios.post(apiUrl, formData, {
@@ -92,10 +198,11 @@ const RecorderView: React.FC<ReactMediaRecorderRenderProps> = ({
   const handleNextQuestion = () => {
     if (currentQuestion < questions.length - 1) {
       setCurrentQuestion((prev) => prev + 1);
+      setTranscript(''); // Reset transcript for the next question
     }
   };
 
-  const handleSubmitInterview = async () => {
+  const handleSubmitInterview = () => {
     setOpenSubmitDialog(false);
     stopRecording(); // Stop recording and wait for mediaBlobUrl to be ready
   };
@@ -164,20 +271,21 @@ const RecorderView: React.FC<ReactMediaRecorderRenderProps> = ({
             <div style={{ backgroundColor: "rgba(0, 0, 0, 0.6)", padding: "1rem", borderRadius: "12px", maxWidth: "600px" }}>
               <p style={{ fontWeight: "bold" }}>Question: {currentQuestion + 1}/{questions.length}</p>
               <p>{questions[currentQuestion]}</p>
+              <p><strong>Answer:</strong> {transcript || 'Start speaking to see your answer here...'}</p>
             </div>
 
             <div style={{ display: "flex", justifyContent: "space-between", gap: "1rem", marginTop: '10px' }}>
               <div style={{ display: 'flex', alignItems: 'center', gap: '20px' }}>
                 <IconButton sx={{ backgroundColor: '#0284C7', color: '#fff', width: '32px', height: '32px', pointerEvents: 'none', opacity: 0.5 }}><MicIcon /></IconButton>
                 <IconButton sx={{ backgroundColor: '#0284C7', color: '#fff', width: '32px', height: '32px', pointerEvents: 'none', opacity: 0.5 }}><VideocamIcon /></IconButton>
-                <IconButton sx={{ backgroundColor: '#0284C7', color: '#fff', width: '32px', height: '32px' }}><VolumeUpIcon /></IconButton>
-                <IconButton sx={{ backgroundColor: '#0284C7', color: '#fff', width: '32px', height: '32px' }} onClick={() => setShowEditor(true)}><CodeIcon /></IconButton>
+                <IconButton sx={{ backgroundColor: '#0284C7', color: '#fff', width: '32px', height: '32px', textTransform: 'none' }}><VolumeUpIcon /></IconButton>
+                <IconButton sx={{ backgroundColor: '#0284C7', color: '#fff', width: '32px', height: '32px', textTransform: 'none' }} onClick={() => setShowEditor(true)}><CodeIcon /></IconButton>
               </div>
 
               {currentQuestion === questions.length - 1 ? (
                 <Button
                   onClick={() => setOpenSubmitDialog(true)}
-                  style={{ borderRadius: '8px', backgroundColor: '#007AC1', color: '#fff', width: '50%' }}
+                  style={{ borderRadius: '8px', backgroundColor: '#007AC1', color: '#fff', width: '50%', textTransform: 'none' }}
                   disabled={isUploading}
                 >
                   {isUploading ? (
@@ -191,7 +299,7 @@ const RecorderView: React.FC<ReactMediaRecorderRenderProps> = ({
               ) : (
                 <Button
                   onClick={() => setOpenNextDialog(true)}
-                  style={{ borderRadius: '8px', backgroundColor: '#007AC1', color: '#fff', width: '50%' }}
+                  style={{ borderRadius: '8px', backgroundColor: '#007AC1', color: '#fff', width: '50%', textTransform: 'none' }}
                   disabled={isUploading}
                 >
                   Next Question
@@ -199,7 +307,7 @@ const RecorderView: React.FC<ReactMediaRecorderRenderProps> = ({
               )}
               <Button
                 onClick={() => setOpenSubmitDialog(true)}
-                style={{ borderRadius: '8px', backgroundColor: '#007AC1', color: '#fff', width: '50%' }}
+                style={{ borderRadius: '8px', backgroundColor: '#007AC1', color: '#fff', width: '50%', textTransform: 'none' }}
                 disabled={isUploading}
               >
                 {isUploading ? (
@@ -212,6 +320,26 @@ const RecorderView: React.FC<ReactMediaRecorderRenderProps> = ({
               </Button>
             </div>
           </div>
+
+          <video
+            width="100%"
+            height="auto"
+            muted
+            style={{
+              flex: '0 0 auto',
+              backgroundColor: 'transparent',
+              zIndex: 2,
+              height: '400px',
+              width: '300px',
+              borderRadius: '12px',
+              position: "absolute", bottom: '0px', right: '20px'
+            }}
+          >
+            <source
+              src={`${process.env.PUBLIC_URL}/assets/static/images/20240913132119-119 (online-video-cutter.com).mp4`}
+              type="video/mp4"
+            />
+          </video>
 
           {showEditor && (
             <Box ref={editorRef} sx={{ width: '60%', height: '45vh', bgcolor: 'background.paper', borderRadius: '8px', boxShadow: 24, p: 1 }}>

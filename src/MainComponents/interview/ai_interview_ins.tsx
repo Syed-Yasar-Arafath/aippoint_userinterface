@@ -37,8 +37,9 @@ const InterviewInstructions = () => {
  
 
   const containerStyle: React.CSSProperties = {
-    margin: '0 auto',
-    padding: '20px 10px',
+    margin: '0 60px',
+    padding: '10px 10px',
+    borderRadius:'12px',
     fontFamily: '-apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif',
     backgroundColor: '#ffffff',
   };

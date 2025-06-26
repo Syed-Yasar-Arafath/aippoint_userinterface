@@ -16,7 +16,6 @@ const CandidateLogIn = () => {
   
   const [showPassword, setShowPassword] = useState(false);
   const [isLoading, setIsLoading] = useState(false);
-  const [loginSuccess, setLoginSuccess] = useState(false);
 
   const navigate = useNavigate();
 
@@ -149,11 +148,9 @@ const CandidateLogIn = () => {
           throw new Error('Failed to update interview status');
         }
 
-        setLoginSuccess(true);
-        // Navigate to next page with organization and interviewId
-        setTimeout(() => {
-          navigate(`/ai_interview_ins/${matchingInterview.organisation}/${matchingInterview.interviewId}/${matchingInterview.meetingId}`);
-        }, 1500);
+        // Navigate immediately to next page with organization and interviewId
+        navigate(`/ai_interview_ins/${matchingInterview.organisation}/${matchingInterview.interviewId}/${matchingInterview.meetingId}`);
+        
       } catch (error) {
         setErrors(prev => ({
           ...prev,
@@ -168,49 +165,6 @@ const CandidateLogIn = () => {
   const togglePasswordVisibility = () => {
     setShowPassword(!showPassword);
   };
-
-  if (loginSuccess) {
-    return (
-      <div style={{
-        height: '100vh',
-        display: 'flex',
-        alignItems: 'center',
-        justifyContent: 'center',
-        backgroundColor: '#f8fafc',
-        fontFamily: 'system-ui, -apple-system, sans-serif',
-        padding: '20px',
-        boxSizing: 'border-box'
-      }}>
-        <div style={{
-          backgroundColor: 'white',
-          padding: '2rem',
-          borderRadius: '12px',
-          boxShadow: '0 10px 25px rgba(0, 0, 0, 0.1)',
-          textAlign: 'center',
-          maxWidth: '400px',
-          width: '100%'
-        }}>
-          <div style={{
-            fontSize: '3rem',
-            color: '#10b981',
-            marginBottom: '1rem'
-          }}>✓</div>
-          <h2 style={{
-            color: '#1f2937',
-            fontSize: '1.5rem',
-            fontWeight: '600',
-            marginBottom: '0.5rem',
-            margin: '0 0 0.5rem 0'
-          }}>Login Successful!</h2>
-          <p style={{
-            color: '#6b7280',
-            fontSize: '1rem',
-            margin: '0'
-          }}>Redirecting to your interview...</p>
-        </div>
-      </div>
-    );
-  }
 
   return (
     <div style={{

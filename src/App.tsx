@@ -32,6 +32,7 @@ import InterviewInstructions from './MainComponents/interview/ai_interview_ins';
 import InterviewAI from './MainComponents/interview/interview_ai';
 import CandidateLogIn from './MainComponents/interview/candidateLogIn';
 import Snackbar from './CommonComponents/snackbar';
+import SubmitInterview from './MainComponents/interview/submitinterview';
 
 const drawerWidth = 240
 const AppContent: React.FC = () => {
@@ -108,6 +109,8 @@ const AppContent: React.FC = () => {
            <Route path="/ai_interview_ins/:organisation/:interviewId/:meetingId" element={<InterviewInstructions />} />
           <Route path="/UpcomingInterview" element={<UpcomingInterview />} />
             <Route path="/candidateLogIn" element={<CandidateLogIn />} /> {/* ✅ Add this */}
+
+            <Route path="/submitinterview" element={<SubmitInterview />} /> {/* ✅ Add this */}
 
 
         </Routes>

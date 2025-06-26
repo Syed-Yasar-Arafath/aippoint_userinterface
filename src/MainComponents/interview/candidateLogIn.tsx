@@ -113,18 +113,47 @@ const CandidateLogIn = () => {
             interview.password === formData.password
         );
 
-        if (matchingInterview) {
-          setLoginSuccess(true);
-          // Navigate to next page with organization and interviewId
-          setTimeout(() => {
-            navigate(`/ai_interview_ins/${matchingInterview.organisation}/${matchingInterview.interviewId}/${matchingInterview.meetingId}`);
-          }, 1500);
-        } else {
+        if (!matchingInterview) {
           setErrors(prev => ({
             ...prev,
             apiError: 'Invalid email or password'
           }));
+          return;
         }
+
+        // Check if interview has already been joined (token generated)
+        if (matchingInterview.isTokenGenerated) {
+          setErrors(prev => ({
+            ...prev,
+            apiError: 'You have already attended'
+          }));
+          return;
+        }
+
+        // Update isTokenGenerated to true
+        const updateResponse = await fetch(
+          `http://localhost:8080/interview/wipro/${matchingInterview.interviewId}`,
+          {
+            method: 'PUT',
+            headers: {
+              'Content-Type': 'application/json',
+            },
+            body: JSON.stringify({
+              ...matchingInterview,
+              isTokenGenerated: true
+            })
+          }
+        );
+
+        if (!updateResponse.ok) {
+          throw new Error('Failed to update interview status');
+        }
+
+        setLoginSuccess(true);
+        // Navigate to next page with organization and interviewId
+        setTimeout(() => {
+          navigate(`/ai_interview_ins/${matchingInterview.organisation}/${matchingInterview.interviewId}/${matchingInterview.meetingId}`);
+        }, 1500);
       } catch (error) {
         setErrors(prev => ({
           ...prev,

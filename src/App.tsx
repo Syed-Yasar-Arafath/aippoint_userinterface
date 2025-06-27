@@ -31,6 +31,9 @@ import InterviewAI from './MainComponents/interview/interview_ai';
 import CandidateLogIn from './MainComponents/interview/candidateLogIn';
 import Snackbar from './CommonComponents/snackbar';
 import SubmitInterview from './MainComponents/interview/submitinterview';
+import AnalyticsReport from './MainComponents/analyticsReport';
+import CandidateInterviewAnalytics from './MainComponents/candidateInterviewAnalytics';
+import CandidateCodingAssessment from './MainComponents/candidateCodingAssessment';
 
 const drawerWidth = 240
 
@@ -41,11 +44,11 @@ const AppContent: React.FC = () => {
   let isAuthenticated: any = useSelector(
     (state: any) => state.tokenChange.inValue,
   )
-  
+
   useEffect(() => {
     setOpen(isLoading)
   }, [isLoading])
-  
+
   if (isAuthenticated != '') {
     isAuthenticated = 'true'
   } else {
@@ -62,7 +65,7 @@ const AppContent: React.FC = () => {
     '/AI-Interview',
     '/candidateLogIn'
   ]
-  
+
   const showSideMenuBar = isAuthenticated === 'true' && !noSideMenuRoutes.includes(location.pathname)
 
   return (
@@ -82,10 +85,10 @@ const AppContent: React.FC = () => {
       </Backdrop>
       <Snackbar />
       <ScrollToTop />
-      
+
       {/* Conditionally render the SideMenuBar */}
       {showSideMenuBar && <SideMenuBars />}
-      
+
       {/* Main content area */}
       <Box
         component="main"
@@ -104,7 +107,7 @@ const AppContent: React.FC = () => {
           <Route path="/ai_interview_ins/:organisation/:interviewId/:meetingId" element={<InterviewInstructions />} />
           <Route path="/interview_ai" element={<InterviewAI />} />
           <Route path="/submitinterview" element={<SubmitInterview />} />
-          
+
           {/* Protected routes (authentication required) */}
           {isAuthenticated === 'true' ? (
             <>
@@ -127,6 +130,10 @@ const AppContent: React.FC = () => {
               <Route path="/interviewDetails/:id" element={<InterviewDetails />} />
               <Route path="/AIJDCreator" element={<AIJDCreator />} />
               <Route path="/UpcomingInterview" element={<UpcomingInterview />} />
+
+              <Route path="/analytics_report" element={<AnalyticsReport />} />
+              <Route path="/candidate_interview_analytics" element={<CandidateInterviewAnalytics />} />
+              <Route path="/candidate_coding_assessment" element={<CandidateCodingAssessment />} />
             </>
           ) : (
             // Redirect unauthenticated users to sign in

@@ -349,7 +349,7 @@ function AnalyticsReport() {
                                 <Box sx={{ height: '36px', width: '1px', backgroundColor: '#1C1C1E' }} />
                             </Grid>
 
-                            <Grid item xs={12} sm={6} md={2}>
+                            {/* <Grid item xs={12} sm={6} md={2}>
                                 <Box>
                                     <LocalizationProvider dateAdapter={AdapterDayjs}>
                                         <DatePicker
@@ -383,7 +383,7 @@ function AnalyticsReport() {
                                         />
                                     </LocalizationProvider>
                                 </Box>
-                            </Grid>
+                            </Grid> */}
 
                             <Grid item xs={12} sm={6} md={2}>
                                 <Box

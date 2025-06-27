@@ -1,5 +1,5 @@
 import React, { useEffect, useState } from 'react'
-import { Link, useLocation } from 'react-router-dom'
+import { Link, useLocation, useNavigate } from 'react-router-dom'
 import { Diamond } from 'lucide-react'
 import {
   Box,
@@ -26,15 +26,17 @@ import AnalyticsIcon from '@mui/icons-material/Analytics'
 import SettingsIcon from '@mui/icons-material/Settings'
 import HelpIcon from '@mui/icons-material/Help'
 import LogoutIcon from '@mui/icons-material/Logout'
-
+import { useDispatch } from 'react-redux'
+import { loaderOff, loaderOn, logout, updaeToken } from '../redux/actions'
 function SideMenuBars() {
   const [clickedItem, setClickedItem] = useState<number | null>(null)
   const [open, setOpen] = useState(false)
   const [drawerOpen, setDrawerOpen] = useState(false)
   const theme = useTheme()
   const isSmallScreen = useMediaQuery(theme.breakpoints.down('sm'))
+  const dispatch = useDispatch()
+  const navigate = useNavigate()
   const pathLocation = useLocation()
-
   const menuItems = [
     { text: 'Dashboard', link: '/RecruitmentDashboard', icon: <DashboardIcon /> },
     {
@@ -89,8 +91,6 @@ function SideMenuBars() {
     }
   }, [pathLocation.pathname])
 
-  const handleOpen = () => setOpen(true)
-  const handleClose = () => setOpen(false)
   const toggleDrawer = () => setDrawerOpen(!drawerOpen)
 
   const modalStyle = {
@@ -106,7 +106,7 @@ function SideMenuBars() {
   }
 
   const renderMenuContent = () => (
-    <Box sx={{ width: isSmallScreen ? 250 : '100%' }}>
+    <Box sx={{ width: isSmallScreen ? 200 : '100%' }}>
       <List>
         <Box sx={{ display: 'flex', alignItems: 'center', justifyContent: 'center', py: 2 }}>
           <a href="/jobdescriptionuploading" style={{ textDecoration: 'none' }}>
@@ -307,7 +307,10 @@ function SideMenuBars() {
                 textTransform: 'none',
                 '&:hover': { background: '#E33629' },
               }}
-              onClick={handleClose}
+              onClick={() => {
+                  handleLogOut()
+                  handleClose()
+                }}
             >
               Ok
             </Button>
@@ -328,6 +331,23 @@ function SideMenuBars() {
     </Box>
   )
 
+const handleLogOut = () => {
+    dispatch(loaderOn())
+    try {
+      dispatch(logout())
+      sessionStorage.removeItem('jwtToken')
+      sessionStorage.removeItem('isLoggedIn')
+      localStorage.removeItem('organisation')
+      dispatch(updaeToken(null))
+      navigate('/')
+      dispatch(loaderOff())
+    } catch {
+      dispatch(loaderOff())
+    }
+  }
+
+  const handleOpen = () => setOpen(true)
+  const handleClose = () => setOpen(false)
   return (
     <>
       {isSmallScreen ? (

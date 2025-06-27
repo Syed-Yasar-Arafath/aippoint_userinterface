@@ -234,6 +234,7 @@ function SignIn() {
   }, [email])
 
   localStorage.setItem('organisation', temporg)
+  
   const organisation = localStorage.getItem('organisation')
   console.log('orggggg', organisation)
   const handleSignIn = async (e: React.MouseEvent) => {
@@ -272,6 +273,8 @@ function SignIn() {
           // dispatch(updateToken(t('loginSuccessfulSnackbar')))
           // dispatch(openSnackbar(t('userLoggedInSnackbar'), 'dodgerblue'))
           navigate('/uploadfiles')
+ fetchDiagnostic()
+    sendOrg(organisation);
         } else if (
           res.data === 'User not found' ||
           res.data === 'Invalid username or password'
@@ -438,7 +441,42 @@ function SignIn() {
   }
 const [keepLoggedIn, setKeepLoggedIn] = useState(false)
 
+//code to send organisation
 
+  const sendOrg = async (dbName: any) => {
+    try {
+      const response = await axios.get(
+        `${process.env.REACT_APP_DJANGO_PYTHON_MODULE_SERVICE}/get-organization-name/`,
+        {
+          headers: { Organization: dbName },
+        },
+      )
+      console.log(response.data) // Log the whole response
+    } catch (error: any) {
+      console.error(
+        'Error:',
+        error.response ? error.response.data : error.message,
+      )
+    }
+  }
+  const fetchDiagnostic = async () => {
+      try {
+        // Call the Django diagnostic endpoint using an absolute URL.
+        const response = await fetch(
+          `${process.env.REACT_APP_DJANGO_PYTHON_MODULE_SERVICE}/diagnostic/?org=${organisation}`,
+        )
+        if (!response.ok) {
+          throw new Error(`HTTP error: ${response.status}`)
+        }
+        const data = await response.json()
+        // setActiveDatabase(data.active_database);
+      } catch (err: any) {
+        setError(err.message)
+      }
+    }
+
+   
+  
 
   return (
     // <div style={{ background: '#FFFFFF', overflowY: 'hidden' }}>

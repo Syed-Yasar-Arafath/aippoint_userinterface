@@ -1,11 +1,13 @@
-import React, { useState } from 'react'
+import React, { useEffect, useState } from 'react'
 import { ArrowUpRight, FileText, BarChart3, FolderOpen } from 'lucide-react'
 import KeyboardArrowDownSharpIcon from '@mui/icons-material/KeyboardArrowDownSharp'
 import CalendarMonthIcon from '@mui/icons-material/CalendarMonth'
 import AccessTimeIcon from '@mui/icons-material/AccessTime'
+import axios from 'axios'
 const RecruitmentDashboard: React.FC = () => {
   // State to manage the active tab
   const [activeTab, setActiveTab] = useState('JD Overview')
+  const [error, setError] = useState<string | null>(null)
 
   // Interface for StatCard
   interface StatCardProps {
@@ -119,7 +121,44 @@ const RecruitmentDashboard: React.FC = () => {
     active: boolean
     onClick: () => void
   }
+ const organisation = localStorage.getItem('organisation')
 
+  const sendOrg = async (dbName: any) => {
+    try {
+      const response = await axios.get(
+        `${process.env.REACT_APP_DJANGO_PYTHON_MODULE_SERVICE}/get-organization-name/`,
+        {
+          headers: { Organization: dbName },
+        },
+      )
+      console.log(response.data) // Log the whole response
+    } catch (error: any) {
+      console.error(
+        'Error:',
+        error.response ? error.response.data : error.message,
+      )
+    }
+  }
+  useEffect(() => {
+    const fetchDiagnostic = async () => {
+      try {
+        // Call the Django diagnostic endpoint using an absolute URL.
+        const response = await fetch(
+          `${process.env.REACT_APP_DJANGO_PYTHON_MODULE_SERVICE}/diagnostic/?org=${organisation}`,
+        )
+        if (!response.ok) {
+          throw new Error(`HTTP error: ${response.status}`)
+        }
+        const data = await response.json()
+        // setActiveDatabase(data.active_database);
+      } catch (err: any) {
+        setError(err.message)
+      }
+    }
+
+    fetchDiagnostic()
+    sendOrg(organisation);
+  }, [organisation])
   const Tab: React.FC<TabProps> = ({ label, active, onClick }) => {
     return (
       <button

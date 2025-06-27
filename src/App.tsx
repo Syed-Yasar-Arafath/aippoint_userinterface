@@ -1,9 +1,7 @@
-
-
 import './App.css'
 import { Backdrop, CircularProgress } from '@mui/material'
 import React, { useEffect, useState } from 'react';
-import { BrowserRouter as Router, Routes, Route, useLocation } from 'react-router-dom';
+import { BrowserRouter as Router, Routes, Route, useLocation, Navigate } from 'react-router-dom';
 import { Box } from '@mui/material';
 import RecruitmentDashboard from './MainComponents/RecruitmentDashboard';
 import { useTheme, useMediaQuery } from '@mui/material';
@@ -35,19 +33,19 @@ import Snackbar from './CommonComponents/snackbar';
 import SubmitInterview from './MainComponents/interview/submitinterview';
 
 const drawerWidth = 240
-const AppContent: React.FC = () => {
-  // const isAuthenticated = 'true'
-  // const isAuthenticated = 1
 
+const AppContent: React.FC = () => {
   const isLoading = useSelector((state: any) => state.loading.isLoading)
   const [open, setOpen] = useState(false)
   const location = useLocation()
   let isAuthenticated: any = useSelector(
     (state: any) => state.tokenChange.inValue,
   )
+  
   useEffect(() => {
     setOpen(isLoading)
   }, [isLoading])
+  
   if (isAuthenticated != '') {
     isAuthenticated = 'true'
   } else {
@@ -64,10 +62,8 @@ const AppContent: React.FC = () => {
     '/AI-Interview',
     '/candidateLogIn'
   ]
-  const showSideMenuBar =
-    isAuthenticated && !noSideMenuRoutes.includes(location.pathname)
-  const [validToken, setValidToken] = useState(false)
- 
+  
+  const showSideMenuBar = isAuthenticated === 'true' && !noSideMenuRoutes.includes(location.pathname)
 
   return (
     <Box
@@ -86,55 +82,58 @@ const AppContent: React.FC = () => {
       </Backdrop>
       <Snackbar />
       <ScrollToTop />
-      <Routes>
-          <Route path="/" element={<SignIn />} />
-          <Route path="/RecruitmentDashboard" element={<RecruitmentDashboard />} />
-
-          <Route path="/aiJdCreation" element={<AIjdCreation />} />
-          <Route path="/collectionavailable" element={<CollectionAvailable />} />
-          <Route path="/collectiondefault" element={<CollectionDefault />} />
-          <Route path="/collectiondefaultfilter" element={<CollectionDefaultfilter />} />
-          <Route path="/interviewSchedule" element={<InterviewScheduler />} />
-          <Route path="/jobDescriptionForm" element={<JobDescriptionForm />} />
-          <Route path="/jdcollection" element={<JdCollection />} />
-          <Route path="/jdPreview" element={<JDPreview />} />
-          <Route path="/jobdescriptionselection" element={<JobDescriptionSelection />} />
-          <Route path="/jobdescriptionuploading" element={<JobDescriptionUpload />} />
-          <Route path="/settings" element={<Settings />} />
-           <Route path="/uploadCV" element={<UploadCV />} />
-            <Route path="/interview_ai" element={<InterviewAI />} />
-            <Route path="/reviewCv" element={<ReviewCV />} />
-            <Route path="/interviewDetails/:id" element={<InterviewDetails />} />
-             <Route path="/AIJDCreator" element={<AIJDCreator />} />
-           <Route path="/ai_interview_ins/:organisation/:interviewId/:meetingId" element={<InterviewInstructions />} />
-          <Route path="/UpcomingInterview" element={<UpcomingInterview />} />
-            <Route path="/candidateLogIn" element={<CandidateLogIn />} /> {/* ✅ Add this */}
-
-            <Route path="/submitinterview" element={<SubmitInterview />} /> {/* ✅ Add this */}
-
-
-        </Routes>
+      
       {/* Conditionally render the SideMenuBar */}
-      {isAuthenticated === 'true' &&
-        !noSideMenuRoutes.includes(location.pathname) && <SideMenuBars />}
-      {isAuthenticated === 'true' &&
-        !noSideMenuRoutes.includes(location.pathname) && (
-          <Box
+      {showSideMenuBar && <SideMenuBars />}
+      
+      {/* Main content area */}
+      <Box
+        component="main"
+        sx={{
+          flexGrow: 1,
+          p: 0,
+          width: showSideMenuBar ? { sm: `calc(100% - ${drawerWidth - 16}px)` } : '100%',
+          marginLeft: showSideMenuBar ? `${drawerWidth - 16}px` : 0,
+          overflow: 'hidden',
+        }}
+      >
+        <Routes>
+          {/* Public routes (no authentication required) */}
+          <Route path="/" element={<SignIn />} />
+          <Route path="/candidateLogIn" element={<CandidateLogIn />} />
+          <Route path="/ai_interview_ins/:organisation/:interviewId/:meetingId" element={<InterviewInstructions />} />
+          <Route path="/interview_ai" element={<InterviewAI />} />
+          <Route path="/submitinterview" element={<SubmitInterview />} />
           
-            component="main"
-            sx={{
-              flexGrow: 1,
-              p: 0, // Reduced padding from 2 to 1.5 for a smaller internal gap
-              width: { sm: `calc(100% - ${drawerWidth - 16}px)` }, // Reduced the drawerWidth by 16px to narrow the gap
-              marginLeft: showSideMenuBar ? `${drawerWidth - 16}px` : 0,
-              overflow: 'hidden',
-            }}
-          >
-            <Routes>
-             
-            </Routes>
-          </Box>
-        )}
+          {/* Protected routes (authentication required) */}
+          {isAuthenticated === 'true' ? (
+            <>
+              {/* Redirect to dashboard after login */}
+              <Route path="/dashboard" element={<Navigate to="/RecruitmentDashboard" replace />} />
+              <Route path="/RecruitmentDashboard" element={<RecruitmentDashboard />} />
+              <Route path="/aiJdCreation" element={<AIjdCreation />} />
+              <Route path="/collectionavailable" element={<CollectionAvailable />} />
+              <Route path="/collectiondefault" element={<CollectionDefault />} />
+              <Route path="/collectiondefaultfilter" element={<CollectionDefaultfilter />} />
+              <Route path="/interviewSchedule" element={<InterviewScheduler />} />
+              <Route path="/jobDescriptionForm" element={<JobDescriptionForm />} />
+              <Route path="/jdcollection" element={<JdCollection />} />
+              <Route path="/jdPreview" element={<JDPreview />} />
+              <Route path="/jobdescriptionselection" element={<JobDescriptionSelection />} />
+              <Route path="/jobdescriptionuploading" element={<JobDescriptionUpload />} />
+              <Route path="/settings" element={<Settings />} />
+              <Route path="/uploadCV" element={<UploadCV />} />
+              <Route path="/reviewCv" element={<ReviewCV />} />
+              <Route path="/interviewDetails/:id" element={<InterviewDetails />} />
+              <Route path="/AIJDCreator" element={<AIJDCreator />} />
+              <Route path="/UpcomingInterview" element={<UpcomingInterview />} />
+            </>
+          ) : (
+            // Redirect unauthenticated users to sign in
+            <Route path="*" element={<Navigate to="/" replace />} />
+          )}
+        </Routes>
+      </Box>
     </Box>
   )
 }
@@ -143,7 +142,7 @@ const App: React.FC = () => {
   return (
     <Router>
       <Provider store={store}>
-      <AppContent />
+        <AppContent />
       </Provider>
     </Router>
   )

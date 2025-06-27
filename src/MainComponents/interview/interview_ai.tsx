@@ -90,10 +90,45 @@ const RecorderView: React.FC<ReactMediaRecorderRenderProps> = ({
   const [isSubmitted, setIsSubmitted] = useState(false);
   const [transcript, setTranscript] = useState(''); // State for speech-to-text transcript
   const recognitionRef = useRef<SpeechRecognition | null>(null); // Ref for SpeechRecognition
-
+  const [questions, setQuestions] = useState([])
+  const [questionGenerated, setQuestionGenerated] = useState<string[]>([])
   const location = useLocation();
-  const { organisation, meetingId } = location.state || { organisation: "default-org", meetingId: "default-meeting" };
+    const organisation = localStorage.getItem('organisation')
+  const {  meetingId } = location.state || {  meetingId: "default-meeting" };
+// fetching questions
+  const generateQuestions = async () => {
+    try {
+      const params = new URLSearchParams()
+      params.append('object_id', meetingId)
+      const response = await axios.post(
+        `${process.env.REACT_APP_DJANGO_PYTHON_MODULE_SERVICE}/get_interview_data/`,
+        params,
+        {
+          headers: {
+            'Content-Type': 'application/x-www-form-urlencoded',
+            organization: organisation,
+          },
+        },
+      )
+      const responseData = response.data.data.questions
+      const candidatename = response.data.data.resume_data.name
+      setQuestions(responseData)
+      const concatenatedQuestions: string[] = []
+      if (Array.isArray(responseData)) {
+        responseData.forEach((questionObj) => {
+          concatenatedQuestions.push(questionObj.question)
+        })
+        setQuestionGenerated(concatenatedQuestions)
+      }
+    } catch (error) {
+      console.error('Error fetching questions:', error)
+    }
+  }
 
+  useEffect(() => {
+    generateQuestions()
+  }, [meetingId])
+// 
   useEffect(() => {
     if (videoRef.current && previewStream) {
       videoRef.current.srcObject = previewStream;

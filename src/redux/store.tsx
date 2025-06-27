@@ -7,6 +7,30 @@ interface AuthState {
   user: string | null
 }
 
+// Upload Status State
+interface UploadStatusState {
+  uploads: Array<{
+    id: string;
+    name: string;
+    type: 'pdf' | 'doc' | 'docx';
+    status: 'uploading' | 'success' | 'error' | 'cancelled';
+    uploadDate: string;
+    size: string;
+    progress?: number;
+    errorMessage?: string;
+  }>;
+  totalUploads: number;
+  successfulUploads: number;
+  failedUploads: number;
+}
+
+const initialUploadStatusState: UploadStatusState = {
+  uploads: [],
+  totalUploads: 0,
+  successfulUploads: 0,
+  failedUploads: 0,
+}
+
 // Initial state
 const initialAuthState: AuthState = {
   isLoggedIn: false,
@@ -135,6 +159,38 @@ const tokrnReducer = (state = initialState, action: any) => {
   }
 }
 
+// Upload Status Reducer
+const uploadStatusReducer = (state = initialUploadStatusState, action: any): UploadStatusState => {
+  switch (action.type) {
+    case 'ADD_UPLOAD':
+      return {
+        ...state,
+        uploads: [action.payload, ...state.uploads],
+        totalUploads: state.totalUploads + 1
+      }
+    case 'UPDATE_UPLOAD_STATUS':
+      const updatedUploads = state.uploads.map(upload => 
+        upload.id === action.payload.id 
+          ? { ...upload, ...action.payload }
+          : upload
+      );
+      
+      const successfulCount = updatedUploads.filter(u => u.status === 'success').length;
+      const failedCount = updatedUploads.filter(u => u.status === 'error').length;
+      
+      return {
+        ...state,
+        uploads: updatedUploads,
+        successfulUploads: successfulCount,
+        failedUploads: failedCount
+      }
+    case 'CLEAR_UPLOADS':
+      return initialUploadStatusState;
+    default:
+      return state
+  }
+}
+
 // Combine reducers if you have more than one reducer
 const rootReducer = combineReducers({
   auth: authReducer,
@@ -144,6 +200,7 @@ const rootReducer = combineReducers({
   image: imageReducer,
   token: tokrnReducer,
   emm: emailReducer,
+  uploadStatus: uploadStatusReducer,
 })
 
 export type RootState = ReturnType<typeof rootReducer>

@@ -1,6 +1,7 @@
 import React, { useState, useRef, useEffect } from 'react'
 import SearchIcon from '@mui/icons-material/Search'
-import { useDispatch, useSelector } from 'react-redux'
+// import { useDispatch, useSelector } from 'react-redux'
+
 import {
   Autocomplete,
   Box,
@@ -20,16 +21,18 @@ import {
 // import { getUserDetails } from '../../services/UserService'
 // import { putResume } from '../../services/JobService'
 // import Header from '../../components/topheader'
-// import { t } from 'i18next'
+import { t } from 'i18next'
 // import i18n from '../../i18n'
 import { makeStyles } from '@mui/styles'
 import { Search } from 'lucide-react'
-import { loaderOff, loaderOn, openSnackbar } from '../redux/actions'
+// import { loaderOff, loaderOn, openSnackbar } from '../../redux/actions'
 import { useTranslation } from 'react-i18next'
+import { loaderOff, loaderOn, openSnackbar } from '../redux/actions'
 import { putResume } from '../services/JobService'
 import { getAllResume } from '../services/ResumeService'
-import Header from '../CommonComponents/topheader'
 import { getUserDetails } from '../services/UserService'
+import Header from '../CommonComponents/topheader'
+// import { useDispatch } from 'react-redux'
 
 const useStyles = makeStyles({
   autocomplete: {
@@ -114,7 +117,9 @@ const ResumeList = () => {
   const [inputExpValue, setInputExpValue] = useState<string>('')
   const [inputLocValue, setInputLocValue] = useState<string>('')
   const { t, i18n } = useTranslation()
-  const dispatch = useDispatch()
+
+  
+  // const dispatch = useDispatch()
   const saveJdCollectionName = async (
     collectionName: string,
     resumeIds: any[],
@@ -125,27 +130,27 @@ const ResumeList = () => {
     const Jobdata = {
       resume_data: resumedata,
     }
-    dispatch(loaderOn())
+    // dispatch(loaderOn())
     try {
       const res = await putResume(jobId, Jobdata, organisation)
-      dispatch(
-        openSnackbar(
-          `${t('storedResume')} ${resumeIds.length} ${t(
-            'resumesIn',
-          )} ${collectionName} ${t('jdCollectionBtn')}`,
-          'green',
-        ),
-      )
-      dispatch(loaderOff())
+      // dispatch(
+      //   openSnackbar(
+      //     `${t('storedResume')} ${resumeIds.length} ${t(
+      //       'resumesIn',
+      //     )} ${collectionName} ${t('jdCollectionBtn')}`,
+      //     'green',
+      //   ),
+      // )
+      // dispatch(loaderOff())
     } catch (error) {
       console.error('Error storing resumes:', error)
-      dispatch(loaderOff())
+      // dispatch(loaderOff())
       throw error
     }
   }
 
   const handleSkillChange = async () => {
-    dispatch(loaderOn())
+    // dispatch(loaderOn())
     try {
       const searchText: string | undefined = searchRef.current?.value
       const selectedExpValue: any | undefined = selectedExperience
@@ -171,47 +176,20 @@ const ResumeList = () => {
       if (selectedLocValue) {
         jsonData.location = selectedLocValue
       }
-      dispatch(loaderOn())
+      // dispatch(loaderOn())
       const response = await getAllResume(jsonData)
       if (response) {
         setProfile(response)
         setProfileLength(response.length)
       }
-      dispatch(loaderOff())
-
-      dispatch(loaderOff())
+      // dispatch(loaderOff())
     } catch (error) {
       console.error('Request error:', error)
     }
   }
-  // const fetchResumes = async () => {
-  //   if (!resumeId) {
-  //     console.warn('No resume IDs provided for fetchResumes')
-  //     setResumes([])
-  //     return
-  //   }
-  //   try {
-  //     const requestData = { resume_id: resumeId }
-  //     const resumeResponse = await getResumeById(requestData)
-  //     if (resumeResponse) {
-  //       const resumeData = resumeResponse.map(
-  //         (resume: any) => resume.resume_data,
-  //       )
-  //       setResumes(resumeData)
-  //     }
-  //   } catch (error) {
-  //     console.error('Error fetching resumes for job:')
-  //   }
-  // }
-
-  // useEffect(() => {
-  //   fetchResumes()
-  // }, [resumeId])
 
   const handleExpChange = (event: React.SyntheticEvent, newValue: any) => {
     setSelectedExperience(newValue)
-
-    // handleSkillChange()
   }
   const autocompleteRef = useRef<HTMLInputElement | null>(null)
 
@@ -273,12 +251,12 @@ const ResumeList = () => {
   const handleOpenModal = () => {
     if (selectedCandidates.length === 0) {
       console.log('Please select at  one candidate')
-      dispatch(
-        openSnackbar(
-          t('pleaseSelectAtLeastOneCandidateSnackbar'),
-          'light blue',
-        ),
-      )
+      // dispatch(
+      //   openSnackbar(
+      //     t('pleaseSelectAtLeastOneCandidateSnackbar'),
+      //     'light blue',
+      //   ),
+      // )
       return
     }
     setOpenModal(true)
@@ -523,6 +501,8 @@ const ResumeList = () => {
   //   t('fifteenToEighteen'),
   //   t('eighteenToTwenty'),
   // ]
+    const [selectedStatus, setSelectedStatus] = useState('Select Status');
+  
   const exp: any = [
     '1-3',
     '2-5',
@@ -540,8 +520,8 @@ const ResumeList = () => {
         fontFamily: 'Inter, -apple-system, BlinkMacSystemFont, sans-serif',
         backgroundColor: '#f8fafc',
         minHeight: '100vh',
-        marginLeft: '140px',
-        padding: '29px',
+        // marginLeft: '140px',
+        // padding: '29px',
       }}
     >
       {/* Header */}
@@ -553,437 +533,395 @@ const ResumeList = () => {
 
       {/* Filters */}
 
-      <div
+<div
         style={{
-          // boxShadow: '15px 0px 32px 0px #040B5B1A',
           display: 'flex',
-          // padding: '30px 38px 10px 30px',
           justifyContent: 'space-between',
           flexDirection: 'row',
+          padding: '15px',
+          gap: '8px',
+          flexWrap: 'wrap', // Allow wrapping on very small screens
         }}
       >
-        <Grid
-          container
-          spacing={2}
-          style={{
-            display: 'flex',
-            // justifyContent: 'space-between',
-            flexDirection: 'row',
-            padding: '19px',
-          }}
-        >
-          <Grid item xs={4}>
-            <div>
-              <TextField //ji
-                id="filled-basic"
-                variant="standard"
-                autoComplete="off"
-                // placeholder="Designation "
-                placeholder={t('designation')}
-                value={selectedRole}
-                onChange={(e) => {
-                  setSelectedRole(e.target.value)
+        {/* Designation Search */}
+        <div style={{ flex: '1 1 150px', minWidth: '120px' }}>
+          <TextField
+            id="filled-basic"
+            variant="standard"
+            autoComplete="off"
+            placeholder={t('designation')}
+            value={selectedRole}
+            onChange={(e) => {
+              setSelectedRole(e.target.value)
+            }}
+            style={{ width: '100%' }}
+            inputRef={searchRef}
+            InputProps={{
+              disableUnderline: true,
+              style: {
+                color: '#000000',
+                fontSize: '12px',
+                border: '2px solid #0284C7',
+                borderRadius: '10px',
+                alignItems: 'center',
+                background: '#ffffff',
+                justifyContent: 'center',
+                height: '38px',
+                direction: i18n.language === 'ar' ? 'rtl' : 'ltr',
+              },
+              startAdornment: (
+                <IconButton size="small">
+                  <SearchIcon sx={{ color: '#0284C7', fontSize: '18px' }} />
+                </IconButton>
+              ),
+            }}
+          />
+        </div>
+
+        {/* Experience */}
+        <div style={{ flex: '0 1 100px', minWidth: '80px' }}>
+          <Autocomplete
+            id="combo-box-demo"
+            options={exp}
+            inputValue={inputExpValue}
+            onInputChange={(event, newInputValue) => {
+              setInputExpValue(newInputValue)
+            }}
+            sx={{
+              height: '36px',
+              borderRadius: '10px',
+              backgroundColor: '#FFFFFF',
+              border: '2px solid #0284C7',
+              '& .MuiAutocomplete-clearIndicator': {
+                color: '#000000 !important',
+              },
+              '& .MuiAutocomplete-noOptions': {
+                color: '#000000 !important',
+              },
+              '& .MuiOutlinedInput-notchedOutline': {
+                border: 'none !important',
+              },
+            }}
+            PaperComponent={(props) => (
+              <Paper
+                {...props}
+                sx={{
+                  backgroundColor: '#FFFFFF',
+                  color: '#000000',
+                  borderColor: 'none',
                 }}
-                style={{ width: '100%' }}
-                inputRef={searchRef}
-                InputProps={{
-                  disableUnderline: true,
-                  style: {
+              />
+            )}
+            freeSolo
+            renderInput={(params) => (
+              <TextField
+                // placeholder={t('profileExperience')}
+                placeholder={t('experience')}
+                {...params}
+                sx={{
+                  '& input': {
+                    backgroundColor: '#FFFFFF !important',
+                    fontSize: '12px',
+                    height: '9px',
+                  },
+                  '& .MuiAutocomplete-popupIndicator': {
+                    color: '#000000 !important',
+                  },
+                }}
+              />
+            )}
+            value={selectedExperience}
+            onChange={handleExpChange}
+            noOptionsText=""
+          />
+        </div>
+
+        {/* Location */}
+        <div style={{ flex: '1 1 120px', minWidth: '100px' }}>
+          <Autocomplete
+            disablePortal
+            id="combo-box-demo"
+            options={loc}
+            inputValue={inputLocValue}
+            onInputChange={(event, newInputValue) => {
+              setInputLocValue(newInputValue)
+              setSelectedLoc(newInputValue)
+            }}
+            sx={{
+              height: '34px',
+              borderRadius: '10px',
+              justifyContent: 'center',
+              backgroundColor: '#FFFFFF',
+              border: '2px solid #0284C7',
+              '& .MuiAutocomplete-clearIndicator': {
+                color: '#000000 !important',
+              },
+              '& .MuiAutocomplete-noOptions': {
+                color: '#000000 !important',
+              },
+              '& .MuiOutlinedInput-notchedOutline': {
+                border: 'none !important',
+              },
+            }}
+            PaperComponent={(props) => (
+              <Paper
+                {...props}
+                sx={{
+                  backgroundColor: '#FFFFFF',
+                  color: '#000000',
+                  borderColor: 'none',
+                }}
+              />
+            )}
+            freeSolo
+            renderInput={(params) => (
+              <TextField
+                placeholder={t('location')}
+                {...params}
+                sx={{
+                  '& input': {
                     color: '#000000',
-                    fontSize: '14px',
-                    border: '2px solid #0284C7',
-                    borderRadius: '10px',
-                    alignItems: 'center',
-                    background: '#ffffff',
-                    justifyContent: 'center',
-                    padding: '0px 0px 5px 0px',
+                    backgroundColor: '#FFFFFF !important',
+                    fontSize: '12px',
+                    height: '8px',
                     direction: i18n.language === 'ar' ? 'rtl' : 'ltr',
                   },
-                  startAdornment: (
-                    <IconButton>
-                      <SearchIcon sx={{ color: '#0284C7' }} />
-                    </IconButton>
-                  ),
-                }}
-              />
-            </div>
-          </Grid>
-          {/* <Grid item xs={2}> */}
-          {/* <div>
-              {' '}
-              <Autocomplete
-                // disablePortal
-                id="combo-box-demo"
-                options={exp}
-                inputValue={inputExpValue}
-                onInputChange={(event, newInputValue: any) => {
-                  setInputExpValue(newInputValue)
-                  // setSelectedExperience(newInputValue)
-                }}
-                // getOptionLabel={(ex: any) => ex.value}
-                sx={{
-                  height: '48px',
-                  borderRadius: '10px',
-                  backgroundColor: '#FFFFFF',
-                  border: '2px solid #0284C7',
-                  // borderColor: 'none',
-                  '& .MuiAutocomplete-clearIndicator': {
-                    color: '#000000 !important', // Set the color of the clear indicator (cross icon) to white
-                  },
-                  '& .MuiAutocomplete-noOptions': {
-                    color: '#000000 !important', // Set the color of the "No Options" message to white
-                  },
-                  '& .MuiOutlinedInput-notchedOutline': {
-                    border: 'none !important', // Remove the border
-                  },
-                }}
-                PaperComponent={(props: any) => (
-                  <Paper
-                    {...props}
-                    sx={{
-                      backgroundColor: '#FFFFFF',
-                      color: '#000000',
-                      borderColor: 'none',
-                    }}
-                  />
-                )}
-                freeSolo
-                renderInput={(params: any) => (
-                  <TextField
-                    // placeholder="Experience"
-                    placeholder={t('profileExperience')}
-                    {...params}
-                    sx={{
-                      '& input': {
-                        backgroundColor: '#FFFFFF !important',
-                        fontSize: '14px',
-                      },
-                      '& .MuiAutocomplete-popupIndicator': {
-                        color: '#000000 !important',
-                      },
-                    }}
-                  />
-                )}
-                value={selectedExperience}
-                onChange={handleExpChange}
-                noOptionsText=""
-              />
-            </div> */}
-          {/* </Grid> */}
-          <Grid item xs={2}>
-            <div>
-              {' '}
-              <Autocomplete
-                disablePortal
-                id="combo-box-demo"
-                options={loc}
-                inputValue={inputLocValue}
-                onInputChange={(event, newInputValue: any) => {
-                  setInputLocValue(newInputValue)
-                  setSelectedLoc(newInputValue)
-                }}
-                // getOptionLabel={(lo: any) => lo.value}
-                sx={{
-                  // marginLeft: '13px',
-                  height: '48px',
-                  borderRadius: '10px',
-                  justifyContent: 'center',
-                  backgroundColor: '#FFFFFF',
-                  border: '2px solid #0284C7',
-                  '& .MuiAutocomplete-clearIndicator': {
+                  '& .MuiAutocomplete-popupIndicator': {
                     color: '#000000 !important',
                   },
-                  '& .MuiAutocomplete-noOptions': {
-                    color: '#000000 !important',
-                  },
-                  '& .MuiOutlinedInput-notchedOutline': {
-                    border: 'none !important',
-                  },
-                }}
-                PaperComponent={(props: any) => (
-                  <Paper
-                    {...props}
-                    sx={{
-                      backgroundColor: '#FFFFFF',
-                      color: '#000000',
-                      borderColor: 'none',
-                    }}
-                  />
-                )}
-                freeSolo
-                renderInput={(params) => (
-                  <TextField
-                    // placeholder="Location"
-                    placeholder={t('location')}
-                    {...params}
-                    sx={{
-                      '& input': {
-                        color: '#000000', // Set the text color for the input
-                        backgroundColor: '#FFFFFFF !important',
-                        fontSize: '14px', // Set the background color of the text input to grey
-                        height: '1.5vh',
-                        direction: i18n.language === 'ar' ? 'rtl' : 'ltr',
-                      },
-                      '& .MuiAutocomplete-popupIndicator': {
-                        color: '#000000 !important', // Set the color of the dropdown indicator to grey
-                      },
-                    }}
-                  />
-                )}
-                value={selectedLoc}
-                onChange={handleLocChange}
-                noOptionsText="" // Set the "No Options" message to an empty string
-              />
-            </div>
-          </Grid>
-          <Grid item xs={2}>
-            <div>
-              {' '}
-              <Autocomplete
-                multiple
-                freeSolo
-                options={[]}
-                value={value}
-                ref={autocompleteRef}
-                inputValue={inputValue}
-                // onChange={(event, newValue: any) => {
-                //   setValue(newValue)
-                // }}
-                onInputChange={(event, newInputValue: any) => {
-                  setInputValue(newInputValue)
-                  // setValue(newInputValue)
-                  // handleSkillChange()
-                }}
-                onChange={(event, newValue) => {
-                  setValue(newValue)
-                  // handleSkillChange()
-                }}
-                renderTags={(tagValue, getTagProps) =>
-                  tagValue.map((option, index) => (
-                    <Chip
-                      label={option}
-                      {...getTagProps({ index })}
-                      sx={{
-                        color: '#000000',
-                        backgroundColor: '#FFFFFF',
-                      }}
-                    />
-                  ))
-                }
-                classes={{
-                  root: classes.autocomplete,
-                  inputRoot: classes.inputRoot,
-                }}
-                renderInput={(params: any) => (
-                  <TextField
-                    {...params}
-                    // placeholder="Search skill"
-                    placeholder={t('searchSkillPlaceholder')}
-                    InputProps={{
-                      style: {
-                        color: '#000000',
-                        background: '#FFFFFF',
-                        borderColor: 'none',
-                        borderRadius: '10px',
-                        width: '100%',
-                        fontSize: '15px',
-                        border: '2px solid #0284C7',
-                        height: '7  vh',
-                        padding: '4px',
-                        direction: i18n.language === 'ar' ? 'rtl' : 'ltr',
-                      },
-                      ...params.InputProps,
-                    }}
-                    sx={{
-                      input: { color: '#000000' },
-                      label: { color: '#FFFFFF' },
-                      // Optional: change label color
-                    }}
-                  />
-                )}
-                sx={{
-                  '& .MuiOutlinedInput-root': {
-                    '& fieldset': {
-                      borderColor: 'none',
-                      color: '#000000',
-                      height: '48px',
-                    },
-
-                    '& .MuiAutocomplete-popper': {
-                      background: '#FFFFFF',
-                    },
-
-                    '& .MuiChip-root': {
-                      color: '#000000',
-                    },
-                    '& .MuiAutocomplete-clearIndicator': {
-                      color: '#000000',
-                    },
-                    '& .MuiAutocomplete-tag .MuiChip-deleteIcon': {
-                      color: '#000000',
-                    },
-                    '& .MuiOutlinedInput-notchedOutline': {
-                      border: 'none !important',
-                    },
-
-                    padding: '6px',
-                  },
                 }}
               />
-            </div>
-          </Grid>
-          <Grid item xs={1}>
-            <Button
-              onClick={handleReset}
-              style={{
-                color: '#FFFFFF',
-                backgroundColor: '#0284C7',
-                borderRadius: '15px',
-                textTransform: 'none',
-                width: '100%',
-                height: '45px',
-                margin: '0', // Set margin to 0
-              }}
-            >
-              {/* Reset */}
-              {t('resetBtn')}
-            </Button>
-          </Grid>
-          <Grid item xs={1}>
-            <Button
-              onClick={handleSkillChange}
-              style={{
-                color: '#FFFFFF',
-                backgroundColor: '#0284C7',
-                borderRadius: '15px',
-                textTransform: 'none',
-                width: '100%',
-                height: '45px',
-                margin: '0',
-              }}
-            >
-              <SearchIcon />
-              {/* Search */}
-              {t('searchBtn')}
-            </Button>
-          </Grid>
-        </Grid>
-      </div>
-      {/* <div
-        style={{
-          backgroundColor: 'white',
-          borderRadius: '8px',
-          padding: '16px',
-          marginBottom: '20px',
-          boxShadow: '0 1px 3px rgba(0,0,0,0.1)',
-          display: 'flex',
-          alignItems: 'center',
-          gap: '12px',
-          flexWrap: 'wrap',
-        }}
-      > */}
-      {/* Search Bar */}
-      {/* <div
-          style={{ position: 'relative', flex: '1 1 300px', maxWidth: '300px' }}
-        >
-          <Search
-            size={20}
-            style={{
-              position: 'absolute',
-              left: '12px',
-              top: '50%',
-              transform: 'translateY(-50%)',
-              color: '#6b7280',
-            }}
+            )}
+            value={selectedLoc}
+            onChange={handleLocChange}
+            noOptionsText=""
           />
-          <input
-            type="text"
-            placeholder="Search by name..."
+        </div>
+
+        {/* Status */}
+        <div style={{ flex: '0 1 120px', minWidth: '100px' }}>
+          <select
+            value={selectedStatus}
+            onChange={(e) => setSelectedStatus(e.target.value)}
             style={{
               width: '100%',
-              padding: '10px 12px 10px 40px',
-              border: '1px solid #d1d5db',
-              borderRadius: '6px',
-              fontSize: '14px',
-              outline: 'none',
+              height: '38px',
+              padding: '10px 12px',
+              border: '2px solid #0284C7',
+              borderRadius: '10px',
+              fontSize: '12px',
+              backgroundColor: '#FFFFFF',
+              cursor: 'pointer',
+              outline: 'none'
             }}
-            value={searchCandidate}
-            onChange={(e) => {
-              setSearchCandidate(e.target.value)
-              handleSearch(e.target.value)
+          >
+            <option>Select Status</option>
+            <option>Top Candidate</option>
+            <option>Looks Promising</option>
+            <option>Good in Parts</option>
+            <option>Follow Up Required</option>
+            <option>Not Relevant</option>
+          </select>
+        </div>
+
+        {/* Skills */}
+              <div style={{ flex: '1 1 150px', minWidth: '120px' }}>
+          <Autocomplete
+            multiple
+            freeSolo
+            options={[]}
+            value={value}
+            ref={autocompleteRef}
+            inputValue={inputValue}
+            onInputChange={(event, newInputValue) => {
+              setInputValue(newInputValue)
+            }}
+            onChange={(event, newValue) => {
+              setValue(newValue)
+            }}
+            renderTags={(tagValue, getTagProps) =>
+              tagValue.map((option, index) => (
+                <Chip
+                  label={option}
+                  {...getTagProps({ index })}
+                  size="small"
+                  sx={{
+                    color: '#000000',
+                    backgroundColor: '#E5E7EB',
+                    fontSize: '10px',
+                    height: '20px',
+                  }}
+                />
+              ))
+            }
+            classes={{
+              root: classes.autocomplete,
+              inputRoot: classes.inputRoot,
+            }}
+            renderInput={(params) => (
+              <TextField
+                {...params}
+                placeholder="Search skills"
+                multiline
+                minRows={1}
+                maxRows={9}
+                InputProps={{
+                  style: {
+                    color: '#000000',
+                    background: '#FFFFFF',
+                    borderColor: 'none',
+                    borderRadius: '10px',
+                    width: '100%',
+                    fontSize: '12px',
+                    border: '2px solid #0284C7',
+                    minHeight: '38px',
+                    height: 'auto',
+                    padding: '4px',
+                    direction: i18n.language === 'ar' ? 'rtl' : 'ltr',
+                    overflow: 'auto',
+                  },
+                  ...params.InputProps,
+                }}
+                sx={{
+                  '& input': { 
+                    color: '#000000', 
+                    fontSize: '12px',
+                    overflow: 'hidden',
+                    textOverflow: 'ellipsis',
+                  },
+                  '& textarea': {
+                    color: '#000000',
+                    fontSize: '12px',
+                    lineHeight: '1.2',
+                    resize: 'none',
+                    overflow: 'auto',
+                  },
+                  label: { color: '#FFFFFF' },
+                }}
+              />
+            )}
+            sx={{
+              '& .MuiOutlinedInput-root': {
+                '& fieldset': {
+                  borderColor: 'none',
+                  color: '#000000',
+                },
+                '& .MuiAutocomplete-popper': {
+                  background: '#FFFFFF',
+                },
+                '& .MuiChip-root': {
+                  color: '#000000',
+                  margin: '1px',
+                  fontSize: '10px',
+                },
+                '& .MuiAutocomplete-clearIndicator': {
+                  color: '#000000',
+                },
+                '& .MuiAutocomplete-tag .MuiChip-deleteIcon': {
+                  color: '#000000',
+                },
+                '& .MuiOutlinedInput-notchedOutline': {
+                  border: 'none !important',
+                },
+                padding: '2px',
+                minHeight: '30px',
+                height: 'auto',
+                alignItems: 'flex-start',
+                '& .MuiAutocomplete-inputRoot': {
+                  flexWrap: 'wrap',
+                  alignItems: 'flex-start',
+                  // paddingTop: '6px',
+                },
+              },
             }}
           />
-        </div> */}
+        </div>
 
-      {/* Job Role Filter */}
-      {/* <select
-          value={selectedJobRole}
-          onChange={handleJobRole}
-          style={{
-            padding: '10px 12px',
-            border: '1px solid #d1d5db',
-            borderRadius: '6px',
-            fontSize: '14px',
-            backgroundColor: 'white',
-            minWidth: '120px',
-            color: selectedJobRole ? '#1f2937' : '#6b7280',
-          }}
-        >
-          <option value="">Select Job Role</option>
-          <option value="Java Developer">Java Developer</option>
-          <option value="DevOps Engineer">DevOps Engineer</option>
-          <option value="AI/ML Engineer">AI/ML Engineer</option>
-          <option value="Mobile App Developer">Mobile App Developer</option>
-          <option value="Product Manager">Product Manager</option>
-          <option value="UI/UX Designer">UI/UX Designer</option>
-        </select> */}
+         <div style={{ flex: '0 1 100px', minWidth: '50px' }}>
+          <input
+            type="date"
+            style={{
+              width: '70%',
+              height: '34px',
+              padding: '0px 8px',
+              border: '2px solid #0284C7',
+              borderRadius: '10px',
+              fontSize: '10px',
+              backgroundColor: '#FFFFFF',
+              cursor: 'pointer',
+              outline: 'none'
+            }}
+          />
+        </div>
+        {/* Reset Button */}
+        <div style={{ flex: '0 0 70px' }}>
+          <Button
+            onClick={handleReset}
+            style={{
+              color: '#FFFFFF',
+              backgroundColor: '#0284C7',
+              borderRadius: '10px',
+              textTransform: 'none',
+              width: '100%',
+              height: '38px',
+              fontSize: '11px',
+              margin: '0',
+            }}
+          >
+            Reset
+          </Button>
+        </div>
 
-      {/* Experience Filter */}
-      {/* <select
-          value={selectedRangeExperience}
-          onChange={handleRangeExperience}
-          style={{
-            padding: '10px 12px',
-            border: '1px solid #d1d5db',
-            borderRadius: '6px',
-            fontSize: '14px',
-            backgroundColor: 'white',
-            minWidth: '140px',
-            color: selectedRangeExperience ? '#1f2937' : '#6b7280',
-          }}
-        >
-          <option value="">Select Experience</option>
-          <option value="0-1">0-1 Years</option>
-          <option value="1-3">1-3 Years</option>
-          <option value="3-5">3-5 Years</option>
-          <option value="5+">5+ Years</option>
-        </select> */}
+        {/* Search Button */}
+        <div style={{ flex: '0 0 80px' }}>
+          <Button
+            onClick={handleSkillChange}
+            style={{
+              color: '#FFFFFF',
+              backgroundColor: '#0284C7',
+              borderRadius: '10px',
+              textTransform: 'none',
+              width: '100%',
+              height: '38px',
+              fontSize: '11px',
+              margin: '0',
+              display: 'flex',
+              alignItems: 'center',
+              gap: '4px',
+            }}
+          >
+            <SearchIcon sx={{ fontSize: '16px' }} />
+            Search
+          </Button>
+        </div>
 
-      {/* Location Filter */}
-      {/* <select
-          value={selectedLocation}
-          onChange={handleLocation}
-          style={{
-            padding: '10px 12px',
-            border: '1px solid #d1d5db',
-            borderRadius: '6px',
-            fontSize: '14px',
-            backgroundColor: 'white',
-            minWidth: '120px',
-            color: selectedLocation ? '#1f2937' : '#6b7280',
-          }}
-        >
-          <option value="">Select Location</option>
-          <option value="Mumbai">Mumbai</option>
-          <option value="Bengaluru">Bengaluru</option>
-          <option value="Chennai">Chennai</option>
-          <option value="Delhi">Delhi</option>
-          <option value="Pune">Pune</option>
-        </select>
-      </div> */}
-
-      {/* Candidates List with Scrollbar */}
-      <div
+        {/* Select All */}
+        <div style={{ flex: '0 0 80px' }}>
+          <button
+            style={{
+              width: '100%',
+              height: '38px',
+              padding: '8px 12px',
+              backgroundColor: '#F3F4F6',
+              border: '2px solid #D1D5DB',
+              borderRadius: '10px',
+              fontSize: '11px',
+              cursor: 'pointer',
+              display: 'flex',
+              alignItems: 'center',
+              justifyContent: 'center',
+              gap: '4px'
+            }}
+          >
+            <input 
+              type="checkbox" 
+              style={{ margin: 0, transform: 'scale(0.8)' }}
+            />
+            Select
+          </button>
+        </div>
+      </div>
+<div
         style={{
           maxHeight: '410px',
           backgroundColor: 'white',
@@ -991,23 +929,23 @@ const ResumeList = () => {
           boxShadow: '0 1px 3px rgba(0,0,0,0.1)',
           overflow: 'hidden',
           marginLeft: '20px',
-          position: 'relative', // For sticky button
+          position: 'relative',
         }}
         className="candidate-list"
       >
         <div
           style={{
-            maxHeight: '100px', // Height for 3 resumes (~200px each)
-            overflowY: 'auto', // Enable vertical scrollbar
-            scrollbarWidth: 'thin', // Firefox
-            scrollbarColor: '#d1d5db #f8fafc', // Firefox
-            paddingBottom: '418px', // Space for sticky button
+            maxHeight: '360px', // Adjusted to leave space for button
+            overflowY: 'auto',
+            scrollbarWidth: 'thin',
+            scrollbarColor: '#d1d5db #f8fafc',
+            paddingBottom: '10px',
           }}
         >
           <style>
             {`
               .candidate-list::-webkit-scrollbar {
-                width: 100px;
+                width: 8px;
               }
               .candidate-list::-webkit-scrollbar-track {
                 background: #f8fafc;
@@ -1018,16 +956,6 @@ const ResumeList = () => {
               }
               .candidate-list::-webkit-scrollbar-thumb:hover {
                 background: #9ca3af;
-              }
-              @media (min-width: 1024px) and (max-width: 1440px) {
-                .candidate-list > div {
-                  max-height: 100px; /* Fit 3 resumes on laptop screens */
-                }
-              }
-              @media (max-width: 1023px) {
-                .candidate-list > div {
-                  max-height: 100px; /* Allow full height on smaller screens */
-                }
               }
             `}
           </style>
@@ -1047,11 +975,13 @@ const ResumeList = () => {
               <div
                 key={candidate.id || index}
                 style={{
-                  padding: '20px',
-                  borderBottom:
-                    index < profile.length - 1 ? '1px solid #e5e7eb' : 'none',
+                  height: '100px', // Fixed height for each resume
+                  padding: '12px 16px',
+                  borderBottom: index < profile.length - 1 ? '1px solid #e5e7eb' : 'none',
                   display: 'flex',
-                  gap: '16px',
+                  gap: '12px',
+                  alignItems: 'flex-start',
+                  overflow: 'hidden', // Prevent content overflow
                 }}
               >
                 {/* Checkbox */}
@@ -1064,25 +994,26 @@ const ResumeList = () => {
                     toggleSelectCandidate(candidate.resume_data.id || index)
                   }
                   style={{
-                    width: '16px',
-                    height: '16px',
-                    marginTop: '4px',
+                    width: '14px',
+                    height: '14px',
+                    marginTop: '2px',
                     cursor: 'pointer',
+                    flexShrink: 0,
                   }}
                 />
 
                 {/* Avatar */}
                 <div
                   style={{
-                    width: '48px',
-                    height: '48px',
+                    width: '36px',
+                    height: '36px',
                     borderRadius: '50%',
                     backgroundColor: '#0284C7',
                     color: 'white',
                     display: 'flex',
                     alignItems: 'center',
                     justifyContent: 'center',
-                    fontSize: '18px',
+                    fontSize: '14px',
                     fontWeight: '600',
                     flexShrink: 0,
                   }}
@@ -1091,25 +1022,31 @@ const ResumeList = () => {
                 </div>
 
                 {/* Main Content */}
-                <div style={{ flex: 1, display: 'flex', gap: '24px' }}>
-                  {/* Left Column */}
-                  <div style={{ flex: 1 }}>
+                <div style={{ flex: 1, display: 'flex', gap: '16px', minWidth: 0 }}>
+                  {/* Left Column - Basic Info */}
+                  <div style={{ flex: 1, minWidth: 0 }}>
                     <h3
                       style={{
-                        margin: '0 0 4px 0',
-                        fontSize: '18px',
+                        margin: '0 0 2px 0',
+                        fontSize: '14px',
                         fontWeight: '600',
                         color: '#1f2937',
+                        whiteSpace: 'nowrap',
+                        overflow: 'hidden',
+                        textOverflow: 'ellipsis',
                       }}
                     >
                       {candidate.resume_data?.name || 'N/A'}
                     </h3>
                     <p
                       style={{
-                        margin: '0 0 8px 0',
-                        fontSize: '14px',
+                        margin: '0 0 4px 0',
+                        fontSize: '11px',
                         color: '#6b7280',
                         fontWeight: '500',
+                        whiteSpace: 'nowrap',
+                        overflow: 'hidden',
+                        textOverflow: 'ellipsis',
                       }}
                     >
                       {candidate?.resume_data?.Resume_Category || 'N/A'}
@@ -1117,57 +1054,35 @@ const ResumeList = () => {
 
                     <div
                       style={{
-                        display: 'grid',
-                        gridTemplateColumns: 'auto 1fr',
-                        gap: '4px 12px',
-                        fontSize: '12px',
+                        display: 'flex',
+                        flexDirection: 'column',
+                        gap: '1px',
+                        fontSize: '10px',
                         color: '#6b7280',
-                        marginBottom: '12px',
+                        marginBottom: '4px',
                       }}
                     >
-                      <span style={{ fontWeight: '500' }}>
-                        {t('profileExperience')}:
-                      </span>
-                      <span>
-                        {candidate.resume_data?.experiance_in_number || 'N/A'}
-                      </span>
-                      <span style={{ fontWeight: '500' }}>
-                        {t('location')}:
-                      </span>
-                      <span>{candidate.resume_data?.location || 'N/A'}</span>
-                      <span style={{ fontWeight: '500' }}>{t('contact')}:</span>
-                      <span>{candidate.resume_data?.phone || 'N/A'}</span>
+                      <div style={{ display: 'flex', gap: '8px' }}>
+                        <span style={{ fontWeight: '500', minWidth: '30px' }}>Exp:</span>
+                        <span style={{ overflow: 'hidden', textOverflow: 'ellipsis' }}>
+                          {candidate.resume_data?.experiance_in_number || 'N/A'}
+                        </span>
+                      </div>
+                      <div style={{ display: 'flex', gap: '8px' }}>
+                        <span style={{ fontWeight: '500', minWidth: '30px' }}>Loc:</span>
+                        <span style={{ overflow: 'hidden', textOverflow: 'ellipsis' }}>
+                          {candidate.resume_data?.location || 'N/A'}
+                        </span>
+                      </div>
+                      <div style={{ display: 'flex', gap: '8px' }}>
+                        <span style={{ fontWeight: '500', minWidth: '30px' }}>Tel:</span>
+                        <span style={{ overflow: 'hidden', textOverflow: 'ellipsis' }}>
+                          {candidate.resume_data?.phone || 'N/A'}
+                        </span>
+                      </div>
                     </div>
 
-                    {/* <div style={{ marginBottom: '12px' }}>
-                      <p
-                        style={{
-                          margin: '0 0 4px 0',
-                          fontSize: '12px',
-                          fontWeight: '500',
-                          color: '#374151',
-                        }}
-                      >
-                        About:
-                      </p>
-                      <p
-                        style={{
-                          margin: 0,
-                          fontSize: '12px',
-                          color: '#6b7280',
-                          lineHeight: '1.4',
-                        }}
-                      >
-                        {candidate.about ||
-                          candidate.summary ||
-                          candidate.description ||
-                          'No description available'}
-                      </p>
-                    </div> */}
-
-                    {/* <div
-                      style={{ display: 'flex', gap: '16px', fontSize: '12px' }}
-                    >
+                    <div style={{ display: 'flex', gap: '12px', fontSize: '10px' }}>
                       <button
                         style={{
                           padding: '0',
@@ -1176,9 +1091,10 @@ const ResumeList = () => {
                           color: '#0284C7',
                           textDecoration: 'underline',
                           cursor: 'pointer',
+                          fontSize: '10px',
                         }}
                       >
-                        View CV/Resume
+                        CV
                       </button>
                       <button
                         style={{
@@ -1188,19 +1104,20 @@ const ResumeList = () => {
                           color: '#0284C7',
                           textDecoration: 'underline',
                           cursor: 'pointer',
+                          fontSize: '10px',
                         }}
                       >
                         Notes
                       </button>
-                    </div> */}
+                    </div>
                   </div>
 
                   {/* Key Skills Column */}
-                  <div style={{ width: '140px' }}>
+                  <div style={{ width: '100px', flexShrink: 0 }}>
                     <h4
                       style={{
-                        margin: '0 0 8px 0',
-                        fontSize: '12px',
+                        margin: '0 0 4px 0',
+                        fontSize: '10px',
                         fontWeight: '600',
                         color: '#374151',
                       }}
@@ -1211,28 +1128,34 @@ const ResumeList = () => {
                       style={{
                         display: 'flex',
                         flexDirection: 'column',
-                        gap: '4px',
+                        gap: '1px',
+                        maxHeight: '60px',
+                        overflow: 'hidden',
                       }}
                     >
                       {(candidate.resume_data?.skills || [])
-                        .slice(0, 5)
-                        .map((skill: any, idx: any) => (
+                        .slice(0, 4) // Reduced to fit in 100px height
+                        .map((skill : any, idx : any) => (
                           <span
                             key={idx}
                             style={{
-                              fontSize: '11px',
+                              fontSize: '9px',
                               color: '#6b7280',
                               display: 'flex',
                               alignItems: 'center',
+                              whiteSpace: 'nowrap',
+                              overflow: 'hidden',
+                              textOverflow: 'ellipsis',
                             }}
                           >
                             <span
                               style={{
-                                width: '4px',
-                                height: '4px',
+                                width: '3px',
+                                height: '3px',
                                 backgroundColor: '#d1d5db',
                                 borderRadius: '50%',
-                                marginRight: '6px',
+                                marginRight: '4px',
+                                flexShrink: 0,
                               }}
                             ></span>
                             {typeof skill === 'string'
@@ -1243,12 +1166,12 @@ const ResumeList = () => {
                     </div>
                   </div>
 
-                  {/* Previous Interview Column
-                  <div style={{ width: '120px' }}>
+                  {/* Previous Interview Column */}
+                  <div style={{ width: '80px', flexShrink: 0 }}>
                     <h4
                       style={{
-                        margin: '0 0 8px 0',
-                        fontSize: '12px',
+                        margin: '0 0 4px 0',
+                        fontSize: '10px',
                         fontWeight: '600',
                         color: '#374151',
                       }}
@@ -1258,20 +1181,24 @@ const ResumeList = () => {
                     <p
                       style={{
                         margin: 0,
-                        fontSize: '11px',
+                        fontSize: '9px',
                         color: '#6b7280',
+                        whiteSpace: 'nowrap',
+                        overflow: 'hidden',
+                        textOverflow: 'ellipsis',
                       }}
                     >
-                      {candidate.previousInterview ||
+                      {/* {candidate.previousInterview ||
                         candidate.interviewHistory ||
-                        '-'}
+                        '-'} */}
                     </p>
-                  </div> */}
+                  </div>
                 </div>
               </div>
             ))
           )}
         </div>
+        
         {/* Fixed Button */}
         <button
           aria-label="Add selected candidates to collection"
@@ -1285,10 +1212,10 @@ const ResumeList = () => {
             fontSize: '12px',
             fontWeight: '500',
             cursor: 'pointer',
-            position: 'sticky',
-            bottom: 0,
+            position: 'absolute',
+            bottom: '10px',
+            right: '10px',
             zIndex: 10,
-            float: 'right',
             boxShadow: '0 -1px 3px rgba(0,0,0,0.1)',
           }}
           onClick={handleOpenModal}
@@ -1298,65 +1225,6 @@ const ResumeList = () => {
         </button>
       </div>
 
-      {/* Modal for Job Selection */}
-      {/* <Modal
-        open={openModal}
-        onClose={handleCloseModal}
-        aria-labelledby="job-selection-modal"
-        aria-describedby="select-job-to-add-to-collection"
-      >
-        <Box
-          sx={{
-            position: 'absolute',
-            top: '50%',
-            left: '50%',
-            transform: 'translate(-50%, -50%)',
-            width: 400,
-            bgcolor: 'white',
-            borderRadius: '8px',
-            boxShadow: 24,
-            p: 4,
-          }}
-        >
-          <h2
-            id="job-selection-modal"
-            style={{
-              margin: '0 0 16px 0',
-              fontSize: '18px',
-              fontWeight: '600',
-            }}
-          >
-            Select Job Title
-          </h2>
-          {jobs.length === 0 ? (
-            <p style={{ color: '#6b7280' }}>No active jobs available.</p>
-          ) : (
-            <div style={{ maxHeight: '300px', overflowY: 'auto' }}>
-              {jobs.map((job) => (
-                <div
-                  key={job.jobid}
-                  style={{
-                    padding: '8px 0',
-                    cursor: 'pointer',
-                    borderBottom: '1px solid #e5e7eb',
-                  }}
-                  onClick={() => handleAddJobToCollection(job.jobid)}
-                >
-                  <span style={{ fontSize: '14px', color: '#1f2937' }}>
-                    {job.job_title} ({job.job_role})
-                  </span>
-                </div>
-              ))}
-            </div>
-          )}
-          <Button
-            onClick={handleCloseModal}
-            sx={{ mt: 2, textTransform: 'none' }}
-          >
-            Cancel
-          </Button>
-        </Box>
-      </Modal> */}
       <Modal
         open={openModal}
         onClose={handleCloseModal}
@@ -1391,38 +1259,29 @@ const ResumeList = () => {
           ) : (
             <div
               style={{
-                maxHeight: '195px', // Show 5 jobs (~37px each)
+                maxHeight: '195px',
                 overflowY: 'auto',
                 scrollbarWidth: 'thin',
                 scrollbarColor: '#d1d5db #f8fafc',
               }}
               className="job-list"
             >
-              {/* <style>
-                {`
-                  .job-list::-webkit-scrollbar { width: 8px; }
-                  .job-list::-webkit-scrollbar-track { background: #f8fafc; }
-                  .job-list::-webkit-scrollbar-thumb { background: #d1d5db; border-radius: 4px; }
-                  .job-list::-webkit-scrollbar-thumb:hover { background: #9ca3af; }
-                `}
-              </style> */}
               <style>
                 {`
-    .job-list::-webkit-scrollbar {
-    background: #9ca3af; 
-      width: 10px; /* Increased width for visibility */
-    }
-    .job-list::-webkit-scrollbar-track {
-      background: #f8fafc; /* Same track color */
-    }
-    .job-list::-webkit-scrollbar-thumb {
-      background: #9ca3af; /* Darker thumb for contrast */
-      border-radius: 4px;
-    }
-    .job-list::-webkit-scrollbar-thumb:hover {
-      background: #6b7280; /* Slightly darker on hover */
-    }
-  `}
+                  .job-list::-webkit-scrollbar {
+                    width: 10px;
+                  }
+                  .job-list::-webkit-scrollbar-track {
+                    background: #f8fafc;
+                  }
+                  .job-list::-webkit-scrollbar-thumb {
+                    background: #9ca3af;
+                    border-radius: 4px;
+                  }
+                  .job-list::-webkit-scrollbar-thumb:hover {
+                    background: #6b7280;
+                  }
+                `}
               </style>
               {jobs.map((job) => (
                 <div

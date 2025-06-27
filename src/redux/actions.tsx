@@ -44,3 +44,32 @@ export const updateToken = (token: any) => ({
   type: 'UPDATE_VALUE' as const,
   payload: token,
 })
+
+// Upload Status Actions
+export const addUpload = (upload: {
+  id: string;
+  name: string;
+  type: 'pdf' | 'doc' | 'docx';
+  status: 'uploading' | 'success' | 'error' | 'cancelled';
+  uploadDate: string;
+  size: string;
+  progress?: number;
+  errorMessage?: string;
+}) => ({
+  type: 'ADD_UPLOAD' as const,
+  payload: upload,
+})
+
+export const updateUploadStatus = (id: string, updates: {
+  status?: 'uploading' | 'success' | 'error' | 'cancelled';
+  progress?: number;
+  errorMessage?: string;
+  uploadDate?: string;
+}) => ({
+  type: 'UPDATE_UPLOAD_STATUS' as const,
+  payload: { id, ...updates },
+})
+
+export const clearUploads = () => ({
+  type: 'CLEAR_UPLOADS' as const,
+})

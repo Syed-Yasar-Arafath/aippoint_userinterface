@@ -45,8 +45,15 @@ function AnalyticsReport() {
 
     useEffect(() => {
         const fetchInterviewData = async () => {
+            const organisation = localStorage.getItem('organisation');
             try {
-                const response = await axios.get("http://localhost:8000/get_all_interview_data/");
+                const response = await axios.get("http://localhost:8000/get_all_interview_data/", {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                        Organization: organisation || '',
+                    },
+                });
                 const report = response.data.data;
                 console.log("Interview Data:", report);
                 // setInterviewData(report)

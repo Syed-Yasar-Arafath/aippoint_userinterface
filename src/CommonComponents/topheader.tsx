@@ -16,6 +16,7 @@ import { useNavigate } from 'react-router-dom'
 import { logout } from '../redux/actions'
 import { useDispatch, useSelector } from 'react-redux'
 import { getUser, getUserDetails } from '../services/UserService'
+import { RootState } from '../redux/store'
 
 // import NotificationsNoneIcon from '@mui/icons-material/NotificationsNone'
 
@@ -23,6 +24,7 @@ import KeyboardArrowDownIcon from '@mui/icons-material/KeyboardArrowDown'
 import { loaderOff, loaderOn } from '../redux/actions'
 import axios from 'axios'
 import { t } from 'i18next'
+
 interface HeaderProps {
   title: string
   userProfileImage?: string | null
@@ -32,6 +34,8 @@ interface HeaderProps {
 const Header: React.FC<HeaderProps> = ({ title, userProfileImage, path }) => {
   const dispatch = useDispatch()
   const navigate = useNavigate()
+  const { uploads, failedUploads } = useSelector((state: RootState) => state.uploadStatus)
+  
   const handleNavigate = (path: string | null) => {
     if (path) {
       navigate(path)
@@ -45,6 +49,31 @@ const Header: React.FC<HeaderProps> = ({ title, userProfileImage, path }) => {
   const [notifications, setNotifications]: any = useState([])
   const anchorRef = useRef(null) // Create a ref
   const open = Boolean(anchorE)
+  
+  // Monitor upload status for notifications
+  useEffect(() => {
+    const recentUploads = uploads.filter(upload => {
+      const uploadTime = new Date(upload.uploadDate).getTime()
+      const now = new Date().getTime()
+      return (now - uploadTime) < 30000 // Last 30 seconds
+    });
+
+    const uploadNotifications = recentUploads.map(upload => ({
+      id: upload.id,
+      text: upload.status === 'success' 
+        ? `${upload.name} uploaded successfully`
+        : upload.status === 'error'
+        ? `Failed to upload ${upload.name}`
+        : `Uploading ${upload.name}...`
+    }));
+
+    setNotifications((prev: any) => {
+      const existingIds = prev.map((n: any) => n.id);
+      const newNotifications = uploadNotifications.filter((n: any) => !existingIds.includes(n.id));
+      return [...newNotifications, ...prev].slice(0, 10); // Keep last 10 notifications
+    });
+  }, [uploads]);
+
   const handleClick = (event: React.MouseEvent<HTMLButtonElement>) => {
     setAnchorE(event.currentTarget)
   }

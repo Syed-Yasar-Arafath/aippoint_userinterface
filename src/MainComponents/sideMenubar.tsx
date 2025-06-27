@@ -70,7 +70,7 @@ function SideMenuBars() {
       ],
     },
     { text: 'Coding Assessment', link: '/', icon: <CodeIcon /> },
-    { text: 'Analytics', link: '/analytics', icon: <AnalyticsIcon /> },
+    { text: 'Analytics', link: '/analytics_report', icon: <AnalyticsIcon /> },
     { text: 'Settings', link: '/settings', icon: <SettingsIcon /> },
     { text: 'Support', link: '/support', icon: <HelpIcon /> },
   ]

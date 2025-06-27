@@ -12,6 +12,7 @@ import PlayCircleIcon from '@mui/icons-material/PlayCircle';
 import HorizontalRuleIcon from '@mui/icons-material/HorizontalRule';
 import { Dayjs } from 'dayjs';
 import axios from 'axios';
+import { useNavigate } from 'react-router-dom';
 
 function AnalyticsReport() {
     const theme = useTheme()
@@ -48,12 +49,12 @@ function AnalyticsReport() {
             const organisation = localStorage.getItem('organisation');
             try {
                 const response = await axios.get("http://localhost:8000/get_all_interview_data/", {
-                    method: 'POST',
                     headers: {
-                        'Content-Type': 'application/json',
-                        Organization: organisation || '',
-                    },
+                        "Content-Type": "application/json",
+                        Organization: organisation || ''
+                    }
                 });
+
                 const report = response.data.data;
                 console.log("Interview Data:", report);
                 // setInterviewData(report)
@@ -62,6 +63,7 @@ function AnalyticsReport() {
                     .filter((item: any) => item.resume_data)
                     .map((item: any, index: number) => ({
                         id: index + 1,
+                        candidateId: item._id || 'N/A',
                         name: item.resume_data.name || 'N/A',
                         email: item.resume_data.email || 'N/A',
                         position: item.resume_data.job_role || 'N/A',
@@ -203,6 +205,8 @@ function AnalyticsReport() {
         fontWeight: 700,
         color: '#FFFFFF',
     }
+
+    const navigate = useNavigate();
 
     return (
         <>
@@ -447,9 +451,11 @@ function AnalyticsReport() {
                                                     </TableCell>
                                                     <TableCell sx={tableHeading}>Full Name & Email</TableCell>
                                                     <TableCell sx={tableHeading}>Position</TableCell>
-                                                    <TableCell sx={tableHeading}>Interview Status</TableCell>
+                                                    {/*<TableCell sx={tableHeading}>Interview Status</TableCell>
                                                     <TableCell sx={tableHeading}>AI Interview Score</TableCell>
-                                                    <TableCell sx={tableHeading}>AI Coding Assessment Score</TableCell>
+                                                    <TableCell sx={tableHeading}>AI Coding Assessment Score</TableCell> */}
+                                                    <TableCell sx={tableHeading}>Interview Type</TableCell>
+                                                    <TableCell sx={tableHeading}>View</TableCell>
                                                 </TableRow>
                                             </TableHead>
                                             <TableBody>
@@ -525,7 +531,7 @@ function AnalyticsReport() {
                                                                         textAlign: 'center'
                                                                     }}>{profile.type}</Typography>
                                                                 </TableCell>
-                                                                <TableCell>
+                                                                {/* <TableCell>
                                                                     {profile.interviewStatus === 'Completed' ? (
                                                                         <Box sx={{
                                                                             display: 'flex',
@@ -606,6 +612,29 @@ function AnalyticsReport() {
                                                                             </Button>
                                                                         </Box>
                                                                     )}
+                                                                </TableCell> */}
+                                                                <TableCell>
+                                                                    <Button
+                                                                        sx={{
+                                                                            textTransform: 'none',
+                                                                            background: '#0284C7',
+                                                                            borderRadius: '6px',
+                                                                            color: '#FFFFFF',
+                                                                            fontSize: '12px',
+                                                                            fontWeight: 500,
+                                                                            fontFamily: 'SF Pro Display',
+                                                                            '&:hover': {
+                                                                                background: '#0284C7',
+                                                                            },
+                                                                        }}
+                                                                        onClick={() =>
+                                                                            profile.type === 'AI'
+                                                                                ? navigate('/candidate_interview_analytics', { state: { id: profile.candidateId } })
+                                                                                : navigate('/candidate_coding_assessment', { state: { id: profile.candidateId } })
+                                                                        }
+                                                                    >
+                                                                        View
+                                                                    </Button>
                                                                 </TableCell>
                                                             </TableRow>
                                                         );

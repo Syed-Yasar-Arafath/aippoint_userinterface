@@ -11,10 +11,15 @@ import VisibilityIcon from '@mui/icons-material/Visibility';
 import LinearProgress, { linearProgressClasses } from '@mui/material/LinearProgress';
 import { styled } from '@mui/material/styles';
 import axios from 'axios';
+import { useLocation } from 'react-router-dom';
 
 function CandidateCodingAssessment() {
 
-    const objectId = "67ff9fe1633a966b147d35a4"
+    const location = useLocation()
+    const { id } = location.state || {}
+    console.log(id)
+
+    const objectId = id
 
     const CustomLinearProgress = styled(LinearProgress)({
         height: 10,
@@ -127,12 +132,14 @@ function CandidateCodingAssessment() {
 
     useEffect(() => {
         const fetchInterviewData = async () => {
+            const organisation = localStorage.getItem('organisation');
             try {
                 const response = await axios.post("http://localhost:8000/get_interview_data/", {
                     object_id: objectId,
                 }, {
                     headers: {
-                        "Content-Type": "application/json"
+                        "Content-Type": "application/json",
+                        Organization: organisation || ''
                     }
                 });
 
@@ -143,7 +150,7 @@ function CandidateCodingAssessment() {
                 setCodeAnalysis(report.code_analysis)
 
                 setInterviewData(report)
-  
+
                 // ✅ Default selection logic
                 if (report.questions.length > 0) {
                     const firstTitle = report.questions[0].title;
@@ -239,7 +246,7 @@ function CandidateCodingAssessment() {
         fetchInterviewData();
     }, []);
 
-   const downloadPDF = async (objectId: string) => {
+    const downloadPDF = async (objectId: string) => {
         try {
             const organisation = localStorage.getItem('organisation');
 
@@ -417,7 +424,7 @@ function CandidateCodingAssessment() {
                                                 }
                                             }}
                                         >
-                                            {interviewData.programming_language || 'N/A'}
+                                            {interviewData.resume_data.job_role.split(' ')[0] || 'N/A'}
                                         </Button>
                                     </Box>
                                 </CardContent>
@@ -470,7 +477,7 @@ function CandidateCodingAssessment() {
                                             flexDirection: 'row'
                                         }}>
                                             <Typography sx={cardTitleStyle}>Code Assesment Metrics</Typography>
-                                            <Typography sx={{
+                                            {/* <Typography sx={{
                                                 color: '#1C1C1E',
                                                 fontSize: '10px',
                                                 fontWeight: 500,
@@ -480,7 +487,7 @@ function CandidateCodingAssessment() {
                                                 padding: '2px'
                                             }}>
                                                 Detailed info <CircleAlert height='15px' />
-                                            </Typography>
+                                            </Typography> */}
                                         </Box>
                                         <Box mt={1} sx={{ height: '140px', overflow: 'auto' }}>
                                             {/* <ReactApexChart

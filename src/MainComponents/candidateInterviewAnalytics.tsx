@@ -12,11 +12,16 @@ import VisibilityIcon from '@mui/icons-material/Visibility';
 import LinearProgress, { linearProgressClasses } from '@mui/material/LinearProgress';
 import { styled } from '@mui/material/styles';
 import axios from 'axios';
+import { useLocation } from 'react-router-dom';
 
 function CandidateInterviewAnalytics() {
 
-    const objectId = "6823223b62f855414c79e6c8"
-    
+    const location = useLocation()
+    const { id } = location.state || {}
+    console.log(id)
+
+    const objectId = id
+
     const [interviewData, setInterviewData] = useState<any>(null)
     const [technicalQuestions, setTechnicalQuestions] = useState<any>([]);
     const [proctoringDetails, setProctoringDetails] = useState<any[]>([]);
@@ -24,12 +29,14 @@ function CandidateInterviewAnalytics() {
 
     useEffect(() => {
         const fetchInterviewData = async () => {
+            const organisation = localStorage.getItem('organisation');
             try {
                 const response = await axios.post("http://localhost:8000/get_interview_data/", {
                     object_id: objectId,
                 }, {
                     headers: {
-                        "Content-Type": "application/json"
+                        "Content-Type": "application/json",
+                        Organization: organisation || ''
                     }
                 });
 
@@ -558,7 +565,7 @@ function CandidateInterviewAnalytics() {
                                             alignContent: 'center',
                                             padding: '0px 10px',
                                             height: '30px'
-                                        }}>{interviewData.resume_data.date || 'N/A'}</Typography>
+                                        }}>Date: {interviewData.resume_data.date || 'N/A'}</Typography>
                                     </Box>
                                     <Typography mt={1} sx={{
                                         color: '#1C1C1E80',
@@ -573,7 +580,7 @@ function CandidateInterviewAnalytics() {
                                         justifyContent: 'space-between',
                                         flexDirection: 'row',
                                     }}>
-                                        <Typography sx={{
+                                        {/* <Typography sx={{
                                             alignContent: 'center',
                                             border: '0.5px solid #1C1C1E1A',
                                             borderRadius: '6px',
@@ -593,7 +600,9 @@ function CandidateInterviewAnalytics() {
                                             fontFamily: 'SF Pro Display',
                                         }}
                                             onClick={() => downloadResume(interviewData.resume_data.resume_id)}
-                                        >Download CV</Button>
+                                        >
+                                            Download CV
+                                        </Button> */}
                                     </Box>
                                 </CardContent>
                             </Card>
@@ -739,7 +748,7 @@ function CandidateInterviewAnalytics() {
                                         flexDirection: 'row'
                                     }}>
                                         <Typography sx={cardTitleStyle}>Question-wise Performance</Typography>
-                                        <FormControl>
+                                        {/* <FormControl>
                                             <Select
                                                 labelId="skill-select-label"
                                                 id="skill-select"
@@ -749,13 +758,13 @@ function CandidateInterviewAnalytics() {
                                                 <MenuItem value="false" sx={{ fontFamily: 'SF Pro Display', }}>Technical Question</MenuItem>
                                                 <MenuItem value="true" sx={{ fontFamily: 'SF Pro Display', }}>Coding Question</MenuItem>
                                             </Select>
-                                        </FormControl>
+                                        </FormControl> */}
                                     </Box>
                                     <Box mt={2} sx={{
                                         height: '170px',
                                         overflow: 'auto'
                                     }}>
-                                        {selectedQuestionType ? (
+                                        {/* {selectedQuestionType ? (
                                             'No Data'
                                         ) : (
                                             technicalQuestions.map((item: any, index: any) => (
@@ -777,7 +786,26 @@ function CandidateInterviewAnalytics() {
                                                     </Box>
                                                 </Box>
                                             ))
-                                        )}
+                                        )} */}
+                                        {technicalQuestions.map((item: any, index: any) => (
+                                            <Box key={index} mb={2}>
+                                                <Typography sx={{
+                                                    fontSize: '12px',
+                                                    fontWeight: 500,
+                                                    fontFamily: 'SF Pro Display',
+                                                    color: '#1C1C1E'
+                                                }}>{index + 1}.{item.question}</Typography>
+                                                <Box sx={{
+                                                    display: 'flex',
+                                                    flexDirection: 'row',
+                                                    justifyContent: 'space-between',
+                                                }}>
+                                                    <Typography sx={{ ...questionPerformanceStyle, color: getColorByRange(item.analysis.correctness), }}>Correctness: {item.analysis.correctness}%</Typography>
+                                                    <Typography sx={{ ...questionPerformanceStyle, color: getColorByRange(item.analysis.clarity), }}>Clarity: {item.analysis.clarity}%</Typography>
+                                                    <Typography sx={{ ...questionPerformanceStyle, color: getColorByRange(item.analysis.Perfection), }}>Perfection: {item.analysis.Perfection}%</Typography>
+                                                </Box>
+                                            </Box>
+                                        ))}
                                     </Box>
                                 </CardContent>
                             </Card>
@@ -792,7 +820,7 @@ function CandidateInterviewAnalytics() {
                                         flexDirection: 'row'
                                     }}>
                                         <Typography sx={cardTitleStyle}>Interview Outcome</Typography>
-                                        <FormControl>
+                                        {/* <FormControl>
                                             <Select
                                                 labelId="skill-select-label"
                                                 id="skill-select"
@@ -802,19 +830,19 @@ function CandidateInterviewAnalytics() {
                                                 <MenuItem value="false" sx={{ fontFamily: 'SF Pro Display', }}>All Question</MenuItem>
                                                 <MenuItem value="true" sx={{ fontFamily: 'SF Pro Display', }}>Question</MenuItem>
                                             </Select>
-                                        </FormControl>
+                                        </FormControl> */}
                                     </Box>
                                     <Box mt={2}>
-                                        {selectedAllQuestionType ? (
+                                        {/* {selectedAllQuestionType ? (
                                             'No Data'
-                                        ) : (
-                                            <ReactApexChart
-                                                options={columnChart.options as ApexOptions}
-                                                series={columnChart.series}
-                                                type="bar"
-                                                height={200}
-                                            />
-                                        )}
+                                        ) : ( */}
+                                        <ReactApexChart
+                                            options={columnChart.options as ApexOptions}
+                                            series={columnChart.series}
+                                            type="bar"
+                                            height={200}
+                                        />
+                                        {/* )} */}
                                     </Box>
                                 </CardContent>
                             </Card>
@@ -881,7 +909,7 @@ function CandidateInterviewAnalytics() {
                                         flexDirection: 'row'
                                     }}>
                                         <Typography sx={cardTitleStyle}>Interview Summary</Typography>
-                                        <FormControl>
+                                        {/* <FormControl>
                                             <Select
                                                 labelId="skill-select-label"
                                                 id="skill-select"
@@ -891,55 +919,55 @@ function CandidateInterviewAnalytics() {
                                                 <MenuItem value="false" sx={{ fontFamily: 'SF Pro Display', }}>All</MenuItem>
                                                 <MenuItem value="true" sx={{ fontFamily: 'SF Pro Display', }}>Individual</MenuItem>
                                             </Select>
-                                        </FormControl>
+                                        </FormControl> */}
                                     </Box>
                                     <Box mt={2} sx={{ height: '170px', overflow: 'auto' }}>
-                                        {selectedType ? (
+                                        {/* {selectedType ? (
                                             'No Data'
-                                        ) : (
-                                            <Box sx={{
-                                                display: 'flex',
-                                                flexDirection: 'column',
-                                                gap: '10px'
-                                            }}>
-                                                <Box>
-                                                    <Typography sx={{ ...interviewSummaryHeadingStyle, color: '#22973F', }}>
-                                                        Strengths
+                                        ) : ( */}
+                                        <Box sx={{
+                                            display: 'flex',
+                                            flexDirection: 'column',
+                                            gap: '10px'
+                                        }}>
+                                            <Box>
+                                                <Typography sx={{ ...interviewSummaryHeadingStyle, color: '#22973F', }}>
+                                                    Strengths
+                                                </Typography>
+                                                {strengths.map((str: any, index: number) => (
+                                                    <Typography
+                                                        key={`strength-${index}`}
+                                                        sx={{
+                                                            color: '#1C1C1E',
+                                                            fontSize: '12px',
+                                                            fontWeight: 400,
+                                                            fontFamily: 'SF Pro Display',
+                                                        }}
+                                                    >
+                                                        <CircleCheck color='#22973F' height='20px' /> {str}
                                                     </Typography>
-                                                    {strengths.map((str: any, index: number) => (
-                                                        <Typography
-                                                            key={`strength-${index}`}
-                                                            sx={{
-                                                                color: '#1C1C1E',
-                                                                fontSize: '12px',
-                                                                fontWeight: 400,
-                                                                fontFamily: 'SF Pro Display',
-                                                            }}
-                                                        >
-                                                            <CircleCheck color='#22973F' height='20px' /> {str}
-                                                        </Typography>
-                                                    ))}
-                                                </Box>
-                                                <Box>
-                                                    <Typography sx={{ ...interviewSummaryHeadingStyle, color: '#FF3B30', }}>
-                                                        Improvements
-                                                    </Typography>
-                                                    {improvements.map((imp: any, index: number) => (
-                                                        <Typography
-                                                            key={`improvement-${index}`}
-                                                            sx={{
-                                                                color: '#1C1C1E',
-                                                                fontSize: '12px',
-                                                                fontWeight: 400,
-                                                                fontFamily: 'SF Pro Display',
-                                                            }}
-                                                        >
-                                                            <CircleAlert color='#FF3B30' height='20px' /> {imp}
-                                                        </Typography>
-                                                    ))}
-                                                </Box>
+                                                ))}
                                             </Box>
-                                        )}
+                                            <Box>
+                                                <Typography sx={{ ...interviewSummaryHeadingStyle, color: '#FF3B30', }}>
+                                                    Improvements
+                                                </Typography>
+                                                {improvements.map((imp: any, index: number) => (
+                                                    <Typography
+                                                        key={`improvement-${index}`}
+                                                        sx={{
+                                                            color: '#1C1C1E',
+                                                            fontSize: '12px',
+                                                            fontWeight: 400,
+                                                            fontFamily: 'SF Pro Display',
+                                                        }}
+                                                    >
+                                                        <CircleAlert color='#FF3B30' height='20px' /> {imp}
+                                                    </Typography>
+                                                ))}
+                                            </Box>
+                                        </Box>
+                                        {/* )} */}
                                     </Box>
                                 </CardContent>
                             </Card>

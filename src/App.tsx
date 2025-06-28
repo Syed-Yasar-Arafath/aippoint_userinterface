@@ -34,6 +34,8 @@ import SubmitInterview from './MainComponents/interview/submitinterview';
 import AnalyticsReport from './MainComponents/analyticsReport';
 import CandidateInterviewAnalytics from './MainComponents/candidateInterviewAnalytics';
 import CandidateCodingAssessment from './MainComponents/candidateCodingAssessment';
+import FileUploadInterface from './MainComponents/uploadstatus';
+import ResumeList from './MainComponents/resumelist';
 
 const drawerWidth = 240
 
@@ -130,6 +132,8 @@ const AppContent: React.FC = () => {
               <Route path="/interviewDetails/:id" element={<InterviewDetails />} />
               <Route path="/AIJDCreator" element={<AIJDCreator />} />
               <Route path="/UpcomingInterview" element={<UpcomingInterview />} />
+              <Route path="/uploadstatus" element={<FileUploadInterface />} />
+              <Route path="/resumelist" element={<ResumeList />} />
 
               <Route path="/analytics_report" element={<AnalyticsReport />} />
               <Route path="/candidate_interview_analytics" element={<CandidateInterviewAnalytics />} />

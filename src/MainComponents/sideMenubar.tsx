@@ -45,7 +45,7 @@ function SideMenuBars() {
       icon: <DescriptionIcon />,
       subItems: [
         { text: 'Upload', link: '/uploadCV', icon: <DescriptionIcon /> },
-        { text: 'Review', link: '/reviewCv', icon: <DescriptionIcon /> },
+        { text: 'Review', link: '/resumelist', icon: <DescriptionIcon /> },
       ],
     },
     {

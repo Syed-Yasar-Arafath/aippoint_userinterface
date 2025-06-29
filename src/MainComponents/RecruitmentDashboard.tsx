@@ -4,10 +4,15 @@ import KeyboardArrowDownSharpIcon from '@mui/icons-material/KeyboardArrowDownSha
 import CalendarMonthIcon from '@mui/icons-material/CalendarMonth'
 import AccessTimeIcon from '@mui/icons-material/AccessTime'
 import axios from 'axios'
+import Header from '../CommonComponents/topheader'
+import { getUserDetails } from '../services/UserService'
+
 const RecruitmentDashboard: React.FC = () => {
   // State to manage the active tab
   const [activeTab, setActiveTab] = useState('JD Overview')
   const [error, setError] = useState<string | null>(null)
+  const [userProfileImage, setUserProfileImage] = useState<string | null>(null)
+  const organisation = localStorage.getItem('organisation')
 
   // Interface for StatCard
   interface StatCardProps {
@@ -121,7 +126,6 @@ const RecruitmentDashboard: React.FC = () => {
     active: boolean
     onClick: () => void
   }
- const organisation = localStorage.getItem('organisation')
 
   const sendOrg = async (dbName: any) => {
     try {
@@ -159,6 +163,27 @@ const RecruitmentDashboard: React.FC = () => {
     fetchDiagnostic()
     sendOrg(organisation);
   }, [organisation])
+
+  // Fetch user profile image
+  useEffect(() => {
+    const getUserData = async () => {
+      try {
+        const res = await getUserDetails(organisation);
+        if (res.imageUrl) {
+          setUserProfileImage(
+            `${process.env.REACT_APP_SPRINGBOOT_BACKEND_SERVICE}/user/read/downloadFile/${res.imageUrl}/${organisation}`,
+          );
+        } else {
+          setUserProfileImage(null);
+        }
+      } catch (error) {
+        console.error('Error fetching user data:', error);
+      }
+    };
+
+    getUserData();
+  }, [organisation]);
+
   const Tab: React.FC<TabProps> = ({ label, active, onClick }) => {
     return (
       <button
@@ -785,6 +810,13 @@ const RecruitmentDashboard: React.FC = () => {
         fontFamily: 'sans-serif',
       }}
     >
+      {/* Header */}
+      <Header
+        title="Dashboard"
+        userProfileImage={userProfileImage}
+        path="/RecruitmentDashboard"
+      />
+
       {/* Top Stats Cards */}
       <div
         style={{

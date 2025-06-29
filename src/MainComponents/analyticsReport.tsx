@@ -13,6 +13,8 @@ import HorizontalRuleIcon from '@mui/icons-material/HorizontalRule';
 import { Dayjs } from 'dayjs';
 import axios from 'axios';
 import { useNavigate } from 'react-router-dom';
+import Header from '../CommonComponents/topheader';
+import { getUserDetails } from '../services/UserService';
 
 function AnalyticsReport() {
     const theme = useTheme()
@@ -23,6 +25,8 @@ function AnalyticsReport() {
 
     const [selectedJobRole, setSelectedJobRole] = useState('');
     const [selectedInterviewStatus, setSelectedInterviewStatus] = useState('');
+    const [userProfileImage, setUserProfileImage] = useState<string | null>(null)
+    const organisation = localStorage.getItem('organisation')
 
     const jobRoles = ['Java Developer', 'Python Developer', 'React Developer', 'Full Stack Developer']
     // const interviewStatus = ['Completed', 'Not Attended', 'Cancelled', 'Rescheduled']
@@ -81,6 +85,26 @@ function AnalyticsReport() {
 
         fetchInterviewData();
     }, []);
+
+    // Fetch user profile image
+    useEffect(() => {
+        const getUserData = async () => {
+            try {
+                const res = await getUserDetails(organisation);
+                if (res.imageUrl) {
+                    setUserProfileImage(
+                        `${process.env.REACT_APP_SPRINGBOOT_BACKEND_SERVICE}/user/read/downloadFile/${res.imageUrl}/${organisation}`,
+                    );
+                } else {
+                    setUserProfileImage(null);
+                }
+            } catch (error) {
+                console.error('Error fetching user data:', error);
+            }
+        };
+
+        getUserData();
+    }, [organisation]);
 
     const [page, setPage] = useState(0)
     const fixedRowsPerPage = 5
@@ -210,6 +234,13 @@ function AnalyticsReport() {
 
     return (
         <>
+            {/* Header */}
+            <Header
+                title="Analytics Report"
+                userProfileImage={userProfileImage}
+                path="/analytics_report"
+            />
+
             <Grid
                 padding={2}
                 sx={{ background: '#F7F7F7' }}

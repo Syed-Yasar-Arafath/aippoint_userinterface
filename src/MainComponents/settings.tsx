@@ -35,6 +35,8 @@ import React, { useEffect, useRef, useState } from 'react'
 import AddIcon from '@mui/icons-material/Add'
 import ExpandMoreIcon from '@mui/icons-material/ExpandMore'
 import { Email } from '@mui/icons-material'
+import Header from '../CommonComponents/topheader'
+import { getUserDetails } from '../services/UserService'
 
 const tabs = [
   'General Settings',
@@ -57,6 +59,8 @@ const Settings: React.FC = () => {
     'https://www.gravatar.com/avatar/?d=mp',
   )
   const [selectedImage, setSelectedImage] = useState<File | null>(null) // Store selected file
+  const [userProfileImage, setUserProfileImage] = useState<string | null>(null)
+  const organisation = localStorage.getItem('organisation')
 
   const fileInputRef = useRef<HTMLInputElement>(null)
 
@@ -276,19 +280,12 @@ const Settings: React.FC = () => {
   }
   const token = localStorage.getItem('token')
   const getUserData=async ()=>{
-      const organisation=localStorage.getItem('organisation')
-    try{
-      const res=await axios.get(`http://localhost:8082/admin/getuserbytoken/${organisation}`,{
-        headers:{
-          Authorization:`Bearer ${token}`
-        }
-      })
-      if(res.status===200){
-        setUserName(res.data.first_name)
-        setUserEmail(res.data.email)
-      }
-    }catch(error){
-
+    try {
+      const res = await getUserDetails(organisation)
+      setUserName(res.name)
+      setUserEmail(res.email)
+    } catch (error) {
+      console.error('Error fetching user data:', error)
     }
   }
 
@@ -320,6 +317,27 @@ const Settings: React.FC = () => {
   useEffect(()=>{
     getUserData()
   },[])
+
+  // Fetch user profile image
+  useEffect(() => {
+    const getUserData = async () => {
+      try {
+        const res = await getUserDetails(organisation);
+        if (res.imageUrl) {
+          setUserProfileImage(
+            `${process.env.REACT_APP_SPRINGBOOT_BACKEND_SERVICE}/user/read/downloadFile/${res.imageUrl}/${organisation}`,
+          );
+        } else {
+          setUserProfileImage(null);
+        }
+      } catch (error) {
+        console.error('Error fetching user data:', error);
+      }
+    };
+
+    getUserData();
+  }, [organisation]);
+
   const handleSaveChangesFirsttab = async () => {
   try {
     const formData = new FormData()
@@ -535,6 +553,13 @@ const Settings: React.FC = () => {
         width: '100%',
       }}
     >
+      {/* Header */}
+      <Header
+        title="Settings"
+        userProfileImage={userProfileImage}
+        path="/settings"
+      />
+
       <div
         style={{
           display: 'flex',
@@ -2109,118 +2134,43 @@ const Settings: React.FC = () => {
               justifyContent="center"
               paddingTop="30px"
             >
-              {/* <Button variant='outlined' style={{ padding: '14px 41px 14px 41px', color: '#1C1C1E', fontWeight: 500, fontSize: 12 }}>Reset to Default</Button>
-                            <Button variant='contained' style={{ padding: '14px 41px 14px 41px', color: '#FFFFFF', fontWeight: 500, fontSize: 12 }}>Save Changes</Button> */}
-              <Button
-                style={{
-                  padding: '14px 41px',
-                  textTransform: 'none',
-                  backgroundColor: 'white',
-                  border: '1px solid #1C1C1E',
-                  borderRadius: 8,
-                  cursor: 'pointer',
-                  fontWeight: 500,
-                  fontSize: '12px',
-                  color: '#1C1C1E',
-                  fontFamily: 'SF Pro Display',
-                  lineHeight: '100%',
-                }}
-                onClick={handleReset}
-              >
-                Reset to Default
-              </Button>
-              <Button
-                style={{
-                  padding: '14px 41px',
-                  textTransform: 'none',
-                  backgroundColor: '#007bce',
-                  color: 'white',
-                  border: 'none',
-                  borderRadius: 8,
-                  cursor: 'pointer',
-                  fontWeight: 500,
-                  fontSize: 12,
-                  fontFamily: 'SF Pro Display',
-                  lineHeight: '100%',
-                }}
-                onClick={handleSaveChangesSecondtab}
-              >
-                Save Changes
-              </Button>
+                <Button
+                  style={{
+                    padding: '14px 41px',
+                    textTransform: 'none',
+                    backgroundColor: 'white',
+                    border: '1px solid #1C1C1E',
+                    borderRadius: 8,
+                    cursor: 'pointer',
+                    fontWeight: 500,
+                    fontSize: '12px',
+                    color: '#1C1C1E',
+                    fontFamily: 'SF Pro Display',
+                    lineHeight: '100%',
+                  }}
+                  onClick={handleReset}
+                >
+                  Reset to Default
+                </Button>
+                <Button
+                  style={{
+                    padding: '14px 41px',
+                    textTransform: 'none',
+                    backgroundColor: '#007bce',
+                    color: 'white',
+                    border: 'none',
+                    borderRadius: 8,
+                    cursor: 'pointer',
+                    fontWeight: 500,
+                    fontSize: 12,
+                    fontFamily: 'SF Pro Display',
+                    lineHeight: '100%',
+                  }}
+                  onClick={handleSaveChangesSecondtab}
+                >
+                  Save Changes
+                </Button>
             </Box>
-
-            {/* <Box p={4} width='100%' mx='auto'>
-                            <Box display='flex' alignItems='center' justifyContent='space-between' mb={3}>
-                                <Box>
-                                    <Typography fontWeight='bold'>Text Size Adjustment</Typography>
-                                </Box>
-                                <Box width='200px'>
-                                    <Slider
-                                        value={textSize}
-                                        min={-5}
-                                        max={5}
-                                        onChange={(e: any, value: any) => setTextSize(value as number)}
-                                        aria-labelledby='text-size-slider'
-                                    />
-                                    <Typography align='center'>{textSize}</Typography>
-                                </Box>
-                            </Box>
-
-                            <Box display='flex' alignItems='center' justifyContent='space-between' mb={3}>
-                                <Box>
-                                    <Typography fontWeight='bold'>Appearance</Typography>
-                                </Box>
-                                <FormControl variant='outlined' size='small' sx={{ width: 200 }}>
-                                    <Select value={appearance} onChange={(e) => setAppearance(e.target.value)}>
-                                        <MenuItem value='Light'>Light</MenuItem>
-                                        <MenuItem value='Dark'>Dark</MenuItem>
-                                    </Select>
-                                </FormControl>
-                            </Box>
-
-                            {[
-                                {
-                                    label: 'Text-to-Speech (TTS)',
-                                },
-                                {
-                                    label: 'Speech-to-Text (STT) Input',
-                                },
-                                {
-                                    label: 'Voice Navigation Assistance',
-                                }
-                            ].map((item, idx) => (
-                                <Box key={idx} display='flex' alignItems='center' justifyContent='space-between' mb={3}>
-                                    <Box>
-                                        <Typography fontWeight='bold'>{item.label}</Typography>
-                                    </Box>
-                                    <Box display='flex' gap={2} alignItems='center'>
-                                        <FormControl variant='outlined' size='small' sx={{ width: 200 }}>
-                                            <Select value='Off' disabled>
-                                                <MenuItem value='Off'>Off</MenuItem>
-                                            </Select>
-                                        </FormControl>
-                                        <Chip label='Coming Soon' color='success' variant='outlined' />
-                                    </Box>
-                                </Box>
-                            ))}
-
-                            <Box display='flex' alignItems='center' justifyContent='space-between' mb={4}>
-                                <Box>
-                                    <Typography fontWeight='bold'>Enable Captions & Subtitles</Typography>
-                                </Box>
-                                <FormControl variant='outlined' size='small' sx={{ width: 200 }}>
-                                    <Select value={captions} onChange={(e) => setCaptions(e.target.value)}>
-                                        <MenuItem value='On'>On</MenuItem>
-                                        <MenuItem value='Off'>Off</MenuItem>
-                                    </Select>
-                                </FormControl>
-                            </Box>
-
-                            <Box display='flex' gap={2} justifyContent='center'>
-                                <Button variant='outlined' style={{ padding: '14px 41px 14px 41px', color: '#1C1C1E', fontWeight: 500, fontSize: 12 }}>Reset to Default</Button>
-                                <Button variant='contained' style={{ padding: '14px 41px 14px 41px', color: '#FFFFFF', fontWeight: 500, fontSize: 12 }}>Save Changes</Button>
-                            </Box>
-                        </Box> */}
           </>
         )}
       </div>

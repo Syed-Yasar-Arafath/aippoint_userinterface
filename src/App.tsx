@@ -36,6 +36,7 @@ import CandidateInterviewAnalytics from './MainComponents/candidateInterviewAnal
 import CandidateCodingAssessment from './MainComponents/candidateCodingAssessment';
 import FileUploadInterface from './MainComponents/uploadstatus';
 import ResumeList from './MainComponents/resumelist';
+// import QuestionFormat from './MainComponents/question_format';
 
 const drawerWidth = 240
 
@@ -134,6 +135,7 @@ const AppContent: React.FC = () => {
               <Route path="/UpcomingInterview" element={<UpcomingInterview />} />
               <Route path="/uploadstatus" element={<FileUploadInterface />} />
               <Route path="/resumelist" element={<ResumeList />} />
+              {/* <Route path="/questionformat" element={<QuestionFormat />} /> */}
 
               <Route path="/analytics_report" element={<AnalyticsReport />} />
               <Route path="/candidate_interview_analytics" element={<CandidateInterviewAnalytics />} />

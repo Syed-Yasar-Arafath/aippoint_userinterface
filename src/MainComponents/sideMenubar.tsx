@@ -38,7 +38,7 @@ function SideMenuBars() {
   const navigate = useNavigate()
   const pathLocation = useLocation()
   const menuItems = [
-    { text: 'Dashboard', link: '/RecruitmentDashboard', icon: <DashboardIcon /> },
+    // { text: 'Dashboard', link: '/RecruitmentDashboard', icon: <DashboardIcon /> },
     {
       text: 'CV Manager',
       link: '/uploadCV',
@@ -57,14 +57,14 @@ function SideMenuBars() {
         { text: 'JD Collection', link: '/jdcollection', icon: <WorkIcon /> },
       ],
     },
-    { text: 'Search Resumes', link: '/', icon: <SearchIcon /> },
-    { text: 'Collections', link: '/collectiondefault', icon: <CollectionsIcon /> },
+    // { text: 'Search Resumes', link: '/', icon: <SearchIcon /> },
+    // { text: 'Collections', link: '/collectiondefault', icon: <CollectionsIcon /> },
     {
       text: 'AI Interview Suite',
       link: '/UpcomingInterview',
       icon: <QuestionAnswerIcon />,
       subItems: [
-        { text: 'Schedule Interview', link: '/interviewSchedule', icon: <QuestionAnswerIcon /> },
+        { text: 'Schedule Interview', link: '/questionformat', icon: <QuestionAnswerIcon /> },
         { text: 'Upcoming', link: '/UpcomingInterview', icon: <QuestionAnswerIcon /> },
         { text: 'Interview Status', link: '/collectiondefaultfilter', icon: <QuestionAnswerIcon /> },
       ],

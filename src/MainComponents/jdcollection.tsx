@@ -77,6 +77,79 @@ const JdCollection: React.FC = () => {
     margin: '5px',
   }
 
+  //  useEffect(() => {
+  //   const fetchJobData = async () => {
+  //     try {
+  //       const response = await getJobActive(organisation)
+  //       const jdid = jobid
+  //       if (jdid != null) {
+  //         const selectedValue = jdid
+  //         const job = response.find((item: any) => item.jobid == selectedValue)
+  //         dispatch(loaderOn())
+  //         try {
+  //           setJdTitle(job.job_title.trim())
+  //           const searchText = job?.job_title.trim()
+  //           const selectedExpValue = job?.experience_required
+  //           const selectedSkillValue = job?.skills.trim()
+  //             ? [job?.skills.trim()]
+  //             : []
+  //           const selectedLocValue = job?.location.trim()
+  //           const jsonData: {
+  //             skills?: string[]
+  //             exp?: any
+  //             designation?: string
+  //             location?: string
+  //           } = {}
+
+  //           if (searchText) {
+  //             jsonData.designation = searchText
+  //           }
+  //           if (selectedSkillValue.length > 0) {
+  //             jsonData.skills = selectedSkillValue
+  //           }
+  //           if (selectedExpValue) {
+  //             jsonData.exp = selectedExpValue
+  //           }
+  //           if (selectedLocValue) {
+  //             jsonData.location = selectedLocValue
+  //           }
+
+  //           const resumeResponse = await getAllResume(jsonData)
+  //           const jsonDataa = { jd_id: parseInt(jobid, 10) }
+
+  //           // dispatch(loaderOn())
+  //           try {
+  //             const res = await getResumeScore(jsonDataa)
+  //             console.log(res)
+
+  //             if (res) {
+  //               const sortedProfiles = res.sort(
+  //                 (a: any, b: any) => b.score - a.score,
+  //               )
+  //               setProfile(sortedProfiles)
+  //             }
+  //             dispatch(loaderOff())
+  //           } catch (err) {
+  //             console.error('Request error:', err)
+  //             dispatch(loaderOff())
+  //           }
+  //           // setProfile(resumeResponse)
+  //           // setProfileLength(resumeResponse.length)
+
+  //           // dispatch(loaderOff())
+  //         } catch (error) {
+  //           console.error('Request error:', error)
+  //           dispatch(loaderOff())
+  //         }
+  //       }
+  //     } catch (error) {
+  //       console.error('Error fetching active jobs:', error)
+  //     }
+  //   }
+
+  //   fetchJobData()
+  // }, [jobid])
+
   const JobCard: React.FC<{ job: Job }> = ({ job }) => (
     <Card
       variant="outlined"

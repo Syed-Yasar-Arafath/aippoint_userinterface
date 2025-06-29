@@ -1,10 +1,11 @@
-import React, { useState, useRef } from 'react';
+import React, { useState, useRef, useEffect } from 'react';
 import CloudUploadOutlinedIcon from '@mui/icons-material/CloudUploadOutlined';
 import { uploadResume } from '../services/ResumeService';
 import { useDispatch } from 'react-redux';
-import { addUpload, updateUploadStatus } from '../redux/actions';
+import { addUpload, openSnackbar, updateUploadStatus } from '../redux/actions';
 import Header from '../CommonComponents/topheader';
 import { t } from 'i18next';
+import { useTranslation } from 'react-i18next';
 
 interface ResumeFile {
   id: string;
@@ -24,6 +25,42 @@ const UploadCV: React.FC = () => {
   const [userEmail, setUserEmail] = useState('test@example.com');
   const dispatch = useDispatch();
   const [userProfileImage, setUserProfileImage]: any = React.useState(null)
+  const { t, i18n } = useTranslation()
+
+  // Pagination state
+  const [currentPage, setCurrentPage] = useState(1);
+  const resumesPerPage = 12;
+
+  // Pagination functions
+  const filteredFiles = resumeFiles.filter(file => 
+    selectedFilter === 'Filter By Status' || file.status === selectedFilter.toLowerCase()
+  );
+  
+  const totalPages = Math.ceil(filteredFiles.length / resumesPerPage);
+  const startIndex = (currentPage - 1) * resumesPerPage;
+  const endIndex = startIndex + resumesPerPage;
+  const currentFiles = filteredFiles.slice(startIndex, endIndex);
+
+  const handlePageChange = (page: number) => {
+    setCurrentPage(page);
+  };
+
+  const handlePreviousPage = () => {
+    if (currentPage > 1) {
+      setCurrentPage(currentPage - 1);
+    }
+  };
+
+  const handleNextPage = () => {
+    if (currentPage < totalPages) {
+      setCurrentPage(currentPage + 1);
+    }
+  };
+
+  // Reset to first page when filter changes
+  useEffect(() => {
+    setCurrentPage(1);
+  }, [selectedFilter]);
 
   const getStatusText = (status: string) => {
     switch (status) {
@@ -203,7 +240,8 @@ const UploadCV: React.FC = () => {
         }));
       });
       
-      alert('Upload successful!');
+      dispatch(openSnackbar(t('uploadIsInProgressSnackbar'), 'green'))
+
 
       // Reset input and file state
       if (fileInputRef.current) {
@@ -232,7 +270,8 @@ const UploadCV: React.FC = () => {
         }));
       });
       
-      alert('Error uploading files. Please try again.');
+      // alert('Error uploading files. Please try again.');
+      
     }
   };
 
@@ -289,20 +328,20 @@ const UploadCV: React.FC = () => {
 
   return (
      
-    <div style={{ fontFamily: 'sans-serif', backgroundColor: '#F8FAFC', minHeight: '100vh', padding: '20px' }}>
+    <div style={{ fontFamily: 'sans-serif', backgroundColor: '#F8FAFC', minHeight: '100vh', padding: '10px' }}>
       {/* Upload Section */}
       <Header
-          title="upload"
+          title="Upload Resumes"
           userProfileImage={userProfileImage}
         />
       <div style={{
         border: '2px dashed #3B82F6',
         borderRadius: '12px',
         backgroundColor: '#FFFFFF',
-        padding: '50px 20px',
+        padding: '50px 10px',
         textAlign: 'center',
-        maxWidth: '100%',
-        margin: '0 auto 40px auto'
+        maxWidth: '90%',
+        margin: '0 auto 10px auto'
       }}>
         <h2 style={{ fontSize: '18px', fontWeight: '500', color: '#1F2937', marginBottom: '8px' }}>
           Upload your CV's or Resumes here
@@ -384,8 +423,11 @@ const UploadCV: React.FC = () => {
             justifyContent: 'space-between',
             alignItems: 'center',
             marginBottom: '20px',
-            maxWidth: '1200px',
-            margin: '0 auto 20px auto'
+            maxWidth: '100%',
+            margin: '0 auto 20px auto',
+            padding: '0 16px',
+            flexWrap: 'wrap',
+            gap: '12px'
           }}>
             <div>
               <h3 style={{ fontSize: '16px', fontWeight: '600', color: '#1F2937', marginBottom: '4px' }}>
@@ -396,9 +438,9 @@ const UploadCV: React.FC = () => {
               </p>
             </div>
 
-            <div style={{ display: 'flex', alignItems: 'center', gap: '16px' }}>
+            <div style={{ display: 'flex', alignItems: 'center', gap: '12px', flexWrap: 'wrap' }}>
               <div style={{
-                width: '120px',
+                width: '100px',
                 height: '6px',
                 backgroundColor: '#E5E7EB',
                 borderRadius: '3px',
@@ -436,69 +478,162 @@ const UploadCV: React.FC = () => {
           {/* Files Grid */}
           <div style={{
             display: 'grid',
-            gridTemplateColumns: 'repeat(4, 1fr)',
+            gridTemplateColumns: 'repeat(auto-fit, minmax(280px, 1fr))',
             gap: '16px',
-            maxWidth: '1200px',
-            margin: '0 auto'
+            maxWidth: '100%',
+            margin: '0 auto',
+            padding: '0 16px'
           }}>
-            {resumeFiles
-              .filter(file => selectedFilter === 'Filter By Status' || file.status === selectedFilter.toLowerCase())
-              .map((file) => (
-                <div key={file.id} style={{
-                  backgroundColor: '#FFFFFF',
-                  border: '1px solid #E5E7EB',
-                  borderRadius: '8px',
-                  padding: '16px',
+            {currentFiles.map((file) => (
+              <div key={file.id} style={{
+                backgroundColor: '#FFFFFF',
+                border: '1px solid #E5E7EB',
+                borderRadius: '8px',
+                padding: '12px',
+                display: 'flex',
+                alignItems: 'flex-start',
+                gap: '10px',
+                minHeight: '70px',
+                maxWidth: '100%',
+                overflow: 'hidden'
+              }}>
+                <div style={{
+                  width: '36px',
+                  height: '36px',
+                  backgroundColor: file.type === 'pdf' ? '#EF4444' : '#2563EB',
+                  borderRadius: '6px',
                   display: 'flex',
-                  alignItems: 'flex-start',
-                  gap: '12px',
-                  minHeight: '80px'
+                  alignItems: 'center',
+                  justifyContent: 'center',
+                  flexShrink: 0
                 }}>
-                  <div style={{
-                    width: '40px',
-                    height: '40px',
-                    backgroundColor: file.type === 'pdf' ? '#EF4444' : '#2563EB',
-                    borderRadius: '8px',
-                    display: 'flex',
-                    alignItems: 'center',
-                    justifyContent: 'center'
+                  <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="white" strokeWidth="2">
+                    <path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z" />
+                    <polyline points="14,2 14,8 20,8" />
+                    <line x1="16" y1="13" x2="8" y2="13" />
+                    <line x1="16" y1="17" x2="8" y2="17" />
+                    <polyline points="10,9 9,9 8,9" />
+                  </svg>
+                </div>
+
+                <div style={{ flex: 1, minWidth: 0, overflow: 'hidden' }}>
+                  <div style={{ 
+                    fontSize: '13px', 
+                    fontWeight: '500', 
+                    color: '#1F2937', 
+                    marginBottom: '3px', 
+                    overflow: 'hidden', 
+                    textOverflow: 'ellipsis', 
+                    whiteSpace: 'nowrap' 
                   }}>
-                    <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="white" strokeWidth="2">
-                      <path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z" />
-                      <polyline points="14,2 14,8 20,8" />
-                      <line x1="16" y1="13" x2="8" y2="13" />
-                      <line x1="16" y1="17" x2="8" y2="17" />
-                      <polyline points="10,9 9,9 8,9" />
-                    </svg>
+                    {file.name}
                   </div>
 
-                  <div style={{ flex: 1, minWidth: 0 }}>
-                    <div style={{ fontSize: '14px', fontWeight: '500', color: '#1F2937', marginBottom: '4px', overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>
-                      {file.name}
-                    </div>
+                  <div style={{ fontSize: '11px', color: '#6B7280', marginBottom: '6px' }}>
+                    {file.size}
+                  </div>
 
-                    <div style={{ fontSize: '12px', color: '#6B7280', marginBottom: '8px' }}>
-                      {file.size}
-                    </div>
+                  <div style={{ display: 'flex', alignItems: 'center', gap: '4px', flexWrap: 'wrap' }}>
+                    <span style={{ fontSize: '10px', color: getStatusColor(file.status) }}>
+                      {getStatusText(file.status)}
+                    </span>
 
-                    <div style={{ display: 'flex', alignItems: 'center', gap: '6px', flexWrap: 'wrap' }}>
-                      <span style={{ fontSize: '11px', color: getStatusColor(file.status) }}>
-                        {getStatusText(file.status)}
-                      </span>
-
-                      {(file.status === 'error' || file.status === 'inProgress') && (
-                        <button
-                          onClick={() => handleRetryUpload(file.id)}
-                          style={{ backgroundColor: 'transparent', border: 'none', color: '#3B82F6', fontSize: '11px', cursor: 'pointer', padding: '0', textDecoration: 'underline' }}
-                        >
-                          Retry
-                        </button>
-                      )}
-                    </div>
+                    {(file.status === 'error' || file.status === 'inProgress') && (
+                      <button
+                        onClick={() => handleRetryUpload(file.id)}
+                        style={{ 
+                          backgroundColor: 'transparent', 
+                          border: 'none', 
+                          color: '#3B82F6', 
+                          fontSize: '10px', 
+                          cursor: 'pointer', 
+                          padding: '0', 
+                          textDecoration: 'underline' 
+                        }}
+                      >
+                        Retry
+                      </button>
+                    )}
                   </div>
                 </div>
-              ))}
+              </div>
+            ))}
           </div>
+
+          {/* Pagination Controls */}
+          {totalPages > 1 && (
+            <div style={{
+              display: 'flex',
+              justifyContent: 'center',
+              alignItems: 'center',
+              gap: '12px',
+              marginTop: '20px',
+              padding: '16px'
+            }}>
+              <button
+                onClick={handlePreviousPage}
+                disabled={currentPage === 1}
+                style={{
+                  padding: '8px 16px',
+                  backgroundColor: currentPage === 1 ? '#F3F4F6' : '#FFFFFF',
+                  border: '1px solid #E5E7EB',
+                  borderRadius: '6px',
+                  color: currentPage === 1 ? '#9CA3AF' : '#3B82F6',
+                  fontSize: '14px',
+                  fontWeight: '500',
+                  cursor: currentPage === 1 ? 'not-allowed' : 'pointer',
+                  transition: 'all 0.2s ease'
+                }}
+              >
+                Previous
+              </button>
+              
+              <div style={{
+                display: 'flex',
+                alignItems: 'center',
+                gap: '8px'
+              }}>
+                {Array.from({ length: totalPages }, (_, index) => index + 1).map((page) => (
+                  <button
+                    key={page}
+                    onClick={() => handlePageChange(page)}
+                    style={{
+                      padding: '8px 12px',
+                      backgroundColor: currentPage === page ? '#3B82F6' : '#FFFFFF',
+                      border: '1px solid #E5E7EB',
+                      borderRadius: '6px',
+                      color: currentPage === page ? '#FFFFFF' : '#3B82F6',
+                      fontSize: '14px',
+                      fontWeight: '500',
+                      cursor: 'pointer',
+                      transition: 'all 0.2s ease',
+                      minWidth: '40px'
+                    }}
+                  >
+                    {page}
+                  </button>
+                ))}
+              </div>
+              
+              <button
+                onClick={handleNextPage}
+                disabled={currentPage === totalPages}
+                style={{
+                  padding: '8px 16px',
+                  backgroundColor: currentPage === totalPages ? '#F3F4F6' : '#FFFFFF',
+                  border: '1px solid #E5E7EB',
+                  borderRadius: '6px',
+                  color: currentPage === totalPages ? '#9CA3AF' : '#3B82F6',
+                  fontSize: '14px',
+                  fontWeight: '500',
+                  cursor: currentPage === totalPages ? 'not-allowed' : 'pointer',
+                  transition: 'all 0.2s ease'
+                }}
+              >
+                Next
+              </button>
+            </div>
+          )}
         </div>
       )}
     </div>

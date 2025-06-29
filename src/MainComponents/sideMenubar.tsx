@@ -61,12 +61,12 @@ function SideMenuBars() {
     // { text: 'Collections', link: '/collectiondefault', icon: <CollectionsIcon /> },
     {
       text: 'AI Interview Suite',
-      link: '/UpcomingInterview',
+      link: '/questionformat',
       icon: <QuestionAnswerIcon />,
       subItems: [
         { text: 'Schedule Interview', link: '/questionformat', icon: <QuestionAnswerIcon /> },
-        { text: 'Upcoming', link: '/UpcomingInterview', icon: <QuestionAnswerIcon /> },
-        { text: 'Interview Status', link: '/collectiondefaultfilter', icon: <QuestionAnswerIcon /> },
+        // { text: 'Upcoming', link: '/scheduleinterview_ai', icon: <QuestionAnswerIcon /> },
+        // { text: 'Interview Status', link: '/collectiondefaultfilter', icon: <QuestionAnswerIcon /> },
       ],
     },
     { text: 'Coding Assessment', link: '/', icon: <CodeIcon /> },

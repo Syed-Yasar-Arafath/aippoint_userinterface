@@ -523,6 +523,10 @@ import {
   ExpandMore,
   MoreVert,
 } from '@mui/icons-material'
+import { loaderOff, loaderOn, openSnackbar } from '../redux/actions'
+import { t } from 'i18next'
+import { useDispatch, useSelector } from 'react-redux'
+import { useTranslation } from 'react-i18next';
 
 interface Job {
   jobid: number
@@ -560,6 +564,126 @@ const JdCollection: React.FC = () => {
   const navigate = useNavigate()
   const organisation = localStorage.getItem('organisation')
   const token = localStorage.getItem('token')
+  const dispatch = useDispatch()
+  
+const { t } = useTranslation();
+ const [matchingResumes, setMatchingResumes] = useState<{
+    [key: string]: number
+  }>({})
+  const [scoredResumes, setScoredResumes] = useState<{
+    [key: string]: number
+  }>({})
+ 
+  const fetchScoredResumes = async () => {
+    if (!jobs.length) return
+
+    const counts: { [key: string]: number } = {}
+    dispatch(loaderOn())
+    try {
+      await Promise.all(
+        jobs.map(async (job) => {
+          try {
+            const response = await axios.post(
+              `${process.env.REACT_APP_DJANGO_PYTHON_MODULE_SERVICE}/count_scored_resumes_for_jd/`,
+              { job_id: job.jobid },
+              {
+                headers: {
+                  Organization: organisation,
+                },
+              },
+            )
+            counts[job.jobid] = response.data.scored_resumes_count || 0
+          } catch (err) {
+            console.error(
+              `Error fetching scored resumes for job ${job.jobid}:`,
+              err,
+            )
+          }
+        }),
+      )
+      setScoredResumes(counts)
+      dispatch(loaderOff())
+    } catch (error) {
+      setError(t('failedToFetchScoredResumes'))
+    }
+  }
+
+  const fetchMatchingResumes = async () => {
+    if (!jobs.length) return
+
+    const counts: { [key: string]: number } = {}
+
+    try {
+      await Promise.all(
+        jobs.map(async (job) => {
+          try {
+            const response = await axios.post(
+              `${process.env.REACT_APP_DJANGO_PYTHON_MODULE_SERVICE}/matching-resumes-count/`,
+              { job_id: job.jobid },
+              {
+                headers: {
+                  Organization: organisation,
+                  'Content-Type': 'application/json',
+                },
+              },
+            )
+            counts[job.jobid] = response.data.matching_resume_count || 0
+          } catch (err) {
+            console.error(
+              `Error fetching matching resumes for job ${job.jobid}:`,
+              err,
+            )
+          }
+        }),
+      )
+      setMatchingResumes(counts)
+    } catch (error) {
+      setError(t('failedToFetchMatchingResumes'))
+    }
+  }
+
+  useEffect(() => {
+    fetchScoredResumes()
+    fetchMatchingResumes()
+  }, [jobs])
+  // const navigate = useNavigate()
+  // const job_id = location.state?.job_id || jobId
+
+  
+  const fetchscore = async (job_id : any) => {
+    if (!job_id) return
+    dispatch(loaderOn())
+    try {
+      const response = await axios.post(
+        `${process.env.REACT_APP_DJANGO_PYTHON_MODULE_SERVICE}/resume_scoring/`,
+        { job_id },
+        {
+          headers: {
+            Organization: organisation,
+            'Content-Type': 'application/json',
+          },
+        },
+      )
+      console.log(response)
+      if (response) {
+        dispatch(openSnackbar(t('scoringCompleted'), 'green'))
+      } else {
+        dispatch(openSnackbar(t('scoringFailed'), 'red'))
+      }
+      // handleSkillChange() // Assuming handleSkillChange is defined and does something
+      dispatch(loaderOff())
+      navigate('/jdccollection')
+      // counts[job.jobid] = response.data.matching_resume_count || 0
+    } catch (err) {
+      console.error(`Error fetching resumes for job ${job_id}:`, err)
+      dispatch(loaderOff())
+    }
+  }
+
+   const handleClickScore = (a: any) => {
+    fetchscore(a)
+    // Additional logic you want to execute on score button click
+  }
  useEffect(() => {
   const fetchJobs = async () => {
     setLoading(true)
@@ -589,6 +713,15 @@ const JdCollection: React.FC = () => {
 
   fetchJobs()
 }, [])
+  const handleViewClick = (jobId: any) => {
+    // setDispatchLoading(true)
+    navigate(`/noscore/${jobId}`, { state: { job_id: jobId } })
+  }
+
+  const handleScoreClick = (jobId: any) => {
+    // setDispatchLoading(true)
+    navigate(`/resumetable/${jobId}`, { state: { job_id: jobId } })
+  }
 
 const [jobRoleFilter, setJobRoleFilter] = useState('')
 const [experienceFilter, setExperienceFilter] = useState('')
@@ -693,15 +826,18 @@ const filteredJobs = jobs.filter((job) => {
           <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', gap: '16px' }}>
             <div style={{ display: 'flex', gap: '12px', flexWrap: 'nowrap' }}>
               <div style={{ border: '1px solid #e5e7eb', borderRadius: '8px', padding: '8px 16px', color: '#6b7280', fontSize: '10px', display: 'flex', alignItems: 'center', height: '40px', justifyContent: 'flex-start', whiteSpace: 'nowrap' }}>
-                <span style={{ fontFamily: 'SF Pro Display', fontSize: '10px' }}>Matching Profiles:</span>
+                <span style={{ fontFamily: 'SF Pro Display', fontSize: '10px' }}>Matching Profiles:{scoredResumes[job.jobid]} <button onClick={() => handleScoreClick(job.jobid)}
+>view</button></span>
                 <span style={{ fontWeight: 400, color: '#000', fontSize: '10px', marginLeft: '8px', fontFamily: 'SF Pro Display' }}>
                   {/* {job.matchingProfiles} */}
                 </span>
               </div>
               <div style={{ border: '1px solid #e5e7eb', borderRadius: '8px', padding: '8px 16px', color: '#6b7280', fontSize: '10px', display: 'flex', alignItems: 'center', height: '40px', justifyContent: 'flex-start', whiteSpace: 'nowrap', fontFamily: 'SF Pro Display' }}>
-                New Matching Profiles
+                New Matching Profiles : {matchingResumes[job.jobid]}<button onClick={() => handleViewClick(job.jobid)}
+> view</button>
                 <span style={{ marginLeft: '4px', color: 'green', fontWeight: 400, fontFamily: 'SF Pro Display', fontSize: '10px' }}>
                   {/* + {job.newProfiles} New */}
+{/* <button onClick={() => handleClickScore(job.jobid)}>Score</button> */}
                 </span>
               </div>
             </div>

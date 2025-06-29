@@ -40,6 +40,12 @@ import NoScore from './MainComponents/NoScore';
 import QuestionFormat from './MainComponents/question_format';
 import ResumeTable from './MainComponents/ResumeTable';
 import ScheduleInterviewAI from './MainComponents/scheduleinterview_ai';
+import AssessmentSelection from './MainComponents/AssessmentSelection';
+import Login from './MainComponents/login';
+import ConfirmJoinInterview from './MainComponents/ConfirmJoinIntreview';
+import Login_Ai from './MainComponents/loginai';
+import InterviewAttend from './MainComponents/AI_interview/AI-Interview';
+// import ConfirmJoinInterview from './MainComponents/ConfirmJoinIntreview';
 // import QuestionFormat from './MainComponents/question_format';
 
 const drawerWidth = 240
@@ -114,6 +120,16 @@ const AppContent: React.FC = () => {
           <Route path="/ai_interview_ins/:organisation/:interviewId/:meetingId" element={<InterviewInstructions />} />
           <Route path="/interview_ai" element={<InterviewAI />} />
           <Route path="/submitinterview" element={<SubmitInterview />} />
+   <Route path='/logincandidate' element={<Login />} />
+        {/* <Route path='/logincandidate' element={<Login_Ai />} /> */}
+                     <Route
+          path='/confirmjoininterview'
+          element={<ConfirmJoinInterview/>}
+        />
+                <Route path="/submitinterview" element={<SubmitInterview />} />
+
+                <Route path="/AI-Interview" element={<InterviewAttend />} />
+
 
           {/* Protected routes (authentication required) */}
           {isAuthenticated === 'true' ? (
@@ -140,14 +156,18 @@ const AppContent: React.FC = () => {
               <Route path="/uploadstatus" element={<FileUploadInterface />} />
               <Route path="/resumelist" element={<ResumeList />} />
               {/* <Route path="/questionformat" element={<QuestionFormat />} /> */}
-
+        {/* <Route path='/loginai' element={<Login_Ai />} /> */}
               <Route path="/analytics_report" element={<AnalyticsReport />} />
               <Route path="/candidate_interview_analytics" element={<CandidateInterviewAnalytics />} />
               <Route path="/candidate_coding_assessment" element={<CandidateCodingAssessment />} />
-
-              <Route path="/noscore" element={<NoScore />} />
-              <Route path="/question_format" element={<QuestionFormat />} />
-              <Route path="/resume_table" element={<ResumeTable />} />
+ <Route
+                path='/assessmentselection'
+                element={<AssessmentSelection />}
+              />
+  
+             <Route path='/noscore/:jobId' element={<NoScore />} />
+              <Route path='/resumetable/:jobId' element={<ResumeTable />} />
+              <Route path="/questionformat" element={<QuestionFormat />} />
               <Route path="/scheduleinterview_ai" element={<ScheduleInterviewAI />} />
             </>
           ) : (

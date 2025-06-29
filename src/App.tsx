@@ -36,6 +36,10 @@ import CandidateInterviewAnalytics from './MainComponents/candidateInterviewAnal
 import CandidateCodingAssessment from './MainComponents/candidateCodingAssessment';
 import FileUploadInterface from './MainComponents/uploadstatus';
 import ResumeList from './MainComponents/resumelist';
+import NoScore from './MainComponents/NoScore';
+import QuestionFormat from './MainComponents/question_format';
+import ResumeTable from './MainComponents/ResumeTable';
+import ScheduleInterviewAI from './MainComponents/scheduleinterview_ai';
 // import QuestionFormat from './MainComponents/question_format';
 
 const drawerWidth = 240
@@ -140,6 +144,11 @@ const AppContent: React.FC = () => {
               <Route path="/analytics_report" element={<AnalyticsReport />} />
               <Route path="/candidate_interview_analytics" element={<CandidateInterviewAnalytics />} />
               <Route path="/candidate_coding_assessment" element={<CandidateCodingAssessment />} />
+
+              <Route path="/noscore" element={<NoScore />} />
+              <Route path="/question_format" element={<QuestionFormat />} />
+              <Route path="/resume_table" element={<ResumeTable />} />
+              <Route path="/scheduleinterview_ai" element={<ScheduleInterviewAI />} />
             </>
           ) : (
             // Redirect unauthenticated users to sign in

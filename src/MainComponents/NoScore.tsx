@@ -839,7 +839,7 @@ const NoScore = () => {
       <Header
         title={t('matchedResumesHeader')}
         userProfileImage={userProfileImage}
-        path="/jdccollection"
+        path="/jdcollection"
       />
 
       <TableContainer component={Paper}>

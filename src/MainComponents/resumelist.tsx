@@ -1,6 +1,7 @@
 import React, { useState, useRef, useEffect } from 'react'
 import SearchIcon from '@mui/icons-material/Search'
 // import { useDispatch, useSelector } from 'react-redux'
+import { useDispatch } from 'react-redux';
 
 import {
   Autocomplete,
@@ -124,7 +125,7 @@ const ResumeList = () => {
   const [currentPage, setCurrentPage] = useState(1)
   const [resumesPerPage] = useState(5) // Show 6 resumes per page for laptop screen
   
-  // const dispatch = useDispatch()
+  const dispatch = useDispatch()
   const saveJdCollectionName = async (
     collectionName: string,
     resumeIds: any[],
@@ -138,15 +139,15 @@ const ResumeList = () => {
     // dispatch(loaderOn())
     try {
       const res = await putResume(jobId, Jobdata, organisation)
-      // dispatch(
-      //   openSnackbar(
-      //     `${t('storedResume')} ${resumeIds.length} ${t(
-      //       'resumesIn',
-      //     )} ${collectionName} ${t('jdCollectionBtn')}`,
-      //     'green',
-      //   ),
-      // )
-      // dispatch(loaderOff())
+      dispatch(
+        openSnackbar(
+          `${t('storedResume')} ${resumeIds.length} ${t(
+            'resumesIn',
+          )} ${collectionName} ${t('jdCollectionBtn')}`,
+          'green',
+        ),
+      )
+      dispatch(loaderOff())
     } catch (error) {
       console.error('Error storing resumes:', error)
       // dispatch(loaderOff())

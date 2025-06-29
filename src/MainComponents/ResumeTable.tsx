@@ -637,7 +637,7 @@ const ResumeTable = () => {
       <Header
         title={t('scoredResume')}
         userProfileImage={userProfileImage}
-        path="/jdccollection"
+        path="/jdcollection"
       />
 
       <div

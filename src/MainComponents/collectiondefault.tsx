@@ -9,17 +9,18 @@ import {
   Popover,
 } from '@mui/material'
 import { Search } from 'lucide-react'
-import React, { useState } from 'react'
+import React, { useEffect, useState } from 'react'
 import { AdapterDayjs } from '@mui/x-date-pickers/AdapterDayjs'
 import { LocalizationProvider } from '@mui/x-date-pickers/LocalizationProvider'
 import { DatePicker } from '@mui/x-date-pickers/DatePicker'
 import dayjs from 'dayjs'
 import EventIcon from '@mui/icons-material/Event'
+import axios from 'axios'
 
 const CollectionDefault: React.FC = () => {
+
   const collections = [
-  
-   
+
     {
       name: 'Junior Data Analyst',
       profiles: 63,
@@ -29,7 +30,7 @@ const CollectionDefault: React.FC = () => {
       experience: '2 years',
       status: 'Scheduled',
     },
-     {
+    {
       name: 'Junior Data Analyst',
       profiles: 63,
       addedBy: 'Kiran Naidu',
@@ -56,6 +57,39 @@ const CollectionDefault: React.FC = () => {
       status: 'Interview Completed',
     },
   ]
+    const [collectionArray, setCollectionArray] = useState([])
+  const organisation = localStorage.getItem('organisation')
+  const getCollectionData = async () => {
+    const res = await axios.get(`http://localhost:8082/job/read/${'nvidia'}`)
+    if (res!=null) {
+      setCollectionArray(res.data)
+    }
+  }
+  useEffect(() => {
+    getCollectionData();
+  }, []);
+  // Grouping job_title with their counts
+const groupedCollections = collectionArray.reduce((acc: any, item: any) => {
+  const title = item.job_title.trim().toLowerCase(); // normalize for consistency
+
+  const resumeCount = Array.isArray(item.resume_data) ? item.resume_data.length : 0;
+
+  if (!acc[title]) {
+    acc[title] = {
+      job_title: item.job_title, // Keep original casing
+      profiles: resumeCount,     // total resume count
+      addedBy: item.added_by ?? null, // optional chaining if added_by might be missing
+      lastUpdated: item.created_on || item.last_updated || null,
+    };
+  } else {
+    acc[title].profiles += resumeCount;
+  }
+
+  return acc;
+}, {});
+
+// Convert object to array
+const collectionList = Object.values(groupedCollections);
 
   const [currentPage, setCurrentPage] = useState(1)
   const itemsPerPage = 9
@@ -583,7 +617,7 @@ const CollectionDefault: React.FC = () => {
               </tr>
             </thead>
             <tbody>
-              {paginatedCollections.map((collection, index) => (
+              {collectionList.map((collection:any, index) => (
                 <tr
                   key={index}
                   onClick={() => setSelectedRow(index)}
@@ -612,7 +646,7 @@ const CollectionDefault: React.FC = () => {
                       fontWeight: '400',
                     }}
                   >
-                    {collection.name}
+                    {collection.job_title}
                   </td>
                   <td
                     style={{

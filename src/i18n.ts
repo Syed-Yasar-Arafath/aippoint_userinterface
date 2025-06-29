@@ -432,8 +432,7 @@ i18n
           searchResume: 'Search Resumes',
           contact: 'Contact',
           keySkill: 'Key Skills',
-          pleaseSelectAtLeastOneCandidateSnackbar:
-            'Please select at least one candidate',
+          pleaseSelectAtLeastOneCandidateSnackbar: 'Please select at least one candidate',
           storedResume: 'Stored',
           resumesIn: 'resumes in',
           saveAsDraftBtn: 'Save as Draft',
@@ -445,8 +444,7 @@ i18n
           modeOfWork: 'Mode of Work',
           aiJd: 'Ai JD',
           manualJd: 'Manual JD',
-          manualJdAndAiJdUnderstandingtheDifference:
-            'Manual JD & AIJD – Understanding the Difference',
+          manualJdAndAiJdUnderstandingtheDifference: 'Manual JD & AIJD – Understanding the Difference',
           yesBtn: 'Yes',
           wouldYouLikeToCreate: 'Would you like to create',
           generateBtn: 'Generate',
@@ -482,15 +480,12 @@ i18n
           modifyQuestionTypeAndLevel: 'Modify Question type and question level',
           aiInterview: 'AI Interview',
           codingAssessment: 'Coding Assessment',
-          selectionQuestionTypeandModify:
-            'Selection question type & modify questions',
+          selectionQuestionTypeandModify: 'Selection question type & modify questions',
           recodings: 'Recordings',
           interviewType: 'Interview Type',
           noPdfAvailable: 'No PDF data available',
-          selectCandidateWhichIsRightFit:
-            'Select candidates which you may feel the right fit',
-          areYouRemoveThisResume:
-            'Are you sure you want to remove this resume?',
+          selectCandidateWhichIsRightFit: 'Select candidates which you may feel the right fit',
+          areYouRemoveThisResume: 'Are you sure you want to remove this resume?',
           jdTitle: 'Job Description Title',
           codingAssessmentReport: 'Coding Assessment Report',
           exportPdf: 'Export PDF',
@@ -498,18 +493,15 @@ i18n
           timeComplexityLabel: 'Time Complexity',
           spaceComplexityLabel: 'Space Complexity',
           errorLabel: 'Error Report',
-          recordingInterviewMessage:
-            'Watch the complete interview session where the candidate demonstrates their skills, problem-solving approach, and communication ability.',
+          recordingInterviewMessage: 'Watch the complete interview session where the candidate demonstrates their skills, problem-solving approach, and communication ability.',
           downloadVideoBtn: 'Download Video',
-          browserDoesNotSupportVideotag:
-            'Your browser does not support the video tag.',
+          browserDoesNotSupportVideotag: 'Your browser does not support the video tag.',
           noVideoSelected: 'No video selected',
           questionWiseVideo: 'Question-wise Video Segments',
           noVideoAvailable: 'No video available',
           noQuestionAvailable: 'No question available',
           jdCollectionHeader: 'JD Collection',
-          viewSpecificJobRoleWithDifferentJd:
-            'View Specific Job Roles with Different JDs',
+          viewSpecificJobRoleWithDifferentJd: 'View Specific Job Roles with Different JDs',
           draftBtn: 'Draft',
           selectJobTitle: 'Select Job Title',
           viewJobDescription: 'View Job Description',
@@ -539,40 +531,31 @@ i18n
           jdBeingGenerated: 'JD being generated, please wait..',
           jdGeneratedSuccessfully: 'JD generated successfully..!',
           fileUploadSuccessful: 'File Upload Successful',
-          successfullySubmittedTheQuestion:
-            'Successfully submitted the Questions',
+          successfullySubmittedTheQuestion: 'Successfully submitted the Questions',
           pastingIsDisabled: 'Pasting is disabled!',
-          cutCopyPasteRestricted:
-            'Copy, cut, and paste are currently restricted.',
+          cutCopyPasteRestricted: 'Copy, cut, and paste are currently restricted.',
           pleaseProvideValidMeetingId: 'Please provide a valid Meeting ID.',
           questionNo: 'Question',
           pleaseJoinTheInterview: 'Please join the interview',
           skipQuestion: 'Skip Question',
           endInterview: 'End Interview',
-          pleaseWriteTheCodeInBelowEditor:
-            'Please write your code in the editor below:',
+          pleaseWriteTheCodeInBelowEditor: 'Please write your code in the editor below:',
           submitCode: 'Submit Code',
-          timeLeftAlertMessage:
-            'minutes left to complete the assessment. Please review your answers and submit before the time expires.',
+          timeLeftAlertMessage: 'minutes left to complete the assessment. Please review your answers and submit before the time expires.',
           youStillHaveTime: 'You still have time left!',
           youHave: 'You have',
-          codeSubmitAlertMessage:
-            'seconds remaining. Are you sure you want to submit now? Once submitted, you cannot make any changes.',
+          codeSubmitAlertMessage: 'seconds remaining. Are you sure you want to submit now? Once submitted, you cannot make any changes.',
           noContinueTest: 'No,Continue Test',
           yesSubmit: 'Yes, Submit',
-          skipThisQuestionAndGoToNextQuestion:
-            'Skip this question? Go to Next Question!',
-          skipQuestionAlertMessage:
-            'Are you sure you want to skip this question? Once skipped, you cannot go back to it.',
+          skipThisQuestionAndGoToNextQuestion: 'Skip this question? Go to Next Question!',
+          skipQuestionAlertMessage: 'Are you sure you want to skip this question? Once skipped, you cannot go back to it.',
           noStayThisQuestion: 'No, Stay on the Question',
           yesSkip: 'Yes, Skip',
           loginToYourAccountHeader: 'Login to your account',
           toAccessCodingAssessment: 'To access the coding assessment',
           pleaseSelectDateAndTime: 'Please select date and time',
-          stableInternetConnection:
-            'Ensure a stable internet connection (Min. 5 Mbps).',
-          useMobileAndLaptop:
-            'Use a laptop/desktop (Mobile & tablets are not allowed).',
+          stableInternetConnection: 'Ensure a stable internet connection (Min. 5 Mbps).',
+          useMobileAndLaptop: 'Use a laptop/desktop (Mobile & tablets are not allowed).',
           processor: 'Processor',
           intelI3: 'Intel i3 or higher',
           ram: 'RAM',
@@ -581,34 +564,25 @@ i18n
           latestChromeEdge: 'Latest Chrome/Edge',
           cameraAndMic: 'Camera & Microphone',
           enableForProctoring: 'Enabled for proctoring',
-          recordedAndProctored:
-            'Recorded & Proctored: Any misbehavior leads to disqualification.',
-          noTabSwitching:
-            'No tab switching or external help—violations may disqualify you.',
-          doNotRefreshAndClose:
-            'Do not refresh or close the browser—it may end the test.',
-          timeAssessment:
-            'Timed assessment: Once started, the timer cannot be paused.',
-          readCarefullyBeforeAnswering:
-            'Read carefully before answering—once submitted, answers cannot be changed.',
-          youHaveAlreadyAttendedThisInterview:
-            'You have already attended this interview',
+          recordedAndProctored: 'Recorded & Proctored: Any misbehavior leads to disqualification.',
+          noTabSwitching: 'No tab switching or external help—violations may disqualify you.',
+          doNotRefreshAndClose: 'Do not refresh or close the browser—it may end the test.',
+          timeAssessment: 'Timed assessment: Once started, the timer cannot be paused.',
+          readCarefullyBeforeAnswering: 'Read carefully before answering—once submitted, answers cannot be changed.',
+          youHaveAlreadyAttendedThisInterview: 'You have already attended this interview',
           failedToNavigate: 'Failed to navigate to the interview page',
           assessmentGuidelines: 'Assessment Guidelines',
           preRequisites: 'Pre-requisites:',
           systemRequirements: 'System Requirements:',
           duringTheAssessment: 'During the Assessment:',
-          failureToFollowTheseRules:
-            'Failure to follow these rules may result in disqualification.',
+          failureToFollowTheseRules: 'Failure to follow these rules may result in disqualification.',
           technicalRequirements: 'Technical Requirements:',
           enableCamera: 'Enable Camera',
           enableAudio: 'Enable Audio',
           agreeAndProceed: 'Agree and proceed to the interview',
           poweredBy: 'Powered by',
-          thankYouForAttendingTheInterview:
-            'Thank you for attending the interview',
-          pleaseRemainOnTheInterviewScreen:
-            'Please remain on the interview screen.',
+          thankYouForAttendingTheInterview: 'Thank you for attending the interview',
+          pleaseRemainOnTheInterviewScreen: 'Please remain on the interview screen.',
           fileUploadSuccessfully: 'File uploaded successfully!',
           uploadFailed: 'Upload failed!',
           invalidCandidate: 'Invalid Candidate..!',
@@ -616,39 +590,25 @@ i18n
           noCandidateFound: 'No candidate found',
           loginSuccessfully: 'Login successfully',
           invalidLoginCredentials: 'Invalid Login Credentials',
-          ensureStableInternetConnection:
-            'Ensure a stable internet connection (Minimum 5 Mbps recommended).',
-          useAQuietEnvironment:
-            'Use a quiet environment with no background noise or distractions.',
-          keepValidGovtID:
-            'Keep a valid government-issued ID for identity verification.',
+          ensureStableInternetConnection: 'Ensure a stable internet connection (Minimum 5 Mbps recommended).',
+          useAQuietEnvironment: 'Use a quiet environment with no background noise or distractions.',
+          keepValidGovtID: 'Keep a valid government-issued ID for identity verification.',
           copyOfYourResume: 'Have a copy of your resume handy for reference.',
-          dressAppropriately:
-            'Dress appropriately for a professional video interview.',
+          dressAppropriately: 'Dress appropriately for a professional video interview.',
           device: 'Device',
-          laptopOrDesktop:
-            'Laptop or desktop (Mobile devices are not recommended).',
-          googleChromeOrMicrosoftEdge:
-            'Google Chrome or Microsoft Edge (Latest version).',
-          ensureWebCamAndMicAreWorking:
-            'Ensure your webcam and microphone are working.',
+          laptopOrDesktop: 'Laptop or desktop (Mobile devices are not recommended).',
+          googleChromeOrMicrosoftEdge: 'Google Chrome or Microsoft Edge (Latest version).',
+          ensureWebCamAndMicAreWorking: 'Ensure your webcam and microphone are working.',
           powerBackup: 'Power Backup',
           keepYourDeviceCharged: 'Keep your device charged or plugged in.',
           disableNotifications: 'Disable Notifications',
-          turnOffPopUpsAndNotifications:
-            'Turn off pop-ups and notifications for a distraction-free experience.',
-          stayInFrame:
-            'Stay in Frame: Ensure your face is clearly visible at all times.',
-          answerClearly:
-            'Answer Clearly: Speak confidently and provide structured answers.',
-          followInstructions:
-            'Follow Instructions: Read questions carefully before answering.',
-          noExternalHelp:
-            'No External Help: Do not use notes, another device, or external help.',
-          avoidConnectivityIssue:
-            'Avoid Connectivity Issues: If disconnected, reconnect immediately.',
-          iAgreeToProceedTheInterview:
-            'I agree and wish to proceed to the interview',
+          turnOffPopUpsAndNotifications: 'Turn off pop-ups and notifications for a distraction-free experience.',
+          stayInFrame: 'Stay in Frame: Ensure your face is clearly visible at all times.',
+          answerClearly: 'Answer Clearly: Speak confidently and provide structured answers.',
+          followInstructions: 'Follow Instructions: Read questions carefully before answering.',
+          noExternalHelp: 'No External Help: Do not use notes, another device, or external help.',
+          avoidConnectivityIssue: 'Avoid Connectivity Issues: If disconnected, reconnect immediately.',
+          iAgreeToProceedTheInterview: 'I agree and wish to proceed to the interview',
           onSite: 'On-Site',
           contractBased: 'Contract-Based',
           jobTypeError: 'Please enter a job type',
@@ -693,10 +653,8 @@ i18n
           sybaseDeveloper: 'Sybase developer',
           pleaseSelectFile: 'Please select a file..!',
           notProvided: 'Not Provided',
-          clickHereToChangeJobDescription:
-            'Click here to change Job Description',
-          failedToUploadFilePleaseTryAgain:
-            'Failed to upload file. Please try again.',
+          clickHereToChangeJobDescription: 'Click here to change Job Description',
+          failedToUploadFilePleaseTryAgain: 'Failed to upload file. Please try again.',
           uploadJobDescription: 'Upload Job Description',
           failedToFetchJobData: 'Failed to fetch job data',
           failedToFetchScoredResumes: 'Failed to fetch scored resumes.',
@@ -714,7 +672,7 @@ i18n
           rust: 'Rust',
           go: 'Go',
           typeScript: 'TypeScript',
-          dart: 'Dart',
+          dart: 'Dart'
         },
       },
       ar: {
@@ -883,20 +841,20 @@ i18n
           twelveToFifteen: '١٢-١٥',
           fifteenToEighteen: '١٥-١٨',
           eighteenToTwenty: '١٨-٢٠',
-          one: '1',
-          two: '2',
-          three: '3',
-          four: '4',
-          five: '5',
-          six: '6',
-          seven: '7',
-          eight: '8',
-          nine: '9',
-          ten: '10',
-          eleven: '11',
-          twelve: '12',
-          fifteen: '15',
-          twenty: '20',
+          one: '١',
+          two: '٢',
+          three: '٣',
+          four: '٤',
+          five: '٥',
+          six: '٦',
+          seven: '٧',
+          eight: '٨',
+          nine: '٩',
+          ten: '١٠',
+          eleven: '١١',
+          twelve: '١٢',
+          fifteen: '١٥',
+          twenty: '٢٠',
           bengaluruCity: 'بنغالورو',
           hyderabadCity: 'حيدر آباد',
           chennaiCity: 'تشيناي',
@@ -1135,8 +1093,7 @@ i18n
           searchResume: 'البحث في السير الذاتية',
           contact: 'اتصل',
           keySkill: 'المهارات الرئيسية',
-          pleaseSelectAtLeastOneCandidateSnackbar:
-            'يرجى اختيار مرشح واحد على الأقل',
+          pleaseSelectAtLeastOneCandidateSnackbar: 'يرجى اختيار مرشح واحد على الأقل',
           storedResume: 'السير الذاتية المحفوظة',
           resumesIn: 'السير الذاتية في',
           saveAsDraftBtn: 'حفظ كمسودة',
@@ -1148,8 +1105,7 @@ i18n
           modeOfWork: 'نمط العمل',
           aiJd: 'الوصف الوظيفي بالذكاء الاصطناعي',
           manualJd: 'الوصف الوظيفي اليدوي',
-          manualJdAndAiJdUnderstandingtheDifference:
-            'الوصف الوظيفي اليدوي والذكاء الاصطناعي – فهم الفرق',
+          manualJdAndAiJdUnderstandingtheDifference: 'الوصف الوظيفي اليدوي والذكاء الاصطناعي – فهم الفرق',
           yesBtn: 'نعم',
           wouldYouLikeToCreate: 'هل ترغب في الإنشاء؟',
           generateBtn: 'إنشاء',
@@ -1189,10 +1145,8 @@ i18n
           recordings: 'تسجيلات',
           interviewType: 'نوع المقابلة',
           noPdfAvailable: 'لا توجد بيانات PDF متاحة',
-          selectCandidateWhichIsRightFit:
-            'اختر المرشحين الذين تعتقد أنهم الأنسب',
-          areYouRemoveThisResume:
-            'هل أنت متأكد أنك تريد إزالة هذه السيرة الذاتية؟',
+          selectCandidateWhichIsRightFit: 'اختر المرشحين الذين تعتقد أنهم الأنسب',
+          areYouRemoveThisResume: 'هل أنت متأكد أنك تريد إزالة هذه السيرة الذاتية؟',
           jdTitle: 'عنوان الوصف الوظيفي',
           codingAssessmentReport: 'تقرير تقييم البرمجة',
           exportPdf: 'تصدير PDF',
@@ -1200,8 +1154,7 @@ i18n
           timeComplexityLabel: 'تعقيد الزمن',
           spaceComplexityLabel: 'تعقيد المساحة',
           errorLabel: 'تقرير الأخطاء',
-          recordingInterviewMessage:
-            'شاهد جلسة المقابلة الكاملة حيث يُظهر المرشح مهاراته ونهجه في حل المشكلات وقدرته على التواصل.',
+          recordingInterviewMessage: 'شاهد جلسة المقابلة الكاملة حيث يُظهر المرشح مهاراته ونهجه في حل المشكلات وقدرته على التواصل.',
           downloadVideoBtn: 'تنزيل الفيديو',
           browserDoesNotSupportVideotag: 'متصفحك لا يدعم وسم الفيديو.',
           noVideoSelected: 'لم يتم تحديد فيديو',
@@ -1209,8 +1162,7 @@ i18n
           noVideoAvailable: 'لا يوجد فيديو متاح',
           noQuestionAvailable: 'لا يوجد سؤال متاح',
           jdCollectionHeader: 'مجموعة الوصف الوظيفي',
-          viewSpecificJobRoleWithDifferentJd:
-            'عرض الأدوار الوظيفية المحددة مع أوصاف وظيفية مختلفة',
+          viewSpecificJobRoleWithDifferentJd: 'عرض الأدوار الوظيفية المحددة مع أوصاف وظيفية مختلفة',
           draftBtn: 'مسودة',
           selectJobTitle: 'اختر المسمى الوظيفي',
           viewJobDescription: 'عرض الوصف الوظيفي',
@@ -1250,27 +1202,21 @@ i18n
           endInterview: 'إنهاء المقابلة',
           pleaseWriteTheCodeInBelowEditor: 'يرجى كتابة الكود في المحرر أدناه:',
           submitCode: 'إرسال الكود',
-          timeLeftAlertMessage:
-            'دقائق متبقية لإكمال التقييم. يرجى مراجعة إجاباتك والإرسال قبل انتهاء الوقت.',
+          timeLeftAlertMessage: 'دقائق متبقية لإكمال التقييم. يرجى مراجعة إجاباتك والإرسال قبل انتهاء الوقت.',
           youStillHaveTime: 'لا يزال لديك وقت!',
           youHave: 'لديك',
-          codeSubmitAlertMessage:
-            'ثواني متبقية. هل أنت متأكد أنك تريد الإرسال الآن؟ بعد الإرسال، لا يمكنك إجراء أي تغييرات.',
+          codeSubmitAlertMessage: 'ثواني متبقية. هل أنت متأكد أنك تريد الإرسال الآن؟ بعد الإرسال، لا يمكنك إجراء أي تغييرات.',
           noContinueTest: 'لا، تابع الاختبار',
           yesSubmit: 'نعم، إرسال',
-          skipThisQuestionAndGoToNextQuestion:
-            'تخطي هذا السؤال؟ الانتقال إلى السؤال التالي!',
-          skipQuestionAlertMessage:
-            'هل أنت متأكد أنك تريد تخطي هذا السؤال؟ بمجرد التخطي، لا يمكنك العودة إليه.',
+          skipThisQuestionAndGoToNextQuestion: 'تخطي هذا السؤال؟ الانتقال إلى السؤال التالي!',
+          skipQuestionAlertMessage: 'هل أنت متأكد أنك تريد تخطي هذا السؤال؟ بمجرد التخطي، لا يمكنك العودة إليه.',
           noStayThisQuestion: 'لا، البقاء في هذا السؤال',
           yesSkip: 'نعم، تخطي',
           loginToYourAccountHeader: 'تسجيل الدخول إلى حسابك',
           toAccessCodingAssessment: 'للوصول إلى تقييم البرمجة',
           pleaseSelectDateAndTime: 'يرجى تحديد التاريخ والوقت',
-          stableInternetConnection:
-            'تأكد من وجود اتصال إنترنت مستقر (الحد الأدنى 5 ميجابت/ثانية).',
-          useMobileAndLaptop:
-            'استخدم جهاز كمبيوتر/لابتوب (الهواتف والأجهزة اللوحية غير مسموح بها).',
+          stableInternetConnection: 'تأكد من وجود اتصال إنترنت مستقر (الحد الأدنى 5 ميجابت/ثانية).',
+          useMobileAndLaptop: 'استخدم جهاز كمبيوتر/لابتوب (الهواتف والأجهزة اللوحية غير مسموح بها).',
           processor: 'المعالج',
           intelI3: 'Intel i3 أو أعلى',
           ram: 'الذاكرة (RAM)',
@@ -1279,24 +1225,18 @@ i18n
           latestChromeEdge: 'أحدث إصدار من Chrome أو Edge',
           cameraAndMic: 'الكاميرا والميكروفون',
           enableForProctoring: 'تمكين للمراقبة',
-          recordedAndProctored:
-            'يتم التسجيل والمراقبة: أي سلوك غير لائق يؤدي إلى الاستبعاد.',
-          noTabSwitching:
-            'ممنوع تبديل التبويبات أو المساعدة الخارجية - المخالفات قد تؤدي إلى الاستبعاد.',
-          doNotRefreshAndClose:
-            'لا تقم بتحديث أو إغلاق المتصفح - قد يؤدي ذلك إلى إنهاء الاختبار.',
-          timeAssessment:
-            'تقييم محدد الوقت: بمجرد البدء، لا يمكن إيقاف المؤقت.',
-          readCarefullyBeforeAnswering:
-            'اقرأ بعناية قبل الإجابة - بعد الإرسال لا يمكن تغيير الإجابات.',
+          recordedAndProctored: 'يتم التسجيل والمراقبة: أي سلوك غير لائق يؤدي إلى الاستبعاد.',
+          noTabSwitching: 'ممنوع تبديل التبويبات أو المساعدة الخارجية - المخالفات قد تؤدي إلى الاستبعاد.',
+          doNotRefreshAndClose: 'لا تقم بتحديث أو إغلاق المتصفح - قد يؤدي ذلك إلى إنهاء الاختبار.',
+          timeAssessment: 'تقييم محدد الوقت: بمجرد البدء، لا يمكن إيقاف المؤقت.',
+          readCarefullyBeforeAnswering: 'اقرأ بعناية قبل الإجابة - بعد الإرسال لا يمكن تغيير الإجابات.',
           youHaveAlreadyAttendedThisInterview: 'لقد حضرت هذه المقابلة مسبقاً',
           failedToNavigate: 'فشل في الانتقال إلى صفحة المقابلة',
           assessmentGuidelines: 'إرشادات التقييم',
           preRequisites: 'المتطلبات المسبقة:',
           systemRequirements: 'متطلبات النظام:',
           duringTheAssessment: 'أثناء التقييم:',
-          failureToFollowTheseRules:
-            'عدم اتباع هذه القواعد قد يؤدي إلى الاستبعاد.',
+          failureToFollowTheseRules: 'عدم اتباع هذه القواعد قد يؤدي إلى الاستبعاد.',
           technicalRequirements: 'المتطلبات التقنية:',
           enableCamera: 'تمكين الكاميرا',
           enableAudio: 'تمكين الصوت',
@@ -1311,33 +1251,24 @@ i18n
           noCandidateFound: 'لم يتم العثور على مرشح',
           loginSuccessfully: 'تم تسجيل الدخول بنجاح',
           invalidLoginCredentials: 'بيانات تسجيل الدخول غير صحيحة',
-          ensureStableInternetConnection:
-            'تأكد من وجود اتصال إنترنت مستقر (الحد الأدنى الموصى به 5 ميجابت في الثانية).',
+          ensureStableInternetConnection: 'تأكد من وجود اتصال إنترنت مستقر (الحد الأدنى الموصى به 5 ميجابت في الثانية).',
           useAQuietEnvironment: 'استخدم بيئة هادئة بدون ضوضاء أو تشويش.',
           keepValidGovtID: 'احتفظ ببطاقة هوية حكومية سارية للتحقق من الهوية.',
           copyOfYourResume: 'احتفظ بنسخة من سيرتك الذاتية للرجوع إليها.',
           dressAppropriately: 'ارتدِ ملابس مناسبة لمقابلة فيديو مهنية.',
           device: 'الجهاز',
-          laptopOrDesktop:
-            'حاسوب محمول أو مكتبي (لا يُنصح باستخدام الأجهزة المحمولة).',
-          googleChromeOrMicrosoftEdge:
-            'Google Chrome أو Microsoft Edge (أحدث إصدار).',
-          ensureWebCamAndMicAreWorking:
-            'تأكد من أن الكاميرا والميكروفون يعملان.',
+          laptopOrDesktop: 'حاسوب محمول أو مكتبي (لا يُنصح باستخدام الأجهزة المحمولة).',
+          googleChromeOrMicrosoftEdge: 'Google Chrome أو Microsoft Edge (أحدث إصدار).',
+          ensureWebCamAndMicAreWorking: 'تأكد من أن الكاميرا والميكروفون يعملان.',
           powerBackup: 'الطاقة الاحتياطية',
           keepYourDeviceCharged: 'احتفظ بجهازك مشحونًا أو موصولًا بالكهرباء.',
           disableNotifications: 'إيقاف الإشعارات',
-          turnOffPopUpsAndNotifications:
-            'قم بإيقاف النوافذ المنبثقة والإشعارات للحصول على تجربة خالية من التشويش.',
-          stayInFrame:
-            'ابق في الإطار: تأكد من أن وجهك مرئي بوضوح في جميع الأوقات.',
+          turnOffPopUpsAndNotifications: 'قم بإيقاف النوافذ المنبثقة والإشعارات للحصول على تجربة خالية من التشويش.',
+          stayInFrame: 'ابق في الإطار: تأكد من أن وجهك مرئي بوضوح في جميع الأوقات.',
           answerClearly: 'أجب بوضوح: تحدث بثقة وقدم إجابات منظمة.',
-          followInstructions:
-            'اتبع التعليمات: اقرأ الأسئلة بعناية قبل الإجابة.',
-          noExternalHelp:
-            'لا تستخدم أي مساعدة خارجية: لا تستخدم الملاحظات أو أجهزة أخرى أو المساعدة الخارجية.',
-          avoidConnectivityIssue:
-            'تجنب مشاكل الاتصال: إذا تم قطع الاتصال، أعد الاتصال فورًا.',
+          followInstructions: 'اتبع التعليمات: اقرأ الأسئلة بعناية قبل الإجابة.',
+          noExternalHelp: 'لا تستخدم أي مساعدة خارجية: لا تستخدم الملاحظات أو أجهزة أخرى أو المساعدة الخارجية.',
+          avoidConnectivityIssue: 'تجنب مشاكل الاتصال: إذا تم قطع الاتصال، أعد الاتصال فورًا.',
           iAgreeToProceedTheInterview: 'أوافق وأرغب في المتابعة إلى المقابلة',
           onSite: 'في الموقع',
           contractBased: 'على أساس العقد',
@@ -1384,8 +1315,7 @@ i18n
           pleaseSelectFile: 'يرجى تحديد ملف..!',
           notProvided: 'غير متوفر',
           clickHereToChangeJobDescription: 'انقر هنا لتغيير وصف الوظيفة',
-          failedToUploadFilePleaseTryAgain:
-            'فشل في تحميل الملف. يرجى المحاولة مرة أخرى.',
+          failedToUploadFilePleaseTryAgain: 'فشل في تحميل الملف. يرجى المحاولة مرة أخرى.',
           uploadJobDescription: 'تحميل وصف الوظيفة',
           failedToFetchJobData: 'فشل في جلب بيانات الوظائف',
           failedToFetchScoredResumes: 'فشل في جلب السير الذاتية المُقيّمة.',
@@ -1403,7 +1333,7 @@ i18n
           rust: 'راست',
           go: 'جو',
           typeScript: 'تايب سكريبت',
-          dart: 'دارت',
+          dart: 'دارت'
         },
       },
     },

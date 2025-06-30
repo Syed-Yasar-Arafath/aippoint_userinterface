@@ -1139,7 +1139,7 @@ setShowButtons(false)
           city: selectedCityValue,
         },
       }
-      dispatch(openSnackbar('Please wait..', 'dodgerblue'))
+      dispatch(openSnackbar('Please wait until JD being generated..', 'dodgerblue'))
       try {
         const response = await axios.post(
           `${process.env.REACT_APP_DJANGO_PYTHON_MODULE_SERVICE}/generate_job_description/`,
@@ -2017,7 +2017,7 @@ onMouseLeave={(e) => {
          
           <Grid id="selectedItems" container spacing={2}>
  {/* job tile */}
-      {visibleSections.job_title && (
+      {!visibleSections.job_title && (
       <Grid id="job_title" item xs={12} sm={6} md={4} lg={3}>
       <div style={{ display: 'flex', alignItems: 'center' }}>
       <div style={{ fontFamily: '"Segoe Script", cursive', fontSize: '24px', fontWeight: 'bold', color: '#e65100' }}>
@@ -2111,7 +2111,7 @@ onMouseLeave={(e) => {
     )}
       
       {/* job role */}
-      {visibleSections.job_role && (
+      {!visibleSections.job_role && (
       <Grid id="job_role" item xs={12} sm={6} md={4} lg={3}>
       <div style={{ display: 'flex', alignItems: 'center' }}>
       <div style={{ fontFamily: '"Segoe Script", cursive', fontSize: '24px', fontWeight: 'bold', color: '#e65100' }}>
@@ -2243,7 +2243,7 @@ onMouseLeave={(e) => {
     )}
 
       {/* job type */}
-      {visibleSections.job_type && (
+      {!visibleSections.job_type && (
       <Grid id="job_type" item xs={12} sm={6} md={4} lg={3}>
       <div style={{ display: 'flex', alignItems: 'center' }}>
       <div style={{ fontFamily: '"Segoe Script", cursive', fontSize: '24px', fontWeight: 'bold', color: '#e65100' }}>
@@ -2367,7 +2367,7 @@ onMouseLeave={(e) => {
     )}
 
       {/* mode of work */}
-      {visibleSections.mode_of_work && (
+      {!visibleSections.mode_of_work && (
       <Grid id="mode_of_work" item xs={12} sm={6} md={4} lg={3}>
       <div style={{ display: 'flex', alignItems: 'center' }}>
       <div style={{ fontFamily: '"Segoe Script", cursive', fontSize: '24px', fontWeight: 'bold', color: '#e65100' }}>
@@ -2474,7 +2474,7 @@ onMouseLeave={(e) => {
     )}
 
       {/* primary skills */}
-      {visibleSections.primary_skills && (
+      {!visibleSections.primary_skills && (
       <Grid id="primary_skills" item xs={12} sm={6} md={4} lg={3}>
       <div style={{ display: 'flex', alignItems: 'center' }}>
       <div style={{ fontFamily: '"Segoe Script", cursive', fontSize: '24px', fontWeight: 'bold', color: '#e65100' }}>
@@ -2567,7 +2567,7 @@ onMouseLeave={(e) => {
       </Grid>
     )}
          {/* experience required */}
-      {visibleSections.experience_required && (
+      {!visibleSections.experience_required && (
       <Grid id="experinece_required" item xs={12} sm={6} md={4} lg={3}>
       <div style={{ display: 'flex', alignItems: 'center' }}>
       <div style={{ fontFamily: '"Segoe Script", cursive', fontSize: '24px', fontWeight: 'bold', color: '#e65100' }}>
@@ -2701,7 +2701,7 @@ onMouseLeave={(e) => {
     )}
 
       {/* secondary skills */}
-      {visibleSections.secondary_skills && (
+      {!visibleSections.secondary_skills && (
       <Grid id="secondary_skills" item xs={12} sm={6} md={4} lg={3}>
       <div style={{ display: 'flex', alignItems: 'center' }}>
       <div style={{ fontFamily: '"Segoe Script", cursive', fontSize: '24px', fontWeight: 'bold', color: '#e65100' }}>
@@ -2788,7 +2788,7 @@ onMouseLeave={(e) => {
     )}
    
       {/* domain skills */}
-      {visibleSections.domain_skills && (
+      {!visibleSections.domain_skills && (
       <Grid id="skills" item xs={12} sm={6} md={4} lg={3}>
       <div style={{ display: 'flex', alignItems: 'center' }}>
       <div style={{ fontFamily: '"Segoe Script", cursive', fontSize: '24px', fontWeight: 'bold', color: '#e65100' }}>
@@ -2876,7 +2876,7 @@ onMouseLeave={(e) => {
 
     
       {/* Job location */}
-       {visibleSections.location && (<>
+       {!visibleSections.location && (<>
       <Grid id="location" item>
       <div style={{ display: 'flex', alignItems: 'center' }}>
       <div style={{ fontFamily: '"Segoe Script", cursive', fontSize: '24px', fontWeight: 'bold', color: '#e65100' }}>

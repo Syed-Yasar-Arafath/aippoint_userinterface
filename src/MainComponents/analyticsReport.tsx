@@ -243,7 +243,7 @@ function AnalyticsReport() {
 
             <Grid
                 padding={2}
-                sx={{ background: '#F7F7F7' }}
+                sx={{ background: '#F7F7F7',marginLeft:'30px' }}
             >
                 {interviewData ? (
                     <>

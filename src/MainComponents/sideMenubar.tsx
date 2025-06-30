@@ -111,15 +111,15 @@ function SideMenuBars() {
         <Box sx={{ display: 'flex', alignItems: 'center', justifyContent: 'center', py: 2 }}>
           <a href="/jobdescriptionuploading" style={{ textDecoration: 'none' }}>
             <img
-              src="assets/static/images/aippoint logo 1.png"
+              src="assets/static/images/aippointlogo.png"
               alt="Logo"
               style={{
                 paddingTop: '17px',
                 paddingBottom: '35px',
                 paddingRight: '30px',
                 cursor: 'pointer',
-                maxWidth: '100%',
-                height: 'auto',
+                width: '136.01px',
+                height: '39px',
               }}
             />
           </a>

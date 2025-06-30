@@ -13,6 +13,7 @@ import LinearProgress, { linearProgressClasses } from '@mui/material/LinearProgr
 import { styled } from '@mui/material/styles';
 import axios from 'axios';
 import { useLocation } from 'react-router-dom';
+import Header from '../CommonComponents/topheader';
 
 function CandidateInterviewAnalytics() {
 
@@ -514,6 +515,11 @@ function CandidateInterviewAnalytics() {
 
     return (
         <>
+          <Header
+                                title="Interview Analytics"
+                                // userProfileImage={userProfileImage}
+                                path="/analytics_report"
+                            />
             <Grid container spacing={2} padding={2} sx={{
                 background: '#F7F7F7'
             }}>

@@ -12,6 +12,7 @@ import LinearProgress, { linearProgressClasses } from '@mui/material/LinearProgr
 import { styled } from '@mui/material/styles';
 import axios from 'axios';
 import { useLocation } from 'react-router-dom';
+import Header from '../CommonComponents/topheader';
 
 function CandidateCodingAssessment() {
 
@@ -286,6 +287,11 @@ function CandidateCodingAssessment() {
 
     return (
         <>
+         <Header
+                        title="Coding Assessment"
+                        // userProfileImage={userProfileImage}
+                        path="/analytics_report"
+                    />
             <Grid container spacing={2} padding={2} gap={2} sx={{ background: '#F7F7F7' }}>
                 {interviewData ? (
                     <>

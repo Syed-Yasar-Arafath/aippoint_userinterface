@@ -822,7 +822,7 @@ const filteredJobs = jobs.filter((job) => {
 
         <Divider orientation="vertical" flexItem sx={{ mx: 2, my: 2, borderColor: '#333', borderWidth: '1.5px' }} />
 
-        <Grid item xs={2} sx={{ display: 'flex', flexDirection: 'column', alignItems: 'flex-end', justifyContent: 'center', marginLeft: '140px' }}>
+        <Grid item xs={2} sx={{ display: 'flex', flexDirection: 'column', alignItems: 'flex-end', justifyContent: 'center', marginLeft: '180px' }}>
           <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', gap: '16px' }}>
             <div style={{ display: 'flex', gap: '12px', flexWrap: 'nowrap' }}>
               <div style={{ border: '1px solid #e5e7eb', borderRadius: '8px', padding: '8px 16px', color: '#6b7280', fontSize: '10px', display: 'flex', alignItems: 'center', height: '40px', justifyContent: 'flex-start', whiteSpace: 'nowrap' }}>
@@ -869,7 +869,7 @@ const filteredJobs = jobs.filter((job) => {
   )
 
   return (
-    <div style={{ padding: '16px', maxWidth: '1280px', margin: '0 auto' }}>
+    <div style={{ padding: '35px', maxWidth: '1280px', margin: '0 auto' }}>
       {/* Filters */}
       {/* <Grid container spacing={2} alignItems="center" wrap="nowrap" sx={{ overflowX: 'auto', mb: 2 }}>
         <Grid item>
@@ -894,7 +894,7 @@ const filteredJobs = jobs.filter((job) => {
           </Grid>
         ))}
       </Grid> */}
-      <Grid container spacing={2} alignItems="center" wrap="nowrap" sx={{ overflowX: 'auto', mb: 2 }}>
+      <Grid container spacing={2} alignItems="center" wrap="nowrap" sx={{  mb: 2 }}>
   <Grid item>
     <div style={{ position: 'relative', width: '200px', height: '40px', border: '1px solid #ccc', borderRadius: '4px', display: 'flex', alignItems: 'center', paddingLeft: '12px' }}>
       <InputBase placeholder="Search..." sx={{ fontSize: '12px', width: '100%' }} />

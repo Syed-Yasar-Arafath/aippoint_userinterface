@@ -32,14 +32,26 @@ function CandidateInterviewAnalytics() {
         const fetchInterviewData = async () => {
             const organisation = localStorage.getItem('organisation');
             try {
-                const response = await axios.post("http://localhost:8000/get_interview_data/", {
-                    object_id: objectId,
-                }, {
-                    headers: {
-                        "Content-Type": "application/json",
-                        Organization: organisation || ''
+                // const response = await axios.post("http://localhost:8000/get_interview_data/", {
+                //     object_id: objectId,
+                // }, {
+                //     headers: {
+                //         "Content-Type": "application/json",
+                //         Organization: organisation || ''
+                //     }
+                // });
+                const response = await axios.post(
+                    "http://localhost:8000/get_interview_data/",
+                    new URLSearchParams({
+                        object_id: objectId,
+                    }),
+                    {
+                        headers: {
+                            "Content-Type": "application/x-www-form-urlencoded",
+                            Organization: organisation || ''
+                        }
                     }
-                });
+                );
 
                 const report = response.data.data
                 console.log("Interview Data:", report);

@@ -45,6 +45,11 @@ import Login from './MainComponents/login';
 import ConfirmJoinInterview from './MainComponents/ConfirmJoinIntreview';
 import Login_Ai from './MainComponents/loginai';
 import InterviewAttend from './MainComponents/AI_interview/AI-Interview';
+import CodingAssessmentScreen from './MainComponents/CodingAssessmentScreen';
+import CodingLogin from './MainComponents/coding_login';
+import CodingAccess from './MainComponents/coding_access';
+import CodingSection from './MainComponents/coding_Section';
+import JdProfile from './MainComponents/jdprofileview';
 // import ConfirmJoinInterview from './MainComponents/ConfirmJoinIntreview';
 // import QuestionFormat from './MainComponents/question_format';
 
@@ -129,6 +134,13 @@ const AppContent: React.FC = () => {
                 <Route path="/submitinterview" element={<SubmitInterview />} />
 
                 <Route path="/AI-Interview" element={<InterviewAttend />} />
+                  <Route
+                path="/codingassessmentscreen"
+                element={<CodingAssessmentScreen />}
+              />
+                     <Route path="/coding_access" element={<CodingAccess />} />
+        <Route path="/coding_login" element={<CodingLogin />} />
+        <Route path="/coding_section" element={<CodingSection />} />
 
 
           {/* Protected routes (authentication required) */}
@@ -164,7 +176,8 @@ const AppContent: React.FC = () => {
                 path='/assessmentselection'
                 element={<AssessmentSelection />}
               />
-  
+        <Route path="/jdprofileview/:jobId" element={<JdProfile />} />
+
              <Route path='/noscore/:jobId' element={<NoScore />} />
               <Route path='/resumetable/:jobId' element={<ResumeTable />} />
               <Route path="/questionformat" element={<QuestionFormat />} />

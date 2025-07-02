@@ -842,22 +842,22 @@ const filteredJobs = jobs.filter((job) => {
               </div>
             </div>
 
-            <button
-              style={{
-                backgroundColor: '#007AC1',
-                color: 'white',
-                padding: '10px 24px',
-                border: 'none',
-                borderRadius: '8px',
-                fontSize: '10px',
-                fontWeight: 500,
-                cursor: 'pointer',
-                fontFamily: 'SF Pro Display',
-              }}
-              onClick={() => navigate('/collectionavailable')}
-            >
-              Quick View
-            </button>
+          <button
+  style={{
+    backgroundColor: '#007AC1',
+    color: 'white',
+    padding: '10px 24px',
+    border: 'none',
+    borderRadius: '8px',
+    fontSize: '10px',
+    fontWeight: 500,
+    cursor: 'pointer',
+    fontFamily: 'SF Pro Display',
+  }}
+  onClick={() => navigate(`/jdprofileview/${job.jobid}`)}
+>
+  Quick View
+</button>
           </div>
         </Grid>
 

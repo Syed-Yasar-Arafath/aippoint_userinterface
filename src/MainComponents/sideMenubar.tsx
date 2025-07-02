@@ -50,7 +50,7 @@ function SideMenuBars() {
     },
     {
       text: 'JD Manager',
-      link: '/jdcollection',
+      link: '/AIJDCreator',
       icon: <WorkIcon />,
       subItems: [
         { text: 'Create JD', link: '/AIJDCreator', icon: <WorkIcon /> },
@@ -69,7 +69,7 @@ function SideMenuBars() {
         // { text: 'Interview Status', link: '/collectiondefaultfilter', icon: <QuestionAnswerIcon /> },
       ],
     },
-    { text: 'Coding Assessment', link: '/', icon: <CodeIcon /> },
+    { text: 'Coding Assessment', link: '/codingassessmentscreen', icon: <CodeIcon /> },
     { text: 'Analytics', link: '/analytics_report', icon: <AnalyticsIcon /> },
     { text: 'Settings', link: '/settings', icon: <SettingsIcon /> },
     { text: 'Support', link: '/support', icon: <HelpIcon /> },

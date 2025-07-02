@@ -344,7 +344,7 @@ const UploadCV: React.FC = () => {
         margin: '0 auto 10px auto'
       }}>
         <h2 style={{ fontSize: '18px', fontWeight: '500', color: '#1F2937', marginBottom: '8px' }}>
-          Upload your CV's or Resumes here
+          Upload your CV or Resumes here
         </h2>
 
         <p style={{ fontSize: '14px', color: '#6B7280', marginBottom: '30px' }}>
@@ -423,11 +423,8 @@ const UploadCV: React.FC = () => {
             justifyContent: 'space-between',
             alignItems: 'center',
             marginBottom: '20px',
-            maxWidth: '100%',
-            margin: '0 auto 20px auto',
-            padding: '0 16px',
-            flexWrap: 'wrap',
-            gap: '12px'
+            maxWidth: '1200px',
+            margin: '0 auto 20px auto'
           }}>
             <div>
               <h3 style={{ fontSize: '16px', fontWeight: '600', color: '#1F2937', marginBottom: '4px' }}>
@@ -438,9 +435,9 @@ const UploadCV: React.FC = () => {
               </p>
             </div>
 
-            <div style={{ display: 'flex', alignItems: 'center', gap: '12px', flexWrap: 'wrap' }}>
+            <div style={{ display: 'flex', alignItems: 'center', gap: '16px' }}>
               <div style={{
-                width: '100px',
+                width: '120px',
                 height: '6px',
                 backgroundColor: '#E5E7EB',
                 borderRadius: '3px',
@@ -489,25 +486,22 @@ const UploadCV: React.FC = () => {
                 backgroundColor: '#FFFFFF',
                 border: '1px solid #E5E7EB',
                 borderRadius: '8px',
-                padding: '12px',
+                padding: '16px',
                 display: 'flex',
                 alignItems: 'flex-start',
-                gap: '10px',
-                minHeight: '70px',
-                maxWidth: '100%',
-                overflow: 'hidden'
+                gap: '12px',
+                minHeight: '80px'
               }}>
                 <div style={{
-                  width: '36px',
-                  height: '36px',
+                  width: '40px',
+                  height: '40px',
                   backgroundColor: file.type === 'pdf' ? '#EF4444' : '#2563EB',
-                  borderRadius: '6px',
+                  borderRadius: '8px',
                   display: 'flex',
                   alignItems: 'center',
-                  justifyContent: 'center',
-                  flexShrink: 0
+                  justifyContent: 'center'
                 }}>
-                  <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="white" strokeWidth="2">
+                  <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="white" strokeWidth="2">
                     <path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z" />
                     <polyline points="14,2 14,8 20,8" />
                     <line x1="16" y1="13" x2="8" y2="13" />
@@ -516,40 +510,24 @@ const UploadCV: React.FC = () => {
                   </svg>
                 </div>
 
-                <div style={{ flex: 1, minWidth: 0, overflow: 'hidden' }}>
-                  <div style={{ 
-                    fontSize: '13px', 
-                    fontWeight: '500', 
-                    color: '#1F2937', 
-                    marginBottom: '3px', 
-                    overflow: 'hidden', 
-                    textOverflow: 'ellipsis', 
-                    whiteSpace: 'nowrap' 
-                  }}>
+                <div style={{ flex: 1, minWidth: 0 }}>
+                  <div style={{ fontSize: '14px', fontWeight: '500', color: '#1F2937', marginBottom: '4px', overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>
                     {file.name}
                   </div>
 
-                  <div style={{ fontSize: '11px', color: '#6B7280', marginBottom: '6px' }}>
+                  <div style={{ fontSize: '12px', color: '#6B7280', marginBottom: '8px' }}>
                     {file.size}
                   </div>
 
-                  <div style={{ display: 'flex', alignItems: 'center', gap: '4px', flexWrap: 'wrap' }}>
-                    <span style={{ fontSize: '10px', color: getStatusColor(file.status) }}>
+                  <div style={{ display: 'flex', alignItems: 'center', gap: '6px', flexWrap: 'wrap' }}>
+                    <span style={{ fontSize: '11px', color: getStatusColor(file.status) }}>
                       {getStatusText(file.status)}
                     </span>
 
                     {(file.status === 'error' || file.status === 'inProgress') && (
                       <button
                         onClick={() => handleRetryUpload(file.id)}
-                        style={{ 
-                          backgroundColor: 'transparent', 
-                          border: 'none', 
-                          color: '#3B82F6', 
-                          fontSize: '10px', 
-                          cursor: 'pointer', 
-                          padding: '0', 
-                          textDecoration: 'underline' 
-                        }}
+                        style={{ backgroundColor: 'transparent', border: 'none', color: '#3B82F6', fontSize: '11px', cursor: 'pointer', padding: '0', textDecoration: 'underline' }}
                       >
                         Retry
                       </button>

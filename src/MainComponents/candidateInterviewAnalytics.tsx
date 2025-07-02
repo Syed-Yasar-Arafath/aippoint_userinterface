@@ -32,26 +32,26 @@ function CandidateInterviewAnalytics() {
         const fetchInterviewData = async () => {
             const organisation = localStorage.getItem('organisation');
             try {
-                // const response = await axios.post("http://localhost:8000/get_interview_data/", {
-                //     object_id: objectId,
-                // }, {
-                //     headers: {
-                //         "Content-Type": "application/json",
-                //         Organization: organisation || ''
-                //     }
-                // });
-                const response = await axios.post(
-                    "http://localhost:8000/get_interview_data/",
-                    new URLSearchParams({
-                        object_id: objectId,
-                    }),
-                    {
-                        headers: {
-                            "Content-Type": "application/x-www-form-urlencoded",
-                            Organization: organisation || ''
-                        }
+                const response = await axios.post("http://localhost:8000/get_interview_data/", {
+                    object_id: objectId,
+                }, {
+                    headers: {
+                        "Content-Type": "application/json",
+                        Organization: organisation || ''
                     }
-                );
+                });
+                // const response = await axios.post(
+                //     "http://localhost:8000/get_interview_data/",
+                //     new URLSearchParams({
+                //         object_id: objectId,
+                //     }),
+                //     {
+                //         headers: {
+                //             "Content-Type": "application/x-www-form-urlencoded",
+                //             Organization: organisation || ''
+                //         }
+                //     }
+                // );
 
                 const report = response.data.data
                 console.log("Interview Data:", report);
@@ -112,47 +112,165 @@ function CandidateInterviewAnalytics() {
 
                 setProctoringDetails(proctoring_formatted_data);
 
-                // ✅ QUESTION TYPE COUNT
-                const technicalKeywords = ['technical', 'algorithm', 'plsql', 'java', 'sql', 'api'];
-                const projectKeywords = ['project', 'responsibilities', 'role', 'architecture'];
-                const situationalKeywords = ['challenge', 'difficult', 'situation', 'pressure', 'deal'];
-                const solvingKeywords = ['solve', 'solution', 'troubleshoot', 'debug', 'fix', 'issue'];
+                // // ✅ QUESTION TYPE COUNT
+                // const technicalKeywords = ['technical', 'algorithm', 'plsql', 'java', 'sql', 'api'];
+                // const projectKeywords = ['project', 'responsibilities', 'role', 'architecture'];
+                // const situationalKeywords = ['challenge', 'difficult', 'situation', 'pressure', 'deal'];
+                // const solvingKeywords = ['solve', 'solution', 'troubleshoot', 'debug', 'fix', 'issue'];
 
-                let technical = 0, project = 0, situational = 0, solving = 0, general = 0;
+                // let technical = 0, project = 0, situational = 0, solving = 0, general = 0;
 
-                report.analysis.forEach((item: any) => {
-                    const question = item.question.toLowerCase();
+                // report.analysis.forEach((item: any) => {
+                //     const question = item.question.toLowerCase();
 
-                    if (technicalKeywords.some(kw => question.includes(kw))) {
-                        technical++;
-                    } else if (projectKeywords.some(kw => question.includes(kw))) {
-                        project++;
-                    } else if (situationalKeywords.some(kw => question.includes(kw))) {
-                        situational++;
-                    } else if (solvingKeywords.some(kw => question.includes(kw))) {
-                        solving++;
-                    } else {
-                        general++;
-                    }
-                });
+                //     if (technicalKeywords.some(kw => question.includes(kw))) {
+                //         technical++;
+                //     } else if (projectKeywords.some(kw => question.includes(kw))) {
+                //         project++;
+                //     } else if (situationalKeywords.some(kw => question.includes(kw))) {
+                //         situational++;
+                //     } else if (solvingKeywords.some(kw => question.includes(kw))) {
+                //         solving++;
+                //     } else {
+                //         general++;
+                //     }
+                // });
 
-                const labels = [
+                // const labels = [
+                //     `Technical Questions: ${technical}`,
+                //     `Project-Based Questions: ${project}`,
+                //     `Situational Questions: ${situational}`,
+                //     `Problem-Solving Questions: ${solving}`,
+                //     `General Questions: ${general}`,
+                // ];
+                // const labelsValues = [technical, project, situational, solving, general];
+                // const updatedPieColors = labelsValues.map(getColorByQuestionRange)
+
+                // setPieChart((prevState: any) => ({
+                //     ...prevState,
+                //     series: labelsValues,
+                //     options: {
+                //         ...prevState.options,
+                //         colors: updatedPieColors,
+                //         labels,
+                //         tooltip: {
+                //             enabled: false
+                //         },
+                //         legend: {
+                //             show: true,
+                //             fontSize: '10px',
+                //             fontWeight: 700,
+                //         },
+                //         plotOptions: {
+                //             ...prevState.options.plotOptions,
+                //             pie: {
+                //                 ...prevState.options.plotOptions?.pie,
+                //                 donut: {
+                //                     ...prevState.options.plotOptions?.pie?.donut,
+                //                     labels: {
+                //                         ...prevState.options.plotOptions?.pie?.donut?.labels,
+                //                         total: {
+                //                             ...prevState.options.plotOptions?.pie?.donut?.labels?.total,
+                //                             formatter: () => `${report.analysis.length}`
+                //                         }
+                //                     }
+                //                 }
+                //             }
+                //         }
+                //     }
+                // }));
+
+                // const skillNames = Object.keys(report.skill_scores)
+                // const skillValues = Object.values(report.skill_scores).map(Number)
+                // const updatedColors = skillValues.map(getColorByRange)
+
+                // const truncatedLabels = skillNames.map(name => {
+                //     return name.length > 10 ? name.slice(0, 10) + '...' : name;
+                // });
+
+                // setColumnChart((prevState: any) => ({
+                //     ...prevState,
+                //     series: [{ data: skillValues }],
+                //     options: {
+                //         ...prevState.options,
+                //         colors: updatedColors,
+                //         xaxis: {
+                //             categories: truncatedLabels,
+                //             labels: {
+                //                 style: {
+                //                     colors: updatedColors,
+                //                     fontSize: '10px',
+                //                 },
+                //             },
+                //         },
+                //         tooltip: {
+                //             x: {
+                //                 formatter: function (value: any) {
+                //                     return skillNames[truncatedLabels.indexOf(value)];
+                //                 }
+                //             }
+                //         },
+                //     },
+                // }))
+
+                const { technical = 0, situational = 0, project_based: project = 0 } = report.question_distribution;
+
+                const questionType = [
                     `Technical Questions: ${technical}`,
-                    `Project-Based Questions: ${project}`,
                     `Situational Questions: ${situational}`,
-                    `Problem-Solving Questions: ${solving}`,
-                    `General Questions: ${general}`,
+                    `Project-Based Questions: ${project}`,
                 ];
-                const labelsValues = [technical, project, situational, solving, general];
-                const updatedPieColors = labelsValues.map(getColorByQuestionRange)
+
+                const questionCount = [technical, situational, project];
+                const updatedColors = ['#22973F', '#FFCC00', '#0284C7'];
+
+                setColumnChart((prevState: any) => ({
+                    ...prevState,
+                    series: [{ data: questionCount }],
+                    options: {
+                        ...prevState.options,
+                        colors: updatedColors,
+                        xaxis: {
+                            categories: questionType.map(name => name.split(" ")[0]),
+                            labels: {
+                                style: {
+                                    colors: updatedColors,
+                                    fontSize: '10px',
+                                },
+                            },
+                        },
+                        tooltip: {
+                            shared: false,
+                            intersect: false,
+                            x: {
+                                formatter: function () {
+                                    return '';
+                                },
+                            },
+                            y: {
+                                title: {
+                                    formatter: function (_: any, { dataPointIndex, w }: any) {
+                                        const truncated = w.config.xaxis.categories[dataPointIndex];
+                                        const fullLabel = questionType[questionType.map(name => name.split(" ")[0]).indexOf(truncated)] || truncated;
+                                        return fullLabel;
+                                    },
+                                },
+                                formatter: function () {
+                                    return '';
+                                },
+                            },
+                        }
+
+                    },
+                }))
 
                 setPieChart((prevState: any) => ({
                     ...prevState,
-                    series: labelsValues,
+                    series: questionCount,
                     options: {
                         ...prevState.options,
-                        colors: updatedPieColors,
-                        labels,
+                        colors: updatedColors,
+                        labels: questionType,
                         tooltip: {
                             enabled: false
                         },
@@ -160,6 +278,10 @@ function CandidateInterviewAnalytics() {
                             show: true,
                             fontSize: '10px',
                             fontWeight: 700,
+                            labels: {
+                                colors: updatedColors,
+                                useSeriesColors: false
+                            },
                         },
                         plotOptions: {
                             ...prevState.options.plotOptions,
@@ -180,38 +302,6 @@ function CandidateInterviewAnalytics() {
                     }
                 }));
 
-                const skillNames = Object.keys(report.skill_scores)
-                const skillValues = Object.values(report.skill_scores).map(Number)
-                const updatedColors = skillValues.map(getColorByRange)
-
-                const truncatedLabels = skillNames.map(name => {
-                    return name.length > 10 ? name.slice(0, 10) + '...' : name;
-                });
-
-                setColumnChart((prevState: any) => ({
-                    ...prevState,
-                    series: [{ data: skillValues }],
-                    options: {
-                        ...prevState.options,
-                        colors: updatedColors,
-                        xaxis: {
-                            categories: truncatedLabels,
-                            labels: {
-                                style: {
-                                    colors: updatedColors,
-                                    fontSize: '10px',
-                                },
-                            },
-                        },
-                        tooltip: {
-                            x: {
-                                formatter: function (value: any) {
-                                    return skillNames[truncatedLabels.indexOf(value)];
-                                }
-                            }
-                        },
-                    },
-                }))
 
             } catch (error) {
                 console.log('Error')
@@ -416,11 +506,7 @@ function CandidateInterviewAnalytics() {
     });
 
     const [columnChart, setColumnChart] = useState({
-        series: [
-            {
-                data: [],
-            },
-        ],
+        series: [{ data: [] }],
         options: {
             chart: {
                 type: 'bar',
@@ -431,25 +517,23 @@ function CandidateInterviewAnalytics() {
                     columnWidth: '50%',
                     distributed: true,
                     borderRadius: 5,
-                }
+                },
             },
             dataLabels: {
-                enabled: false
+                enabled: false,
             },
             legend: {
-                show: false
+                show: false,
             },
             tooltip: {
                 shared: false,
                 intersect: false,
-                y: {
-                    title: {
-                        formatter: function () {
-                            return 'Score:'
-                        },
-                    },
-                    formatter: function (val: any) {
-                        return `${val}%`
+            },
+            xaxis: {
+                categories: [],
+                labels: {
+                    style: {
+                        fontSize: '10px',
                     },
                 },
             },
@@ -527,11 +611,11 @@ function CandidateInterviewAnalytics() {
 
     return (
         <>
-          <Header
-                                title="Interview Analytics"
-                                // userProfileImage={userProfileImage}
-                                path="/analytics_report"
-                            />
+            <Header
+                title="Interview Analytics"
+                // userProfileImage={userProfileImage}
+                path="/analytics_report"
+            />
             <Grid container spacing={2} padding={2} sx={{
                 background: '#F7F7F7'
             }}>

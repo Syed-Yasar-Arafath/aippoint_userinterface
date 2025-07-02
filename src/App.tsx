@@ -125,22 +125,22 @@ const AppContent: React.FC = () => {
           <Route path="/ai_interview_ins/:organisation/:interviewId/:meetingId" element={<InterviewInstructions />} />
           <Route path="/interview_ai" element={<InterviewAI />} />
           <Route path="/submitinterview" element={<SubmitInterview />} />
-   <Route path='/logincandidate' element={<Login />} />
-        {/* <Route path='/logincandidate' element={<Login_Ai />} /> */}
-                     <Route
-          path='/confirmjoininterview'
-          element={<ConfirmJoinInterview/>}
-        />
-                <Route path="/submitinterview" element={<SubmitInterview />} />
+          <Route path='/logincandidate' element={<Login />} />
+          {/* <Route path='/logincandidate' element={<Login_Ai />} /> */}
+          <Route
+            path='/confirmjoininterview'
+            element={<ConfirmJoinInterview />}
+          />
+          <Route path="/submitinterview" element={<SubmitInterview />} />
 
-                <Route path="/AI-Interview" element={<InterviewAttend />} />
-                  <Route
-                path="/codingassessmentscreen"
-                element={<CodingAssessmentScreen />}
-              />
-                     <Route path="/coding_access" element={<CodingAccess />} />
-        <Route path="/coding_login" element={<CodingLogin />} />
-        <Route path="/coding_section" element={<CodingSection />} />
+          <Route path="/AI-Interview" element={<InterviewAttend />} />
+          <Route
+            path="/codingassessmentscreen"
+            element={<CodingAssessmentScreen />}
+          />
+          <Route path="/coding_access" element={<CodingAccess />} />
+          <Route path="/coding_login" element={<CodingLogin />} />
+          <Route path="/coding_section" element={<CodingSection />} />
 
 
           {/* Protected routes (authentication required) */}
@@ -168,17 +168,17 @@ const AppContent: React.FC = () => {
               <Route path="/uploadstatus" element={<FileUploadInterface />} />
               <Route path="/resumelist" element={<ResumeList />} />
               {/* <Route path="/questionformat" element={<QuestionFormat />} /> */}
-        {/* <Route path='/loginai' element={<Login_Ai />} /> */}
+              {/* <Route path='/loginai' element={<Login_Ai />} /> */}
               <Route path="/analytics_report" element={<AnalyticsReport />} />
               <Route path="/candidate_interview_analytics" element={<CandidateInterviewAnalytics />} />
               <Route path="/candidate_coding_assessment" element={<CandidateCodingAssessment />} />
- <Route
+              <Route
                 path='/assessmentselection'
                 element={<AssessmentSelection />}
               />
-        <Route path="/jdprofileview/:jobId" element={<JdProfile />} />
+              <Route path="/jdprofileview/:jobId" element={<JdProfile />} />
 
-             <Route path='/noscore/:jobId' element={<NoScore />} />
+              <Route path='/noscore/:jobId' element={<NoScore />} />
               <Route path='/resumetable/:jobId' element={<ResumeTable />} />
               <Route path="/questionformat" element={<QuestionFormat />} />
               <Route path="/scheduleinterview_ai" element={<ScheduleInterviewAI />} />

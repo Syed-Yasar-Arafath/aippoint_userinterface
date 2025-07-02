@@ -675,7 +675,6 @@ function AnalyticsReport() {
                                     </TableContainer>
                                 </Box>
                             ) : (
-                                // eslint-disable-next-line jsx-a11y/img-redundant-alt
                                 <img src="assets/static/images/Profiling-bro 1.png" alt='Image'
                                     height='auto'
                                     width='40%'

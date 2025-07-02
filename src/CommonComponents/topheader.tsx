@@ -245,7 +245,7 @@ const Header: React.FC<HeaderProps> = ({ title, userProfileImage, path }) => {
       style={{
         boxShadow: '15px 0px 32px 0px #EAF1F5',
         display: 'flex',
-        padding: '7px 30px 30px 30px',
+        padding: '7px 30px 10px 30px',
         justifyContent: 'space-between',
         // borderRadius: '25px',
         // background: '#EAF1F5',

@@ -596,7 +596,7 @@ function CandidateInterviewAnalytics() {
         border: '0.5px solid #22973F1A',
         borderRadius: '12px',
         padding: '5px',
-        width: '30%',
+        width: '40%',
         textAlign: 'center',
         marginBottom: '10px'
     }
@@ -616,9 +616,7 @@ function CandidateInterviewAnalytics() {
                 // userProfileImage={userProfileImage}
                 path="/analytics_report"
             />
-            <Grid container spacing={2} padding={2} sx={{
-                background: '#F7F7F7'
-            }}>
+            <Grid container spacing={2} padding={2} sx={{ background: '#F7F7F7' }}>
                 {interviewData ? (
                     <>
                         <Grid item xs={12} sm={6} md={4}>
@@ -746,7 +744,7 @@ function CandidateInterviewAnalytics() {
                                                 justifyContent: 'center',
                                                 alignItems: 'center',
                                             }}
-                                        >{interviewData.overall_score * 10}%
+                                        >{interviewData.overall_score * 10 || '0'}%
                                             <Typography sx={{
                                                 color: '#FFFFFF',
                                                 fontSize: '14px',

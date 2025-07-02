@@ -136,7 +136,7 @@ function SideMenuBars() {
                     justifyContent: 'space-between',
                     alignContent: 'center',
                     flexDirection: 'row',
-                    padding: '10px 20px',
+                    padding: '10px',
                     backgroundColor:
                       clickedItem === index || pathLocation.pathname === item.link
                         ? '#0284C7'
@@ -375,7 +375,7 @@ const handleLogOut = () => {
             flexDirection: 'column',
             alignItems: 'center',
             overflowY: 'hidden',
-            width: { xs: '200px', sm: '220px', md: '250px' },
+            width: { xs: '200px', sm: '220px', md: '230px' },
             zIndex: 1000,
           }}
         >

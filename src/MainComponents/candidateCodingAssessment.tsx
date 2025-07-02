@@ -299,12 +299,12 @@ function CandidateCodingAssessment() {
 
     return (
         <>
-         <Header
-                        title="Coding Assessment"
-                        // userProfileImage={userProfileImage}
-                        path="/analytics_report"
-                    />
-            <Grid container spacing={2} padding={2} gap={2} sx={{ background: '#F7F7F7' }}>
+            <Header
+                title="Coding Assessment"
+                // userProfileImage={userProfileImage}
+                path="/analytics_report"
+            />
+            <Grid container spacing={0} padding={2} gap={2} sx={{ background: '#F7F7F7' }}>
                 {interviewData ? (
                     <>
                         <Grid item xs={12} md={7.5}>
@@ -476,7 +476,7 @@ function CandidateCodingAssessment() {
                                                     justifyContent: 'center',
                                                     alignItems: 'center',
                                                 }}
-                                            >{interviewData.coding_overall_score * 10}%
+                                            >{interviewData.coding_overall_score * 10 || '0'}%
                                                 <Typography sx={{
                                                     color: '#FFFFFF',
                                                     fontSize: '14px',

@@ -560,7 +560,9 @@ const JdCollection: React.FC = () => {
   const [loading, setLoading] = useState<boolean>(false)
   const [error, setError] = useState<string | null>(null)
   const [currentPage, setCurrentPage] = useState(1)
-  const totalPages = 4
+  // const totalPages = 4
+  
+
   const navigate = useNavigate()
   const organisation = localStorage.getItem('organisation')
   const token = localStorage.getItem('token')
@@ -737,7 +739,13 @@ const filteredJobs = jobs.filter((job) => {
   )
 })
 
- 
+ const pageSize = 4
+const totalPages = Math.ceil(filteredJobs.length / pageSize)
+const startIdx = (currentPage - 1) * pageSize
+const endIdx = startIdx + pageSize
+const paginatedJobs = filteredJobs.slice(startIdx, endIdx)
+
+
 
   const CustomExpandMore = () => (
     <ExpandMore sx={{ fontSize: '20px', color: '#666', marginRight: '10px' }} />
@@ -972,7 +980,7 @@ const filteredJobs = jobs.filter((job) => {
       ) : jobs.length === 0 ? (
         <Typography>No jobs found.</Typography>
       ) : (
-        filteredJobs.map((job) => <JobCard key={job.jobid} job={job} />)
+        paginatedJobs.map((job) => <JobCard key={job.jobid} job={job} />)
       )}
 
       {/* Pagination */}
@@ -982,7 +990,7 @@ const filteredJobs = jobs.filter((job) => {
             Prev
           </Button>
         </Grid>
-        {[1, 2, 3, 4].map((n) => (
+        {Array.from({ length: totalPages }, (_, idx) => idx + 1).map((n) => (
           <Grid item key={n}>
             <Button
               onClick={() => setCurrentPage(n)}

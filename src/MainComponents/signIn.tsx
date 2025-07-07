@@ -268,11 +268,12 @@ function SignIn() {
           // dispatch(openSnackbar(t('accountNotActivatedSnackbar'), 'red'))
         } else if (res.length >= 50) {
           localStorage.setItem('token', res)
+          localStorage.setItem('email',email)
           dispatch(updateToken('login successful'))
           dispatch(openSnackbar('User logged In successfully', 'dodgerblue'))
           // dispatch(updateToken(t('loginSuccessfulSnackbar')))
           // dispatch(openSnackbar(t('userLoggedInSnackbar'), 'dodgerblue'))
-          navigate('/uploadfiles')
+          navigate('/RecruitmentDashboard')
  fetchDiagnostic()
     sendOrg(organisation);
         } else if (

@@ -44,7 +44,7 @@ const tabs = [
   'Privacy & Security',
   'Interview Settings',
   'Notification Preferences',
-  'Accessibility',
+  // 'Accessibility',
 ]
 
 const Settings: React.FC = () => {
@@ -55,9 +55,7 @@ const Settings: React.FC = () => {
   const [editField, setEditField] = useState<{ field: string | null }>({
     field: null,
   })
-  const [profileImage, setProfileImage] = useState<string>(
-    'https://www.gravatar.com/avatar/?d=mp',
-  )
+  const [profileImage, setProfileImage] = useState<string>('')
   const [selectedImage, setSelectedImage] = useState<File | null>(null) // Store selected file
   const [userProfileImage, setUserProfileImage] = useState<string | null>(null)
   const organisation = localStorage.getItem('organisation')
@@ -71,7 +69,6 @@ const Settings: React.FC = () => {
   const handleReset = () => {
     setAppearancegeneral('System')
     setEditField({ field: null })
-    setProfileImage('https://www.gravatar.com/avatar/?d=mp') // Reset profile image
     setSelectedImage(null) // Reset selected image
     getUserData();
   }
@@ -284,6 +281,13 @@ const Settings: React.FC = () => {
       const res = await getUserDetails(organisation)
       setUserName(res.name)
       setUserEmail(res.email)
+    if (res.imageUrl) {
+      setProfileImage(
+        `http://localhost:8082/user/read/downloadFile/${res.imageUrl}/${organisation}`
+      )
+    } else {
+      setProfileImage('https://www.gravatar.com/avatar/?d=mp') // fallback
+    }
     } catch (error) {
       console.error('Error fetching user data:', error)
     }
@@ -310,7 +314,7 @@ const Settings: React.FC = () => {
         setUserEmail(res.data.email)
       }
     }catch(error){
-
+console.log('Error = ', error)
     }
   }
 
@@ -337,7 +341,6 @@ const Settings: React.FC = () => {
 
     getUserData();
   }, [organisation]);
-
   const handleSaveChangesFirsttab = async () => {
   try {
     const formData = new FormData()
@@ -348,15 +351,13 @@ const Settings: React.FC = () => {
     if (selectedImage) {
       formData.append('image', selectedImage)
     }
-    const res = await axios.post('http://localhost:8082/user/update-profile', formData, {
+    const res = await axios.put(`http://localhost:8082/user/update-profile/${organisation}`, formData, {
       headers: {
         Authorization: `Bearer ${token}`,
-        'Content-Type': 'multipart/form-data',
       },
     })
 
     if (res.status === 200) {
-      setProfileImage(`http://localhost:8082${res.data.imageUrl}`)
       alert('Profile updated successfully!')
     }
   } catch (error) {
@@ -551,24 +552,27 @@ const Settings: React.FC = () => {
         backgroundColor: '#F7F7F7',
         borderRadius: 10,
         width: '100%',
+        paddingLeft:'35px',
       }}
     >
       {/* Header */}
       <Header
-        title="Settings"
+        title='Settings'
         userProfileImage={userProfileImage}
-        path="/settings"
+        path='/settings'
       />
 
       <div
         style={{
           display: 'flex',
-          gap: 10,
+          // gap: 10,
+          justifyContent:'space-between',
           marginBottom: 30,
           flexWrap: 'wrap',
           border: '0.5px solid #1C1C1E40',
           padding: '8px',
           borderRadius: '6px',
+          marginRight:'45px',
         }}
       >
         {tabs.map((tab) => (
@@ -593,7 +597,7 @@ const Settings: React.FC = () => {
       </div>
 
       <div
-        style={{ backgroundColor: '#FFFFFF', padding: 30, borderRadius: 12 }}
+        style={{ backgroundColor: '#FFFFFF', padding: 30, borderRadius: 12,marginTop:'10px' }}
       >
         {activeTab === 'General Settings' && (
           <>
@@ -618,7 +622,7 @@ const Settings: React.FC = () => {
             >
               <img
                 src={profileImage}
-                alt="Profile"
+                alt='Profile'
                 style={{
                   width: 100,
                   height: 100,
@@ -661,8 +665,8 @@ const Settings: React.FC = () => {
                 </span>
               </div>
               <input
-                type="file"
-                accept="image/*"
+                type='file'
+                accept='image/*'
                 ref={fileInputRef}
                 style={{ display: 'none' }}
                 onChange={handleFileChange}
@@ -789,11 +793,12 @@ const Settings: React.FC = () => {
                     sx={{ display: 'flex', alignItems: 'center', gap: '10px' }}
                   >
                     <TextField
-                      variant="outlined"
+                      variant='outlined'
                       value={userName}
                       disabled={editField.field !== 'name'}
                       onChange={(e) => setUserName(e.target.value)}
-                      size="small"
+                      autoComplete='off'
+                      size='small'
                       style={{ flex: 1, maxWidth: 300 }}
                       InputProps={{
                         style: { borderRadius: 8 },
@@ -857,11 +862,12 @@ const Settings: React.FC = () => {
                     sx={{ display: 'flex', alignItems: 'center', gap: '10px' }}
                   >
                     <TextField
-                      variant="outlined"
+                      variant='outlined'
                       value={userEmail}
                       disabled={editField.field !== 'email'}
                       onChange={(e) => setUserEmail(e.target.value)}
-                      size="small"
+                      size='small'
+                      autoComplete='off'
                       style={{ flex: 1, maxWidth: 300 }}
                       InputProps={{
                         style: { borderRadius: 8 },
@@ -927,12 +933,12 @@ const Settings: React.FC = () => {
                     <Select
                       value={appearancegeneral}
                       onChange={(e) => setAppearancegeneral(e.target.value)}
-                      size="small"
+                      size='small'
                       style={{ flex: 1, maxWidth: 300 }}
                     >
-                      <MenuItem value="Light">Light</MenuItem>
-                      <MenuItem value="Dark">Dark</MenuItem>
-                      <MenuItem value="System">System</MenuItem>
+                      <MenuItem value='Light'>Light</MenuItem>
+                      <MenuItem value='Dark'>Dark</MenuItem>
+                      <MenuItem value='System'>System</MenuItem>
                     </Select>
                     <span
                       style={{
@@ -961,7 +967,7 @@ const Settings: React.FC = () => {
             >
               <Button
                 style={{
-                  padding: '14px 41px',
+                  padding: '14px 25px',
                   textTransform: 'none',
                   backgroundColor: 'white',
                   border: '1px solid #1C1C1E',
@@ -979,7 +985,7 @@ const Settings: React.FC = () => {
               </Button>
               <Button
                 style={{
-                  padding: '14px 41px',
+                  padding: '14px 25px',
                   textTransform: 'none',
                   backgroundColor: '#007bce',
                   color: 'white',
@@ -1019,7 +1025,7 @@ const Settings: React.FC = () => {
                     </Grid>
                     <Grid item lg={4}>
                       <Button
-                        variant="outlined"
+                        variant='outlined'
                         startIcon={<AddIcon />}
                         onClick={handleOpenInviteDialog}
                         sx={{
@@ -1045,11 +1051,11 @@ const Settings: React.FC = () => {
                   <DialogContent>
                     <TextField
                       autoFocus
-                      margin="dense"
-                      label="Email Address"
-                      type="email"
+                      margin='dense'
+                      label='Email Address'
+                      type='email'
                       fullWidth
-                      variant="outlined"
+                      variant='outlined'
                       value={newMemberEmail}
                       onChange={(e) => setNewMemberEmail(e.target.value)}
                     />
@@ -1063,7 +1069,7 @@ const Settings: React.FC = () => {
                     </Button>
                     <Button
                       onClick={handleSendInvite}
-                      color="primary"
+                      color='primary'
                       style={{ textTransform: 'none' }}
                     >
                       Send Invite
@@ -1082,15 +1088,15 @@ const Settings: React.FC = () => {
                 >
                   <TextField
                     // fullWidth
-                    placeholder="Enter email of the team member..."
-                    variant="outlined"
-                    size="small"
+                    placeholder='Enter email of the team member...'
+                    variant='outlined'
+                    size='small'
                     sx={{ mr: 2, width: '313px' }}
                     value={newMemberEmail}
                     onChange={(e) => setNewMemberEmail(e.target.value)}
                   />
                   <Button
-                    variant="text"
+                    variant='text'
                     style={{
                       color: '#1C1C1E',
                       fontSize: '12px',
@@ -1103,7 +1109,7 @@ const Settings: React.FC = () => {
                     Cancel
                   </Button>
                   <Button
-                    variant="text"
+                    variant='text'
                     style={{
                       color: '#0284C7',
                       fontSize: '12px',
@@ -1140,7 +1146,7 @@ const Settings: React.FC = () => {
                     <TableContainer
                       component={Paper}
                       elevation={0}
-                      variant="outlined"
+                      variant='outlined'
                     >
                       <Table sx={{ minWidth: 650 }}>
                         <TableHead>
@@ -1170,7 +1176,7 @@ const Settings: React.FC = () => {
                               </TableCell>
                               <TableCell>{member.email}</TableCell>
                               <TableCell>
-                                <FormControl fullWidth size="small">
+                                <FormControl fullWidth size='small'>
                                   <Select
                                     value={member.permissions}
                                     onChange={(e) =>
@@ -1182,26 +1188,26 @@ const Settings: React.FC = () => {
                                     IconComponent={ExpandMoreIcon}
                                     sx={{ minWidth: 200 }}
                                   >
-                                    <MenuItem value="JD Collection">
+                                    <MenuItem value='JD Collection'>
                                       JD Collection
                                     </MenuItem>
-                                    <MenuItem value="JD Creation">
+                                    <MenuItem value='JD Creation'>
                                       JD Creation
                                     </MenuItem>
-                                    <MenuItem value="Conduct Interviews">
+                                    <MenuItem value='Conduct Interviews'>
                                       Conduct Interviews
                                     </MenuItem>
-                                    <MenuItem value="Upload Resumes">
+                                    <MenuItem value='Upload Resumes'>
                                       Upload Resumes
                                     </MenuItem>
-                                    <MenuItem value="Conduct Assessments">
+                                    <MenuItem value='Conduct Assessments'>
                                       Conduct Assessments
                                     </MenuItem>
                                   </Select>
                                 </FormControl>
                               </TableCell>
                               <TableCell>
-                                <FormControl fullWidth size="small">
+                                <FormControl fullWidth size='small'>
                                   <Select
                                     value={member.role}
                                     onChange={(e) =>
@@ -1213,8 +1219,8 @@ const Settings: React.FC = () => {
                                     IconComponent={ExpandMoreIcon}
                                     sx={{ minWidth: 150 }}
                                   >
-                                    <MenuItem value="Viewer">Viewer</MenuItem>
-                                    <MenuItem value="Editor">Editor</MenuItem>
+                                    <MenuItem value='Viewer'>Viewer</MenuItem>
+                                    <MenuItem value='Editor'>Editor</MenuItem>
                                   </Select>
                                 </FormControl>
                               </TableCell>
@@ -1248,7 +1254,7 @@ const Settings: React.FC = () => {
                     <TableContainer
                       component={Paper}
                       elevation={0}
-                      variant="outlined"
+                      variant='outlined'
                     >
                       <Table sx={{ minWidth: 650 }}>
                         <TableHead>
@@ -1385,7 +1391,7 @@ const Settings: React.FC = () => {
                     }}
                   >
                     <Typography
-                      variant="body1"
+                      variant='body1'
                       style={{
                         fontSize: '12px',
                         fontWeight: 700,
@@ -1426,12 +1432,12 @@ const Settings: React.FC = () => {
                   >
                     <TextField
                       fullWidth
-                      placeholder="Enter new password to update your password"
-                      variant="outlined"
-                      type="password"
+                      placeholder='Enter new password to update your password'
+                      variant='outlined'
+                      type='password'
                       value={newPassword}
                       onChange={handlePasswordChange}
-                      size="small"
+                      size='small'
                     />
                     <Box
                       sx={{
@@ -1442,8 +1448,8 @@ const Settings: React.FC = () => {
                       }}
                     >
                       <Button
-                        variant="text"
-                        color="inherit"
+                        variant='text'
+                        color='inherit'
                         onClick={handleCancel}
                         style={{
                           fontSize: '12px',
@@ -1457,8 +1463,8 @@ const Settings: React.FC = () => {
                         Cancel
                       </Button>
                       <Button
-                        variant="text"
-                        color="primary"
+                        variant='text'
+                        color='primary'
                         onClick={handleUpdatePassword}
                         style={{
                           fontSize: '12px',
@@ -1516,7 +1522,7 @@ const Settings: React.FC = () => {
                     }}
                   >
                     <Stack
-                      direction="row"
+                      direction='row'
                       spacing={2}
                       sx={{ flexGrow: 1, paddingTop: '6px' }}
                     >
@@ -1534,7 +1540,7 @@ const Settings: React.FC = () => {
                               onChange={() => handleTwoFactorChange('sms')}
                             />
                           }
-                          label="SMS"
+                          label='SMS'
                         />
                         <FormControlLabel
                           control={
@@ -1543,7 +1549,7 @@ const Settings: React.FC = () => {
                               onChange={() => handleTwoFactorChange('email')}
                             />
                           }
-                          label="Email"
+                          label='Email'
                         />
                         <FormControlLabel
                           control={
@@ -1554,12 +1560,12 @@ const Settings: React.FC = () => {
                               }
                             />
                           }
-                          label="Authenticator App"
+                          label='Authenticator App'
                         />
                       </div>
                       <Button
-                        variant="text"
-                        color="inherit"
+                        variant='text'
+                        color='inherit'
                         onClick={handleReset2FA}
                         style={{
                           fontSize: '12px',
@@ -1573,8 +1579,8 @@ const Settings: React.FC = () => {
                         Reset
                       </Button>
                       <Button
-                        variant="text"
-                        color="primary"
+                        variant='text'
+                        color='primary'
                         onClick={handleUpdate2FA}
                         style={{
                           fontSize: '12px',
@@ -1761,7 +1767,7 @@ const Settings: React.FC = () => {
                     </Grid>
                     <Grid item xs={4} sm={3}>
                       <Button
-                        variant="text"
+                        variant='text'
                         onClick={() => handleSaveFourthtab(row.field)}
                         style={{ textTransform: 'none' }}
                       >
@@ -1828,7 +1834,7 @@ const Settings: React.FC = () => {
         )}
         {activeTab === 'Notification Preferences' && (
           <>
-            <Box p={4} width="100%" mx="auto">
+            <Box p={4} width='100%' mx='auto'>
               {/* In-App Notifications Section */}
               <Grid container spacing={0} sx={{ display: 'flex' }}>
                 <Grid item lg={5}>
@@ -1857,11 +1863,11 @@ const Settings: React.FC = () => {
                     </Typography>
                   </div>
                   <Box
-                    display="flex"
-                    flexWrap="wrap"
-                    padding="10px"
-                    border="0.5px solid #1C1C1E40 "
-                    borderRadius="6px"
+                    display='flex'
+                    flexWrap='wrap'
+                    padding='10px'
+                    border='0.5px solid #1C1C1E40 '
+                    borderRadius='6px'
                   >
                     {[
                       'Interview Reminders',
@@ -1908,10 +1914,10 @@ const Settings: React.FC = () => {
 
                 <Grid item lg={6}>
                   <Box
-                    display="flex"
-                    flexDirection="column"
+                    display='flex'
+                    flexDirection='column'
                     gap={3}
-                    maxWidth="400px"
+                    maxWidth='400px'
                   >
                     <Box>
                       <Typography
@@ -1925,9 +1931,9 @@ const Settings: React.FC = () => {
                       >
                         Do Not Disturb Mode
                       </Typography>
-                      <Select fullWidth defaultValue="Off">
-                        <MenuItem value="Off">Off</MenuItem>
-                        <MenuItem value="On">On</MenuItem>
+                      <Select fullWidth defaultValue='Off'>
+                        <MenuItem value='Off'>Off</MenuItem>
+                        <MenuItem value='On'>On</MenuItem>
                       </Select>
                     </Box>
 
@@ -1943,10 +1949,10 @@ const Settings: React.FC = () => {
                       >
                         Set Preferred Notification Time
                       </Typography>
-                      <Select fullWidth defaultValue="Off">
-                        <MenuItem value="Off">Off</MenuItem>
-                        <MenuItem value="Morning">Morning</MenuItem>
-                        <MenuItem value="Evening">Evening</MenuItem>
+                      <Select fullWidth defaultValue='Off'>
+                        <MenuItem value='Off'>Off</MenuItem>
+                        <MenuItem value='Morning'>Morning</MenuItem>
+                        <MenuItem value='Evening'>Evening</MenuItem>
                       </Select>
                     </Box>
 
@@ -1962,17 +1968,17 @@ const Settings: React.FC = () => {
                       >
                         Select Preferred Communication Channel
                       </Typography>
-                      <Select fullWidth defaultValue="Email">
-                        <MenuItem value="Email">Email</MenuItem>
-                        <MenuItem value="SMS">SMS</MenuItem>
-                        <MenuItem value="Both">Both</MenuItem>
+                      <Select fullWidth defaultValue='Email'>
+                        <MenuItem value='Email'>Email</MenuItem>
+                        <MenuItem value='SMS'>SMS</MenuItem>
+                        <MenuItem value='Both'>Both</MenuItem>
                       </Select>
                     </Box>
                   </Box>
                 </Grid>
               </Grid>
 
-              <Box mt={4} display="flex" gap={2} justifyContent="center">
+              <Box mt={4} display='flex' gap={2} justifyContent='center'>
                 {/* <Button variant='outlined' style={{ textTransform: 'none', color: '#1C1C1E', fontWeight: 500, fontSize: '12px', padding: '14px 41px 14px 41px' }}>Reset to Default</Button>
                                 <Button variant='contained' style={{ textTransform: 'none', color: '#FFFFFF', fontWeight: 500, fontSize: '12px', padding: '14px 41px 14px 41px' }}>Save Changes</Button> */}
                 <Button
@@ -2015,17 +2021,17 @@ const Settings: React.FC = () => {
             </Box>
           </>
         )}
-        {activeTab == 'Accessibility' && (
+        {/* {activeTab == 'Accessibility' && (
           <>
             <Grid container spacing={0}>
               <Grid item lg={5}>
                 <Box>
-                  <Typography fontWeight="bold">
+                  <Typography fontWeight='bold'>
                     Text Size Adjustment
                   </Typography>
                 </Box>
                 <Box>
-                  <Typography fontWeight="bold">Appearance</Typography>
+                  <Typography fontWeight='bold'>Appearance</Typography>
                 </Box>
                 <Box>
                   {[
@@ -2041,26 +2047,26 @@ const Settings: React.FC = () => {
                   ].map((item, idx) => (
                     <Box
                       key={idx}
-                      display="flex"
-                      alignItems="center"
-                      justifyContent="space-between"
+                      display='flex'
+                      alignItems='center'
+                      justifyContent='space-between'
                       mb={3}
-                      paddingTop="22px"
+                      paddingTop='22px'
                     >
                       <Box>
-                        <Typography fontWeight="bold">{item.label}</Typography>
+                        <Typography fontWeight='bold'>{item.label}</Typography>
                       </Box>
                     </Box>
                   ))}
                 </Box>
-                <Box paddingTop="22px">
-                  <Typography fontWeight="bold">
+                <Box paddingTop='22px'>
+                  <Typography fontWeight='bold'>
                     Enable Captions & Subtitles
                   </Typography>
                 </Box>
               </Grid>
               <Grid item lg={4}>
-                <Box width="200px">
+                <Box width='200px'>
                   <Slider
                     value={textSize}
                     min={-5}
@@ -2068,9 +2074,9 @@ const Settings: React.FC = () => {
                     onChange={(e: any, value: any) =>
                       setTextSize(value as number)
                     }
-                    aria-labelledby="text-size-slider"
+                    aria-labelledby='text-size-slider'
                   />
-                  <Typography align="center">{textSize}</Typography>
+                  <Typography align='center'>{textSize}</Typography>
                 </Box>
                 Notification Preferences
                 <Box>
@@ -2087,25 +2093,25 @@ const Settings: React.FC = () => {
                   ].map((item, idx) => (
                     <Box
                       key={idx}
-                      display="flex"
-                      alignItems="center"
-                      justifyContent="space-between"
+                      display='flex'
+                      alignItems='center'
+                      justifyContent='space-between'
                       mb={3}
                     >
-                      <Box display="flex" gap={2} alignItems="center">
+                      <Box display='flex' gap={2} alignItems='center'>
                         <FormControl
-                          variant="outlined"
-                          size="small"
+                          variant='outlined'
+                          size='small'
                           sx={{ width: 200 }}
                         >
-                          <Select value="Off" disabled>
-                            <MenuItem value="Off">Off</MenuItem>
+                          <Select value='Off' disabled>
+                            <MenuItem value='Off'>Off</MenuItem>
                           </Select>
                         </FormControl>
                         <Chip
-                          label="Coming Soon"
-                          color="success"
-                          variant="outlined"
+                          label='Coming Soon'
+                          color='success'
+                          variant='outlined'
                         />
                       </Box>
                     </Box>
@@ -2113,26 +2119,26 @@ const Settings: React.FC = () => {
                 </Box>
                 <Box>
                   <FormControl
-                    variant="outlined"
-                    size="small"
+                    variant='outlined'
+                    size='small'
                     sx={{ width: 200, paddingTop: '22px' }}
                   >
                     <Select
                       value={captions}
                       onChange={(e) => setCaptions(e.target.value)}
                     >
-                      <MenuItem value="On">On</MenuItem>
-                      <MenuItem value="Off">Off</MenuItem>
+                      <MenuItem value='On'>On</MenuItem>
+                      <MenuItem value='Off'>Off</MenuItem>
                     </Select>
                   </FormControl>
                 </Box>
               </Grid>
             </Grid>
             <Box
-              display="flex"
+              display='flex'
               gap={2}
-              justifyContent="center"
-              paddingTop="30px"
+              justifyContent='center'
+              paddingTop='30px'
             >
                 <Button
                   style={{
@@ -2172,7 +2178,7 @@ const Settings: React.FC = () => {
                 </Button>
             </Box>
           </>
-        )}
+        )} */}
       </div>
     </div>
   )

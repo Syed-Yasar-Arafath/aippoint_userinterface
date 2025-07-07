@@ -218,6 +218,18 @@ export async function getUserDetails(organisation: any) {
     throw error
   }
 }
+
+export async function getUserDetailsWithouttoken(email:any,organisation: any) {
+  try {
+    const response = await internalApi.get(`/user/readwithouttoken/${organisation}`,{
+      params: { email }
+    })
+    return response.data
+  } catch (error) {
+    console.error('Error fetching data:', error)
+    throw error
+  }
+}
 export async function isVallidToken(token: any) {
   try {
     // const token = localStorage.getItem('token')

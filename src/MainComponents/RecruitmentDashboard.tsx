@@ -940,12 +940,8 @@ const RecruitmentDashboard: React.FC = () => {
   }
    const getAvailableresumes = async (user_id:any) => {
     try {
-      const data={
-        created_by:user_id
-      }
-      const res = await axios.post('http://localhost:8000/count_resumes_by_user/',{
-        data
-      },
+    
+      const res = await axios.post('http://localhost:8000/count_resumes_by_user/',{ created_by: user_id },
        {
         headers: {
           Organization: organisation,

@@ -6,18 +6,43 @@ import AccessTimeIcon from '@mui/icons-material/AccessTime'
 import axios from 'axios'
 import Header from '../CommonComponents/topheader'
 import { getUserDetails } from '../services/UserService'
-
+interface Job {
+  jobid: number
+  referenceNumber: string
+  job_title: string
+  job_role: string
+  createdBy: string
+  experience_required: string
+  location: string
+  type: string
+  job_type: string[]
+  skills: string
+  company_name: string | null
+  modeOfWork: string
+  specificDomainSkills: string
+  primarySkills: string
+  secondarySkills: string
+  job_description: string
+  created_on: string
+  rolecategory: string
+  newLocation: {
+    country: string
+    state: string
+    city: string
+  }
+}
 const RecruitmentDashboard: React.FC = () => {
   // State to manage the active tab
   const [activeTab, setActiveTab] = useState('JD Overview')
   const [error, setError] = useState<string | null>(null)
   const [userProfileImage, setUserProfileImage] = useState<string | null>(null)
   const organisation = localStorage.getItem('organisation')
+  const token = localStorage.getItem('token')
 
   // Interface for StatCard
   interface StatCardProps {
     title: string
-    value: string
+    value: number
     change: string
     isPositive: boolean
     changeText: string
@@ -78,7 +103,7 @@ const RecruitmentDashboard: React.FC = () => {
           style={{
             fontFamily: 'SF Pro Display',
             fontWeight: 700,
-            fontSize: '34px',
+            fontSize: '24px',
             lineHeight: '100%',
             letterSpacing: '0%',
             color: '#0284C7',
@@ -353,7 +378,7 @@ const RecruitmentDashboard: React.FC = () => {
           style={{
             fontFamily: 'SF Pro Display',
             fontWeight: 700,
-            fontSize: '34px',
+            fontSize: '24px',
             lineHeight: '100%',
             letterSpacing: '0%',
             color: '#0284C7',
@@ -408,12 +433,109 @@ const RecruitmentDashboard: React.FC = () => {
     assessmentStatus: 'Completed',
     aiScore: '95%',
   })
+  const [loading, setLoading] = useState<boolean>(false)
+  const [jobs, setJobs] = useState<Job[]>([])
+  const [upcomingInterview, setUpcomingInterview] = useState<Job[]>([])
+  const [aiInterview, setAiInterview] = useState<Job[]>([])
+  const [codingAssessment, setCodingAssessment] = useState<Job[]>([])
+
+  useEffect(() => {
+    const fetchJobs = async () => {
+      setLoading(true)
+      try {
+        const response = await axios.get(`http://localhost:8082/user/read/${organisation}`, {
+          headers: {
+            Authorization: `Bearer ${token}`,
+          },
+        })
+
+        console.log('API response:', response.data)
+
+        // ✅ set jobs from job_description field
+        if (Array.isArray(response.data.job_description)) {
+          setJobs(response.data.job_description)
+          setUpcomingInterview(response.data.job_description)
+          setAiInterview(response.data.job_description)
+          setCodingAssessment(response.data.job_description)
+        } else {
+          console.error('Unexpected response format:', response.data)
+          setError('Unexpected response format from server.')
+        }
+      } catch (err) {
+        console.error('Error fetching jobs:', err)
+        setError('Failed to fetch job data.')
+      } finally {
+        setLoading(false)
+      }
+    }
+
+    fetchJobs()
+  }, [])
 
   // Render table based on active tab
   const renderTable = () => {
     switch (activeTab) {
       case 'JD Overview':
         return (
+          // <table style={{ width: '100%', borderCollapse: 'collapse' }}>
+          //   <thead>
+          //     <tr style={{ backgroundColor: '#0284C7', color: 'white' }}>
+          //       <th
+          //         style={{
+          //           textAlign: 'left',
+          //           padding: '12px',
+          //           borderTopLeftRadius: '8px',
+          //         }}
+          //       >
+          //         <div style={{ display: 'flex', alignItems: 'center' }}>
+          //           JD Title
+          //           <span>
+          //             <KeyboardArrowDownSharpIcon
+          //               style={{
+          //                 marginLeft: '4px',
+          //                 width: '16px',
+          //                 height: '16px',
+          //               }}
+          //             />
+          //           </span>
+          //         </div>
+          //       </th>
+          //       <th style={{ textAlign: 'left', padding: '12px' }}>
+          //         Open Positions
+          //       </th>
+          //       <th style={{ textAlign: 'left', padding: '12px' }}>
+          //         Resumes Available
+          //       </th>
+          //       <th
+          //         style={{
+          //           textAlign: 'left',
+          //           padding: '12px',
+          //           borderTopRightRadius: '8px',
+          //         }}
+          //       >
+          //         AI Interviews Completed
+          //       </th>
+          //     </tr>
+          //   </thead>
+          //   <tbody>
+          //     {jdOverviewData.map((row, index) => (
+          //       <tr
+          //         key={index}
+          //         style={{
+          //           backgroundColor: 'white',
+          //           borderBottom: '1px solid #e5e7eb',
+          //         }}
+          //       >
+          //         <td style={{ padding: '12px' }}>{row.jdTitle}</td>
+          //         <td style={{ padding: '12px' }}>{row.openPositions}</td>
+          //         <td style={{ padding: '12px' }}>{row.resumesAvailable}</td>
+          //         <td style={{ padding: '12px' }}>
+          //           {row.aiInterviewsCompleted}
+          //         </td>
+          //       </tr>
+          //     ))}
+          //   </tbody>
+          // </table>
           <table style={{ width: '100%', borderCollapse: 'collapse' }}>
             <thead>
               <tr style={{ backgroundColor: '#0284C7', color: 'white' }}>
@@ -455,7 +577,7 @@ const RecruitmentDashboard: React.FC = () => {
               </tr>
             </thead>
             <tbody>
-              {jdOverviewData.map((row, index) => (
+              {jobs.map((job, index) => (
                 <tr
                   key={index}
                   style={{
@@ -463,16 +585,15 @@ const RecruitmentDashboard: React.FC = () => {
                     borderBottom: '1px solid #e5e7eb',
                   }}
                 >
-                  <td style={{ padding: '12px' }}>{row.jdTitle}</td>
-                  <td style={{ padding: '12px' }}>{row.openPositions}</td>
-                  <td style={{ padding: '12px' }}>{row.resumesAvailable}</td>
-                  <td style={{ padding: '12px' }}>
-                    {row.aiInterviewsCompleted}
-                  </td>
+                  <td style={{ padding: '12px' }}>{job.job_title}</td>
+                  <td style={{ padding: '12px' }}>{job.job_type?.length || 0}</td>
+                  <td style={{ padding: '12px' }}>{job.skills?.split(',').length || 0}</td>
+                  <td style={{ padding: '12px' }}>{Math.floor(Math.random() * 10)}</td>
                 </tr>
               ))}
             </tbody>
           </table>
+
         )
 
       case 'Upcoming Interviews':
@@ -545,7 +666,7 @@ const RecruitmentDashboard: React.FC = () => {
               </tr>
             </thead>
             <tbody>
-              {upcomingInterviewsData.map((row, index) => (
+              {upcomingInterview.map((row, index) => (
                 <tr
                   key={index}
                   style={{
@@ -553,31 +674,31 @@ const RecruitmentDashboard: React.FC = () => {
                     borderBottom: '1px solid #e5e7eb',
                   }}
                 >
-                  <td style={{ padding: '12px' }}>{row.candidate}</td>
-                  <td style={{ padding: '12px' }}>{row.jdTitle}</td>
-                  <td style={{ padding: '12px' }}>{row.date}</td>
-                  <td style={{ padding: '12px' }}>{row.time}</td>
+                  <td style={{ padding: '12px' }}>n/a</td>
+                  <td style={{ padding: '12px' }}>{row.job_title}</td>
+                  {/* <td style={{ padding: '12px' }}>{row.date}</td> */}
+                  {/* <td style={{ padding: '12px' }}>{row.time}</td> */}
                   <td style={{ padding: '12px' }}>
                     <span
                       style={{
-                        color:
-                          row.status === 'Scheduled'
-                            ? '#2563eb'
-                            : row.status === 'Cancelled'
-                            ? '#FF3B30'
-                            : '#22c55e',
-                        backgroundColor:
-                          row.status === 'Scheduled'
-                            ? '#dbeafe'
-                            : row.status === 'Cancelled'
-                            ? '#fee2e2'
-                            : '#dcfce7',
+                        // color:
+                        //   row.status === 'Scheduled'
+                        //     ? '#2563eb'
+                        //     : row.status === 'Cancelled'
+                        //     ? '#FF3B30'
+                        //     : '#22c55e',
+                        // backgroundColor:
+                        //   row.status === 'Scheduled'
+                        //     ? '#dbeafe'
+                        //     : row.status === 'Cancelled'
+                        //     ? '#fee2e2'
+                        //     : '#dcfce7',
                         padding: '4px 8px',
                         borderRadius: '12px',
                         fontSize: '12px',
                       }}
                     >
-                      {row.status}
+                      {/* {row.status} */}
                     </span>
                   </td>
                 </tr>
@@ -659,7 +780,7 @@ const RecruitmentDashboard: React.FC = () => {
               </tr>
             </thead>
             <tbody>
-              {aiInterviewsData.map((row, index) => (
+              {aiInterview.map((row, index) => (
                 <tr
                   key={index}
                   style={{
@@ -667,32 +788,32 @@ const RecruitmentDashboard: React.FC = () => {
                     borderBottom: '1px solid #e5e7eb',
                   }}
                 >
-                  <td style={{ padding: '12px' }}>{row.candidate}</td>
-                  <td style={{ padding: '12px' }}>{row.jdTitle}</td>
-                  <td style={{ padding: '12px' }}>{row.date}</td>
-                  <td style={{ padding: '12px' }}>{row.time}</td>
-                  <td style={{ padding: '12px' }}>{row.aiScore}</td>
+                  <td style={{ padding: '12px' }}>n/a</td>
+                  <td style={{ padding: '12px' }}>{row.job_title}</td>
+                  {/* <td style={{ padding: '12px' }}>{row.date}</td> */}
+                  {/* <td style={{ padding: '12px' }}>{row.time}</td> */}
+                  {/* <td style={{ padding: '12px' }}>{row.aiScore}</td> */}
                   <td style={{ padding: '12px' }}>
                     <span
                       style={{
-                        color:
-                          row.status === 'Completed'
-                            ? '#2563eb'
-                            : row.status === 'Cancelled'
-                            ? '#FF3B30'
-                            : '#22c55e',
-                        backgroundColor:
-                          row.status === 'Completed'
-                            ? '#dbeafe'
-                            : row.status === 'Cancelled'
-                            ? '#fee2e2'
-                            : '#dcfce7',
+                        // color:
+                        //   row.status === 'Completed'
+                        //     ? '#2563eb'
+                        //     : row.status === 'Cancelled'
+                        //     ? '#FF3B30'
+                        //     : '#22c55e',
+                        // backgroundColor:
+                        //   row.status === 'Completed'
+                        //     ? '#dbeafe'
+                        //     : row.status === 'Cancelled'
+                        //     ? '#fee2e2'
+                        //     : '#dcfce7',
                         padding: '4px 8px',
                         borderRadius: '12px',
                         fontSize: '12px',
                       }}
                     >
-                      {row.status}
+                      {/* {row.status} */}
                     </span>
                   </td>
                 </tr>
@@ -757,7 +878,7 @@ const RecruitmentDashboard: React.FC = () => {
               </tr>
             </thead>
             <tbody>
-              {codingAssessmentsData.map((row, index) => (
+              {codingAssessment.map((row, index) => (
                 <tr
                   key={index}
                   style={{
@@ -765,32 +886,32 @@ const RecruitmentDashboard: React.FC = () => {
                     borderBottom: '1px solid #e5e7eb',
                   }}
                 >
-                  <td style={{ padding: '12px' }}>{row.candidate}</td>
-                  <td style={{ padding: '12px' }}>{row.jdTitle}</td>
+                  <td style={{ padding: '12px' }}>n/a</td>
+                  <td style={{ padding: '12px' }}>{row.job_title}</td>
                   <td style={{ padding: '12px' }}>
                     <span
                       style={{
-                        color:
-                          row.assessmentStatus === 'Completed'
-                            ? '#2563eb'
-                            : row.assessmentStatus === 'Cancelled'
-                            ? '#FF3B30'
-                            : '#22c55e',
-                        backgroundColor:
-                          row.assessmentStatus === 'Completed'
-                            ? '#dbeafe'
-                            : row.assessmentStatus === 'Cancelled'
-                            ? '#fee2e2'
-                            : '#dcfce7',
+                        // color:
+                        //   row.assessmentStatus === 'Completed'
+                        //     ? '#2563eb'
+                        //     : row.assessmentStatus === 'Cancelled'
+                        //     ? '#FF3B30'
+                        //     : '#22c55e',
+                        // backgroundColor:
+                        //   row.assessmentStatus === 'Completed'
+                        //     ? '#dbeafe'
+                        //     : row.assessmentStatus === 'Cancelled'
+                        //     ? '#fee2e2'
+                        //     : '#dcfce7',
                         padding: '4px 8px',
                         borderRadius: '12px',
                         fontSize: '12px',
                       }}
                     >
-                      {row.assessmentStatus}
+                      {/* {row.assessmentStatus} */}
                     </span>
                   </td>
-                  <td style={{ padding: '12px' }}>{row.aiScore}</td>
+                  {/* <td style={{ padding: '12px' }}>{row.aiScore}</td> */}
                 </tr>
               ))}
             </tbody>
@@ -801,6 +922,102 @@ const RecruitmentDashboard: React.FC = () => {
         return null
     }
   }
+  const [totaljdCount, setTotaljdcount] = useState(0)
+  const [totalresumeavailableCount, setTotalresumeavailablecount] = useState(0)
+  const [totalaiinterviewcompletedCount, setTotalaiinterviewcompletedcount] = useState(0)
+  const [totalcodingassessmentcompletedCount, setTotalcodingassessmentcompletedcount] = useState(0)
+  // const[userId,setUserId]=useState(0)
+  const getUserData = async (userId: any) => {
+    try {
+      const res = await axios.get(`http://localhost:8082/user/jdcount/${organisation}/${userId}`)
+      if (res.status === 200) {
+        setTotaljdcount(res.data.totalJDs)
+
+      }
+    } catch (err: any) {
+      console.log('error', err)
+    }
+  }
+  const email = localStorage.getItem('email')
+  const getUserId = async () => {
+    try {
+      const res = await axios.get(`http://localhost:8082/user/getuserid/${organisation}/${email}`)
+      if (res.status === 200) {
+        console.log(res.data.user_id)
+        const temp = res.data.user_id
+        getUserData(temp)
+        if (Array.isArray(allresume)) {
+          const matchedResumes = allresume.filter(
+            (resume: any) => {
+              resume.resume_data?.created_by === temp
+            }
+          );
+
+          setTotalresumeavailablecount(matchedResumes.length);
+
+        // 2. Count of completed coding interviews
+        const codingCompleted = matchedResumes.filter(
+          (resume: any) =>
+            resume.interview_type === 'coding' &&
+            resume.interview_status === 'completed'
+        ).length;
+
+        // 3. Count of completed AI interviews
+        const aiCompleted = matchedResumes.filter(
+          (resume: any) =>
+            resume.interview_type === 'AI' &&
+            resume.interview_status === 'completed'
+        ).length;
+        setTotalaiinterviewcompletedcount(aiCompleted)
+        setTotalcodingassessmentcompletedcount(codingCompleted)
+        } else {
+          setTotalresumeavailablecount(0);
+        }
+      }
+    } catch (error: any) {
+      console.log('error', error)
+    }
+  }
+  const getAiinterviewCount = async (userId: any) => {
+    try {
+      const res = await axios.get(`http://localhost:8082/user/jdcount/${organisation}/${userId}`)
+      if (res.status === 200) {
+        setTotalaiinterviewcompletedcount(res.data.totalJDs)
+      }
+    } catch (err: any) {
+      console.log('error', err)
+    }
+  }
+  const getCodingassessmentCount = async (userId: any) => {
+    try {
+      const res = await axios.get(`http://localhost:8082/user/jdcount/${organisation}/${userId}`)
+      if (res.status === 200) {
+        setTotalcodingassessmentcompletedcount(res.data.totalJDs)
+      }
+    } catch (err: any) {
+      console.log('error', err)
+    }
+  }
+  const [allresume, getAllresume] = useState([])
+  const getAllResume = async () => {
+    try {
+      const res = await axios.get('http://localhost:8000/get_all_interview_data/', {
+        headers: {
+          Organization: organisation,
+          'Content-Type': 'application/json'
+        }
+      })
+      if (res.status === 200) {
+        getAllresume(res.data)
+      }
+    } catch (error: any) {
+      console.log('error', error)
+    }
+  }
+  useEffect(() => {
+    getUserId()
+    getAllResume()
+  }, [])
 
   return (
     <div
@@ -828,28 +1045,28 @@ const RecruitmentDashboard: React.FC = () => {
       >
         <StatCard
           title="Total Job Descriptions"
-          value="200"
+          value={totaljdCount}
           change="5"
           isPositive={true}
           changeText="Increased from last login"
         />
         <StatCard
           title="Resumes Available"
-          value="2500"
+          value={totalresumeavailableCount}
           change="250"
           isPositive={true}
           changeText="Increased from last login"
         />
         <StatCard
           title="Interviews Completed"
-          value="150"
+          value={totalaiinterviewcompletedCount}
           change="22"
           isPositive={false}
           changeText="Pending from last login"
         />
         <StatCard
           title="Coding Assessment"
-          value="75"
+          value={totalcodingassessmentcompletedCount}
           change="5"
           isPositive={true}
           changeText="Increased from last login"

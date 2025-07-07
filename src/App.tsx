@@ -50,6 +50,7 @@ import CodingLogin from './MainComponents/coding_login';
 import CodingAccess from './MainComponents/coding_access';
 import CodingSection from './MainComponents/coding_Section';
 import JdProfile from './MainComponents/jdprofileview';
+import ForgotPassword from './MainComponents/Forgotpassword';
 // import ConfirmJoinInterview from './MainComponents/ConfirmJoinIntreview';
 // import QuestionFormat from './MainComponents/question_format';
 
@@ -120,6 +121,9 @@ const AppContent: React.FC = () => {
       >
         <Routes>
           {/* Public routes (no authentication required) */}
+           <Route path="/forgotpassword_ai" element={<ForgotPassword />} />
+           <Route path="/dashboard" element={<Navigate to="/RecruitmentDashboard" replace />} />
+              <Route path="/RecruitmentDashboard" element={<RecruitmentDashboard />} />
           <Route path="/" element={<SignIn />} />
           <Route path="/candidateLogIn" element={<CandidateLogIn />} />
           <Route path="/ai_interview_ins/:organisation/:interviewId/:meetingId" element={<InterviewInstructions />} />

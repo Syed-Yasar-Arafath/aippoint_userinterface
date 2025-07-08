@@ -452,12 +452,24 @@ const RecruitmentDashboard: React.FC = () => {
         console.log('API response:', response.data)
 
         // ✅ set jobs from job_description field
-        if (Array.isArray(response.data.job_description)) {
-          setJobs(response.data.job_description)
-          setUpcomingInterview(response.data.job_description)
+         if (Array.isArray(response.data.job_description)) {
+        // ✅ Remove duplicates by job_title
+        const uniqueJobsMap = new Map()
+
+        response.data.job_description.forEach((job:any) => {
+          if (!uniqueJobsMap.has(job.job_title)) {
+            uniqueJobsMap.set(job.job_title, job)
+          }
+        })
+
+        const uniqueJobs = Array.from(uniqueJobsMap.values())
+
+        // ✅ Set filtered jobs
+        setJobs(uniqueJobs)
+        setUpcomingInterview(response.data.job_description)
           setAiInterview(response.data.job_description)
           setCodingAssessment(response.data.job_description)
-        } else {
+      }else {
           console.error('Unexpected response format:', response.data)
           setError('Unexpected response format from server.')
         }

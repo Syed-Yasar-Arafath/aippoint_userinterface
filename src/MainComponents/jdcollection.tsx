@@ -530,10 +530,12 @@ import { useTranslation } from 'react-i18next';
 
 interface Job {
   jobid: number
+  email: string
+  no_of_open_positions: number
   referenceNumber: string
   job_title: string
   job_role: string
-  createdBy:string
+  createdBy: string
   experience_required: string
   location: string
   type: string
@@ -557,25 +559,26 @@ interface Job {
 
 const JdCollection: React.FC = () => {
   const [jobs, setJobs] = useState<Job[]>([])
+  const [creator, setCreator] = useState('')
   const [loading, setLoading] = useState<boolean>(false)
   const [error, setError] = useState<string | null>(null)
   const [currentPage, setCurrentPage] = useState(1)
   // const totalPages = 4
-  
+
 
   const navigate = useNavigate()
   const organisation = localStorage.getItem('organisation')
   const token = localStorage.getItem('token')
   const dispatch = useDispatch()
-  
-const { t } = useTranslation();
- const [matchingResumes, setMatchingResumes] = useState<{
+
+  const { t } = useTranslation();
+  const [matchingResumes, setMatchingResumes] = useState<{
     [key: string]: number
   }>({})
   const [scoredResumes, setScoredResumes] = useState<{
     [key: string]: number
   }>({})
- 
+
   const fetchScoredResumes = async () => {
     if (!jobs.length) return
 
@@ -651,8 +654,8 @@ const { t } = useTranslation();
   // const navigate = useNavigate()
   // const job_id = location.state?.job_id || jobId
 
-  
-  const fetchscore = async (job_id : any) => {
+
+  const fetchscore = async (job_id: any) => {
     if (!job_id) return
     dispatch(loaderOn())
     try {
@@ -682,39 +685,40 @@ const { t } = useTranslation();
     }
   }
 
-   const handleClickScore = (a: any) => {
+  const handleClickScore = (a: any) => {
     fetchscore(a)
     // Additional logic you want to execute on score button click
   }
- useEffect(() => {
-  const fetchJobs = async () => {
-    setLoading(true)
-    try {
-      const response = await axios.get(`http://localhost:8082/user/read/${organisation}`, {
-        headers: {
-          Authorization: `Bearer ${token}`,
-        },
-      })
+  useEffect(() => {
+    const fetchJobs = async () => {
+      setLoading(true)
+      try {
+        const response = await axios.get(`http://localhost:8082/user/read/${organisation}`, {
+          headers: {
+            Authorization: `Bearer ${token}`,
+          },
+        })
 
-      console.log('API response:', response.data)
+        console.log('API response:', response.data)
+        setCreator(response.data.email)
 
-      // ✅ set jobs from job_description field
-      if (Array.isArray(response.data.job_description)) {
-        setJobs(response.data.job_description)
-      } else {
-        console.error('Unexpected response format:', response.data)
-        setError('Unexpected response format from server.')
+        // ✅ set jobs from job_description field
+        if (Array.isArray(response.data.job_description)) {
+          setJobs(response.data.job_description)
+        } else {
+          console.error('Unexpected response format:', response.data)
+          setError('Unexpected response format from server.')
+        }
+      } catch (err) {
+        console.error('Error fetching jobs:', err)
+        setError('Failed to fetch job data.')
+      } finally {
+        setLoading(false)
       }
-    } catch (err) {
-      console.error('Error fetching jobs:', err)
-      setError('Failed to fetch job data.')
-    } finally {
-      setLoading(false)
     }
-  }
 
-  fetchJobs()
-}, [])
+    fetchJobs()
+  }, [])
   const handleViewClick = (jobId: any) => {
     // setDispatchLoading(true)
     navigate(`/noscore/${jobId}`, { state: { job_id: jobId } })
@@ -725,25 +729,43 @@ const { t } = useTranslation();
     navigate(`/resumetable/${jobId}`, { state: { job_id: jobId } })
   }
 
-const [jobRoleFilter, setJobRoleFilter] = useState('')
-const [experienceFilter, setExperienceFilter] = useState('')
-const [locationFilter, setLocationFilter] = useState('')
-const jobRoles = Array.from(new Set(jobs.map((j) => j.job_role).filter(Boolean)))
-const experiences = Array.from(new Set(jobs.map((j) => j.experience_required).filter(Boolean)))
-const locations = Array.from(new Set(jobs.map((j) => j.location).filter(Boolean)))
-const filteredJobs = jobs.filter((job) => {
-  return (
-    (jobRoleFilter === '' || job.job_role === jobRoleFilter) &&
-    (experienceFilter === '' || job.experience_required === experienceFilter) &&
-    (locationFilter === '' || job.location === locationFilter)
-  )
-})
+  const [jobRoleFilter, setJobRoleFilter] = useState('')
+  const [experienceFilter, setExperienceFilter] = useState('')
+  const [locationFilter, setLocationFilter] = useState('')
+  const jobRoles = Array.from(new Set(jobs.map((j) => j.job_role).filter(Boolean)))
+  // const experiences = Array.from(new Set(jobs.map((j) => j.experience_required).filter(Boolean)))
+  const experiences = Array.from({ length: 10 }, (_, i) => `${i + 1}`)
 
- const pageSize = 4
-const totalPages = Math.ceil(filteredJobs.length / pageSize)
-const startIdx = (currentPage - 1) * pageSize
-const endIdx = startIdx + pageSize
-const paginatedJobs = filteredJobs.slice(startIdx, endIdx)
+  // const locations = Array.from(new Set(jobs.map((j) => j.location).filter(Boolean)))
+  const locations = Array.from(
+    new Set(
+      jobs
+        .map((j) => `${j.newLocation.city}, ${j.newLocation.country}`)
+        .filter(Boolean)
+    )
+  )
+
+  const [searchText, setSearchText] = useState('');
+
+  const filteredJobs = jobs.filter((job) => {
+    const matchesSearch =
+      job.job_title.toLowerCase().includes(searchText.toLowerCase());
+
+    return (
+      matchesSearch &&
+      (jobRoleFilter === '' || job.job_role === jobRoleFilter) &&
+      (experienceFilter === '' || job.experience_required === experienceFilter) &&
+      (locationFilter === '' ||
+        `${job.newLocation.city}, ${job.newLocation.country}` === locationFilter)
+    )
+  })
+
+
+  const pageSize = 4
+  const totalPages = Math.ceil(filteredJobs.length / pageSize)
+  const startIdx = (currentPage - 1) * pageSize
+  const endIdx = startIdx + pageSize
+  const paginatedJobs = filteredJobs.slice(startIdx, endIdx)
 
 
 
@@ -753,7 +775,8 @@ const paginatedJobs = filteredJobs.slice(startIdx, endIdx)
 
   const pillStyle = {
     fontSize: '10px',
-    backgroundColor: '#f5f5f5',
+    backgroundColor: '#fff',
+    border: '1px solid #f5f5f5',
     px: 1.5,
     py: 0.5,
     borderRadius: '6px',
@@ -773,6 +796,7 @@ const paginatedJobs = filteredJobs.slice(startIdx, endIdx)
         borderColor: '#e0e0e0',
         px: 2,
         py: 1.5,
+        height: '100px'
       }}
     >
       <Grid container spacing={2} alignItems="flex-start">
@@ -781,14 +805,24 @@ const paginatedJobs = filteredJobs.slice(startIdx, endIdx)
         </Grid>
 
         <Grid item xs>
-          <Typography variant="h6" sx={{ color: '#1976d2', fontWeight: 600, fontSize: 12 }}>
+          <Typography sx={{ fontFamily: 'SF Pro Display', color: '#0284C7', fontWeight: 500, fontSize: '14px', lineHeight: '100%' }}>
             {job.job_title}
           </Typography>
-          <Typography variant="body2" sx={{ fontSize: 10, color: '#666' }}>
+          <Typography variant="h6" sx={{ fontSize: 10, color: '#666', paddingTop: '9px' }}>
+            Created: <strong>{job.created_on}</strong>
+          </Typography>
+          <Typography variant="h6" sx={{ fontSize: 10, color: '#666', paddingTop: '9px' }}>
+            Job ID: <strong>{job.referenceNumber}</strong>
+          </Typography>
+          <Typography variant="h6" sx={{ fontSize: 10, color: '#666', paddingTop: '9px' }}>
+            Created By: <strong>{creator}</strong>
+          </Typography>
+
+          {/* <Typography variant="body2" sx={{ fontSize: 10, color: '#666' }}>
             <strong>Created:</strong> {job.created_on} | <strong>Job ID:</strong> {job.referenceNumber} |{' '}
             <strong>
-              Created By:
-              <img
+              Created By: */}
+          {/* <img
                 src="/assets/static/images/Group 1171277791.png"
                 alt="Creator"
                 style={{
@@ -797,12 +831,12 @@ const paginatedJobs = filteredJobs.slice(startIdx, endIdx)
                   marginLeft: 4,
                   verticalAlign: 'middle',
                 }}
-              />
-            </strong>{' '}
-            {job.createdBy}
-          </Typography>
+              /> */}
+          {/* </strong>{' '}
+            {creator}
+          </Typography> */}
 
-          <Typography
+          {/* <Typography
             variant="body2"
             sx={{
               fontSize: 12,
@@ -812,19 +846,19 @@ const paginatedJobs = filteredJobs.slice(startIdx, endIdx)
             }}
           >
             {job.job_description}
-          </Typography>
+          </Typography> */}
         </Grid>
 
         <Divider orientation="vertical" flexItem sx={{ mx: 2, my: 2, borderColor: '#333', borderWidth: '1.5px' }} />
 
-        <Grid item xs={3}>
-          <Grid container spacing={1}>
-            <Grid item xs={6}><Typography sx={pillStyle}>Experience: {job.experience_required}</Typography></Grid>
-            <Grid item xs={6}><Typography sx={pillStyle}>{job.type}</Typography></Grid>
-            {/* <Grid item xs={6}><Typography sx={pillStyle}>{job.remote ? 'Remote' : 'On-Site'}</Typography></Grid> */}
-            {/* <Grid item xs={6}><Typography sx={pillStyle}>Open: {job.openPositions}</Typography></Grid> */}
-            <Grid item xs={6}><Typography sx={pillStyle}>Skills:{job.skills} </Typography></Grid>
-            <Grid item xs={6}><Typography sx={pillStyle}>{job.location}</Typography></Grid>
+        <Grid item xs={4}>
+          <Grid container spacing={0}>
+            <Grid item xs={4}><Typography sx={pillStyle}>Experience: {job.experience_required}</Typography></Grid>
+            <Grid item xs={4}><Typography sx={pillStyle}>{job.job_type[0]}</Typography></Grid>
+            <Grid item xs={4}><Typography sx={pillStyle}>{job.modeOfWork}</Typography></Grid>
+            <Grid item xs={4}><Typography sx={pillStyle}>Open: {job.no_of_open_positions}</Typography></Grid>
+            <Grid item xs={4}><Typography sx={pillStyle}>Skills: {job.skills} </Typography></Grid>
+            <Grid item xs={4}><Typography sx={pillStyle}>{job.newLocation.city},{job.newLocation.country}</Typography></Grid>
           </Grid>
         </Grid>
 
@@ -833,39 +867,43 @@ const paginatedJobs = filteredJobs.slice(startIdx, endIdx)
         <Grid item xs={2} sx={{ display: 'flex', flexDirection: 'column', alignItems: 'flex-end', justifyContent: 'center', marginLeft: '180px' }}>
           <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', gap: '16px' }}>
             <div style={{ display: 'flex', gap: '12px', flexWrap: 'nowrap' }}>
-              <div style={{ border: '1px solid #e5e7eb', borderRadius: '8px', padding: '8px 16px', color: '#6b7280', fontSize: '10px', display: 'flex', alignItems: 'center', height: '40px', justifyContent: 'flex-start', whiteSpace: 'nowrap' }}>
-                <span style={{ fontFamily: 'SF Pro Display', fontSize: '10px' }}>Matching Profiles:{scoredResumes[job.jobid]} <button onClick={() => handleScoreClick(job.jobid)}
->view</button></span>
+              <div style={{ border: '1px solid #e5e7eb', borderRadius: '8px', padding: '0px 16px', color: '#6b7280', fontSize: '10px', display: 'flex', alignItems: 'center', height: '40px', justifyContent: 'flex-start', whiteSpace: 'nowrap' }}>
+                <span style={{ fontFamily: 'SF Pro Display', fontSize: '10px' }}>Matching Profiles: {scoredResumes[job.jobid]}
+                  {/* <button onClick={() => handleScoreClick(job.jobid)}
+                >view</button> */}
+                </span>
                 <span style={{ fontWeight: 400, color: '#000', fontSize: '10px', marginLeft: '8px', fontFamily: 'SF Pro Display' }}>
                   {/* {job.matchingProfiles} */}
                 </span>
               </div>
-              <div style={{ border: '1px solid #e5e7eb', borderRadius: '8px', padding: '8px 16px', color: '#6b7280', fontSize: '10px', display: 'flex', alignItems: 'center', height: '40px', justifyContent: 'flex-start', whiteSpace: 'nowrap', fontFamily: 'SF Pro Display' }}>
-                New Matching Profiles : {matchingResumes[job.jobid]}<button onClick={() => handleViewClick(job.jobid)}
-> view</button>
+              <div style={{ border: '1px solid #e5e7eb', borderRadius: '8px', padding: '0px 16px', color: '#6b7280', fontSize: '10px', display: 'flex', alignItems: 'center', height: '40px', justifyContent: 'flex-start', whiteSpace: 'nowrap', fontFamily: 'SF Pro Display' }}>
+                New Matching Profiles : {matchingResumes[job.jobid]}
+                {/* <button onClick={() => handleViewClick(job.jobid)}
+                > view
+                </button> */}
                 <span style={{ marginLeft: '4px', color: 'green', fontWeight: 400, fontFamily: 'SF Pro Display', fontSize: '10px' }}>
                   {/* + {job.newProfiles} New */}
-{/* <button onClick={() => handleClickScore(job.jobid)}>Score</button> */}
+                  {/* <button onClick={() => handleClickScore(job.jobid)}>Score</button> */}
                 </span>
               </div>
             </div>
 
-          <button
-  style={{
-    backgroundColor: '#007AC1',
-    color: 'white',
-    padding: '10px 24px',
-    border: 'none',
-    borderRadius: '8px',
-    fontSize: '10px',
-    fontWeight: 500,
-    cursor: 'pointer',
-    fontFamily: 'SF Pro Display',
-  }}
-  onClick={() => navigate(`/jdprofileview/${job.jobid}`)}
->
-  Quick View
-</button>
+            <button
+              style={{
+                backgroundColor: '#0284C7',
+                color: 'white',
+                padding: '10px 24px',
+                border: 'none',
+                borderRadius: '8px',
+                fontSize: '10px',
+                fontWeight: 500,
+                cursor: 'pointer',
+                fontFamily: 'SF Pro Display',
+              }}
+              onClick={() => navigate(`/jdprofileview/${job.jobid}`)}
+            >
+              Quick View
+            </button>
           </div>
         </Grid>
 
@@ -902,74 +940,118 @@ const paginatedJobs = filteredJobs.slice(startIdx, endIdx)
           </Grid>
         ))}
       </Grid> */}
-      <Grid container spacing={2} alignItems="center" wrap="nowrap" sx={{  mb: 2 }}>
-  <Grid item>
-    <div style={{ position: 'relative', width: '200px', height: '40px', border: '1px solid #ccc', borderRadius: '4px', display: 'flex', alignItems: 'center', paddingLeft: '12px' }}>
-      <InputBase placeholder="Search..." sx={{ fontSize: '12px', width: '100%' }} />
-      <Search fontSize="small" sx={{ position: 'absolute', right: '8px', top: '50%', transform: 'translateY(-50%)', color: '#666' }} />
-    </div>
-  </Grid>
+      <Grid container spacing={2} alignItems="center" wrap="nowrap" sx={{ mb: 2 }}>
+        <Grid item>
+          <div style={{ position: 'relative', width: '200px', height: '40px', border: '1px solid #ccc', borderRadius: '4px', display: 'flex', alignItems: 'center', paddingLeft: '12px' }}>
+            {/* <InputBase placeholder="Search..." sx={{ fontSize: '12px', width: '100%' }} /> */}
+            <InputBase
+              placeholder="Search..."
+              sx={{ fontSize: '12px', width: '100%' }}
+              value={searchText}
+              onChange={(e) => setSearchText(e.target.value)}
+            />
 
-  <Grid item>
-    <Select
-      displayEmpty
-      value={jobRoleFilter}
-      onChange={(e) => setJobRoleFilter(e.target.value)}
-      IconComponent={CustomExpandMore}
-      sx={{ height: '40px', width: '158px', fontSize: '14px', border: '1px solid #ccc', borderRadius: '4px', backgroundColor: '#fff' }}
-      renderValue={() => (
-        <Typography sx={{ color: '#666', fontSize: '12px' }}>
-          {jobRoleFilter || 'Select Job Role'}
-        </Typography>
-      )}
-    >
-      <MenuItem value="" disabled>Select Job Role</MenuItem>
-      {jobRoles.map((role, idx) => (
-        <MenuItem key={idx} value={role}>{role}</MenuItem>
-      ))}
-    </Select>
-  </Grid>
+            <Search fontSize="small" sx={{ position: 'absolute', right: '8px', top: '50%', transform: 'translateY(-50%)', color: '#666' }} />
+          </div>
+        </Grid>
 
-  <Grid item>
-    <Select
-      displayEmpty
-      value={experienceFilter}
-      onChange={(e) => setExperienceFilter(e.target.value)}
-      IconComponent={CustomExpandMore}
-      sx={{ height: '40px', width: '158px', fontSize: '14px', border: '1px solid #ccc', borderRadius: '4px', backgroundColor: '#fff' }}
-      renderValue={() => (
-        <Typography sx={{ color: '#666', fontSize: '12px' }}>
-          {experienceFilter || 'Select Experience'}
-        </Typography>
-      )}
-    >
-      <MenuItem value="" disabled>Select Experience</MenuItem>
-      {experiences.map((exp, idx) => (
-        <MenuItem key={idx} value={exp}>{exp}</MenuItem>
-      ))}
-    </Select>
-  </Grid>
+        <Grid item>
+          <Select
+            displayEmpty
+            value={jobRoleFilter}
+            onChange={(e) => setJobRoleFilter(e.target.value)}
+            IconComponent={CustomExpandMore}
+            sx={{ height: '40px', width: '158px', fontSize: '14px', border: '1px solid #ccc', borderRadius: '4px', backgroundColor: '#fff' }}
+            renderValue={() => (
+              <Typography sx={{ color: '#666', fontSize: '12px' }}>
+                {jobRoleFilter || 'Select Job Role'}
+              </Typography>
+            )}
+          >
+            <MenuItem value="" disabled>Select Job Role</MenuItem>
+            {jobRoles.map((role, idx) => (
+              <MenuItem key={idx} value={role}>{role}</MenuItem>
+            ))}
+          </Select>
+        </Grid>
 
-  <Grid item>
-    <Select
-      displayEmpty
-      value={locationFilter}
-      onChange={(e) => setLocationFilter(e.target.value)}
-      IconComponent={CustomExpandMore}
-      sx={{ height: '40px', width: '158px', fontSize: '14px', border: '1px solid #ccc', borderRadius: '4px', backgroundColor: '#fff' }}
-      renderValue={() => (
-        <Typography sx={{ color: '#666', fontSize: '12px' }}>
-          {locationFilter || 'Select Location'}
-        </Typography>
-      )}
-    >
-      <MenuItem value="" disabled>Select Location</MenuItem>
-      {locations.map((loc, idx) => (
-        <MenuItem key={idx} value={loc}>{loc}</MenuItem>
-      ))}
-    </Select>
-  </Grid>
-</Grid>
+        <Grid item>
+          <Select
+            displayEmpty
+            value={experienceFilter}
+            onChange={(e) => setExperienceFilter(e.target.value)}
+            IconComponent={CustomExpandMore}
+            sx={{ height: '40px', width: '158px', fontSize: '14px', border: '1px solid #ccc', borderRadius: '4px', backgroundColor: '#fff' }}
+            renderValue={() => (
+              <Typography sx={{ color: '#666', fontSize: '12px' }}>
+                {experienceFilter || 'Select Experience'}
+              </Typography>
+            )}
+          >
+            <MenuItem value="" disabled>Select Experience</MenuItem>
+            {experiences.map((exp, idx) => (
+              <MenuItem key={idx} value={exp}>{exp}</MenuItem>
+            ))}
+          </Select>
+        </Grid>
+
+        <Grid item>
+          {/* <Select
+            displayEmpty
+            value={locationFilter}
+            onChange={(e) => setLocationFilter(e.target.value)}
+            IconComponent={CustomExpandMore}
+            sx={{ height: '40px', width: '158px', fontSize: '14px', border: '1px solid #ccc', borderRadius: '4px', backgroundColor: '#fff' }}
+            renderValue={() => (
+              <Typography sx={{ color: '#666', fontSize: '12px' }}>
+                {locationFilter || 'Select Location'}
+              </Typography>
+            )}
+          >
+            <MenuItem value="" disabled>Select Location</MenuItem>
+            {locations.map((loc, idx) => (
+              <MenuItem key={idx} value={loc}>{loc}</MenuItem>
+            ))}
+          </Select> */}
+          <Select
+            value={locationFilter}
+            onChange={(e) => setLocationFilter(e.target.value)}
+            displayEmpty
+            sx={{ height: '40px', width: '158px', fontSize: '14px', border: '1px solid #ccc', borderRadius: '4px', backgroundColor: '#fff' }}
+          >
+            <MenuItem value="" disabled>Select Location</MenuItem>
+            {locations.map((loc) => (
+              <MenuItem key={loc} value={loc}>
+                {loc}
+              </MenuItem>
+            ))}
+          </Select>
+
+        </Grid>
+        <Grid item>
+          <Button
+            variant="outlined"
+            size="small"
+            sx={{
+              height: '40px',
+              textTransform: 'none',
+              fontSize: '12px',
+              borderRadius: '4px',
+              padding: '0 16px',
+            }}
+            onClick={() => {
+              setSearchText('');
+              setJobRoleFilter('');
+              setExperienceFilter('');
+              setLocationFilter('');
+            }}
+          >
+            Clear Filters
+          </Button>
+        </Grid>
+
+      </Grid>
+
 
 
       {/* Job Cards */}

@@ -14,7 +14,8 @@
     "es6": true
   },
   "rules": {
-    "quotes": ["error", "single"], // you can remove if you want
+    // "quotes": ["error", "single"], // you can remove if you want
+    "quotes":"off",
     "@typescript-eslint/no-explicit-any": "off",
     "react/jsx-key": "off"
   },

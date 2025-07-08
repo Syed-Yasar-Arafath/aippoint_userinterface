@@ -207,6 +207,10 @@ const Header: React.FC<HeaderProps> = ({ title, userProfileImage, path }) => {
         {title}
       </Typography>
 
+       <Grid sx={{display:'flex', alignItems:'center', justifyContent:'center',}}>
+        <img style={{height:'60px', width:'60px'}} src="/assets/static/SVG/aippointButtonIcon.svg" />
+      </Grid>
+
       <div
         style={{
           display: 'flex',

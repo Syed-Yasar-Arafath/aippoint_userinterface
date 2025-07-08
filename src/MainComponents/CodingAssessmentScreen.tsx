@@ -45,6 +45,7 @@ import { t } from 'i18next'
 import i18n from '../i18n'
 // import JobDescription from './JobDescription' //
 import { useTranslation } from 'react-i18next';
+import { useCodingAssessmentForm } from '../custom-components/custom_forms/CodingAssessmentForm'
 function CodingAssessmentScreen() {
   const selectedLanguage: any = localStorage.getItem('i18nextLng')
 
@@ -52,7 +53,7 @@ function CodingAssessmentScreen() {
   console.log(currentLanguage)
 
   const organisation = localStorage.getItem('organisation')
-const { t } = useTranslation();
+  const { t } = useTranslation();
 
   const [questionLength, setQuestionLength] = useState('')
   const [questionLevel, setQuestionLevel] = useState('')
@@ -100,15 +101,17 @@ const { t } = useTranslation();
   const handleJDChange = (e: any) => {
     const selectedJobId = e.target.value
     setJD(selectedJobId)
+    
     setFormValues((prev) => ({
       ...prev,
-      JobDescription: {
+      jobDescription: {
         ...prev.jobDescription,
         value: selectedJobId,
         error: false,
         errorMessage: '',
       },
     }))
+
     const selectedJobObject =
       jobs.find((job) => job.jobid === selectedJobId) || null
     // setSelectedJob(selectedJobObject)
@@ -192,6 +195,16 @@ const { t } = useTranslation();
 
     if (selectedId) {
       setCollection(selectedId)
+
+        setFormValues((prev) => ({
+      ...prev,
+      collection: {
+        ...prev.collection,
+        value: selectedId,
+        error: false,
+        errorMessage: '',
+      },
+    }));
 
       const selectedItem = combinedData.find(
         (item) =>
@@ -764,7 +777,7 @@ const { t } = useTranslation();
   // const queLength = [3, 5, 10, 15, 20]
   const queLength = [t('three'), t('five'), t('ten'), t('fifteen'), t('twenty')]
 
-  const { formValues, setFormValues } = useQuestionFormatForm()
+  const { formValues, setFormValues } = useCodingAssessmentForm()
 
   const handleSubmit = async () => {
     let valid = true
@@ -831,6 +844,23 @@ const { t } = useTranslation();
       },
     }))
   }
+
+  const handleCancel = () => {
+    setFormValues((prevState: any) => ({
+      ...prevState,
+      questionLength: {
+        ...prevState.questionLength,
+        value: '',
+        error: false,
+      },
+      questionLevel: {
+        ...prevState.questionLevel,
+        value: '',
+        error: false,
+      }
+    }));
+  };
+
   const [select, setSelect] = useState(false)
   const [loading, setLoading] = useState(false)
   const [dispatchLoading, setDispatchLoading] = useState(false)
@@ -852,8 +882,7 @@ const { t } = useTranslation();
         <Typography color="error">{error}</Typography>
       ) : (
         <Header
-          title={t('codingAssessment')}
-          // title={t('collectionHeader')}
+          title={t('collectionHeader')}
           userProfileImage={userProfileImage}
           path="/assessmentselection"
         />
@@ -868,14 +897,14 @@ const { t } = useTranslation();
           textAlign: 'left',
         }}
       >
-        {t('selectionQuestionTypeandModify')}
-        {/* {t('modifyQuestionHeader')} */}
+        Manage and collaborate on job-based candidate collections.
+        {/* {t('selectionQuestionTypeandModify')} */}
       </Typography>
       <Grid
         container
         spacing={2}
         style={{
-          background: '#FFFFFF',
+          background: '#F7F7F7',
           borderRadius: '14px',
           boxShadow: '0px 0px 6px rgba(0, 0, 0, 0.1)',
           padding: '40px',
@@ -908,19 +937,29 @@ const { t } = useTranslation();
                 // onChange={handleChange('jobDescription')}
                 // value={formValues.jobDescription.value}
                 sx={{
-                  border: '1.5px solid #0A0B5C',
+                  border: '1px solid #1C1C1E80',
                   borderRadius: '6px',
                   direction: i18n.language === 'ar' ? 'rtl' : 'ltr',
+                  '& .MuiOutlinedInput-notchedOutline': {
+                    border: 'none',
+                  },
+                  '&:hover .MuiOutlinedInput-notchedOutline': {
+                    border: 'none',
+                  },
+                  '&.Mui-focused .MuiOutlinedInput-notchedOutline': {
+                    border: 'none',
+                  },
+                  backgroundColor: '#FFFFFF',
                 }}
                 renderValue={
                   jd !== '' ? undefined : () => t('selectJobDescription')
                 }
-                // renderValue={
-                //   formValues.jobDescription.value !== ''
-                //     ? undefined
-                //     : () => 'Select Job Description'
-                // }
-                // error={formValues.jobDescription.error}
+              // renderValue={
+              //   formValues.jobDescription.value !== ''
+              //     ? undefined
+              //     : () => 'Select Job Description'
+              // }
+              // error={formValues.jobDescription.error}
               >
                 <MenuItem disabled value="">
                   {/* Select Job Description */}
@@ -932,19 +971,19 @@ const { t } = useTranslation();
                   </MenuItem>
                 ))}
               </Select>
-              {/* {formValues.jobDescription.error && (
+              {formValues.jobDescription.error && (
                 <div style={{ color: 'red' }}>
                   {formValues.jobDescription.errorMessage}
                 </div>
-              )} */}
+              )}
             </FormControl>
             <p
               style={{
                 marginTop: '50px',
               }}
             >
-              {/* Select number of questions */}
-              {t('selectNumberHeader')}
+              {/* {t('selectNumberHeader')} */}
+              Select No.of Questions
             </p>
             <FormControl fullWidth>
               <Select
@@ -952,19 +991,30 @@ const { t } = useTranslation();
                 value={formValues.questionLength.value}
                 onChange={handleChange('questionLength')}
                 sx={{
-                  border: '1.5px solid #0A0B5C',
+                  border: '1px solid #1C1C1E80',
                   borderRadius: '6px',
                   direction: i18n.language === 'ar' ? 'rtl' : 'ltr',
+                  '& .MuiOutlinedInput-notchedOutline': {
+                    border: 'none',
+                  },
+                  '&:hover .MuiOutlinedInput-notchedOutline': {
+                    border: 'none',
+                  },
+                  '&.Mui-focused .MuiOutlinedInput-notchedOutline': {
+                    border: 'none',
+                  },
+                  backgroundColor: '#FFFFFF',
                 }}
                 renderValue={
                   formValues.questionLength.value !== ''
                     ? undefined
-                    : () => t('selectQuestionLengthPlaceholder')
+                    : () => 'Select Number Of Questions'
                 }
                 error={formValues.questionLength.error}
               >
                 <MenuItem disabled value="">
-                  {t('selectNumberHeader')}
+                  {/* {t('selectNumberHeader')} */}
+                  Select Number Of Questions
                 </MenuItem>
                 {queLength.map((length: any, index: number) => (
                   <MenuItem key={index} value={length}>
@@ -992,8 +1042,19 @@ const { t } = useTranslation();
                 value={collection} // Ensure value matches the state
                 onChange={handleCollectionChange} // Update the state on change
                 sx={{
-                  border: '1.5px solid #0A0B5C',
+                  border: '1px solid #1C1C1E80',
                   borderRadius: '6px',
+                  direction: i18n.language === 'ar' ? 'rtl' : 'ltr',
+                  '& .MuiOutlinedInput-notchedOutline': {
+                    border: 'none',
+                  },
+                  '&:hover .MuiOutlinedInput-notchedOutline': {
+                    border: 'none',
+                  },
+                  '&.Mui-focused .MuiOutlinedInput-notchedOutline': {
+                    border: 'none',
+                  },
+                  backgroundColor: '#FFFFFF',
                 }}
                 renderValue={(selected) => {
                   if (!selected) return t('selectCollection')
@@ -1020,9 +1081,8 @@ const { t } = useTranslation();
                 </MenuItem>
                 {combinedData.map((item) => (
                   <MenuItem
-                    key={`${item.type}-${
-                      item.type === 'job' ? item.jobid : item.collection_id
-                    }`}
+                    key={`${item.type}-${item.type === 'job' ? item.jobid : item.collection_id
+                      }`}
                     value={
                       item.type === 'job' ? item.jobid : item.collection_id
                     }
@@ -1033,6 +1093,11 @@ const { t } = useTranslation();
                   </MenuItem>
                 ))}
               </Select>
+              {formValues.collection.error && (
+                <div style={{ color: 'red' }}>
+                  {formValues.collection.errorMessage}
+                </div>
+              )}
             </FormControl>
             <p
               style={{
@@ -1048,14 +1113,24 @@ const { t } = useTranslation();
                 value={formValues.questionLevel.value}
                 onChange={handleChange('questionLevel')}
                 sx={{
-                  border: '1.5px solid #0A0B5C',
+                  border: '1px solid #1C1C1E80',
                   borderRadius: '6px',
                   direction: i18n.language === 'ar' ? 'rtl' : 'ltr',
+                  '& .MuiOutlinedInput-notchedOutline': {
+                    border: 'none',
+                  },
+                  '&:hover .MuiOutlinedInput-notchedOutline': {
+                    border: 'none',
+                  },
+                  '&.Mui-focused .MuiOutlinedInput-notchedOutline': {
+                    border: 'none',
+                  },
+                  backgroundColor: '#FFFFFF',
                 }}
                 renderValue={
                   formValues.questionLevel.value !== ''
                     ? undefined
-                    : () => t('selectQuestionLevelPlaceholder')
+                    : () => 'Select Programming Language'
                 }
                 error={formValues.questionLevel.error}
               >
@@ -1085,25 +1160,57 @@ const { t } = useTranslation();
             </FormControl>
           </Grid>
         </Grid>
-        <Button
+        <Grid
+          item
+          lg={12}
           style={{
-            background: isDisabled ? '#CCCCCC' : '#0284C7',
-            // background: '#0284C7',
-            color: '#FFFFFF',
-            fontSize: '14px',
-            fontWeight: 700,
-            height: '40px',
-            width: '250px',
-            textTransform: 'none',
-            margin: '20px 0px',
+            display: 'flex',
+            flexDirection: 'row',
+            justifyContent: 'center',
+            gap: 5
           }}
-          onChange={handleJDChange}
-          onClick={handleSubmit}
-          disabled={isDisabled}
         >
-          {/* Schedule Interview */}
-          {t('scheduleInterviewBtn')}
-        </Button>
+          <Button
+            style={{
+              color: '#1C1C1E',
+              border: '1px solid #1C1C1E',
+              borderRadius: '6px',
+              fontSize: '14px',
+              fontWeight: 700,
+              height: '40px',
+              width: '250px',
+              textTransform: 'none',
+              margin: '20px 0px',
+            }}
+            onClick={() => {
+              setJD('')
+              setCollection('')
+              handleCancel()
+              setSelect(false)
+            }}
+          >
+            Cancel
+          </Button>
+          <Button
+            style={{
+              background: isDisabled ? '#CCCCCC' : '#0284C7',
+              color: '#FFFFFF',
+              borderRadius: '6px',
+              fontSize: '14px',
+              fontWeight: 700,
+              height: '40px',
+              width: '250px',
+              textTransform: 'none',
+              margin: '20px 0px',
+            }}
+            onChange={handleJDChange}
+            onClick={handleSubmit}
+            disabled={isDisabled}
+          >
+            {/* Schedule Interview */}
+            {t('scheduleInterviewBtn')}
+          </Button>
+        </Grid>
         {select && (
           <div style={{ height: 400, width: '100%' }}>
             <TableContainer

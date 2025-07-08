@@ -2,6 +2,7 @@ import React, { useState, useRef, useEffect } from 'react'
 import SearchIcon from '@mui/icons-material/Search'
 // import { useDispatch, useSelector } from 'react-redux'
 import { useDispatch } from 'react-redux';
+import CloseIcon from '@mui/icons-material/Close'
 
 import {
   Autocomplete,
@@ -17,6 +18,8 @@ import {
   Paper,
   TextField,
   Chip,
+  Divider,
+  Typography,
 } from '@mui/material'
 // import { getAllResume, getResumeById } from '../../services/ResumeService'
 // import { getUserDetails } from '../../services/UserService'
@@ -30,7 +33,7 @@ import { Search } from 'lucide-react'
 import { useTranslation } from 'react-i18next'
 import { loaderOff, loaderOn, openSnackbar } from '../redux/actions'
 import { putResume } from '../services/JobService'
-import { getAllResume } from '../services/ResumeService'
+import { getAllResume, postResume, saveNotes } from '../services/ResumeService'
 import { getUserDetails } from '../services/UserService'
 import Header from '../CommonComponents/topheader'
 // import { useDispatch } from 'react-redux'
@@ -90,7 +93,8 @@ type Profile = {
     phone: any
     location: any
     pdf_data: any
-  }
+    profile_summary : any
+    notes:any  }
   score: any
 }
 
@@ -120,6 +124,11 @@ const ResumeList = () => {
   const [inputExpValue, setInputExpValue] = useState<string>('')
   const [inputLocValue, setInputLocValue] = useState<string>('')
   const { t, i18n } = useTranslation()
+  const [notes, setNotes] = useState('');
+  const [loading, setLoading] = useState(false);
+  const [responseMsg, setResponseMsg] = useState('');
+  const [objectId, setObjectId] = useState('');
+
 
   // Pagination state
   const [currentPage, setCurrentPage] = useState(1)
@@ -154,7 +163,78 @@ const ResumeList = () => {
       throw error
     }
   }
+  const handleClose = () => setOpenModal(false)
+     const handleSaveNotes = async () => {
+    if (!objectId || !notes.trim()) {
+      setResponseMsg('Object ID and notes are required');
+      return;
+    }
 
+    setLoading(true);
+    setResponseMsg('');
+    const jsonData =JSON.stringify({
+        object_id: objectId,
+        notes: notes,
+      })
+
+        try {
+      const res = await saveNotes(jsonData)
+     
+      if (res && res.status === 200) {
+        setNotes(notes)
+        setResponseMsg('✅ Notes saved successfully!');
+        dispatch(openSnackbar('Notes saved successfully!', 'green'));
+        
+        // Update the candidate's notes in the profile data
+        const updatedProfile = profile.map((candidate) => {
+          if (candidate.resume_data?.id === objectId || candidate.id === objectId) {
+            return {
+              ...candidate,
+              resume_data: {
+                ...candidate.resume_data,
+                notes: notes
+              }
+            };
+          }
+          return candidate;
+        });
+        setProfile(updatedProfile);
+        
+        // Close modal after successful save
+        setTimeout(() => {
+          handleNotesClose();
+        }, 1500);
+      } else {
+        setResponseMsg('Error saving notes. Please try again.');
+        dispatch(openSnackbar('Failed to save notes. Please try again.', 'red'));
+      }
+    } catch (err : any) {
+      setResponseMsg('Something went wrong: ' + err.message);
+      dispatch(openSnackbar('Something went wrong while saving notes.', 'red'));
+    } 
+    finally {
+      setLoading(false);
+    }
+  };
+  const handleNotesClick = (candidate: any) => {
+    setSelectedCandidateForNotes(candidate)
+    setObjectId(candidate.resume_data?.id || candidate.id)
+    // Load existing notes if present, otherwise reset to empty
+    setNotes(candidate.resume_data?.notes || '')
+    setNotesText(candidate.resume_data?.notes || '') // Reset notes text for new candidate
+    setResponseMsg('') // Clear any previous messages
+    setNotesModalOpen(true)
+  }
+  
+  const handleNotesClose = () => {
+    setNotesModalOpen(false)
+    setSelectedCandidateForNotes(null)
+    setNotesText('')
+    setNotes('')
+    setObjectId('')
+    setResponseMsg('')
+  }
+ 
   const handleSkillChange = async () => {
     // dispatch(loaderOn())
     try {
@@ -245,6 +325,10 @@ const ResumeList = () => {
       console.log('error' + error)
     }
   }
+  const [base64Pdf, setBase64Pdf] = useState('')
+  const [notesModalOpen, setNotesModalOpen] = useState(false)
+  const [selectedCandidateForNotes, setSelectedCandidateForNotes] = useState<any>(null)
+  const [notesText, setNotesText] = useState('')
 
   useEffect(() => {
     getAllCollection()
@@ -257,6 +341,19 @@ const ResumeList = () => {
         : [...prev, candidateId],
     )
   }
+ const handleOpen = async (proId: any) => {
+    const jsonData = {
+      resume_id: [proId],
+    }
+    try {
+      const res = await postResume(jsonData)
+      setBase64Pdf(res[0].file_data)
+      setOpenModal(true)
+    } catch (error) {
+      // Handle errors
+      console.error('Error fetching data:', error)
+    }
+  }
 
   const handleSelectAll = () => {
     if (selectAll) {
@@ -264,9 +361,8 @@ const ResumeList = () => {
       setSelectedCandidates([])
       setSelectAll(false)
     } else {
-      // Select all visible resumes on current page
-      const currentPageResumes = getCurrentPageResumes()
-      const allResumeIds = currentPageResumes.map((candidate) => 
+      // Select all resumes across all pages
+      const allResumeIds = filteredData.map((candidate) => 
         candidate.resume_data.id || candidate.id
       ).filter(id => id !== null && id !== undefined)
       setSelectedCandidates(allResumeIds)
@@ -488,8 +584,7 @@ const ResumeList = () => {
 
   // Update selectAll state when individual selections change
   useEffect(() => {
-    const currentPageResumes = getCurrentPageResumes()
-    const allResumeIds = currentPageResumes.map((candidate) => 
+    const allResumeIds = filteredData.map((candidate) => 
       candidate.resume_data.id || candidate.id
     ).filter(id => id !== null && id !== undefined)
     
@@ -497,7 +592,7 @@ const ResumeList = () => {
       allResumeIds.every(id => selectedCandidates.includes(id))
     
     setSelectAll(allSelected)
-  }, [selectedCandidates, filteredData, currentPage])
+  }, [selectedCandidates, filteredData])
 
   const [searchCandidate, setSearchCandidate] = useState('')
   const handleSearch = (value: string) => {
@@ -577,14 +672,14 @@ const ResumeList = () => {
       style={{
         fontFamily: 'Inter, -apple-system, BlinkMacSystemFont, sans-serif',
         backgroundColor: '#f8fafc',
-        minHeight: '100vh',
+        minHeight: '80vh',
         // marginLeft: '140px',
-        padding: '20px',
+        padding: '10px',
       }}
     >
       {/* Header */}
       <Header
-        title="Search Resume"
+        title="Review Resume"
         userProfileImage={''}
         path="/jdccollection"
       />
@@ -759,7 +854,7 @@ const ResumeList = () => {
         </div>
 
         {/* Status */}
-        <div style={{ flex: '1 1 120px', minWidth: '100px', flexShrink: 0 }}>
+        {/* <div style={{ flex: '1 1 120px', minWidth: '100px', flexShrink: 0 }}>
           <select
             value={selectedStatus}
             onChange={(e) => setSelectedStatus(e.target.value)}
@@ -782,7 +877,7 @@ const ResumeList = () => {
             <option>Follow Up Required</option>
             <option>Not Relevant</option>
           </select>
-        </div>
+        </div> */}
 
         {/* Skills */}
               <div style={{ flex: '1 1 140px', minWidth: '140px', flexShrink: 0 }}>
@@ -1054,11 +1149,11 @@ const ResumeList = () => {
               <div
                 key={candidate.id || index}
                 style={{
-                  height: '60px', // Reduced from 100px
-                  padding: '10px 16px', // Reduced top/bottom padding from 12px
+                  height: '80px', // Fixed height to fit 5 resumes on laptop screen
+                  padding: '5px 20px', // Reduced top/bottom padding to reduce gaps
                   borderBottom: index < getCurrentPageResumes().length - 1 ? '1px solid #e5e7eb' : 'none',
                   display: 'flex',
-                  gap: '10px', // Reduced from 12px
+                  gap: '2px', // Reduced gap between elements
                   alignItems: 'flex-start',
                   overflow: 'hidden', // Prevent content overflow
                 }}
@@ -1101,24 +1196,24 @@ const ResumeList = () => {
                 </div>
 
                 {/* Main Content */}
-                <div style={{ flex: 1, display: 'flex', gap: '16px', minWidth: 0 }}>
+                <div style={{ flex: 1, display: 'flex', gap: '8px', minWidth: 0 }}>
                   {/* Left Column - Basic Info */}
-                  <div style={{ flex: 1, minWidth: 0 }}>
+                  <div style={{ flex: '0 0 200px', minWidth: 0 }}>
                     <h3
                       style={{
                         margin: '0 0 2px 0',
                         fontSize: '14px',
-                        fontWeight: '600',
-                        color: '#1f2937',
+                        fontWeight: '500',
+                        color: '#0284C7',
                         whiteSpace: 'nowrap',
                         overflow: 'hidden',
                         textOverflow: 'ellipsis',
+                        fontFamily: 'SF Pro Display'
                       }}
                     >
                       {candidate.resume_data?.name || 'N/A'}
                     </h3>
-                    <p
-                      style={{
+                    <span  style={{
                         margin: '0 0 4px 0',
                         fontSize: '11px',
                         color: '#6b7280',
@@ -1126,10 +1221,21 @@ const ResumeList = () => {
                         whiteSpace: 'nowrap',
                         overflow: 'hidden',
                         textOverflow: 'ellipsis',
+                      }}>Current Position:</span>
+
+                    <span
+                      style={{
+                        margin: '0 0 4px 0',
+                        fontSize: '11px',
+                        color: '#1C1C1E',
+                        fontWeight: '500',
+                        whiteSpace: 'nowrap',
+                        overflow: 'hidden',
+                        textOverflow: 'ellipsis',
                       }}
                     >
                       {candidate?.resume_data?.Resume_Category || 'N/A'}
-                    </p>
+                    </span>
 
                     <div
                       style={{
@@ -1143,53 +1249,140 @@ const ResumeList = () => {
                     >
                       <div style={{ display: 'flex', gap: '8px' }}>
                         <span style={{ fontWeight: '500', minWidth: '30px' }}>Exp:</span>
-                        <span style={{ overflow: 'hidden', textOverflow: 'ellipsis' }}>
+                        <span style={{ overflow: 'hidden', textOverflow: 'ellipsis',                        color: '#1C1C1E',
+ }}>
                           {candidate.resume_data?.experiance_in_number || 'N/A'}
                         </span>
                       </div>
                       <div style={{ display: 'flex', gap: '8px' }}>
                         <span style={{ fontWeight: '500', minWidth: '30px' }}>Loc:</span>
-                        <span style={{ overflow: 'hidden', textOverflow: 'ellipsis' }}>
+                        <span style={{ overflow: 'hidden', textOverflow: 'ellipsis',color: '#1C1C1E',
+ }}>
                           {candidate.resume_data?.location || 'N/A'}
                         </span>
                       </div>
                       <div style={{ display: 'flex', gap: '8px' }}>
                         <span style={{ fontWeight: '500', minWidth: '30px' }}>Tel:</span>
-                        <span style={{ overflow: 'hidden', textOverflow: 'ellipsis' }}>
+                        <span style={{ overflow: 'hidden', textOverflow: 'ellipsis',                        color: '#1C1C1E',
+ }}>
                           {candidate.resume_data?.phone || 'N/A'}
                         </span>
                       </div>
                     </div>
 
-                    <div style={{ display: 'flex', gap: '12px', fontSize: '10px' }}>
-                      <button
-                        style={{
-                          padding: '0',
-                          border: 'none',
-                          background: 'none',
-                          color: '#0284C7',
-                          textDecoration: 'underline',
-                          cursor: 'pointer',
-                          fontSize: '10px',
-                        }}
-                      >
-                        CV
-                      </button>
-                      <button
-                        style={{
-                          padding: '0',
-                          border: 'none',
-                          background: 'none',
-                          color: '#0284C7',
-                          textDecoration: 'underline',
-                          cursor: 'pointer',
-                          fontSize: '10px',
-                        }}
-                      >
-                        Notes
-                      </button>
-                    </div>
+                  
                   </div>
+                   
+                     <Divider
+                                        orientation="vertical"
+                                        sx={{
+                                          display: { xs: 'none', sm: 'block' },
+                                          borderColor: '#1C1C1E59',
+                                          alignSelf: 'stretch',
+                                          width: '1px',
+                                          margin: '0 10px',
+                                        }}
+                                      />
+                                      <div
+                                        style={{
+                                          fontSize: '0.75rem',
+                                          color: '#4B5563',
+                                          fontFamily: 'SF Pro Display',
+                                          flex: 1,
+                                          minWidth: 0,
+                                          display: 'flex',
+                                          flexDirection: 'column',
+                                          gap: '2px',
+                                          justifyContent: 'space-between',
+                                          height: '78px', // fixed height to fit in 100px container
+                                        }}
+                                      >
+                                       <p
+  style={{
+    margin: 0,
+    fontFamily: 'SF Pro Display',
+    fontWeight: 400,
+    fontSize: '10px',
+    color: '#4B5563',
+    maxHeight: '4em', // 2 lines to fit in 100px height
+    overflowY: 'auto',
+    lineHeight: '1.2em',
+    display: '-webkit-box',
+    WebkitLineClamp: 3, // 2 lines maximum
+    WebkitBoxOrient: 'vertical',
+    wordBreak: 'break-word',
+    padding: '4px',
+    backgroundColor: '#f8fafc',
+    borderRadius: '6px',
+    border: '1px solid #e5e7eb',
+    flexShrink: 0, // prevent shrinking
+  }}
+>
+  <span
+    style={{
+      fontWeight: 600,
+      fontFamily: 'SF Pro Display',
+    }}
+  >
+    About:
+  </span>{' '}
+  {candidate.resume_data?.profile_summary || 'N/A'}
+</p>
+
+                                        <div style={{ 
+                                          display: 'flex', 
+                                          gap: '4px', 
+                                          justifyContent: 'flex-start',
+                                          marginTop: '4px',
+                                          flexShrink: 0, // prevent shrinking
+                                        }}>
+                                        <Button
+  variant="outlined"
+  style={{
+    fontSize: '10px',
+    padding: '2px 8px',
+    border: '1px solid #E5E7EB',
+    borderRadius: '4px',
+    backgroundColor: 'white',
+    color: '#4B5563',
+    fontFamily: 'SF Pro Display',
+    textTransform: 'inherit',
+    minWidth: '70px',
+    whiteSpace: 'nowrap',
+    overflow: 'hidden',
+    textOverflow: 'ellipsis',
+    boxShadow: '0 1px 2px rgba(0,0,0,0.05)',
+    height: '14px',
+  }}
+  onClick={() => handleOpen(candidate.resume_data?.id)} // ✅ Fixed here
+>
+  View CV
+</Button>
+
+                                          <Button
+                                            variant="outlined"
+                                            style={{
+                                              fontSize: '10px',
+                                              padding: '4px 8px',
+                                              border: candidate.resume_data?.notes ? '1px solid #0284C7' : '1px solid #E5E7EB',
+                                              borderRadius: '4px',
+                                              backgroundColor: candidate.resume_data?.notes ? '#f0f9ff' : 'white',
+                                              color: candidate.resume_data?.notes ? '#0284C7' : '#4B5563',
+                                              fontFamily: 'SF Pro Display',
+                                              textTransform: 'inherit',
+                                              minWidth: '50px',
+                                              whiteSpace: 'nowrap',
+                                              overflow: 'hidden',
+                                              textOverflow: 'ellipsis',
+                                              boxShadow: '0 1px 2px rgba(0,0,0,0.05)',
+                                              height: '14px',
+                                            }}
+                                            onClick={() => handleNotesClick(candidate)}
+                                          >
+                                            {candidate.resume_data?.notes ? 'Notes ✓' : 'Notes'}
+                                          </Button>
+                                        </div>
+                                      </div>
 
                   {/* Key Skills Column */}
                   <div style={{ width: '100px', flexShrink: 0 }}>
@@ -1247,7 +1440,7 @@ const ResumeList = () => {
 
                   {/* Previous Interview Column */}
                   <div style={{ width: '80px', flexShrink: 0 }}>
-                    <h4
+                    {/* <h4
                       style={{
                         margin: '0 0 4px 0',
                         fontSize: '10px',
@@ -1256,7 +1449,7 @@ const ResumeList = () => {
                       }}
                     >
                       Previous Interview
-                    </h4>
+                    </h4> */}
                     <p
                       style={{
                         margin: 0,
@@ -1284,7 +1477,7 @@ const ResumeList = () => {
             display: 'flex',
             justifyContent: 'space-between',
             alignItems: 'center',
-            padding: '12px 16px', // Reduced from 16px
+            padding: '2px 16px', // Reduced from 16px
             borderTop: '1px solid #e5e7eb',
             backgroundColor: '#f9fafb'
           }}
@@ -1355,7 +1548,7 @@ const ResumeList = () => {
               onClick={() => handlePageChange(currentPage + 1)}
               disabled={currentPage === totalPages}
               style={{
-                padding: '4px 10px',
+                padding: '2px 10px',
                 backgroundColor: currentPage === totalPages ? '#f3f4f6' : '#ffffff',
                 color: currentPage === totalPages ? '#9ca3af' : '#374151',
                 border: '1px solid #d1d5db',
@@ -1476,6 +1669,182 @@ const ResumeList = () => {
           >
             {t('cancelBtn')}
           </Button>
+        </Box>
+      </Modal>
+        <Modal
+                open={openModal}
+                aria-labelledby="modal-modal-title"
+                aria-describedby="modal-modal-description"
+              >
+                <Box
+                  sx={{
+                    top: 0,
+                    left: 0,
+                    right: 0,
+                    bottom: 0,
+                    zIndex: 9999,
+                    display: 'flex',
+                    position: 'fixed',
+                    alignItems: 'center',
+                    justifyContent: 'center',
+                    backgroundColor: 'rgba(0, 0, 0, 0.8)',
+                  }}
+                >
+                  <Typography id="modal-modal-title" variant="h6" component="h2">
+                    {' '}
+                  </Typography>
+      
+                  <Typography id="modal-modal-description" sx={{ mt: 2 }}>
+                    {' '}
+                  </Typography>
+                  <div
+                    style={{
+                      width: '100%',
+                      height: '100%',
+                      position: 'relative',
+                    }}
+                  >
+                    <iframe
+                      title="PDF Preview"
+                      src={'data:application/pdf;base64,' + base64Pdf}
+                      style={{
+                        width: '100vw',
+                        height: '100vh',
+                        border: 'none',
+                        padding: '10px 0px 0px 100px',
+                      }}
+                    ></iframe>
+                    <CloseIcon
+                      onClick={handleClose}
+                      style={{
+                        top: '25px',
+                        right: '0px',
+                        width: '25px',
+                        height: '25px',
+                        color: '#000000',
+                        position: 'absolute',
+                        background: '#FFFFFF',
+                        padding: '1px 1px 1px 1px',
+                      }}
+                    />
+                  </div>
+                </Box>
+              </Modal>
+
+      {/* Notes Modal */}
+      <Modal
+        open={notesModalOpen}
+        onClose={handleNotesClose}
+        aria-labelledby="notes-modal"
+        aria-describedby="add-notes-for-candidate"
+      >
+        <Box
+          sx={{
+            position: 'absolute',
+            top: '50%',
+            left: '50%',
+            transform: 'translate(-50%, -50%)',
+            width: 500,
+            bgcolor: 'white',
+            borderRadius: '8px',
+            boxShadow: 24,
+            p: 4,
+          }}
+        >
+          <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '16px' }}>
+            <h2
+              id="notes-modal"
+              style={{
+                margin: 0,
+                fontSize: '18px',
+                fontWeight: '600',
+                color: '#1f2937',
+              }}
+            >
+              {selectedCandidateForNotes?.resume_data?.notes ? 'Edit Notes' : 'Add Notes'}
+            </h2>
+            <CloseIcon
+              onClick={handleNotesClose}
+              style={{
+                cursor: 'pointer',
+                color: '#6b7280',
+                fontSize: '20px',
+              }}
+            />
+          </div>
+          
+          <div style={{ marginBottom: '16px' }}>
+            <p style={{ margin: '0 0 8px 0', fontSize: '14px', color: '#374151', fontWeight: '500' }}>
+              Candidate: {selectedCandidateForNotes?.resume_data?.name || 'N/A'}
+            </p>
+            <p style={{ margin: 0, fontSize: '12px', color: '#6b7280' }}>
+              Position: {selectedCandidateForNotes?.resume_data?.Resume_Category || 'N/A'}
+            </p>
+          </div>
+
+          <TextField
+            multiline
+            rows={6}
+            fullWidth
+            variant="outlined"
+            placeholder={selectedCandidateForNotes?.resume_data?.notes ? 'Update your notes about this candidate...' : 'Enter your notes about this candidate...'}
+            value={notes}
+            onChange={(e) => setNotes(e.target.value)}
+            sx={{
+              marginBottom: '20px',
+              '& .MuiOutlinedInput-root': {
+                fontSize: '14px',
+                fontFamily: 'SF Pro Display',
+              },
+            }}
+          />
+          {responseMsg && (
+  <p
+    style={{
+      marginBottom: '20px',
+      color: responseMsg.includes('✅') ? 'green' : 'red',
+      fontSize: '13px',
+      fontFamily: 'SF Pro Display',
+    }}
+  >
+    {responseMsg}
+  </p>
+)}
+
+          <div style={{ display: 'flex', gap: '12px', justifyContent: 'flex-end' }}>
+            <Button
+              onClick={handleNotesClose}
+              variant="outlined"
+              sx={{
+                textTransform: 'none',
+                borderColor: '#d1d5db',
+                color: '#6b7280',
+                '&:hover': {
+                  borderColor: '#9ca3af',
+                  backgroundColor: '#f9fafb',
+                },
+              }}
+            >
+              Cancel
+            </Button>
+            <Button
+              onClick={handleSaveNotes}
+              variant="contained"
+              disabled={loading}
+              sx={{
+                textTransform: 'none',
+                backgroundColor: '#0284C7',
+                '&:hover': {
+                  backgroundColor: '#0369a1',
+                },
+                '&:disabled': {
+                  backgroundColor: '#9ca3af',
+                },
+              }}
+            >
+              {loading ? 'Saving...' : 'Save Notes'}
+            </Button>
+          </div>
         </Box>
       </Modal>
     </div>

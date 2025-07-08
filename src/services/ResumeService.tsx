@@ -403,3 +403,20 @@ export async function CodingAssessment(formData: FormData) {
     return error
   }
 }
+
+export async function saveNotes(data: any) {
+  const organisation = localStorage.getItem('organisation')
+
+  try {
+    const response = await internalApi.post('/save_notes/', data, {
+      headers: { 
+        Organization: organisation,
+        'Content-Type': 'application/json'
+      },
+    })
+    return response
+  } catch (error) {
+    console.error('Save notes failed:', error)
+    throw error
+  }
+}

@@ -939,9 +939,10 @@ const RecruitmentDashboard: React.FC = () => {
     }
   }
    const getAvailableresumes = async (user_id:any) => {
+    console.log(user_id)
     try {
     
-      const res = await axios.post('http://localhost:8000/count_resumes_by_user/',{ created_by: user_id },
+      const res = await axios.post('http://localhost:8000/count_resumes_by_user/',{ created_by: String(user_id) },
        {
         headers: {
           Organization: organisation,
@@ -950,19 +951,17 @@ const RecruitmentDashboard: React.FC = () => {
       }
      )
       if (res.status === 200) {
-        setTotalresumeavailablecount(res.data.totalresumes)
+        const count=res.data.totalresumes
+        setTotalresumeavailablecount(count)
       }
     } catch (error: any) {
       console.log('error', error)
     }
   }
-   const getTotalaiinterview = async (user_id:any) => {
+   const getTotalaiinterviewAndCoding = async (user_id:any) => {
     try {
-      const data={
-        created_by:user_id
-      }
-      const res = await axios.post('http://localhost:8000/count_resumes_by_user/',{
-        data
+      const res = await axios.post('http://localhost:8000/get_interview_count_by_user/',{
+        created_by:String(user_id)
       },
        {
         headers: {
@@ -972,34 +971,14 @@ const RecruitmentDashboard: React.FC = () => {
       }
      )
       if (res.status === 200) {
-        setTotalaiinterviewcompletedcount(res.data.totalresumes)
+        setTotalaiinterviewcompletedcount(res.data.ai_interview_count)
+        setTotalcodingassessmentcompletedcount(res.data.coding_interview_count)
       }
     } catch (error: any) {
       console.log('error', error)
     }
   }
-   const getTotalcodinginterview = async (user_id:any) => {
-    try {
-      const data={
-        created_by:user_id
-      }
-      const res = await axios.post('http://localhost:8000/count_resumes_by_user/',{
-        data
-      },
-       {
-        headers: {
-          Organization: organisation,
-          'Content-Type': 'application/json'
-        }
-      }
-     )
-      if (res.status === 200) {
-        setTotalcodingassessmentcompletedcount(res.data.totalresumes)
-      }
-    } catch (error: any) {
-      console.log('error', error)
-    }
-  }
+  
   const email = localStorage.getItem('email')
   const getUserId = async () => {
     try {
@@ -1009,8 +988,7 @@ const RecruitmentDashboard: React.FC = () => {
         const temp = res.data.user_id
         getUserData(temp)
         getAvailableresumes(temp)
-        getTotalaiinterview(temp)
-        getTotalcodinginterview(temp)
+        getTotalaiinterviewAndCoding(temp)
         // if (Array.isArray(allresume)) {
         //   const matchedResumes = allresume.filter(
         //     (resume: any) => {

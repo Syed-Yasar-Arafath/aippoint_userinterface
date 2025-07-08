@@ -951,7 +951,7 @@ const RecruitmentDashboard: React.FC = () => {
       }
      )
       if (res.status === 200) {
-        const count=res.data.totalresumes
+        const count=res.data.total_resumes
         setTotalresumeavailablecount(count)
       }
     } catch (error: any) {

@@ -16,7 +16,6 @@ import { useNavigate } from 'react-router-dom'
 import { logout } from '../redux/actions'
 import { useDispatch, useSelector } from 'react-redux'
 import { getUser, getUserDetails } from '../services/UserService'
-import { RootState } from '../redux/store'
 
 // import NotificationsNoneIcon from '@mui/icons-material/NotificationsNone'
 
@@ -24,7 +23,6 @@ import KeyboardArrowDownIcon from '@mui/icons-material/KeyboardArrowDown'
 import { loaderOff, loaderOn } from '../redux/actions'
 import axios from 'axios'
 import { t } from 'i18next'
-
 interface HeaderProps {
   title: string
   userProfileImage?: string | null
@@ -34,8 +32,6 @@ interface HeaderProps {
 const Header: React.FC<HeaderProps> = ({ title, userProfileImage, path }) => {
   const dispatch = useDispatch()
   const navigate = useNavigate()
-  const { uploads, failedUploads } = useSelector((state: RootState) => state.uploadStatus)
-  
   const handleNavigate = (path: string | null) => {
     if (path) {
       navigate(path)
@@ -49,50 +45,6 @@ const Header: React.FC<HeaderProps> = ({ title, userProfileImage, path }) => {
   const [notifications, setNotifications]: any = useState([])
   const anchorRef = useRef(null) // Create a ref
   const open = Boolean(anchorE)
-  
-  // Monitor upload status for notifications
-  useEffect(() => {
-    const recentUploads = uploads.filter(upload => {
-      const uploadTime = new Date(upload.uploadDate).getTime()
-      const now = new Date().getTime()
-      return (now - uploadTime) < 30000 // Last 30 seconds
-    });
-
-    const uploadNotifications = recentUploads.map(upload => ({
-      id: upload.id,
-      text: upload.status === 'success' 
-        ? `${upload.name} uploaded successfully`
-        : upload.status === 'error'
-        ? `Failed to upload ${upload.name}${upload.errorMessage ? `: ${upload.errorMessage}` : ''}`
-        : `Uploading ${upload.name}...`,
-      type: 'upload',
-      timestamp: new Date(upload.uploadDate).getTime(),
-      status: upload.status
-    }));
-
-    setNotifications((prev: any) => {
-      const existingIds = prev.map((n: any) => n.id);
-      const newNotifications = uploadNotifications.filter((n: any) => !existingIds.includes(n.id));
-      return [...newNotifications, ...prev].slice(0, 10); // Keep last 10 notifications
-    });
-  }, [uploads]);
-
-  // Clean up old notifications
-  useEffect(() => {
-    const cleanupInterval = setInterval(() => {
-      const now = Date.now();
-      setNotifications((prev: any) => 
-        prev.filter((notification: any) => {
-          // Keep notifications for 5 minutes
-          const notificationTime = new Date(notification.timestamp || now).getTime();
-          return (now - notificationTime) < 300000; // 5 minutes
-        })
-      );
-    }, 60000); // Check every minute
-
-    return () => clearInterval(cleanupInterval);
-  }, []);
-
   const handleClick = (event: React.MouseEvent<HTMLButtonElement>) => {
     setAnchorE(event.currentTarget)
   }
@@ -147,17 +99,7 @@ const Header: React.FC<HeaderProps> = ({ title, userProfileImage, path }) => {
     })
     console.log('ok', filteredData)
     setNotifications(filteredData)
-    
-    // Navigate based on notification type
-    const notification = notifications.find((n: any) => n.id === from)
-    if (notification && notification.type === 'upload') {
-      // For upload notifications, navigate to upload status
-      navigate(`/uploadstatus/?req_no=${from}`)
-    } else {
-      // For other notifications, use the original navigation
-      navigate(`/uploadstatus/?req_no=${from}`)
-    }
-    
+    navigate(`/uploadnotification/?req_no=${from}`)
     dispatch(loaderOff())
   }
 
@@ -174,12 +116,12 @@ const Header: React.FC<HeaderProps> = ({ title, userProfileImage, path }) => {
 
     // const ws = new WebSocket(`ws://http://localhost:8000/ws/notifications/${userId}/`)
     if (!dbName) return
-    // const ws = new WebSocket(
-    //   `ws://http://localhost:8000/ws/notifications/${userId}/`,
-    // )
     const ws = new WebSocket(
-      `wss://parseez.ai/parseez-django-service/ws/notifications/${userId}/`,
+      `ws://http://localhost:8000/ws/notifications/${userId}/`,
     )
+    // const ws = new WebSocket(
+    //   `wss://parseez.ai/parseez-django-service/ws/notifications/${userId}/`,
+    // )
     ws.onopen = () => {
       console.log('WebSocket Connected')
     }
@@ -190,9 +132,6 @@ const Header: React.FC<HeaderProps> = ({ title, userProfileImage, path }) => {
       const notificationData = {
         id: notification.req_no,
         text: notification.message,
-        timestamp: Date.now(),
-        type: 'backend', // Mark as backend notification
-        status: notification.status || 'info'
       }
 
       // Log notification data
@@ -224,28 +163,12 @@ const Header: React.FC<HeaderProps> = ({ title, userProfileImage, path }) => {
     }
     setAnchorEl(anchorRef.current)
   }
-  
-  // Get notification count for badge
-  const getNotificationCount = () => {
-    return notifications.length
-  }
-  
-  // Get notification icon color based on status
-  const getNotificationIconColor = () => {
-    const hasErrors = notifications.some((n: any) => n.status === 'error')
-    const hasSuccess = notifications.some((n: any) => n.status === 'success')
-    
-    if (hasErrors) return '#ef4444' // Red for errors
-    if (hasSuccess) return '#10b981' // Green for success
-    return '#0284C7' // Default blue
-  }
-
   return (
     <div
       style={{
         boxShadow: '15px 0px 32px 0px #EAF1F5',
         display: 'flex',
-        padding: '7px 30px 10px 30px',
+        padding: '7px 28px 7px 20px',
         justifyContent: 'space-between',
         // borderRadius: '25px',
         // background: '#EAF1F5',
@@ -275,8 +198,6 @@ const Header: React.FC<HeaderProps> = ({ title, userProfileImage, path }) => {
           fontSize: '20px',
           lineHeight: '26.04px',
           letterSpacing: '0%',
-          display:'flex',
-          alignItems:'center'
         }}
       >
         <KeyboardBackspaceIcon
@@ -305,34 +226,11 @@ const Header: React.FC<HeaderProps> = ({ title, userProfileImage, path }) => {
               lineHeight: '24px',
               color: 'green',
               textTransform: 'none',
-              position: 'relative',
               // marginLeft: "20px",
               // marginRight: "20px",
             }}
           >
-            <NotificationsIcon sx={{ color: getNotificationIconColor() }} />
-            {/* Notification Badge */}
-            {getNotificationCount() > 0 && (
-              <div
-                style={{
-                  position: 'absolute',
-                  top: '-5px',
-                  right: '-5px',
-                  backgroundColor: '#ef4444',
-                  color: 'white',
-                  borderRadius: '50%',
-                  width: '18px',
-                  height: '18px',
-                  fontSize: '10px',
-                  display: 'flex',
-                  alignItems: 'center',
-                  justifyContent: 'center',
-                  fontWeight: 'bold',
-                }}
-              >
-                {getNotificationCount() > 9 ? '9+' : getNotificationCount()}
-              </div>
-            )}
+            <NotificationsIcon sx={{ color: '#0284C7' }} />
           </Button>
         </Grid>
         <Popover
@@ -354,7 +252,8 @@ const Header: React.FC<HeaderProps> = ({ title, userProfileImage, path }) => {
           >
             {notifications.length < 1 && (
               <ListItem>
-                <ListItemText primary="No notifications" />
+                {/* <ListItemText primary={'No Notifications'} /> */}
+                <ListItemText primary='Notifications' />
               </ListItem>
             )}
             {notifications.map((notification: any) => (
@@ -368,13 +267,12 @@ const Header: React.FC<HeaderProps> = ({ title, userProfileImage, path }) => {
                       justifyContent="space-between"
                     >
                       <Typography variant="body2">
-                        {notification.type === 'upload' ? 'Upload status' : 'Check upload status.'}
+                        Check upload status.
                       </Typography>
                       <Button
                         onClick={() => navigateID(notification.id)}
                         sx={{
-                          backgroundColor: notification.status === 'error' ? '#ef4444' : 
-                                           notification.status === 'success' ? '#10b981' : '#A7DBD6',
+                          backgroundColor: '#A7DBD6',
                           color: '#000000',
                           textTransform: 'none',
                           marginLeft: '10px',

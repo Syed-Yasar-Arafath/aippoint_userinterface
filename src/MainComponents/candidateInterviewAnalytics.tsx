@@ -91,7 +91,7 @@ function CandidateInterviewAnalytics() {
                             text = report.tab_switching?.tab === "true" ? "Yes, detected" : "No major issues";
                             break;
 
-                        case "eye_movement":
+                        case "eye_movement": {
                             const percentStr = report.eye_movement?.sustained_eye_contact || "0%";
                             const percentNum = Math.round(parseFloat(percentStr.replace('%', '')));
                             text =
@@ -99,6 +99,8 @@ function CandidateInterviewAnalytics() {
                                     ? `Normal, No excessive sideways glances`
                                     : `Abnormal, excessive sideways glances detected`;
                             break;
+                        }
+
 
                         default:
                             break;
@@ -655,7 +657,7 @@ function CandidateInterviewAnalytics() {
                                                 fontFamily: 'SF Pro Display',
                                             }}>{interviewData.resume_data.email || 'N/A'}</Typography>
                                         </Box>
-                                        <Typography sx={{
+                                        {/* <Typography sx={{
                                             border: '0.5px solid #1C1C1E1A',
                                             borderRadius: '6px',
                                             color: '#1C1C1E',
@@ -665,7 +667,7 @@ function CandidateInterviewAnalytics() {
                                             alignContent: 'center',
                                             padding: '0px 10px',
                                             height: '30px'
-                                        }}>Date: {interviewData.resume_data.date || 'N/A'}</Typography>
+                                        }}>Date: {interviewData.interview_time.split(', ')[1] || 'N/A'}</Typography> */}
                                     </Box>
                                     <Typography mt={1} sx={{
                                         color: '#1C1C1E80',

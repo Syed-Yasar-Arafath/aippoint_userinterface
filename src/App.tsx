@@ -121,9 +121,9 @@ const AppContent: React.FC = () => {
       >
         <Routes>
           {/* Public routes (no authentication required) */}
-           <Route path="/forgotpassword_ai" element={<ForgotPassword />} />
-           <Route path="/dashboard" element={<Navigate to="/RecruitmentDashboard" replace />} />
-              <Route path="/RecruitmentDashboard" element={<RecruitmentDashboard />} />
+          <Route path="/forgotpassword_ai" element={<ForgotPassword />} />
+          <Route path="/dashboard" element={<Navigate to="/RecruitmentDashboard" replace />} />
+          <Route path="/RecruitmentDashboard" element={<RecruitmentDashboard />} />
           <Route path="/" element={<SignIn />} />
           <Route path="/candidateLogIn" element={<CandidateLogIn />} />
           <Route path="/ai_interview_ins/:organisation/:interviewId/:meetingId" element={<InterviewInstructions />} />

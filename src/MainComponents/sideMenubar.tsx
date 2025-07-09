@@ -65,6 +65,7 @@ function SideMenuBars() {
       icon: <QuestionAnswerIcon />,
       subItems: [
         { text: 'Schedule Interview', link: '/questionformat', icon: <QuestionAnswerIcon /> },
+        { text: 'Upcoming Interview', link: '/UpcomingInterview', icon: <QuestionAnswerIcon /> },
         // { text: 'Upcoming', link: '/scheduleinterview_ai', icon: <QuestionAnswerIcon /> },
         // { text: 'Interview Status', link: '/collectiondefaultfilter', icon: <QuestionAnswerIcon /> },
       ],

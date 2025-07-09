@@ -45,8 +45,11 @@ import axios from 'axios'
 // Enhanced candidate type with resume details
 export interface Candidate {
   id: number
+  created_by: string
+  resume_id: string
   name: string
   interviewDate: string
+  interview_time: string
   timeSlot: string
   position: string
   email: string
@@ -73,6 +76,7 @@ interface FilterState {
 interface InterviewDto {
   email: string
   candidateName: string
+  interview_time: string
   organisation: string
   interviewStatus?: string
   date?: string
@@ -82,60 +86,6 @@ interface InterviewDto {
   isTokenGenerated?: boolean
   warningCount?: number
 }
-
-// Generate dummy candidate data with more details
-export const allCandidates: Candidate[] = Array(1)
-  .fill(null)
-  .map((_, index) => ({
-    id: index + 1,
-    name: `Priya Sharma ${index + 1}`,
-    interviewDate: '23 March 2025',
-    timeSlot: '10:00AM - 10:35 AM',
-    position: [
-      'Full-Stack Developer',
-      'Frontend Developer',
-      'Backend Developer',
-      'UI/UX Developer',
-    ][index % 4],
-    email: `pragatika.r@iosyssoftware.com`,
-    phone: `+1 (555) 123-456${index % 10}`,
-    experience: [
-      `${(index % 5) + 1} years`,
-      '2-3 years',
-      '5+ years',
-      'Fresh Graduate',
-    ][index % 4],
-    skills: [
-      'React',
-      'TypeScript',
-      'Node.js',
-      'MongoDB',
-      'AWS',
-      'JavaScript',
-      'HTML',
-      'CSS',
-      'Redux',
-      'Express',
-      'Java',
-      'Spring Boot',
-      'SQL',
-      'Docker',
-      'GraphQL',
-    ].slice(0, 5 + (index % 5)),
-    education: [
-      'B.Tech in Computer Science, IIT Delhi',
-      'M.S. in Computer Science, Stanford University',
-      'B.E. in Information Technology, MIT',
-      'MCA, Delhi University',
-    ][index % 4],
-    currentCompany: 'XYZ Company',
-    currentRole: [
-      'Full-Stack Developer',
-      'Frontend Developer',
-      'Backend Developer',
-      'UI/UX Developer',
-    ][index % 4],
-  }))
 
 const UpcomingInterview: React.FC = () => {
   // States
@@ -161,8 +111,10 @@ const UpcomingInterview: React.FC = () => {
   )
 
   // Filtered candidates
-  const [filteredCandidates, setFilteredCandidates] =
-    useState<Candidate[]>(allCandidates)
+  // const [filteredCandidates, setFilteredCandidates] =
+  //   useState<Candidate[]>(allCandidates)
+  const [filteredCandidates, setFilteredCandidates] = useState<Candidate[]>([])
+
 
   // Backend API base URL
   const API_BASE_URL = 'http://localhost:8080'
@@ -180,6 +132,7 @@ const UpcomingInterview: React.FC = () => {
       for (const candidate of selectedCandidateDetails) {
         const interviewDto: InterviewDto = {
           email: candidate.email,
+          interview_time: candidate.interview_time,
           candidateName: candidate.name,
           organisation: organisation,
           interviewStatus: 'Scheduled',
@@ -198,13 +151,91 @@ const UpcomingInterview: React.FC = () => {
         `Successfully scheduled ${selectedCandidateDetails.length} interview(s)! Email(s) will be sent soon.`,
       )
       setSelectedCandidates([]) // Clear selection after scheduling
-    } catch (error:any) {
+    } catch (error: any) {
       console.error('Error scheduling interviews:', error)
       alert('Failed to schedule interviews: ' + error.message)
     }
   }
 
   // Apply filters
+  const organisation = localStorage.getItem('organisation')
+  const [allCandidates, setAllCandidates] = useState<Candidate[]>([])
+  const [jobRoles, setJobRoles] = useState<string[]>([])
+
+  const getAvailableresumes = async (user_id: any) => {
+    console.log(user_id)
+    try {
+
+      const res = await axios.post('http://localhost:8000/get_interview_count_by_user/', { created_by: String(user_id) },
+        {
+          headers: {
+            Organization: organisation,
+            'Content-Type': 'application/json'
+          }
+        }
+      )
+      if (res.status === 200 && res.data?.interviews) {
+        const awaitedInterviews = res.data.interviews.filter(
+          (interview: any) => interview.interview_status === 'awaited'
+        )
+
+        const formattedCandidates = awaitedInterviews.map(
+          (item: any, index: number) => ({
+            id: index + 1,
+            created_by:item.resume_data?.created_by||'' ,
+            resume_id:item.resume_data?.resume_id||'' ,
+            name: item.resume_data?.name ?? 'Unknown',
+            interviewDate: item.uploaded_at || 'N/A',
+            interview_time: item.interview_time || 'N/A',
+            timeSlot: '10:00AM - 10:35 AM',
+            position: item.resume_data?.job_role ?? 'N/A',
+            email: item.resume_data?.email ?? '',
+            phone: item.resume_data?.phone ?? '',
+            experience: item.resume_data?.experience_in_number
+              ? `${item.resume_data.experience_in_number} years`
+              : 'N/A',
+            skills: item.resume_data?.skills || [],
+            education: item.resume_data?.education?.Degree || 'N/A',
+            currentCompany: item.resume_data?.work?.[0]?.company ?? '',
+            currentRole:
+              item.resume_data?.work?.[0]?.designation_at_company ?? '',
+          })
+        )
+
+        setAllCandidates(formattedCandidates)
+        setFilteredCandidates(formattedCandidates)
+        const rolesSet: Set<string> = new Set(
+          awaitedInterviews
+            .map((i: any) => i.resume_data?.job_role)
+            .filter((role: string | undefined): role is string => Boolean(role && role.trim()))
+        )
+        setJobRoles(Array.from(rolesSet))
+
+      }
+    } catch (error: any) {
+      console.log('error', error)
+    }
+  }
+  const email = localStorage.getItem('email')
+  const getUserId = async () => {
+    try {
+      const res = await axios.get(`http://localhost:8082/user/getuserid/${organisation}/${email}`)
+      if (res.status === 200) {
+        console.log(res.data.user_id)
+        const temp = res.data.user_id
+        getAvailableresumes(temp)
+      }
+    } catch (error: any) {
+      console.log('error', error)
+    }
+  }
+
+  useEffect(() => {
+    getUserId()
+  }, [])
+
+
+
   useEffect(() => {
     let results = [...allCandidates]
 
@@ -286,7 +317,7 @@ const UpcomingInterview: React.FC = () => {
   }
 
   const handleViewDetails = (candidate: Candidate) => {
-    navigate(`/interviewDetails/${candidate.id}`)
+    navigate(`/interviewDetails/${candidate.resume_id}`)
   }
 
   const resetFilters = () => {
@@ -300,6 +331,13 @@ const UpcomingInterview: React.FC = () => {
     })
     setSearchTerm('')
   }
+  const [currentPage, setCurrentPage] = useState(1)
+  const pageSize = 6
+  const totalPages = Math.ceil(filteredCandidates.length / pageSize)
+  const startIdx = (currentPage - 1) * pageSize
+  const endIdx = startIdx + pageSize
+  const paginatedCandidate = filteredCandidates.slice(startIdx, endIdx)
+
 
   return (
     <LocalizationProvider dateAdapter={AdapterDateFns}>
@@ -334,11 +372,17 @@ const UpcomingInterview: React.FC = () => {
                   filters.jobRole !== '' ? undefined : () => 'Job Role'
                 }
               >
-                <MenuItem value="">All Roles</MenuItem>
+                {/* <MenuItem value="">All Roles</MenuItem>
                 <MenuItem value="full-stack">Full-Stack Developer</MenuItem>
                 <MenuItem value="frontend">Frontend Developer</MenuItem>
                 <MenuItem value="backend">Backend Developer</MenuItem>
-                <MenuItem value="ui/ux">UI/UX Developer</MenuItem>
+                <MenuItem value="ui/ux">UI/UX Developer</MenuItem> */}
+                <MenuItem value="">All Roles</MenuItem>
+                {jobRoles.map((role, index) => (
+                  <MenuItem key={index} value={role}>
+                    {role}
+                  </MenuItem>
+                ))}
               </Select>
             </FormControl>
           </Grid>
@@ -368,6 +412,7 @@ const UpcomingInterview: React.FC = () => {
             <Button
               variant="outlined"
               color="inherit"
+              style={{textTransform:'none'}}
               fullWidth
               startIcon={<CalendarIcon size={20} />}
               onClick={() => setDateRangeOpen(true)}
@@ -381,6 +426,7 @@ const UpcomingInterview: React.FC = () => {
               variant="outlined"
               color="inherit"
               fullWidth
+              style={{textTransform:'none'}}
               startIcon={<Clock size={20} />}
               onClick={() => setTimeSelectOpen(true)}
             >
@@ -388,7 +434,7 @@ const UpcomingInterview: React.FC = () => {
             </Button>
           </Grid>
 
-          <Grid item xs={6} md={1}>
+          <Grid item xs={6} md={1} sx={{display:'flex',gap:'10px'}} >
             <Button
               variant="outlined"
               color="error"
@@ -397,13 +443,11 @@ const UpcomingInterview: React.FC = () => {
             >
               Reset
             </Button>
-          </Grid>
-
-          <Grid
+            <Grid
             item
             xs={6}
             md={12}
-            sx={{ display: 'flex', justifyContent: 'flex-end' }}
+            // sx={{ display: 'flex', justifyContent: 'flex-end' }}
           >
             <Button
               variant="contained"
@@ -417,78 +461,98 @@ const UpcomingInterview: React.FC = () => {
                 : ''}
             </Button>
           </Grid>
+          </Grid>
+
+          
         </Grid>
 
         {/* Active Filters Display */}
-        {(filters.jobRole ||
+        {/* {(filters.jobRole ||
           filters.experience ||
           filters.startDate ||
           filters.startTime) && (
-          <Box sx={{ display: 'flex', flexWrap: 'wrap', gap: 1, mb: 2 }}>
-            <Typography variant="body2" sx={{ mr: 1, pt: 0.5 }}>
-              Active Filters:
-            </Typography>
+            <Box sx={{ display: 'flex', flexWrap: 'wrap', gap: 1, mb: 2 }}>
+              <Typography variant="body2" sx={{ mr: 1, pt: 0.5 }}>
+                Active Filters:
+              </Typography>
 
-            {filters.jobRole && (
-              <Chip
-                label={`Job: ${filters.jobRole}`}
-                size="small"
-                onDelete={() => handleFilterChange('jobRole', '')}
-              />
-            )}
+              {filters.jobRole && (
+                <Chip
+                  label={`Job: ${filters.jobRole}`}
+                  size="small"
+                  onDelete={() => handleFilterChange('jobRole', '')}
+                />
+              )}
 
-            {filters.experience && (
-              <Chip
-                label={`Experience: ${filters.experience}`}
-                size="small"
-                onDelete={() => handleFilterChange('experience', '')}
-              />
-            )}
+              {filters.experience && (
+                <Chip
+                  label={`Experience: ${filters.experience}`}
+                  size="small"
+                  onDelete={() => handleFilterChange('experience', '')}
+                />
+              )}
 
-            {filters.startDate && filters.endDate && (
-              <Chip
-                label={`Date: ${filters.startDate.toLocaleDateString()} - ${filters.endDate.toLocaleDateString()}`}
-                size="small"
-                onDelete={() => {
-                  handleFilterChange('startDate', null)
-                  handleFilterChange('endDate', null)
-                }}
-              />
-            )}
+              {filters.startDate && filters.endDate && (
+                <Chip
+                  label={`Date: ${filters.startDate.toLocaleDateString()} - ${filters.endDate.toLocaleDateString()}`}
+                  size="small"
+                  onDelete={() => {
+                    handleFilterChange('startDate', null)
+                    handleFilterChange('endDate', null)
+                  }}
+                />
+              )}
 
-            {filters.startTime && filters.endTime && (
-              <Chip
-                label={`Time: ${filters.startTime.toLocaleTimeString([], {
-                  hour: '2-digit',
-                  minute: '2-digit',
-                })} - ${filters.endTime.toLocaleTimeString([], {
-                  hour: '2-digit',
-                  minute: '2-digit',
-                })}`}
-                size="small"
-                onDelete={() => {
-                  handleFilterChange('startTime', null)
-                  handleFilterChange('endTime', null)
-                }}
-              />
-            )}
-          </Box>
-        )}
+              {filters.startTime && filters.endTime && (
+                <Chip
+                  label={`Time: ${filters.startTime.toLocaleTimeString([], {
+                    hour: '2-digit',
+                    minute: '2-digit',
+                  })} - ${filters.endTime.toLocaleTimeString([], {
+                    hour: '2-digit',
+                    minute: '2-digit',
+                  })}`}
+                  size="small"
+                  onDelete={() => {
+                    handleFilterChange('startTime', null)
+                    handleFilterChange('endTime', null)
+                  }}
+                />
+              )}
+            </Box>
+          )} */}
 
-        <Typography variant="h6" sx={{ mb: 2 }}>
-          Upcoming Interviews for Full-Stack Developer 24:
-          {filteredCandidates.length > 0 && (
+        <Typography sx={{ mb: 2 }}>
+          Upcoming Interviews:
+          {/* {filteredCandidates.length > 0 && (
             <span style={{ fontWeight: 'normal', fontSize: '0.9rem' }}>
               {' '}
               ({filteredCandidates.length} candidates)
             </span>
-          )}
+          )} */}
         </Typography>
+        {filters.jobRole && (
+
+          <div style={{display:'flex'}}><Typography sx={{ mb: 2 }}>
+            Available profiles for
+            <Chip
+              label={`${filters.jobRole}`}
+              size="small"
+              variant='filled'
+              sx={{
+                backgroundColor: 'transparent',
+                color: '#0284C7'
+              }}
+            // onDelete={() => handleFilterChange('jobRole', '')}
+            />: {filteredCandidates.length}</Typography>
+          </div>
+        )}
+
 
         {/* Candidates Grid */}
         {displayedCandidates.length > 0 ? (
           <Grid container spacing={2}>
-            {displayedCandidates.map((candidate) => (
+            {paginatedCandidate.map((candidate) => (
               <Grid item xs={12} sm={6} md={4} key={candidate.id}>
                 <Card
                   sx={{
@@ -535,7 +599,8 @@ const UpcomingInterview: React.FC = () => {
                           {candidate.name}
                         </Typography>
                         <Typography variant="body2" color="text.secondary">
-                          {candidate.interviewDate} • {candidate.timeSlot}
+                          {/* {candidate.interviewDate} • {candidate.timeSlot} */}
+                          {candidate.interview_time}
                         </Typography>
                       </Box>
                     </Box>
@@ -604,7 +669,7 @@ const UpcomingInterview: React.FC = () => {
         )}
 
         {/* Pagination */}
-        {pageCount > 1 && (
+        {/* {pageCount > 1 && (
           <Box sx={{ display: 'flex', justifyContent: 'center', mt: 4 }}>
             <Pagination
               count={pageCount}
@@ -615,7 +680,39 @@ const UpcomingInterview: React.FC = () => {
               showLastButton
             />
           </Box>
-        )}
+        )} */}
+        <Grid container justifyContent="center" spacing={1} mt={2}>
+          <Grid item>
+            <Button disabled={currentPage === 1} onClick={() => setCurrentPage(currentPage - 1)} sx={{ textTransform: 'none', fontSize: '12px' }}>
+              Prev
+            </Button>
+          </Grid>
+          {Array.from({ length: totalPages }, (_, idx) => idx + 1).map((n) => (
+            <Grid item key={n}>
+              <Button
+                onClick={() => setCurrentPage(n)}
+                sx={{
+                  minWidth: '32px',
+                  height: '32px',
+                  borderRadius: '4px',
+                  backgroundColor: n === currentPage ? '#1976d2' : 'transparent',
+                  color: n === currentPage ? 'white' : '#1976d2',
+                  fontSize: '12px',
+                }}
+              >
+                {n}
+              </Button>
+            </Grid>
+          ))}
+          <Grid item>
+            <Typography sx={{ fontSize: '12px', color: '#666', padding: '8px' }}>...</Typography>
+          </Grid>
+          <Grid item>
+            <Button disabled={currentPage === totalPages} onClick={() => setCurrentPage(currentPage + 1)} sx={{ textTransform: 'none', fontSize: '12px' }}>
+              Next
+            </Button>
+          </Grid>
+        </Grid>
 
         {/* Date Range Dialog */}
         <Dialog open={dateRangeOpen} onClose={() => setDateRangeOpen(false)}>

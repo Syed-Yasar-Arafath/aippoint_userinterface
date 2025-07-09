@@ -1,4 +1,4 @@
-import React, { useState } from 'react'
+import React, { useEffect, useState } from 'react'
 import {
   Box,
   Button,
@@ -11,7 +11,8 @@ import {
 } from '@mui/material'
 import { Trash2, Edit2 } from 'lucide-react'
 import { useParams } from 'react-router-dom'
-import { allCandidates } from './upcomingInterview'
+import { Candidate } from './upcomingInterview'
+import axios from 'axios'
 
 // Interface for questions
 interface Question {
@@ -34,40 +35,48 @@ interface InterviewSettings {
 
 const InterviewDetails: React.FC = () => {
   const { id } = useParams<{ id: string }>()
-  const candidate = allCandidates.find((c: any) => c.id === parseInt(id || '0'))
+  // const candidate = allCandidates.find((c: any) => c.id === parseInt(id || '0'))
+ 
 
   // State for interview settings
-  const [settings, setSettings] = useState<InterviewSettings>({
-    mode: 'AI Avatar',
-    country: 'America',
-    language: 'English US',
-    questionFormat: 'AI + Question Format',
-    numberOfQuestions: 'AI (04) + Question Bank (02)',
-    difficultyLevel: 'Beginner',
-    voiceTone: 'Angel (Female)',
-  })
+  // const [settings, setSettings] = useState<InterviewSettings>({
+  //   mode: 'AI Avatar',
+  //   country: 'America',
+  //   language: 'English US',
+  //   questionFormat: 'AI + Question Format',
+  //   numberOfQuestions: 'AI (04) + Question Bank (02)',
+  //   difficultyLevel: 'Beginner',
+  //   voiceTone: 'Angel (Female)',
+  // })
+const [settings, setSettings] = useState<InterviewSettings | null>(null)
 
   // State for questions
-  const [questions, setQuestions] = useState<Question[]>([
-    {
-      id: 1,
-      type: 'AI',
-      text: 'Can you explain the SOLID principles in object-oriented programming and provide examples?',
-    },
-    {
-      id: 2,
-      type: 'Question Bank',
-      text: 'What are the key differences between microservices and monolithic architecture?',
-    },
-  ])
+  // const [questions, setQuestions] = useState<Question[]>([
+  //   {
+  //     id: 1,
+  //     type: 'AI',
+  //     text: 'Can you explain the SOLID principles in object-oriented programming and provide examples?',
+  //   },
+  //   {
+  //     id: 2,
+  //     type: 'Question Bank',
+  //     text: 'What are the key differences between microservices and monolithic architecture?',
+  //   },
+  // ])
+  const [questions, setQuestions] = useState<Question[]>([])
+
 
   // Handlers
-  const handleSettingChange = (
-    field: keyof InterviewSettings,
-    value: string,
-  ) => {
-    setSettings((prev) => ({ ...prev, [field]: value }))
-  }
+const handleSettingChange = (
+  field: keyof InterviewSettings,
+  value: string,
+) => {
+  setSettings((prev) => {
+    if (!prev) return prev // or optionally: throw an error or show a warning
+    return { ...prev, [field]: value }
+  })
+}
+
 
   const handleDeleteQuestion = (id: number) => {
     setQuestions((prev) => prev.filter((q) => q.id !== id))
@@ -88,10 +97,75 @@ const InterviewDetails: React.FC = () => {
     // In a real app, send to backend API
   }
 
-  if (!candidate) {
-    return <Typography variant="h6">Candidate not found</Typography>
-  }
+  // if (!candidate) {
+  //   return <Typography variant="h6">Candidate not found</Typography>
+  // }
+ const [candidate, setCandidate] = useState<Candidate | null>(null)
+  const organisation = localStorage.getItem('organisation')
 
+  useEffect(() => {
+  const fetchCandidateDetails = async () => {
+  try {
+    const res = await axios.post(
+      'http://localhost:8000/get_resume/',
+      { resume_id: [id] },
+      {
+        headers: {
+          Organization: organisation,
+          'Content-Type': 'application/json',
+        },
+      }
+    )
+
+    if (res.status === 200 && Array.isArray(res.data) && res.data.length > 0) {
+      const data = res.data[0] // Get the first resume object
+
+      // ✅ Interview Settings
+      if (data.interview_settings) {
+        setSettings(data.interview_settings)
+      }
+
+      // ✅ Questions
+      if (Array.isArray(data.questions)) {
+        setQuestions(data.questions)
+      }
+
+      // ✅ Resume Data
+      if (data.resume_data) {
+        const resume = data.resume_data
+
+        const candidateObj: Candidate = {
+          id: 1,
+          name: resume.name ?? 'Unknown',
+          interviewDate: resume.uploaded_at || 'N/A',
+          interview_time: '',
+          timeSlot: '10:00AM - 10:35 AM',
+          position: resume.job_role ?? 'N/A',
+          email: resume.email ?? '',
+          phone: resume.phone ?? '',
+          experience: resume.experience_in_number
+            ? `${resume.experience_in_number} years`
+            : 'N/A',
+          skills: resume.skills || [],
+          education: resume.education?.[0]?.Degree || 'N/A',
+          currentCompany: resume.work?.[0]?.company ?? '',
+          currentRole: resume.work?.[0]?.designation_at_company ?? '',
+          created_by: '',
+          resume_id: ''
+        }
+
+        setCandidate(candidateObj)
+      }
+    }
+  } catch (error) {
+    console.error('Failed to fetch candidate details', error)
+  }
+}
+fetchCandidateDetails()
+}, [id])
+
+
+  // if (!candidate) return <Typography>Loading candidate details...</Typography>
   return (
     <Box
       sx={{
@@ -127,7 +201,7 @@ const InterviewDetails: React.FC = () => {
           >
             <img
               src="https://plus.unsplash.com/premium_photo-1664474619075-644dd191935f?fm=jpg&q=60&w=3000&ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxzZWFyY2h8MXx8aW1hZ2V8ZW58MHx8MHx8fDA%3D"
-              alt={candidate.name}
+              alt={candidate?.name||''}
               style={{ width: '100%', height: '100%', objectFit: 'cover' }}
             />
           </Box>
@@ -136,13 +210,13 @@ const InterviewDetails: React.FC = () => {
               variant="h6"
               sx={{ mb: 0.5, fontWeight: 'bold', fontSize: '14px' }}
             >
-              {candidate.name}
+              {candidate?.name||''}
             </Typography>
             <Typography variant="body2" sx={{ mb: 1, color: '#666' }}>
-              {candidate.interviewDate} {candidate.timeSlot}
+              {candidate?.interviewDate||''} {candidate?.timeSlot||''}
             </Typography>
             <Typography variant="body1" sx={{ fontWeight: 'bold' }}>
-              {candidate.position}
+              {candidate?.position||''}
             </Typography>
             <Box
               sx={{
@@ -174,10 +248,10 @@ const InterviewDetails: React.FC = () => {
           </Box>
           <Box sx={{ display: 'flex', justifyContent: 'space-between', mb: 2 }}>
             <Typography sx={{ fontWeight: 'bold' }}>
-              {candidate.currentCompany || 'N/A'}
+              {candidate?.currentCompany || 'N/A'}
             </Typography>
             <Typography sx={{ fontWeight: 'bold' }}>
-              {candidate.experience}
+              {candidate?.experience||''}
             </Typography>
           </Box>
           <Box sx={{ display: 'flex', justifyContent: 'space-between', mb: 1 }}>
@@ -186,7 +260,7 @@ const InterviewDetails: React.FC = () => {
           </Box>
           <Box sx={{ display: 'flex', justifyContent: 'space-between' }}>
             <Typography sx={{ fontWeight: 'bold' }}>
-              {candidate.currentRole || candidate.position}
+              {candidate?.currentRole || candidate?.position}
             </Typography>
             <Button
               sx={{
@@ -232,7 +306,7 @@ const InterviewDetails: React.FC = () => {
                     flex: 1,
                     p: 2,
                     border:
-                      settings.mode === mode
+                      settings?.mode||'' === mode
                         ? '2px solid #0277BD'
                         : '1px solid #ddd',
                     borderRadius: '5px',
@@ -248,18 +322,18 @@ const InterviewDetails: React.FC = () => {
                         height: '20px',
                         borderRadius: '50%',
                         border:
-                          settings.mode === mode
+                          settings?.mode||'' === mode
                             ? '2px solid #0277BD'
                             : '1px solid #aaa',
                         backgroundColor:
-                          settings.mode === mode ? '#0277BD' : 'transparent',
+                          settings?.mode||'' === mode ? '#0277BD' : 'transparent',
                         mr: 1,
                         display: 'flex',
                         alignItems: 'center',
                         justifyContent: 'center',
                       }}
                     >
-                      {settings.mode === mode && (
+                      {settings?.mode||'' === mode && (
                         <Box
                           sx={{
                             width: '8px',
@@ -292,7 +366,7 @@ const InterviewDetails: React.FC = () => {
               </Typography>
               <FormControl fullWidth>
                 <Select
-                  value={settings.country}
+                  value={settings?.country||''}
                   onChange={(e) =>
                     handleSettingChange('country', e.target.value as string)
                   }
@@ -317,7 +391,7 @@ const InterviewDetails: React.FC = () => {
               </Typography>
               <FormControl fullWidth>
                 <Select
-                  value={settings.language}
+                  value={settings?.language||''}
                   onChange={(e) =>
                     handleSettingChange('language', e.target.value as string)
                   }
@@ -353,7 +427,7 @@ const InterviewDetails: React.FC = () => {
               </Typography>
               <FormControl fullWidth>
                 <Select
-                  value={settings.questionFormat}
+                  value={settings?.questionFormat||''}
                   onChange={(e) =>
                     handleSettingChange(
                       'questionFormat',
@@ -384,7 +458,7 @@ const InterviewDetails: React.FC = () => {
               </Typography>
               <FormControl fullWidth>
                 <Select
-                  value={settings.numberOfQuestions}
+                  value={settings?.numberOfQuestions||''}
                   onChange={(e) =>
                     handleSettingChange(
                       'numberOfQuestions',
@@ -426,7 +500,7 @@ const InterviewDetails: React.FC = () => {
               </Typography>
               <FormControl fullWidth>
                 <Select
-                  value={settings.difficultyLevel}
+                  value={settings?.difficultyLevel||''}
                   onChange={(e) =>
                     handleSettingChange(
                       'difficultyLevel',
@@ -453,7 +527,7 @@ const InterviewDetails: React.FC = () => {
               </Typography>
               <FormControl fullWidth>
                 <Select
-                  value={settings.voiceTone}
+                  value={settings?.voiceTone||''}
                   onChange={(e) =>
                     handleSettingChange('voiceTone', e.target.value as string)
                   }

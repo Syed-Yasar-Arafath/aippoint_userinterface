@@ -682,7 +682,7 @@ function CandidateInterviewAnalytics() {
                                         justifyContent: 'space-between',
                                         flexDirection: 'row',
                                     }}>
-                                        {/* <Typography sx={{
+                                         <Typography sx={{
                                             alignContent: 'center',
                                             border: '0.5px solid #1C1C1E1A',
                                             borderRadius: '6px',
@@ -691,8 +691,19 @@ function CandidateInterviewAnalytics() {
                                             fontWeight: 500,
                                             fontFamily: 'SF Pro Display',
                                             padding: '0px 10px'
-                                        }}>Interview Completed</Typography>
-                                        <Button sx={{
+                                        }}>{interviewData.interview_status || 'N/A'}</Typography>
+                                        <Typography sx={{
+                                            border: '0.5px solid #1C1C1E1A',
+                                            borderRadius: '6px',
+                                            color: '#1C1C1E',
+                                            fontSize: '10px',
+                                            fontWeight: 400,
+                                            fontFamily: 'SF Pro Display',
+                                            alignContent: 'center',
+                                            padding: '0px 10px',
+                                            height: '30px'
+                                        }}>Date: {interviewData.interview_time.split(', ')[1] || 'N/A'}</Typography>
+                                        {/* <Button sx={{
                                             textTransform: 'none',
                                             border: '0.5px solid #1C1C1E1A',
                                             borderRadius: '6px',

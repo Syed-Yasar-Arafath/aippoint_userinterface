@@ -13,6 +13,7 @@ import DeleteOutlineIcon from '@mui/icons-material/DeleteOutline';
 import TitleIcon from '@mui/icons-material/Title';
 import KeyboardDoubleArrowRightIcon from '@mui/icons-material/KeyboardDoubleArrowRight';
 import KeyboardDoubleArrowLeftIcon from '@mui/icons-material/KeyboardDoubleArrowLeft';
+import CancelPresentationIcon from '@mui/icons-material/CancelPresentation';
 import { loaderOff, loaderOn, openSnackbar } from '../redux/actions';
 import { useNewJobForm } from '../custom-components/custom_forms/NewJobForm'
 import { Theme, useTheme } from '@mui/material/styles'
@@ -26,6 +27,7 @@ import ArrowBackIcon from '@mui/icons-material/ArrowBack';
 import AutoAwesomeIcon from '@mui/icons-material/AutoAwesome';
 import KeyboardBackspaceIcon from '@mui/icons-material/KeyboardBackspace';
 import { getUserDetails } from '../services/UserService';
+import Header from '../CommonComponents/topheader';
 const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/
 const containsOnlyCharacters = /\D+/
 const passwordRegex =
@@ -99,13 +101,13 @@ const secondarySkills = [
 
 const jobTypeNames = [
   'Full Time',
-  'part Time',
-  'contractBased',
-  'freelance',
-  'internship',
+  'Part Time',
+  'Contract Based',
+  'Freelance',
+  'Internship',
 ]
 
-const modeOfWorkNames = ['onSite', 'remote', 'hybrid']
+const modeOfWorkNames = ['Onsite', 'Remote', 'Hybrid']
 
 function getStyles(name: string, personName: readonly string[], theme: Theme) {
   return {
@@ -140,8 +142,9 @@ const previewValuesStyle = {
   color: '#00000080',
 }
 const AIjdCreation = () => {
-   const organisation = localStorage.getItem('organisation')
-     const selectedLanguage: any = localStorage.getItem('i18nextLng')
+  const organisation = localStorage.getItem('organisation')
+  const selectedLanguage: any = localStorage.getItem('i18nextLng')
+  const [userProfileImage, setUserProfileImage] = useState<string | null>(null)
 
   const currentLanguage = selectedLanguage === 'ar' ? 'Arabic' : 'English'
   console.log(currentLanguage)
@@ -200,7 +203,7 @@ Additional Requirements:
   };
 
   const tabStyle = (isActive: boolean) => ({
-    padding: '5px 10px',
+    padding: '5px 14px',
     borderRadius: '25px',
     border: '0.5px solid #0284C780',
     backgroundColor: isActive ? '#e3f2fd' : 'transparent',
@@ -211,7 +214,7 @@ Additional Requirements:
     transition: 'all 0.3s ease',
     display: 'flex',
     alignItems: 'center',
-    gap: '8px',
+    gap: '5px',
     margin: '5px'
   });
 
@@ -301,6 +304,17 @@ const [createdBy, setCreatedBy] = useState('')
     try {
       const res = await getUserDetails(organisation)
       console.log(res, 'API Response') // Log the entire response
+
+ if (res.imageUrl) {
+                    setUserProfileImage(
+                        `${process.env.REACT_APP_SPRINGBOOT_BACKEND_SERVICE}/user/read/downloadFile/${res.imageUrl}/${organisation}`,
+                    );
+                } else {
+                    setUserProfileImage(null);
+                }
+
+
+
 
       // Directly access the `user_id` at the root of the response
       if (res && res.user_id !== undefined) {
@@ -500,10 +514,11 @@ const submitFormAi = async () => {
 
   const payload = {
     job_title: jobTitleAi,
-    job_role: jobRoleAi,
+    job_role: formValues.job_role.value,
     experience_required: experienceRequiredAi,
-    rolecategory: roleCategoryAi,
+    rolecategory: formValues.job_role.value,
     job_type: jobTypeAi,
+    no_of_open_positions: formValues.no_of_open_positions.value,
     primarySkills: trimmedPrime,
     secondarySkills: trimmedSec,
     specificDomainSkills: specificDomainSkillsCombined,
@@ -787,7 +802,7 @@ const handleChangeSpecificDomainSkillsAi = (e: React.ChangeEvent<HTMLInputElemen
 
 
   //preview code
-    const [openPreview, setOpenPreview] = React.useState(false);
+  const [openPreview, setOpenPreview] = React.useState(false);
   const [scrollPreview, setScrollPreview] = React.useState<DialogProps['scroll']>('paper');
 
   const handleClickOpenPreview = (scrollType: DialogProps['scroll']) => () => {
@@ -821,6 +836,7 @@ const [visibleSections, setVisibleSections] = useState({
   job_title: false,
   job_role: false,
   job_type: false,
+  no_of_open_positions : false,
   mode_of_work: false,
   primary_skills: false,
   secondary_skills: false,
@@ -948,7 +964,24 @@ useEffect(() => {
           error: !isValidJobRole,
         },
       }))
-    } else {
+    }else
+
+  if (name === 'no_of_open_positions') {
+    // Allow only digits
+    const numericValue = value.replace(/[^0-9]/g, '');
+
+    setFormValues((prev) => ({
+      ...prev,
+      [name]: {
+        ...prev[name],
+        value: numericValue,
+        error: numericValue.trim() === '',
+      },
+    }));
+    return;
+  }
+
+ else {
       setFormValues((prev) => ({
         ...prev,
         [name]: {
@@ -1509,17 +1542,27 @@ setShowButtons(true)
       }
     }
   }
-
+  
   return (
     <div style={{
+      padding:'10px 10px 0px 10px',
       minHeight: '100vh',
       background: 'linear-gradient(135deg, #e3f2fd 0%, #f0f7ff 100%)',
       fontFamily: '-apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif'
     }}>
 
+        <Header
+                title="Create JD"
+                userProfileImage={userProfileImage}
+                path="/AIJDCreator"
+            />
+
+     {/* <Grid sx={{display:'flex', alignItems:'center', justifyContent:'center',}}>
+        <img style={{height:'70px', width:'70px'}} src="/assets/static/SVG/aippointButtonIcon.svg" />
+      </Grid> */}
 
       {/* Header */}
-      <div style={{
+      {/* <div style={{
         padding: '20px 40px',
         display: 'flex',
         justifyContent: 'space-between',
@@ -1571,38 +1614,46 @@ setShowButtons(true)
             </div>
           </div>
         </div>
-      </div>
+      </div> */}
 
-
-      {/* Main Content */}
-      <div style={{
-        padding: '30px 15px',
-        textAlign: 'center',
-        maxWidth: '1200px',
-        margin: '0 auto'
-      }}>
-       
-        {/* Title Section */}
-        <div style={{ marginBottom: '20px' }}>
-          <h1 style={{
-            fontSize: '36px',
+<Grid sx={{display:'flex', justifyContent:'center', alignItems:'center',}}>
+  <Box style={{
+            fontSize: '28px',
             fontWeight: '700',
             color: '#1976d2',
-            marginBottom: '15px',
+             textAlign:'center',
+            // marginBottom: '15px',
             background: 'linear-gradient(135deg, #1976d2, #21cbf3)',
             WebkitBackgroundClip: 'text',
             WebkitTextFillColor: 'transparent'
           }}>
             Hire Smarter with AI-Powered JD Creation
-          </h1>
-          <p style={{
+          </Box>
+
+         
+</Grid>
+ <Box style={{
             fontSize: '16px',
             color: '#666',
-            maxWidth: '600px',
-            margin: '0 auto'
+            // maxWidth: '600px',
+            margin: '0 auto',
+            textAlign:'center',
+            padding:'0px'
           }}>
             Just tell me about the role, and I &apos;ll generate a professional, tailored JD for you instantly.
-          </p>
+          
+          </Box>
+      {/* Main Content */}
+      <div style={{
+        // padding: '30px 8px',
+        // textAlign: 'center',
+        // maxWidth: '1200px',
+        // margin: '0 auto',
+        // backgroundColor:'orange'
+      }}>
+       
+        {/* Title Section */}
+        <div style={{ marginBottom: '10px' }}>         
         </div>
 
         {/* Tab Navigation */}
@@ -1681,7 +1732,7 @@ setShowButtons(true)
       <div style={{
           display: 'flex',
           justifyContent: 'center',
-          marginBottom: '30px',
+          marginBottom: '5px',
           flexWrap: 'wrap'
         }}>
          <button
@@ -1723,6 +1774,19 @@ setShowButtons(true)
 >
  
   💼 Job Type
+</button>
+
+<button id="btnNoOfOpenPositions"
+  draggable={true}
+  onDragStart={(e) => {
+    e.dataTransfer.setData('text/plain', 'dragging-mode-of-work');
+    e.dataTransfer.effectAllowed = 'move';
+  }}
+  onDragEnd={() => toggleSection('no_of_open_positions')}
+  style={tabStyle(activeTab === 'no_of_open_positions')}
+>
+
+  📌 Open Positions
 </button>
 
 <button id="btnModeOfWork"
@@ -1832,8 +1896,8 @@ setShowButtons(true)
           backgroundColor: 'rgba(255, 235, 59, 0.1)',
           border: '1px solid rgba(255, 235, 59, 0.3)',
           borderRadius: '12px',
-          padding: '8px',
-          marginBottom: '40px',
+          padding: '3px',
+          marginBottom: '10px',
           display: 'flex',
           alignItems: 'center',
           justifyContent: 'center',
@@ -1849,10 +1913,11 @@ setShowButtons(true)
         <div style={{
           backgroundColor: 'white',
           borderRadius: '20px',
-          padding: '40px',
+          padding: '20px',
           boxShadow: '0 10px 40px rgba(0,0,0,0.1)',
           marginBottom: '5px',
-          minHeight: '400px'
+           minHeight: '100px',
+          // minHeight: '400px',
         }}>
           {/* <p style={{
             color: '#666',
@@ -2026,7 +2091,8 @@ onMouseLeave={(e) => {
         	🧾
       </div>
       <div style={{ fontSize: '15px', marginLeft: '4px' }}>
-        Job Title
+        Job Title<span style={{color:'red'}}> *</span>
+
       </div>
       </div>
         <Grid sx={{display:'flex', alignItems:'center', justifyContent:'space-between',
@@ -2120,7 +2186,7 @@ onMouseLeave={(e) => {
         	👤
       </div>
       <div style={{ fontSize: '15px', marginLeft: '4px' }}>
-        Job Role
+        Job Role<span style={{color:'red'}}> *</span>
       </div>
       </div>
         <Grid sx={{display:'flex', alignItems:'center', justifyContent:'space-between',
@@ -2172,7 +2238,7 @@ onMouseLeave={(e) => {
                   lineHeight: '18.23px',
                   letterSpacing: '0%',
                   color: '#00000080',
-                  border: '0.5px solid transparent',
+                  // border: '0.5px solid transparent',
                   direction: 'ltr',
                 },
                 '& .MuiInputBase-input': {
@@ -2194,7 +2260,7 @@ onMouseLeave={(e) => {
                   placeholder="Type or search role"
                   variant="outlined"
                   fullWidth
-                  error={formValues.job_role.error}
+                  // error={formValues.job_role.error}
                   InputProps={{
                     ...params.InputProps,
                     endAdornment: (
@@ -2252,7 +2318,7 @@ onMouseLeave={(e) => {
         💼
       </div>
       <div style={{ fontSize: '15px', marginLeft: '4px' }}>
-        Job Type
+        Job Type<span style={{color:'red'}}> *</span>
       </div>
       </div>
         <Grid sx={{display:'flex', alignItems:'center', justifyContent:'space-between',
@@ -2282,7 +2348,7 @@ onMouseLeave={(e) => {
                       background: '#FFFFFF',
                       // border: '1px solid #00000080',
                       borderRadius: '5px',
-                      padding: '5px 0px 5px 0px',
+                      padding: '8px 0px 5px 0px',
                       direction:  'ltr',
 
                       fontFamily: 'SF Pro Display',
@@ -2290,7 +2356,7 @@ onMouseLeave={(e) => {
                       fontSize: '14px',
                       lineHeight: '18.23px',
                       letterSpacing: '0%',
-
+                      marginTop:'2px',
                       opacity: 1,
                       '& .MuiButtonBase-root': {
                         fontFamily: 'SF Pro Display',
@@ -2368,6 +2434,92 @@ onMouseLeave={(e) => {
       </Grid>
     )}
 
+
+   {!visibleSections.no_of_open_positions && (
+      <Grid id="no_of_open_positions" item xs={12} sm={6} md={4} lg={3}>
+      <div style={{ display: 'flex', alignItems: 'center' }}>
+      <div style={{ fontFamily: '"Segoe Script", cursive', fontSize: '24px', fontWeight: 'bold', color: '#e65100' }}>
+        	📌
+      </div>
+      <div style={{ fontSize: '15px', marginLeft: '4px' }}>
+        Open Positions <span style={{color:'red'}}> *</span>
+
+      </div>
+      </div>
+        <Grid sx={{display:'flex', alignItems:'center', justifyContent:'space-between',
+           color: '#00000080',
+                  borderRadius: '5px',
+                  border: '0.5px solid #bdbdbd',
+                  height: '40px',
+                  background: '#FFFFFF',
+                  textAlign: 'center',
+                  padding: '20px 0px 20px 0px',
+                  fontFamily: 'SF Pro Display',
+                  fontWeight: 300,
+                  fontSize: '14px',
+                  lineHeight: '18.23px',
+                  letterSpacing: '0%',
+                  opacity: 1,
+        }}>
+         <TextField
+      fullWidth
+      variant="filled"
+      autoComplete="off"
+      placeholder="Enter No. Of Open Positions"
+      sx={{
+        '& .MuiInputBase-input::placeholder': {
+          fontFamily: 'SF Pro Display',
+          fontWeight: 300,
+          fontSize: '14px',
+          lineHeight: '18.23px',
+          letterSpacing: '0%',
+          color: '#00000080',
+          opacity: 1,
+        },
+      }}
+      InputProps={{
+        disableUnderline: true,
+        style: {
+          color: '#00000080',
+          borderRadius: '5px',
+          height: '40px',
+          background: '#FFFFFF',
+          textAlign: 'center',
+          padding: '0px 0px 15px 0px',
+          fontFamily: 'SF Pro Display',
+          fontWeight: 300,
+          fontSize: '14px',
+          lineHeight: '18.23px',
+          letterSpacing: '0%',
+          opacity: 1,
+        },
+      }}
+      inputProps={{
+        inputMode: 'numeric',
+        pattern: '[0-9]*',
+        style: { textAlign: 'left' },
+      }}
+      required
+      name="no_of_open_positions"
+      value={formValues.no_of_open_positions.value}
+      onChange={handleChange}
+      error={formValues.no_of_open_positions.error}
+      // helperText={
+      //   formValues.no_of_open_positions.error
+      //     ? formValues.no_of_open_positions.errorMessage
+      //     : ''
+      // }
+    />
+
+          {/* <Grid sx={{padding: '15px 0px 15px 0px',}}>
+            <Button sx={{padding:'10px'}}>
+              <DeleteOutlineIcon sx={{color:'red', '&:hover':{color:'red', cursor:'pointer'}}}/>
+            </Button>
+            </Grid> */}
+        </Grid>
+      </Grid>
+    
+    )}
       {/* mode of work */}
       {!visibleSections.mode_of_work && (
       <Grid id="mode_of_work" item xs={12} sm={6} md={4} lg={3}>
@@ -2376,7 +2528,7 @@ onMouseLeave={(e) => {
         🏠
       </div>
       <div style={{ fontSize: '15px', marginLeft: '4px' }}>
-        Mode Of Work
+        Mode Of Work<span style={{color:'red'}}> *</span>
       </div>
       </div>
         <Grid sx={{display:'flex', alignItems:'center', justifyContent:'space-between',
@@ -2483,7 +2635,7 @@ onMouseLeave={(e) => {
         🛠️	
       </div>
       <div style={{ fontSize: '15px', marginLeft: '4px' }}>
-        Primary Skills
+        Primary Skills<span style={{color:'red'}}> *</span>
       </div>
       </div>
         <Grid sx={{display:'flex', alignItems:'center', justifyContent:'space-between',
@@ -2576,7 +2728,7 @@ onMouseLeave={(e) => {
         🎯	
       </div>
       <div style={{ fontSize: '15px', marginLeft: '4px' }}>
-        Experience Level
+        Experience Level<span style={{color:'red'}}> *</span>
       </div>
       </div>
         <Grid sx={{display:'flex', alignItems:'center', justifyContent:'space-between',
@@ -2710,7 +2862,7 @@ onMouseLeave={(e) => {
         ⚙️	
       </div>
       <div style={{ fontSize: '15px', marginLeft: '4px' }}>
-        Secondary Skills
+        Secondary Skills<span style={{color:'red'}}> *</span>
       </div>
       </div>
         <Grid sx={{display:'flex', alignItems:'center', justifyContent:'space-between',
@@ -2797,7 +2949,7 @@ onMouseLeave={(e) => {
         🧠	
       </div>
       <div style={{ fontSize: '15px', marginLeft: '4px' }}>
-        Specific Domain Skills
+        Specific Domain Skills<span style={{color:'red'}}> *</span>
       </div>
       </div>
         <Grid sx={{display:'flex', alignItems:'center', justifyContent:'space-between',
@@ -2885,7 +3037,7 @@ onMouseLeave={(e) => {
           📍
       </div>
       <div style={{ fontSize: '15px', marginLeft: '4px' }}>
-        Location
+        Location<span style={{color:'red'}}> *</span>
       </div>
       </div>
        <Grid sx={{display:'flex', alignItems:'center', justifyContent:'space-between',
@@ -3322,27 +3474,45 @@ onMouseLeave={(e) => {
     
       <Dialog
         open={openPreview}
-        onClose={handleClosePreview}
+        // onClose={handleClosePreview}
+         onClose={(event, reason) => {
+            if (reason !== 'backdropClick' && reason !== 'escapeKeyDown') {
+            handleClosePreview();
+            }
+        }}
         scroll={scrollPreview}
         aria-labelledby="scroll-dialog-title"
         aria-describedby="scroll-dialog-description"
       >
-        <DialogTitle id="scroll-dialog-title" 
+        <DialogTitle><Grid  sx={{
+      display: 'flex',
+      alignItems: 'center',
+      justifyContent: 'space-between',
+      width: '100%',
+    }}>
+          <Grid id="scroll-dialog-title" 
         sx={{color: 'rgba(2, 132, 199, 1)',
            fontFamily: 'SF Pro Display',
   fontWeight: 700,
   fontSize: '16px',
   lineHeight: '100%',
-  letterSpacing: '0%',
-}}>
-          Review & Customize Your AI-Generated Job Description</DialogTitle>
+  letterSpacing: '0%',}}>
+    Review & Customize Your AI-Generated Job Description
+
+          </Grid>
+          <Grid>
+<Button onClick={handleClosePreview}>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<CancelPresentationIcon sx={{color:'red', '&:hover':{backgroundColor:'red', color:'#fff'}}}/></Button>
+
+          </Grid>
+          </Grid>
+           </DialogTitle>
         <DialogContent dividers={scrollPreview === 'paper'}>
           <DialogContentText
             id="scroll-dialog-description"
             ref={descriptionElementRef}
             tabIndex={-1}
           >
-              <Grid id="job_title" item xs={12} sm={6} md={4} lg={3}>
+      <Grid id="job_title" item xs={12} sm={6} md={4} lg={3}>
       <div style={{ display: 'flex', alignItems: 'center' }}>
       <div style={{ fontFamily: '"Segoe Script", cursive', fontSize: '24px', fontWeight: 'bold', color: '#e65100' }}>
         	🧾
@@ -3420,12 +3590,11 @@ onMouseLeave={(e) => {
   helperText={formErrorsAi.job_title}
             />
 
-          <Grid sx={{padding: '15px 0px 15px 0px',}}>
-            <Button sx={{padding:'10px'}}>
-            </Button>
-            </Grid>
+      
         </Grid>
       </Grid>
+
+ 
 
    <Grid id="job_role" item xs={12} sm={6} md={4} lg={3}>
       <div style={{ display: 'flex', alignItems: 'center' }}>
@@ -3456,14 +3625,22 @@ onMouseLeave={(e) => {
               options={jobCategory}
               loading={jobCategoryLoading}
               // value={formValues.job_role.value || (editAijd ? jobRoleAi : '')}
-              value={jobRoleAi ||  ''}
+              value={formValues.job_role.value ||  ''}
               inputValue={jobCategoryInput}
               onInputChange={(e, newInputValue) => {
                 setJobCategoryInput(newInputValue)
                 fetchCategories(newInputValue)
               }}
-              onChange={(e, newValue) => setJobRoleAi(newValue || '')}
+              onChange={(e, newValue) => {
+                const syntheticEvent = {
+                  target: {
+                    name: 'job_role',
+                    value: newValue || '',
+                  },
+                } as React.ChangeEvent<HTMLInputElement>
 
+                handleChange(syntheticEvent)
+              }}
               sx={{
                 width: '100%',
                 '& .MuiOutlinedInput-root': {
@@ -3477,7 +3654,7 @@ onMouseLeave={(e) => {
                   lineHeight: '18.23px',
                   letterSpacing: '0%',
                   color: '#00000080',
-                  border: '0.5px solid transparent',
+                  // border: '0.5px solid transparent',
                   direction: 'ltr',
                 },
                 '& .MuiInputBase-input': {
@@ -3499,8 +3676,7 @@ onMouseLeave={(e) => {
                   placeholder="Type or search role"
                   variant="outlined"
                   fullWidth
-                    error={!!formErrorsAi.job_role}
-                helperText={formErrorsAi.job_role}
+                  error={formValues.job_role.error}
                   InputProps={{
                     ...params.InputProps,
                     endAdornment: (
@@ -3521,13 +3697,7 @@ onMouseLeave={(e) => {
                 />
               )}
             />
-            {noCategoryFound && (
-              <div
-                style={{ color: '#d32f2f', fontSize: '13px', marginTop: '5px' }}
-              >
-                No category found
-              </div>
-            )}
+           
             {/* {formValues.job_role.error && (
               <span
                 style={{
@@ -3541,10 +3711,11 @@ onMouseLeave={(e) => {
               </span>
             )} */}
 
-          <Grid sx={{padding: '15px 0px 15px 0px',}}>
+          {/* <Grid sx={{padding: '15px 0px 15px 0px',}}>
             <Button sx={{padding:'10px'}}>
+              <DeleteOutlineIcon sx={{color:'red', '&:hover':{color:'red', cursor:'pointer'}}}/>
             </Button>
-            </Grid>
+            </Grid> */}
         </Grid>
       </Grid>
 
@@ -3566,7 +3737,7 @@ onMouseLeave={(e) => {
                   height: '40px',
                   background: '#FFFFFF',
                   textAlign: 'center',
-                  padding: '20px 0px 20px 0px',
+                  padding: '17px 0px 17px 0px',
                   fontFamily: 'SF Pro Display',
                   fontWeight: 300,
                   fontSize: '14px',
@@ -3574,7 +3745,7 @@ onMouseLeave={(e) => {
                   letterSpacing: '0%',
                   opacity: 1,
         }}>
-          <FormControl sx={{ width: '100%', height: '45px' }}>
+          <FormControl sx={{ width: '100%', height: '45px', paddingTop:'5px' }}>
                   <Select
                     // value={jobTypeName || ''}
                     displayEmpty
@@ -3663,10 +3834,91 @@ onMouseLeave={(e) => {
                     </FormHelperText>
                   )} */}
                 </FormControl>
-          <Grid sx={{padding: '15px 0px 15px 0px',}}>
+       
+        </Grid>
+      </Grid>
+
+
+     <Grid id="no_of_open_positions" item xs={12} sm={6} md={4} lg={3}>
+      <div style={{ display: 'flex', alignItems: 'center' }}>
+      <div style={{ fontFamily: '"Segoe Script", cursive', fontSize: '24px', fontWeight: 'bold', color: '#e65100' }}>
+        	📌
+      </div>
+      <div style={{ fontSize: '15px', marginLeft: '4px' }}>
+        Open Positions <span style={{color:'red'}}> *</span>
+
+      </div>
+      </div>
+        <Grid sx={{display:'flex', alignItems:'center', justifyContent:'space-between',
+           color: '#00000080',
+                  borderRadius: '5px',
+                  border: '0.5px solid #bdbdbd',
+                  height: '40px',
+                  background: '#FFFFFF',
+                  textAlign: 'center',
+                  padding: '20px 0px 20px 0px',
+                  fontFamily: 'SF Pro Display',
+                  fontWeight: 300,
+                  fontSize: '14px',
+                  lineHeight: '18.23px',
+                  letterSpacing: '0%',
+                  opacity: 1,
+        }}>
+         <TextField
+      fullWidth
+      variant="filled"
+      autoComplete="off"
+      placeholder="Enter No. Of Open Positions"
+      sx={{
+        '& .MuiInputBase-input::placeholder': {
+          fontFamily: 'SF Pro Display',
+          fontWeight: 300,
+          fontSize: '14px',
+          lineHeight: '18.23px',
+          letterSpacing: '0%',
+          color: '#00000080',
+          opacity: 1,
+        },
+      }}
+      InputProps={{
+        disableUnderline: true,
+        style: {
+          color: '#00000080',
+          borderRadius: '5px',
+          height: '40px',
+          background: '#FFFFFF',
+          textAlign: 'center',
+          padding: '0px 0px 15px 0px',
+          fontFamily: 'SF Pro Display',
+          fontWeight: 300,
+          fontSize: '14px',
+          lineHeight: '18.23px',
+          letterSpacing: '0%',
+          opacity: 1,
+        },
+      }}
+      inputProps={{
+        inputMode: 'numeric',
+        pattern: '[0-9]*',
+        style: { textAlign: 'left' },
+      }}
+      required
+      name="no_of_open_positions"
+      value={formValues.no_of_open_positions.value}
+      onChange={handleChange}
+      error={formValues.no_of_open_positions.error}
+      // helperText={
+      //   formValues.no_of_open_positions.error
+      //     ? formValues.no_of_open_positions.errorMessage
+      //     : ''
+      // }
+    />
+
+          {/* <Grid sx={{padding: '15px 0px 15px 0px',}}>
             <Button sx={{padding:'10px'}}>
+              <DeleteOutlineIcon sx={{color:'red', '&:hover':{color:'red', cursor:'pointer'}}}/>
             </Button>
-            </Grid>
+            </Grid> */}
         </Grid>
       </Grid>
   <Grid id="mode_of_work" item xs={12} sm={6} md={4} lg={3}>
@@ -3764,14 +4016,8 @@ onMouseLeave={(e) => {
                     </FormHelperText>
                   )} */}
                 </FormControl>
-          <Grid sx={{padding: '15px 0px 15px 0px',}}>
-            <Button sx={{padding:'10px'}}>
-            </Button>
-            </Grid>
         </Grid>
       </Grid>
-
-
 
   <Grid id="primary_skills" item xs={12} sm={6} md={4} lg={3}>
       <div style={{ display: 'flex', alignItems: 'center' }}>
@@ -3852,10 +4098,7 @@ onMouseLeave={(e) => {
                   //   primarySkillForm ? 'enter atleast oen skill' : ''
                   // }
                 />
-          <Grid sx={{padding: '15px 0px 15px 0px',}}>
-            <Button sx={{padding:'10px'}}>
-            </Button>
-            </Grid>
+        
         </Grid>
       </Grid>
 
@@ -3979,10 +4222,7 @@ onMouseLeave={(e) => {
                   {formValues.experience_required.errorMessage}
                 </span>
               )} */}
-          <Grid sx={{padding: '15px 0px 15px 0px',}}>
-            <Button sx={{padding:'10px'}}>
-            </Button>
-            </Grid>
+        
         </Grid>
       </Grid>
 
@@ -4061,10 +4301,7 @@ onMouseLeave={(e) => {
                   //   secondarySkillForm ? 'Enter atleast one skill' : ''
                   // }
                 />
-          <Grid sx={{padding: '15px 0px 15px 0px',}}>
-            <Button sx={{padding:'10px'}}>
-            </Button>
-            </Grid>
+       
         </Grid>
       </Grid>
 
@@ -4142,10 +4379,7 @@ onMouseLeave={(e) => {
                   //   secondarySkillForm ? 'Enter atleast one skill' : ''
                   // }
                 />
-          <Grid sx={{padding: '15px 0px 15px 0px',}}>
-            <Button sx={{padding:'10px'}}>
-            </Button>
-            </Grid>
+        
         </Grid>
       </Grid>
 
@@ -4486,34 +4720,45 @@ onMouseLeave={(e) => {
       </Grid>
           </DialogContentText>
         </DialogContent>
-        <DialogActions>
-          <Button onClick={handleClosePreview}>Cancel</Button>
+       <DialogActions>
+  <Grid
+    sx={{
+      display: 'flex',
+      alignItems: 'center',
+      justifyContent: 'center',
+      width: '100%',
+      padding:'10px'
+    }}
+  >
+    {/* Left side button */}
+    <Button
+      onClick={submitFormAi}
+      sx={{
+        fontFamily: 'SF Pro Display',
+        fontWeight: 500,
+        fontSize: '14px',
+        lineHeight: '100%',
+        letterSpacing: '0%',
+        color: 'rgba(28, 28, 30, 1)',
+        boxShadow: '0px 0px 8px 0px rgba(28, 28, 30, 0.08)',
+        border: '0.5px solid rgba(28, 28, 30, 0.25)',
+        borderRadius: '50px',
+        textTransform: 'none',
+        padding: '9px 20px',
+        '&:hover': {
+          background: 'rgba(2, 132, 199, 1)',
+          color: '#fff',
+          border: '0.5px solid transparent',
+        },
+      }}
+    >
+      <AutoAwesomeIcon sx={{ color: '#ffeb3b' }} /> &nbsp;&nbsp; Create Job Description
+    </Button>
 
-            <Button 
-  onClick={submitFormAi}
-  
-  sx={{ fontFamily: 'SF Pro Display',
-  fontWeight: 500,
-  fontSize: '14px',
-  lineHeight: '100%',
-  letterSpacing: '0%',
-color: 'rgba(28, 28, 30, 1)',
-boxShadow: '0px 0px 8px 0px rgba(28, 28, 30, 0.08)',
-border: '0.5px solid rgba(28, 28, 30, 0.25)',
-borderRadius:'50px',
-textTransform:'none',
- padding:'9px 20px',
- '&:hover':{
-  background:' rgba(2, 132, 199, 1)',
-  color:'#fff',
-  border: '0.5px solid transparent',
+    {/* Right side button */}
+  </Grid>
+</DialogActions>
 
- }
-}}>
-<AutoAwesomeIcon sx={{color:'#ffeb3b'}}/> &nbsp; &nbsp; Create Job Description
-  </Button>
- 
-        </DialogActions>
       </Dialog>
       </React.Fragment>
       {/* preview ends here.. */}
@@ -4546,7 +4791,8 @@ textTransform:'none',
             onClick={handleGenerateAijd}
             disabled={isGenerating}
             style={{
-              padding: '15px 30px',
+              marginTop:'5px',
+              padding: '8px 20px',
               background: isGenerating 
                 ? 'linear-gradient(135deg, #ccc, #999)' 
                 : 'linear-gradient(135deg, #2196f3, #21cbf3)',
@@ -4571,7 +4817,7 @@ textTransform:'none',
          
         {/* Footer */}
         <div style={{
-          marginTop: '40px',
+          marginTop: '10px',
           fontSize: '12px',
           color: '#999',
           textAlign: 'center'
@@ -4588,7 +4834,7 @@ textTransform:'none',
           backgroundColor: 'rgba(240, 250, 255, 0.81)', 
     zIndex: theme.zIndex.drawer + 1 })}
         open={openGeneration}
-        onClick={handleCloseGeneration}
+        // onClick={handleCloseGeneration}
       >
       <Grid
   container
@@ -4668,8 +4914,11 @@ textTransform:'none',
   color:'#fff',
   border: '0.5px solid transparent',
 
- }
-}}>
+ } 
+}}
+ onClick={handleCloseGeneration}
+
+>
 <KeyboardBackspaceIcon/> &nbsp;&nbsp;Back to canvas
   </Button>
   <Button 

@@ -168,7 +168,8 @@ const Header: React.FC<HeaderProps> = ({ title, userProfileImage, path }) => {
       style={{
         boxShadow: '15px 0px 32px 0px #EAF1F5',
         display: 'flex',
-        padding: '7px 28px 7px 20px',
+        padding: '0px 28px 0px 20px',
+        marginBottom:'5px',
         justifyContent: 'space-between',
         // borderRadius: '25px',
         // background: '#EAF1F5',
@@ -186,30 +187,33 @@ const Header: React.FC<HeaderProps> = ({ title, userProfileImage, path }) => {
       >
         {title}
       </Typography> */}
-      <Typography
-        style={{
-          color: '#0284C7',
+    <Box
+  display="flex"
+  alignItems="center"
+  style={{ color: '#0284C7', textAlign: 'left', padding:'0px', margin:'0px' }}
+>
+  <KeyboardBackspaceIcon
+    style={{ color: '#0A0B5C', marginRight: '15px', paddingTop: '2px', cursor: 'pointer' }}
+    onClick={() => handleNavigate(path)}
+  />
+  <Typography
+    style={{
+      fontFamily: 'SF Pro Display',
+      fontWeight: 600,
+      fontSize: '20px',
+      lineHeight: '26.04px',
+      letterSpacing: '0%',
+      color: '#0284C7'
+    }}
+  >
+    {title}
+  </Typography>
+</Box>
 
-          // lineHeight: '95px',
-          textAlign: 'left',
 
-          fontFamily: 'SF Pro Display',
-          fontWeight: 600,
-          fontSize: '20px',
-          lineHeight: '26.04px',
-          letterSpacing: '0%',
-        }}
-      >
-        <KeyboardBackspaceIcon
-          style={{ color: '#0A0B5C', marginRight: '15px' }}
-          onClick={() => handleNavigate(path)}
-        />
-        {title}
-      </Typography>
-
-       <Grid sx={{display:'flex', alignItems:'center', justifyContent:'center',}}>
-        <img style={{height:'60px', width:'60px'}} src="/assets/static/SVG/aippointButtonIcon.svg" />
-      </Grid>
+       {/* <Grid sx={{display:'flex', alignItems:'center', justifyContent:'center',}}>
+        <img style={{height:'50px', width:'50px'}} src="/assets/static/SVG/aippointButtonIcon.svg" />
+      </Grid> */}
 
       <div
         style={{

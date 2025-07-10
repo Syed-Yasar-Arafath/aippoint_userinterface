@@ -29,6 +29,12 @@ export function useNewJobForm() {
       // errorMessage: 'Please Select experience',
       errorMessage: t('experienceRequiredError'),
     },
+      no_of_open_positions: {
+      value: '',
+      error: false,
+      errorMessage: 'Please select no. of opening positions ',
+      // errorMessage: t('experienceRequiredError'),
+    },
     job_type: {
       value: '',
       error: false,

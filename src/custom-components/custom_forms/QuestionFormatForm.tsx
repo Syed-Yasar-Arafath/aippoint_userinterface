@@ -17,11 +17,11 @@ export function useQuestionFormatForm() {
       // errorMessage: 'Please select a job description',
       errorMessage: t('selectAJobDescriptionError'),
     },
-    collection: {
+    programmingLanguage: {
       value: '',
       error: false,
-      // errorMessage: 'Please select a collection',
-      errorMessage: t('selectANameError'),
+      errorMessage: 'Please select a programming language',
+      // errorMessage: t('selectANameError'),
     },
     questionLevel: {
       value: '',
@@ -44,9 +44,9 @@ export function useQuestionFormatForm() {
         ...prev.jobDescription,
         errorMessage: t('selectAJobDescriptionError'),
       },
-      collection: {
-        ...prev.collection,
-        errorMessage: t('selectANameError'),
+      programmingLanguage: {
+        ...prev.programmingLanguage,
+        errorMessage: 'Please select a programming language',
       },
       questionLevel: {
         ...prev.questionLevel,

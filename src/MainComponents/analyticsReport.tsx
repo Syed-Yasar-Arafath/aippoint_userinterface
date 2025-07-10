@@ -20,7 +20,7 @@ function AnalyticsReport() {
     const theme = useTheme()
 
     const [selectedDate, setSelectedDate] = useState<Dayjs | null>(null); //dayjs()
-    const formattedDate = selectedDate?.format('DD/MM/YYYY');
+    const formattedDate = selectedDate?.format('DD-MM-YYYY');
     console.log(formattedDate);
 
     const [selectedJobRole, setSelectedJobRole] = useState('');
@@ -29,8 +29,8 @@ function AnalyticsReport() {
     const organisation = localStorage.getItem('organisation')
 
     const jobRoles = ['Java Developer', 'Python Developer', 'React Developer', 'Full Stack Developer']
-    // const interviewStatus = ['Completed', 'Not Attended', 'Cancelled', 'Rescheduled']
-    const interviewStatus = ['Coding', 'AI']
+    const interviewStatus = ['Completed', 'Awaited', 'Cancelled', 'Rescheduled']
+    // const interviewStatus = ['Coding', 'AI']
 
     const handleJobRole = (event: SelectChangeEvent) => {
         console.log('Job Role:', event.target.value)
@@ -72,6 +72,8 @@ function AnalyticsReport() {
                         email: item.resume_data.email || 'N/A',
                         position: item.resume_data.job_role || 'N/A',
                         type: item.interview_type || 'N/A',
+                        status: item.interview_status || 'N/A',
+                        date: item.interview_time || 'N/A',
                         experience: item.resume_data.experience_in_number || 'N/A',
                         score: item.coding_overall_score ?? item.overall_score ?? 'N/A'
                     }));
@@ -107,7 +109,7 @@ function AnalyticsReport() {
     }, [organisation]);
 
     const [page, setPage] = useState(0)
-    const fixedRowsPerPage = 5
+    const fixedRowsPerPage = 8
 
     const handleBackButtonClick = (
         event: React.MouseEvent<HTMLButtonElement>,
@@ -162,9 +164,12 @@ function AnalyticsReport() {
             !selectedJobRole || item.position?.toLowerCase() === selectedJobRole.toLowerCase();
 
         const matchesInterviewStatus =
-            !selectedInterviewStatus || item.type?.toLowerCase() === selectedInterviewStatus.toLowerCase();
+            !selectedInterviewStatus || item.status?.toLowerCase() === selectedInterviewStatus.toLowerCase();
 
-        return matchesJobRole && matchesInterviewStatus;
+        const matchesInterviewDate =
+            !formattedDate || item.date.split(', ')[1] === formattedDate;
+
+        return matchesJobRole && matchesInterviewStatus && matchesInterviewDate;
     });
 
 
@@ -182,7 +187,7 @@ function AnalyticsReport() {
                     item.name.toLowerCase().includes(value.toLowerCase()) ||
                     item.email.toLowerCase().includes(value.toLowerCase()) ||
                     item.position.toLowerCase().includes(value.toLowerCase()) ||
-                    item.type.toLowerCase().includes(value.toLowerCase()) ||
+                    item.status.toLowerCase().includes(value.toLowerCase()) ||
                     item.experience?.toString().includes(value)
             );
             setInterviewProfileData(filteredData);
@@ -202,11 +207,11 @@ function AnalyticsReport() {
     };
 
     const interviewStatusColor = (value: string) => {
-        if (value === 'Completed') {
+        if (value === 'completed') {
             return '#22973F';
-        } else if (value === 'Not Attended' || value === 'Cancelled') {
+        } else if (value === 'awaited' || value === 'cancelled') {
             return '#FF3B30';
-        } else if (value === 'Rescheduled') {
+        } else if (value === 'rescheduled') {
             return '#FF9500';
         }
         return '#000000';
@@ -220,7 +225,8 @@ function AnalyticsReport() {
         fontSize: '10px',
         fontWeight: 500,
         fontFamily: 'SF Pro Display',
-        gap: '5px'
+        gap: '5px',
+        width:'70%'
     }
 
     const tableHeading: React.CSSProperties = {
@@ -380,7 +386,7 @@ function AnalyticsReport() {
                                 <Box sx={{ height: '36px', width: '1px', backgroundColor: '#1C1C1E' }} />
                             </Grid>
 
-                            {/* <Grid item xs={12} sm={6} md={2}>
+                            <Grid item xs={12} sm={6} md={2}>
                                 <Box>
                                     <LocalizationProvider dateAdapter={AdapterDayjs}>
                                         <DatePicker
@@ -414,7 +420,7 @@ function AnalyticsReport() {
                                         />
                                     </LocalizationProvider>
                                 </Box>
-                            </Grid> */}
+                            </Grid>
 
                             <Grid item xs={12} sm={6} md={2}>
                                 <Box
@@ -456,7 +462,7 @@ function AnalyticsReport() {
                                 </Box>
                             </Grid>
                         </Grid>
-                        <Box mt={2}>
+                        {/* <Box mt={2}>
                             {isSelected && (
                                 <Typography sx={{
                                     fontSize: '12px',
@@ -465,7 +471,7 @@ function AnalyticsReport() {
                                     color: '#1C1C1E',
                                 }}>Candidates interview details for {selectedJobRole}:</Typography>
                             )}
-                        </Box>
+                        </Box> */}
                         <Grid item xs={12} sm={12} md={12} display='flex' justifyContent='center' mt={2}>
                             {isSelected ? (
                                 <Box width='100%' height='60vh'>
@@ -482,10 +488,10 @@ function AnalyticsReport() {
                                                     </TableCell>
                                                     <TableCell sx={tableHeading}>Full Name & Email</TableCell>
                                                     <TableCell sx={tableHeading}>Position</TableCell>
-                                                    {/*<TableCell sx={tableHeading}>Interview Status</TableCell>
-                                                    <TableCell sx={tableHeading}>AI Interview Score</TableCell>
+                                                    <TableCell sx={tableHeading}>Interview Date</TableCell>
+                                                    <TableCell sx={tableHeading}>Interview Status</TableCell>
+                                                    {/* <TableCell sx={tableHeading}>AI Interview Score</TableCell>
                                                     <TableCell sx={tableHeading}>AI Coding Assessment Score</TableCell> */}
-                                                    <TableCell sx={tableHeading}>Interview Type</TableCell>
                                                     <TableCell sx={tableHeading}>View</TableCell>
                                                 </TableRow>
                                             </TableHead>
@@ -503,7 +509,13 @@ function AnalyticsReport() {
                                                     .map((profile) => {
                                                         const isItemSelected = isChecked(profile.id);
                                                         return (
-                                                            <TableRow key={profile.id} hover>
+                                                            <TableRow key={profile.id} hover
+                                                              sx={{
+                                                        '& td': {
+                                                            padding: '0px',
+                                                        },
+                                                    }}
+                                                            >
                                                                 <TableCell padding="checkbox">
                                                                     <Checkbox
                                                                         checked={isItemSelected}
@@ -557,13 +569,20 @@ function AnalyticsReport() {
                                                                 <TableCell>
                                                                     <Typography sx={{
                                                                         ...interviewScoreStyle,
-                                                                        color: interviewStatusColor(profile.type),
                                                                         padding: '5px',
                                                                         textAlign: 'center'
-                                                                    }}>{profile.type}</Typography>
+                                                                    }}>{profile.date.split(', ')[1] || 'N/A'}</Typography>
+                                                                </TableCell>
+                                                                <TableCell>
+                                                                    <Typography sx={{
+                                                                        ...interviewScoreStyle,
+                                                                        color: interviewStatusColor(profile.status),
+                                                                        padding: '5px',
+                                                                        textAlign: 'center'
+                                                                    }}>{profile.status}</Typography>
                                                                 </TableCell>
                                                                 {/* <TableCell>
-                                                                    {profile.interviewStatus === 'Completed' ? (
+                                                                    {profile.status === 'completed' ? (
                                                                         <Box sx={{
                                                                             display: 'flex',
                                                                             flexDirection: 'row',
@@ -602,8 +621,8 @@ function AnalyticsReport() {
                                                                             </Button>
                                                                         </Box>
                                                                     )}
-                                                                </TableCell>
-                                                                <TableCell>
+                                                                </TableCell> */}
+                                                                {/* <TableCell>
                                                                     {profile.interviewStatus === 'Completed' ? (
                                                                         <Box sx={{
                                                                             display: 'flex',
@@ -681,9 +700,9 @@ function AnalyticsReport() {
                                 />
                             )}
                         </Grid>
-                        <Grid item xs={12} sm={12} md={12} display='flex' justifyContent='center' mt={2}>
+                        <Grid item xs={12} sm={12} md={12} display='flex' justifyContent='center'>
                             {isSelected && (
-                                <Box display="flex" justifyContent="center" marginTop={7}>
+                                <Box display="flex" justifyContent="center" marginTop={8}>
                                     <Box sx={{ flexShrink: 0 }}>
                                         <IconButton
                                             onClick={handleBackButtonClick}

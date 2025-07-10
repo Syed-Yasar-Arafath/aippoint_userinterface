@@ -495,8 +495,8 @@ function CandidateInterviewAnalytics() {
                 breakpoint: 3200, //From 3200 to below 
                 options: {
                     chart: {
-                        width: 300,
-                        height: 200,
+                        width: 350,
+                        height: 170,
                     },
                     legend: {
                         position: 'bottom',
@@ -618,14 +618,14 @@ function CandidateInterviewAnalytics() {
                 // userProfileImage={userProfileImage}
                 path="/analytics_report"
             />
-            <Grid container spacing={2} padding={2} sx={{ background: '#F7F7F7' }}>
+            <Grid container spacing={1} padding={1} sx={{ background: '#F7F7F7' }}>
                 {interviewData ? (
                     <>
                         <Grid item xs={12} sm={6} md={4}>
-                            <Card sx={{ background: '#FFFFFF', borderRadius: '12px', height: '250px' }} elevation={0}>
+                            <Card sx={{ background: '#FFFFFF', borderRadius: '12px', height: '230px' }} elevation={0}>
                                 <CardContent>
                                     <Typography sx={cardTitleStyle}>Candidate Overview</Typography>
-                                    <Box mt={2} sx={{
+                                    <Box mt={1} sx={{
                                         display: 'flex',
                                         justifyContent: 'space-between',
                                         flexDirection: 'row',
@@ -722,10 +722,10 @@ function CandidateInterviewAnalytics() {
                         </Grid>
 
                         <Grid item xs={12} sm={6} md={4}>
-                            <Card sx={{ background: '#FFFFFF', borderRadius: '12px', height: '250px' }} elevation={0}>
+                            <Card sx={{ background: '#FFFFFF', borderRadius: '12px', height: '230px' }} elevation={0}>
                                 <CardContent>
                                     <Typography sx={cardTitleStyle}>Total Number of Questions</Typography>
-                                    <Box mt={2} width="100%">
+                                    <Box mt={1} width="100%">
                                         <ReactApexChart options={pieChart.options as ApexOptions} series={pieChart.series} type="donut" />
                                     </Box>
                                 </CardContent>
@@ -733,10 +733,10 @@ function CandidateInterviewAnalytics() {
                         </Grid>
 
                         <Grid item xs={12} sm={6} md={4} >
-                            <Card sx={{ background: '#FFFFFF', borderRadius: '12px', height: '250px' }} elevation={0}>
+                            <Card sx={{ background: '#FFFFFF', borderRadius: '12px', height: '230px' }} elevation={0}>
                                 <CardContent>
                                     <Typography sx={cardTitleStyle}>Overall Interview Score</Typography>
-                                    <Box mt={2} sx={{
+                                    <Box mt={1} sx={{
                                         display: 'flex',
                                         justifyContent: 'center',
                                         alignItems: 'center',
@@ -771,7 +771,7 @@ function CandidateInterviewAnalytics() {
                         </Grid>
 
                         <Grid item xs={12} sm={6} md={4} >
-                            <Card sx={{ background: '#FFFFFF', borderRadius: '12px', height: '250px' }} elevation={0}>
+                            <Card sx={{ background: '#FFFFFF', borderRadius: '12px', height: '230px' }} elevation={0}>
                                 <CardContent>
                                     <Box sx={{
                                         display: 'flex',
@@ -791,7 +791,7 @@ function CandidateInterviewAnalytics() {
                                             </Select>
                                         </FormControl>
                                     </Box>
-                                    <Box mt={2} sx={{ height: '170px', overflow: 'auto' }}>
+                                    <Box mt={1} sx={{ height: '170px', overflow: 'auto' }}>
                                         {selectedSkills ? (
                                             softSkill &&
                                             Object.entries(softSkill).map(([skill, rating]) => (
@@ -853,7 +853,7 @@ function CandidateInterviewAnalytics() {
                         </Grid>
 
                         <Grid item xs={12} sm={6} md={4} >
-                            <Card sx={{ background: '#FFFFFF', borderRadius: '12px', height: '250px' }} elevation={0}>
+                            <Card sx={{ background: '#FFFFFF', borderRadius: '12px', height: '230px' }} elevation={0}>
                                 <CardContent>
                                     <Box sx={{
                                         display: 'flex',
@@ -873,7 +873,7 @@ function CandidateInterviewAnalytics() {
                                             </Select>
                                         </FormControl> */}
                                     </Box>
-                                    <Box mt={2} sx={{
+                                    <Box mt={1} sx={{
                                         height: '170px',
                                         overflow: 'auto'
                                     }}>
@@ -925,7 +925,7 @@ function CandidateInterviewAnalytics() {
                         </Grid>
 
                         <Grid item xs={12} sm={6} md={4} >
-                            <Card sx={{ background: '#FFFFFF', borderRadius: '12px', height: '250px' }} elevation={0}>
+                            <Card sx={{ background: '#FFFFFF', borderRadius: '12px', height: '230px' }} elevation={0}>
                                 <CardContent>
                                     <Box sx={{
                                         display: 'flex',
@@ -945,7 +945,7 @@ function CandidateInterviewAnalytics() {
                                             </Select>
                                         </FormControl> */}
                                     </Box>
-                                    <Box mt={2}>
+                                    <Box mt={1}>
                                         {/* {selectedAllQuestionType ? (
                                             'No Data'
                                         ) : ( */}
@@ -953,7 +953,7 @@ function CandidateInterviewAnalytics() {
                                             options={columnChart.options as ApexOptions}
                                             series={columnChart.series}
                                             type="bar"
-                                            height={200}
+                                            height={150}
                                         />
                                         {/* )} */}
                                     </Box>
@@ -962,10 +962,10 @@ function CandidateInterviewAnalytics() {
                         </Grid>
 
                         <Grid item xs={12} sm={6} md={4} >
-                            <Card sx={{ background: '#FFFFFF', borderRadius: '12px', height: '250px' }} elevation={0}>
+                            <Card sx={{ background: '#FFFFFF', borderRadius: '12px', height: '230px' }} elevation={0}>
                                 <CardContent>
                                     <Typography sx={cardTitleStyle}>Proctoring Details</Typography>
-                                    <Box mt={2} sx={{
+                                    <Box mt={1} sx={{
                                         height: '170px',
                                         overflow: 'auto'
                                     }}>
@@ -977,8 +977,8 @@ function CandidateInterviewAnalytics() {
                                                 gap: '20px'
                                             }}>
                                                 <Box
-                                                    height="10px"
-                                                    width="10px"
+                                                    height="3px"
+                                                    width="3px"
                                                     display="flex"
                                                     alignItems="center"
                                                     justifyContent="center"
@@ -1014,7 +1014,7 @@ function CandidateInterviewAnalytics() {
                         </Grid>
 
                         <Grid item xs={12} sm={6} md={4} >
-                            <Card sx={{ background: '#FFFFFF', borderRadius: '12px', height: '250px' }} elevation={0}>
+                            <Card sx={{ background: '#FFFFFF', borderRadius: '12px', height: '230px' }} elevation={0}>
                                 <CardContent>
                                     <Box sx={{
                                         display: 'flex',
@@ -1034,7 +1034,7 @@ function CandidateInterviewAnalytics() {
                                             </Select>
                                         </FormControl> */}
                                     </Box>
-                                    <Box mt={2} sx={{ height: '170px', overflow: 'auto' }}>
+                                    <Box mt={1} sx={{ height: '170px', overflow: 'auto' }}>
                                         {/* {selectedType ? (
                                             'No Data'
                                         ) : ( */}
@@ -1087,10 +1087,10 @@ function CandidateInterviewAnalytics() {
                         </Grid>
 
                         <Grid item xs={12} sm={6} md={4} >
-                            <Card sx={{ background: '#FFFFFF', borderRadius: '12px', height: '250px' }} elevation={0}>
+                            <Card sx={{ background: '#FFFFFF', borderRadius: '12px', height: '230px' }} elevation={0}>
                                 <CardContent>
                                     <Typography sx={cardTitleStyle}>Interview Outcome</Typography>
-                                    <Box mt={2}>
+                                    <Box mt={1}>
                                         <Typography sx={{
                                             color: '#1C1C1E',
                                             fontSize: '12px',

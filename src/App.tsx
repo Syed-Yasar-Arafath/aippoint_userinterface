@@ -51,6 +51,7 @@ import CodingAccess from './MainComponents/coding_access';
 import CodingSection from './MainComponents/coding_Section';
 import JdProfile from './MainComponents/jdprofileview';
 import ForgotPassword from './MainComponents/Forgotpassword';
+import InterviewScheduleCoding from './MainComponents/interviewScheduleCoding';
 // import ConfirmJoinInterview from './MainComponents/ConfirmJoinIntreview';
 // import QuestionFormat from './MainComponents/question_format';
 
@@ -158,6 +159,7 @@ const AppContent: React.FC = () => {
               <Route path="/collectiondefault" element={<CollectionDefault />} />
               <Route path="/collectiondefaultfilter" element={<CollectionDefaultfilter />} />
               <Route path="/interviewSchedule" element={<InterviewScheduler />} />
+              <Route path="/interviewScheduleCoding" element={<InterviewScheduleCoding />} />
               <Route path="/jobDescriptionForm" element={<JobDescriptionForm />} />
               <Route path="/jdcollection" element={<JdCollection />} />
               <Route path="/jdPreview" element={<JDPreview />} />

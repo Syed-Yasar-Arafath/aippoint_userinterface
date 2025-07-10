@@ -509,36 +509,60 @@ const { t } = useTranslation();
     }
   }
 
-  const generateQuestions = async () => {
-    try {
-      const params = new URLSearchParams()
-      params.append('object_id', objId)
-      const response = await axios.post(
-        `${process.env.REACT_APP_DJANGO_PYTHON_MODULE_SERVICE}/get_interview_data/`,
-        params,
-        {
-          headers: {
-            'Content-Type': 'application/x-www-form-urlencoded',
-            organization: organisation,
-          },
+  // const generateQuestions = async () => {
+  //   try {
+  //     const params = new URLSearchParams()
+  //     params.append('object_id', objId)
+  //     const response = await axios.post(
+  //       `${process.env.REACT_APP_DJANGO_PYTHON_MODULE_SERVICE}/get_interview_data/`,
+  //       params,
+  //       {
+  //         headers: {
+  //           'Content-Type': 'application/x-www-form-urlencoded',
+  //           organization: organisation,
+  //         },
+  //       },
+  //     )
+  //     const responseData = response.data.data.questions
+  //     const candidatename = response.data.data.resume_data.name
+  //     setQuestions(responseData)
+  //     setCandidateName(candidatename)
+  //     const concatenatedQuestions: string[] = []
+  //     if (Array.isArray(responseData)) {
+  //       responseData.forEach((questionObj) => {
+  //         concatenatedQuestions.push(questionObj.question)
+  //       })
+  //       setQuestionGenerated(concatenatedQuestions)
+  //     }
+  //   } catch (error) {
+  //     console.error('Error fetching questions:', error)
+  //   }
+  // }
+const generateQuestions = async () => {
+  try {
+    const response = await axios.post(
+      `${process.env.REACT_APP_DJANGO_PYTHON_MODULE_SERVICE}/get_interview_data/`,
+      { object_id: objId }, // Send JSON
+      {
+        headers: {
+          'Content-Type': 'application/json',
+          organization: organisation,
         },
-      )
-      const responseData = response.data.data.questions
-      const candidatename = response.data.data.resume_data.name
-      setQuestions(responseData)
-      setCandidateName(candidatename)
-      const concatenatedQuestions: string[] = []
-      if (Array.isArray(responseData)) {
-        responseData.forEach((questionObj) => {
-          concatenatedQuestions.push(questionObj.question)
-        })
-        setQuestionGenerated(concatenatedQuestions)
-      }
-    } catch (error) {
-      console.error('Error fetching questions:', error)
+      },
+    );
+    const responseData = response.data.data.questions;
+    const candidatename = response.data.data.resume_data.name;
+    setQuestions(responseData);
+    setCandidateName(candidatename);
+    const concatenatedQuestions = responseData.map((questionObj:any) => questionObj.question);
+    setQuestionGenerated(concatenatedQuestions);
+  } catch (error:any) {
+    console.error('Error fetching questions:', error);
+    if (error.response) {
+      console.log('Error response:', error.response.data); // Log the server error message
     }
   }
-
+};
   useEffect(() => {
     generateQuestions()
   }, [objId])

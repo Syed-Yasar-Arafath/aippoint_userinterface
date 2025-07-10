@@ -1,9 +1,7 @@
-import React, { useState, useRef, useEffect } from 'react'
-import SearchIcon from '@mui/icons-material/Search'
-// import { useDispatch, useSelector } from 'react-redux'
+import React, { useState, useRef, useEffect } from 'react';
+import SearchIcon from '@mui/icons-material/Search';
 import { useDispatch } from 'react-redux';
 import { useParams } from 'react-router-dom';
-
 import {
   Autocomplete,
   Box,
@@ -18,274 +16,302 @@ import {
   Paper,
   TextField,
   Chip,
-} from '@mui/material'
-// import { getAllResume, getResumeById } from '../../services/ResumeService'
-// import { getUserDetails } from '../../services/UserService'
-// import { putResume } from '../../services/JobService'
-// import Header from '../../components/topheader'
-import { t } from 'i18next'
-// import i18n from '../../i18n'
-import { makeStyles } from '@mui/styles'
-import { Search } from 'lucide-react'
-// import { loaderOff, loaderOn, openSnackbar } from '../../redux/actions'
-import { useTranslation } from 'react-i18next'
-import { loaderOff, loaderOn, openSnackbar } from '../redux/actions'
-import { putResume } from '../services/JobService'
-import { getAllResume, getResumeById } from '../services/ResumeService'
-import { getUserDetails } from '../services/UserService'
-import Header from '../CommonComponents/topheader'
+} from '@mui/material';
+import { useTranslation } from 'react-i18next';
+import { loaderOff, loaderOn, openSnackbar } from '../redux/actions';
+import { putResume } from '../services/JobService';
+import { getAllResume, getResumeById } from '../services/ResumeService';
+import { getUserDetails } from '../services/UserService';
+import Header from '../CommonComponents/topheader';
 import axios from 'axios';
-// import { useDispatch } from 'react-redux'
+import { makeStyles } from '@mui/styles';
 
 const useStyles = makeStyles({
-  autocomplete: {
-    // width: 100, // Set your desired fixed width here
-  },
+  autocomplete: {},
   inputRoot: {
     '&[class*="MuiOutlinedInput-root"] .MuiAutocomplete-input:first-child': {
-      // Prevent the first child (the input field) from affecting height
       minHeight: 'auto',
     },
     '&[class*="MuiOutlinedInput-root"] .MuiAutocomplete-tag': {
-      // Set the height and margins for the tags
       margin: '2px',
       height: 'auto',
     },
   },
-})
-
-// Assuming putResume and dispatch are imported or available in scope
-// import { putResume, loaderOn, loaderOff, openSnackbar } from '../../services' // Adjust import path as needed
-
-// Updated saveJdCollectionName function
+});
 
 interface Collection {
-  collection_name: string
-  collection_id: number
+  collection_name: string;
+  collection_id: number;
 }
 
 interface Job {
-  type: 'job'
-  jobid: number
-  job_title: any
-  skills: any
-  experience_required: any
-  location: any
-  resume_data: any
+  type: 'job';
+  jobid: number;
+  job_title: any;
+  skills: any;
+  experience_required: any;
+  location: any;
+  resume_data: any;
 }
 
-interface Collection {
-  type: 'collection'
-  collection_id: number
-  collection_name: string
-  resume_data: any
-}
-type Profile = {
-  id: any
-  name?: any
-  skills?: any
-  experience_in_number?: any
-  phone?: any
-  location?: any
-  Resume_Category?: any
-  work?: any
-  pdf_data?: any
+interface Profile {
+  id: any;
+  name?: any;
+  skills?: any;
+  experience_in_number?: any;
+  phone?: any;
+  location?: any;
+  Resume_Category?: any;
+  work?: any;
+  pdf_data?: any;
   resume_data?: {
-    id: any
-    skills: any
-    experience_in_number: any
-    name: any
-    Resume_Category: any
-    work: any
-    phone: any
-    location: any
-    pdf_data: any
-  }
-  score: any
+    id: any;
+    skills: any;
+    experience_in_number: any;
+    name: any;
+    Resume_Category: any;
+    work: any;
+    phone: any;
+    location: any;
+    pdf_data: any;
+  };
+  score: any;
 }
 
 const JdProfile = () => {
-  const [selectedCandidates, setSelectedCandidates] = useState<any[]>([])
-  const [selectAll, setSelectAll] = useState(false)
-  const [profile, setProfile] = React.useState<Profile[]>([])
-  const [profileLength, setProfileLength] = useState<number>(0)
-  const [selectedExperience, setSelectedExperience] = useState<string | null>(
-    null,
-  )
-  const [selectedSkill, setSelectedSkill] = useState<string[]>([])
-  const [selectedLoc, setSelectedLoc] = useState<string>('')
-  const [selectedRole, setSelectedRole] = useState<string>('')
-  const [value, setValue] = useState<any[]>([])
-  const [collectionNames, setCollectionNames] = useState<Collection[]>([])
-  const [userId, setUserId] = useState('')
-  const [openModal, setOpenModal] = useState(false)
-  const [jobs, setJobs] = useState<any[]>([])
-  const [collection, setCollection] = useState<string | number>('')
-  const [resumes, setResumes] = useState<any[]>([])
-  const [resumeId, setResumeId] = useState<any[]>([])
-  const [collections, setCollections] = useState<Collection[]>([])
-  const organisation = localStorage.getItem('organisation')
-  const searchRef = useRef<HTMLInputElement>(null)
-  const [inputValue, setInputValue] = useState<any | null>('')
-  const [inputExpValue, setInputExpValue] = useState<string>('')
-  const [inputLocValue, setInputLocValue] = useState<string>('')
-  const { t, i18n } = useTranslation()
-    const { jobId } = useParams();
-const token = localStorage.getItem('token')
-  console.log('Job ID:', jobId);
-  // Pagination state
-  const [currentPage, setCurrentPage] = useState(1)
-  const [resumesPerPage] = useState(5) // Show 6 resumes per page for laptop screen
-  const [loading, setLoading] = useState(false)
-  const [error, setError] = useState<string | null>(null)
-  const [noFilterProfiles, setNoFilterProfiles] = useState<any[]>([])
-  
-  const dispatch = useDispatch()
+  const [selectedCandidates, setSelectedCandidates] = useState<any[]>([]);
+  const [selectAll, setSelectAll] = useState(false);
+  const [profile, setProfile] = React.useState<Profile[]>([]);
+  const [profileLength, setProfileLength] = useState<number>(0);
+  const [selectedExperience, setSelectedExperience] = useState<string | null>(null);
+  const [selectedSkill, setSelectedSkill] = useState<string[]>([]);
+  const [selectedLoc, setSelectedLoc] = useState<string>('');
+  const [selectedRole, setSelectedRole] = useState<string>('');
+  const [value, setValue] = useState<any[]>([]);
+  const [collectionNames, setCollectionNames] = useState<Collection[]>([]);
+  const [userId, setUserId] = useState('');
+  const [openModal, setOpenModal] = useState(false);
+  const [jobs, setJobs] = useState<any[]>([]);
+  const [collection, setCollection] = useState<string | number>('');
+  const [resumes, setResumes] = useState<any[]>([]);
+  const [resumeId, setResumeId] = useState<any[]>([]);
+  const [collections, setCollections] = useState<Collection[]>([]);
+  const organisation = localStorage.getItem('organisation');
+  const searchRef = useRef<HTMLInputElement>(null);
+  const [inputValue, setInputValue] = useState<any | null>('');
+  const [inputExpValue, setInputExpValue] = useState<string>('');
+  const [inputLocValue, setInputLocValue] = useState<string>('');
+  const { t } = useTranslation();
+  const { jobId } = useParams();
+  const token = localStorage.getItem('token');
+  const [currentPage, setCurrentPage] = useState(1);
+  const [resumesPerPage] = useState(5);
+  const [loading, setLoading] = useState(false);
+  const [error, setError] = useState<string | null>(null);
+  const [noFilterProfiles, setNoFilterProfiles] = useState<any[]>([]);
+  const [scoredResumes, setScoredResumes] = useState<{ [key: string]: number }>({});
+  const dispatch = useDispatch();
+
+  const fetchScoredResumes = async () => {
+    if (!jobId) {
+      console.warn('No jobId provided');
+      setError(t('noJobIdProvided'));
+      return;
+    }
+    if (!organisation) {
+      console.warn('No organisation provided');
+      setError(t('organisationNotFound'));
+      dispatch(openSnackbar(t('organisationNotFound'), 'red'));
+      return;
+    }
+
+    const jobIdNum = parseInt(jobId, 10);
+    console.log('Fetching scored resumes for jobId:', jobIdNum);
+    setLoading(true);
+    setError(null); // Clear any previous error
+    dispatch(loaderOn());
+
+    try {
+      const response = await axios.post(
+        `http://localhost:8000/count_scored_resumes_for_jd/`,
+        { job_id: jobIdNum },
+        {
+          headers: {
+            Organization: organisation,
+            Authorization: `Bearer ${token}`,
+          },
+        }
+      );
+
+      console.log('API Response:', response.data);
+      // Check if response contains scored_resumes and handle empty array case
+      if (response.status === 200 && Array.isArray(response.data.scored_resumes)) {
+        const formattedProfiles = response.data.scored_resumes.map((resume: any) => ({
+          id: resume.resume_id,
+          resume_data: {
+            id: resume.resume_id,
+            name: resume.resume_data.name,
+            skills: resume.resume_data.skills,
+            experience_in_number: resume.resume_data.experiance_in_number,
+            phone: resume.resume_data.phone,
+            location: resume.resume_data.location,
+            Resume_Category: resume.resume_data.Resume_Category,
+            work: resume.resume_data.work,
+            pdf_data: resume.resume_data.file_name,
+          },
+          score: resume.score,
+        }));
+        setScoredResumes({ [jobId]: response.data.scored_resumes_count || 0 });
+        setProfile(formattedProfiles);
+        setNoFilterProfiles(formattedProfiles);
+        setProfileLength(formattedProfiles.length);
+        if (formattedProfiles.length === 0) {
+          setError(t('noResumesFound')); // Set error only if no resumes are found
+        }
+      } else {
+        setError(t('invalidResponseFormat'));
+        setProfile([]);
+        setNoFilterProfiles([]);
+        setProfileLength(0);
+      }
+      setLoading(false);
+      dispatch(loaderOff());
+    } catch (err) {
+      console.error('Error fetching scored resumes:', err);
+      setError(t('failedToFetchScoredResumes'));
+      setProfile([]);
+      setNoFilterProfiles([]);
+      setProfileLength(0);
+      setLoading(false);
+      dispatch(loaderOff());
+      dispatch(openSnackbar(t('failedToFetchScoredResumes'), 'red'));
+    }
+  };
+
+  useEffect(() => {
+    fetchScoredResumes();
+  }, [jobId]);
 
   const handleProfile = async (jobIdParam: any) => {
-    console.log('Selected Job ID:', jobIdParam)
-
+    console.log('Selected Job ID:', jobIdParam);
     if (!jobIdParam) {
-      console.warn('No Job ID provided.')
-      setError('No Job ID provided.')
-      return
+      console.warn('No Job ID provided.');
+      setError('No Job ID provided.');
+      return;
     }
 
-    setLoading(true)
-    setError(null)
-    setCollection(jobIdParam)
+    setLoading(true);
+    setError(null);
+    setCollection(jobIdParam);
 
     try {
-      // Find the job in the jobs array
-      const selectedJob = jobs.find((job) => job.jobid === parseInt(jobIdParam))
-
+      const selectedJob = jobs.find((job) => job.jobid === parseInt(jobIdParam));
       if (!selectedJob) {
-        console.warn('No matching job found for the provided Job ID.')
-        setError('No matching job found for the provided Job ID.')
-        return
+        console.warn('No matching job found for the provided Job ID.');
+        setError('No matching job found for the provided Job ID.');
+        return;
       }
 
-      console.log('Selected Job:', selectedJob)
-      const resumeDataArray = selectedJob.resume_data || []
-
+      console.log('Selected Job:', selectedJob);
+      const resumeDataArray = selectedJob.resume_data || [];
       if (resumeDataArray.length === 0) {
-        console.warn('No resumes found for the selected job.')
-        setError('No resumes found for the selected job.')
-        setProfile([])
-        setNoFilterProfiles([])
-        return
+        console.warn('No resumes found for the selected job.');
+        setError('No resumes found for the selected job.');
+        setProfile([]);
+        setNoFilterProfiles([]);
+        return;
       }
 
-      // Extract all resume IDs from the job
-      const resumeIds = resumeDataArray.map((resume: any) => resume.id)
-      console.log('Resume IDs found:', resumeIds)
-      console.log('Total resumes to fetch:', resumeIds.length)
+      const resumeIds = resumeDataArray.map((resume: any) => resume.id);
+      console.log('Resume IDs found:', resumeIds);
+      console.log('Total resumes to fetch:', resumeIds.length);
 
-      // Fetch all resumes using getResumeById
-      const requestData = { resume_id: resumeIds }
-      const resumeResponse = await getResumeById(requestData)
-
+      const requestData = { resume_id: resumeIds };
+      const resumeResponse = await getResumeById(requestData);
       if (resumeResponse && Array.isArray(resumeResponse)) {
-        // The response structure might be different, let's handle both cases
-        const resumeData = resumeResponse.map((resume: any) => {
-          // If resume has resume_data property, use it, otherwise use the resume directly
-          return resume.resume_data || resume
-        })
-        console.log('Fetched Resume Data:', resumeData)
-
-        setProfile(resumeData)
-        setNoFilterProfiles(resumeData) // Set noFilterProfiles for search functionality
-        setProfileLength(resumeData.length)
+        const resumeData = resumeResponse.map((resume: any) => resume.resume_data || resume);
+        console.log('Fetched Resume Data:', resumeData);
+        setProfile(resumeData);
+        setNoFilterProfiles(resumeData);
+        setProfileLength(resumeData.length);
       } else {
-        console.error('Invalid response format from getResumeById')
-        setError('Invalid response format from server.')
-        setProfile([])
-        setNoFilterProfiles([])
+        console.error('Invalid response format from getResumeById');
+        setError('Invalid response format from server.');
+        setProfile([]);
+        setNoFilterProfiles([]);
       }
     } catch (error) {
-      console.error('Error fetching resumes for the selected job:', error)
-      setError('Failed to fetch resumes for the selected job.')
-      setProfile([])
-      setNoFilterProfiles([])
+      console.error('Error fetching resumes for the selected job:', error);
+      setError('Failed to fetch resumes for the selected job.');
+      setProfile([]);
+      setNoFilterProfiles([]);
     } finally {
-      setLoading(false)
+      setLoading(false);
     }
-  }
- useEffect(() => {
-  const fetchJobs = async () => {
-    setLoading(true)
-    try {
-      const response = await axios.get(`http://localhost:8082/user/read/${organisation}`, {
-        headers: {
-          Authorization: `Bearer ${token}`,
-        },
-      })
+  };
 
-      console.log('API response:', response.data)
-
-      // ✅ set jobs from job_description field
-      if (Array.isArray(response.data.job_description)) {
-        setJobs(response.data.job_description)
-      } else {
-        console.error('Unexpected response format:', response.data)
-        setError('Unexpected response format from server.')
+  useEffect(() => {
+    const fetchJobs = async () => {
+      setLoading(true);
+      try {
+        const response = await axios.get(`http://localhost:8082/user/read/${organisation}`, {
+          headers: {
+            Authorization: `Bearer ${token}`,
+          },
+        });
+        console.log('API response:', response.data);
+        if (Array.isArray(response.data.job_description)) {
+          setJobs(response.data.job_description);
+        } else {
+          console.error('Unexpected response format:', response.data);
+          setError('Unexpected response format from server.');
+        }
+      } catch (err) {
+        console.error('Error fetching jobs:', err);
+        setError('Failed to fetch job data.');
+      } finally {
+        setLoading(false);
       }
-    } catch (err) {
-      console.error('Error fetching jobs:', err)
-      setError('Failed to fetch job data.')
-    } finally {
-      setLoading(false)
-    }
-  }
+    };
+    fetchJobs();
+  }, []);
 
-  fetchJobs()
-}, [])
   const saveJdCollectionName = async (
     collectionName: string,
     resumeIds: any[],
     jobId: string,
     organisation: string,
   ) => {
-    const resumedata = resumeIds.map((id) => ({ id, status: 'accepted' }))
-    const Jobdata = {
-      resume_data: resumedata,
-    }
-    // dispatch(loaderOn())
+    const resumedata = resumeIds.map((id) => ({ id, status: 'accepted' }));
+    const Jobdata = { resume_data: resumedata };
     try {
-      const res = await putResume(jobId, Jobdata, organisation)
+      const res = await putResume(jobId, Jobdata, organisation);
       dispatch(
         openSnackbar(
-          `${t('storedResume')} ${resumeIds.length} ${t(
-            'resumesIn',
-          )} ${collectionName} ${t('jdCollectionBtn')}`,
+          `${t('storedResume')} ${resumeIds.length} ${t('resumesIn')} ${collectionName} ${t('jdCollectionBtn')}`,
           'green',
         ),
-      )
-      dispatch(loaderOff())
+      );
+      dispatch(loaderOff());
     } catch (error) {
-      console.error('Error storing resumes:', error)
-      // dispatch(loaderOff())
-      throw error
+      console.error('Error storing resumes:', error);
+      throw error;
     }
-  }
-
-
+  };
 
   const handleExpChange = (event: React.SyntheticEvent, newValue: any) => {
-    setSelectedExperience(newValue)
-  }
-  const autocompleteRef = useRef<HTMLInputElement | null>(null)
+    setSelectedExperience(newValue);
+  };
+
+  const autocompleteRef = useRef<HTMLInputElement | null>(null);
 
   useEffect(() => {
     if (jobId) {
-      handleProfile(jobId)
+      handleProfile(jobId);
     }
-  }, [jobId, jobs]) // Add jobs as dependency since handleProfile depends on it
+  }, [jobId, jobs]);
 
-  // Set noFilterProfiles when profile data is loaded
-
-
-  type CombinedData = Job | Collection
+  type CombinedData = Job | Collection;
   const combinedData: CombinedData[] = [
     ...jobs.map(
       (job): Job => ({
@@ -293,257 +319,208 @@ const token = localStorage.getItem('token')
         type: 'job',
       }),
     ),
-    
-  ]
+  ];
 
-  const classes = useStyles()
+  const classes = useStyles();
 
   const getAllCollection = async () => {
     try {
-      const response = await getUserDetails(organisation)
-      console.log('This is the response', response)
-      setUserId(response.user_id)
+      const response = await getUserDetails(organisation);
+      console.log('This is the response', response);
+      setUserId(response.user_id);
       const filteredJobs = response.job_description.filter(
         (job: any) => job.type === 'active' && job.deleteStatus !== 'deleted',
-      )
+      );
       const filteredCollections = response.collection.filter(
         (item: any) => item.deleteStatus !== 'deleted',
-      )
-      console.log('filteredJobs', filteredJobs)
-      setJobs(filteredJobs)
-      setCollectionNames(filteredCollections)
+      );
+      setJobs(filteredJobs);
+      setCollectionNames(filteredCollections);
     } catch (error) {
-      console.log('error' + error)
+      console.log('error' + error);
     }
-  }
+  };
 
- 
   const toggleSelectCandidate = (candidateId: any) => {
     setSelectedCandidates((prev: any) =>
       prev.includes(candidateId)
         ? prev.filter((id: any) => id !== candidateId)
         : [...prev, candidateId],
-    )
-  }
+    );
+  };
 
   const handleSelectAll = () => {
     if (selectAll) {
-      // Deselect all
-      setSelectedCandidates([])
-      setSelectAll(false)
+      setSelectedCandidates([]);
+      setSelectAll(false);
     } else {
-      // Select all resumes across all pages (not just current page)
       const allResumeIds = filteredData.map((candidate) => {
-        // Add null checks for candidate structure
-        if (!candidate) return null
-        return candidate?.resume_data?.id || candidate?.id
-      }).filter(id => id !== null && id !== undefined)
-      
-      console.log('Selecting all resumes:', allResumeIds.length, 'resume IDs:', allResumeIds)
-      setSelectedCandidates(allResumeIds)
-      setSelectAll(true)
+        if (!candidate) return null;
+        return candidate?.resume_data?.id || candidate?.id;
+      }).filter(id => id !== null && id !== undefined);
+      setSelectedCandidates(allResumeIds);
+      setSelectAll(true);
     }
-  }
+  };
 
-  // Function to select all resumes from original data (not filtered)
   const handleSelectAllResumes = () => {
     const allResumeIds = profile.map((candidate) => {
-      if (!candidate) return null
-      return candidate?.resume_data?.id || candidate?.id
-    }).filter(id => id !== null && id !== undefined)
-    
-    console.log('Selecting all resumes from original data:', allResumeIds.length, 'resume IDs:', allResumeIds)
-    setSelectedCandidates(allResumeIds)
-    setSelectAll(true)
-  }
+      if (!candidate) return null;
+      return candidate?.resume_data?.id || candidate?.id;
+    }).filter(id => id !== null && id !== undefined);
+    setSelectedCandidates(allResumeIds);
+    setSelectAll(true);
+  };
 
   const handleOpenModal = () => {
     if (selectedCandidates.length === 0) {
-      console.log('Please select at  one candidate')
-      // dispatch(
-      //   openSnackbar(
-      //     t('pleaseSelectAtLeastOneCandidateSnackbar'),
-      //     'light blue',
-      //   ),
-      // )
-      return
+      dispatch(openSnackbar(t('pleaseSelectAtLeastOneCandidateSnackbar'), 'light blue'));
+      return;
     }
-    setOpenModal(true)
-  }
+    setOpenModal(true);
+  };
+
   const handleLocChange = (event: React.SyntheticEvent, newValue: any) => {
-    setSelectedLoc(newValue)
-    // Log the current value of selectedExp
-  }
+    setSelectedLoc(newValue);
+  };
+
   const handleAddJobToCollection = async (jobId: number) => {
     try {
-      // Use selectedCandidates directly since they contain the resume IDs
-      const resumeIds = selectedCandidates.filter((id) => id !== null && id !== undefined)
-
+      const resumeIds = selectedCandidates.filter((id) => id !== null && id !== undefined);
       if (resumeIds.length === 0) {
-        console.warn('No valid resume IDs found for selected candidates.')
-        dispatch(openSnackbar('No valid resumes selected', 'red'))
-        return
+        dispatch(openSnackbar('No valid resumes selected', 'red'));
+        return;
       }
 
-      // Find the job title for the collection name
-      const selectedJob = jobs.find((job) => job.jobid === jobId)
-      const collectionName = selectedJob?.job_title || 'Unknown Job'
-
-      console.log(`Adding ${resumeIds.length} resumes to collection: ${collectionName}`)
-      console.log('Resume IDs:', resumeIds)
-
-      // Show loading message
-      dispatch(openSnackbar(`Adding ${resumeIds.length} resumes to collection...`, 'blue'))
-
-      // Call saveJdCollectionName with multiple resume IDs
-      await saveJdCollectionName(
-        collectionName,
-        resumeIds,
-        jobId.toString(),
-        organisation || '',
-      )
-
-      setOpenModal(false)
-      setSelectedCandidates([]) // Clear selected candidates after adding
-      setSelectAll(false) // Reset select all state
-      await getAllCollection() // Refresh collections
-      
-      // Show success message
-      dispatch(openSnackbar(`Successfully added ${resumeIds.length} resumes to collection: ${collectionName}`, 'green'))
-      console.log(`Successfully added ${resumeIds.length} resumes to collection: ${collectionName}`)
+      const selectedJob = jobs.find((job) => job.jobid === jobId);
+      const collectionName = selectedJob?.job_title || 'Unknown Job';
+      dispatch(openSnackbar(`Adding ${resumeIds.length} resumes to collection...`, 'blue'));
+      await saveJdCollectionName(collectionName, resumeIds, jobId.toString(), organisation || '');
+      setOpenModal(false);
+      setSelectedCandidates([]);
+      setSelectAll(false);
+      await getAllCollection();
+      dispatch(openSnackbar(`Successfully added ${resumeIds.length} resumes to collection: ${collectionName}`, 'green'));
     } catch (error) {
-      console.error('Error adding resumes to collection:', error)
-      dispatch(openSnackbar('Failed to add resumes to collection', 'red'))
+      console.error('Error adding resumes to collection:', error);
+      dispatch(openSnackbar('Failed to add resumes to collection', 'red'));
     }
-  }
+  };
+
   useEffect(() => {
     if (inputValue === null) {
-      setInputValue('')
+      setInputValue('');
     }
-  }, [inputValue])
-
+  }, [inputValue]);
 
   const handleCloseModal = () => {
-    setOpenModal(false)
-  }
+    setOpenModal(false);
+  };
 
   const colors = {
     green: '#dcfce7',
     blue: '#dbeafe',
     orange: '#fed7aa',
     yellow: '#fef3c7',
-  }
+  };
 
   const getInsightBadgeColor = (color: keyof typeof colors) => {
-    return colors[color] || colors.blue
-  }
+    return colors[color] || colors.blue;
+  };
 
   const getProfileInsights = (candidate: any) => {
     if (candidate.rating && candidate.rating > 4) {
-      return { insight: 'Top Candidate', color: 'green' }
+      return { insight: 'Top Candidate', color: 'green' };
     } else if (candidate.experience && parseInt(candidate.experience) > 3) {
-      return { insight: 'Lead Promising', color: 'blue' }
+      return { insight: 'Lead Promising', color: 'blue' };
     } else if (candidate.status === 'rejected') {
-      return { insight: 'Good to Reject', color: 'orange' }
+      return { insight: 'Good to Reject', color: 'orange' };
     } else if (candidate.followUp) {
-      return { insight: 'Follow Up Required', color: 'yellow' }
+      return { insight: 'Follow Up Required', color: 'yellow' };
     }
-    return { insight: 'Not Relevant', color: 'blue' }
-  }
+    return { insight: 'Not Relevant', color: 'blue' };
+  };
 
   const getInitials = (name: string) => {
     return name
       .split(' ')
       .map((n: string) => n[0])
       .join('')
-      .toUpperCase()
-  }
+      .toUpperCase();
+  };
 
-  const [selectedJobRole, setSelectedJobRole] = useState('')
-  const handleJobRole = (event: React.ChangeEvent<HTMLSelectElement>) => {
-    console.log('Job Role:', event.target.value)
-    setSelectedJobRole(event.target.value)
-  }
+  const [selectedJobRole, setSelectedJobRole] = useState('');
+  const handleJobRole = (event: any) => {
+    setSelectedJobRole(event.target.value);
+  };
 
-  const [selectedRangeExperience, setSelectedRangeExperience] = useState('')
+  const [selectedRangeExperience, setSelectedRangeExperience] = useState('');
   const [experienceRange, setExperienceRange] = useState<{
-    min: number
-    max: number
-  } | null>(null)
-  const handleRangeExperience = (
-    event: React.ChangeEvent<HTMLSelectElement>,
-  ) => {
-    const value = event.target.value
-    setSelectedRangeExperience(value)
+    min: number;
+    max: number;
+  } | null>(null);
+  const handleRangeExperience = (event: any) => {
+    const value = event.target.value;
+    setSelectedRangeExperience(value);
     if (value === '5+') {
-      setExperienceRange({ min: 5, max: Infinity })
+      setExperienceRange({ min: 5, max: Infinity });
     } else if (value.includes('-')) {
-      const [min, max] = value.split('-').map(Number)
-      setExperienceRange({ min, max })
+      const [min, max] = value.split('-').map(Number);
+      setExperienceRange({ min, max });
     } else {
-      setExperienceRange(null)
+      setExperienceRange(null);
     }
-  }
-  const [selectedDesignation, setSelectedDesignation] = useState<string | any>(
-    null,
-  )
+  };
+
+  const [selectedDesignation, setSelectedDesignation] = useState<string | any>(null);
 
   const handleReset = () => {
-    setSelectedDesignation('')
-    setSelectedExperience('')
-    setSelectedSkill([])
-    setSelectedLoc('')
-    setValue([])
-    setInputValue('')
-    setInputExpValue('')
-    setSelectedRole('')
-    setSelectedCandidates([])
-    setSelectAll(false)
-    setCurrentPage(1) // Reset to first page when filters are reset
-  }
+    setSelectedDesignation('');
+    setSelectedExperience('');
+    setSelectedSkill([]);
+    setSelectedLoc('');
+    setValue([]);
+    setInputValue('');
+    setInputExpValue('');
+    setSelectedRole('');
+    setSelectedCandidates([]);
+    setSelectAll(false);
+    setCurrentPage(1);
+  };
 
-  // Pagination functions
   const handlePageChange = (pageNumber: number) => {
-    setCurrentPage(pageNumber)
-  }
+    setCurrentPage(pageNumber);
+  };
 
-  const [selectedLocation, setSelectedLocation] = useState('')
-  const handleLocation = (event: React.ChangeEvent<HTMLSelectElement>) => {
-    console.log('Location:', event.target.value)
-    setSelectedLocation(event.target.value)
-  }
+  const [selectedLocation, setSelectedLocation] = useState('');
+  const handleLocation = (event: any) => {
+    setSelectedLocation(event.target.value);
+  };
 
-  const [selectedInterviewStatus, setSelectedInterviewStatus] = useState('')
-  const handleInterviewStatus = (
-    event: React.ChangeEvent<HTMLSelectElement>,
-  ) => {
-    console.log('Interview Status:', event.target.value)
-    setSelectedInterviewStatus(event.target.value)
-  }
+  const [selectedInterviewStatus, setSelectedInterviewStatus] = useState('');
+  const handleInterviewStatus = (event: any) => {
+    setSelectedInterviewStatus(event.target.value);
+  };
 
-  const [searchCandidate, setSearchCandidate] = useState('')
-  
-  // Search functionality
+  const [searchCandidate, setSearchCandidate] = useState('');
+
   const handleSearch = (value: string) => {
-    setSearchCandidate(value)
-  }
+    setSearchCandidate(value);
+  };
 
-  // Enhanced filter logic
   const filteredData = profile.filter((item) => {
-    // Name search
-    const name = item?.resume_data?.name || item?.name || ''
+    const name = item?.resume_data?.name || item?.name || '';
     const nameMatch = searchCandidate
       ? name.toLowerCase().includes(searchCandidate.toLowerCase())
-      : true
+      : true;
 
-    // Skill matching
-    const resumeSkills = item?.resume_data?.skills || item?.skills || []
+    const resumeSkills = item?.resume_data?.skills || item?.skills || [];
     const normalizedResumeSkills = resumeSkills.map((skill: any) =>
       typeof skill === 'string' ? skill.toLowerCase() : (skill?.name || skill?.skill || '').toLowerCase()
-    )
+    );
     const normalizedValue = value.length > 0
       ? value.map((skill: any) => skill.toLowerCase())
-      : []
+      : [];
     const skillMatch =
       normalizedValue.length === 0 ||
       normalizedValue.some(
@@ -552,61 +529,50 @@ const token = localStorage.getItem('token')
           normalizedResumeSkills.some((resumeSkill: any) =>
             resumeSkill.includes(skill)
           ),
-      )
+      );
 
-    // Experience matching
-    const experience = item?.resume_data?.experience_in_number || item?.experience_in_number
+    const experience = item?.resume_data?.experience_in_number || item?.experience_in_number;
     const expMatch = experienceRange
       ? experience >= experienceRange.min && experience <= experienceRange.max
-      : true
+      : true;
 
-    // Location matching
-    const location = item?.resume_data?.location || item?.location || ''
+    const location = item?.resume_data?.location || item?.location || '';
     const locMatch = selectedLocation
       ? location.toLowerCase().includes(selectedLocation.toLowerCase())
-      : true
+      : true;
 
-    // Designation/Resume_Category matching
-    const category = item?.resume_data?.Resume_Category || item?.Resume_Category || ''
+    const category = item?.resume_data?.Resume_Category || item?.Resume_Category || '';
     const desigMatch = selectedJobRole
       ? category.toLowerCase().includes(selectedJobRole.toLowerCase())
-      : true
+      : true;
 
-    // Status matching (based on candidate insights)
     const statusMatch = selectedInterviewStatus === 'Select Status' || !selectedInterviewStatus
       ? true
-      : getProfileInsights(item).insight === selectedInterviewStatus
+      : getProfileInsights(item).insight === selectedInterviewStatus;
 
-    return nameMatch && skillMatch && expMatch && locMatch && desigMatch && statusMatch
-  })
+    return nameMatch && skillMatch && expMatch && locMatch && desigMatch && statusMatch;
+  });
 
-  // Pagination functions that depend on filteredData
   const getCurrentPageResumes = () => {
-    const startIndex = (currentPage - 1) * resumesPerPage
-    const endIndex = startIndex + resumesPerPage
-    return filteredData.slice(startIndex, endIndex)
-  }
+    const startIndex = (currentPage - 1) * resumesPerPage;
+    const endIndex = startIndex + resumesPerPage;
+    return filteredData.slice(startIndex, endIndex);
+  };
 
-  const totalPages = Math.ceil(filteredData.length / resumesPerPage)
+  const totalPages = Math.ceil(filteredData.length / resumesPerPage);
 
-  // Helper function to get total filtered resumes count
   const getTotalFilteredResumes = () => {
-    return filteredData.length
-  }
+    return filteredData.length;
+  };
 
-  // Update selectAll state when individual selections change
   useEffect(() => {
-    // Get all resume IDs from filtered data (across all pages)
-    const allResumeIds = filteredData.map((candidate) => 
+    const allResumeIds = filteredData.map((candidate) =>
       candidate?.resume_data?.id || candidate?.id
-    ).filter(id => id !== null && id !== undefined)
-    
-    // Check if all resumes are selected
-    const allSelected = allResumeIds.length > 0 && 
-      allResumeIds.every(id => selectedCandidates.includes(id))
-    
-    setSelectAll(allSelected)
-  }, [selectedCandidates, filteredData])
+    ).filter(id => id !== null && id !== undefined);
+    const allSelected = allResumeIds.length > 0 &&
+      allResumeIds.every(id => selectedCandidates.includes(id));
+    setSelectAll(allSelected);
+  }, [selectedCandidates, filteredData]);
 
   const loc: any = [
     'Bengaluru',
@@ -616,47 +582,7 @@ const token = localStorage.getItem('token')
     'Ahmedabad',
     'Jaipur',
     'Lucknow',
-    // t('bengaluruCity'),
-    // t('hyderabadCity'),
-    // t('chennaiCity'),
-    // t('mumbaiCity'),
-    // t('ahmedabadCity'),
-    // t('jaipurCity'),
-    // t('lucknowCity'),
-  ]
-  // const exp: any = [
-  //   // '1-3',
-  //   // '2-5',
-  //   // '3-6',
-  //   // '6-8',
-  //   // '8-10',
-  //   // '10-12',
-  //   // '12-15',
-  //   // '15-18',
-  //   // '18-20',
-  //   t('oneToThree'),
-  //   t('twoToFive'),
-  //   t('threeToSix'),
-  //   t('sixToEigth'),
-  //   t('eightToTen'),
-  //   t('tenToTwelve'),
-  //   t('twelveToFifteen'),
-  //   t('fifteenToEighteen'),
-  //   t('eighteenToTwenty'),
-  // ]
-    const [selectedStatus, setSelectedStatus] = useState('Select Status');
-//     useEffect(() => {
-//     handleSkillChange()
-//   }, [selectedExperience, selectedLoc, value, selectedRole, inputValue])
-//   useEffect(() => {
-//     if (profile.length > 0 && noFilterProfiles.length === 0) {
-//       setNoFilterProfiles(profile)
-//     }
-//   }, [profile, noFilterProfiles.length])
-  // Reset to first page when filters change
-  useEffect(() => {
-    setCurrentPage(1)
-  }, [selectedExperience, selectedLoc, value, selectedRole, inputValue, selectedLocation, selectedJobRole, selectedInterviewStatus, searchCandidate, filteredData.length])
+  ];
 
   const exp: any = [
     '1-3',
@@ -668,39 +594,34 @@ const token = localStorage.getItem('token')
     '12-15',
     '15-18',
     '18-20',
-  ]
+  ];
+
   return (
     <div
       style={{
         fontFamily: 'Inter, -apple-system, BlinkMacSystemFont, sans-serif',
         backgroundColor: '#f8fafc',
         minHeight: '100vh',
-        // marginLeft: '140px',
         padding: '20px',
       }}
     >
-      {/* Header */}
       <Header
         title="JD Collection"
         userProfileImage={''}
         path="/jdcollection"
       />
-
-      {/* Filters */}
-
-     <div
+      <div
         style={{
           display: 'flex',
           justifyContent: 'space-between',
           flexDirection: 'row',
           padding: '10px',
-          gap: '4px', // Reduced gap to fit more elements
-          flexWrap: 'nowrap', // Prevent wrapping to keep in single line
-          overflowX: 'auto', // Allow horizontal scroll if needed
+          gap: '4px',
+          flexWrap: 'nowrap',
+          overflowX: 'auto',
           alignItems: 'center',
         }}
       >
-        {/* Name Search */}
         <div style={{ flex: '1 1 140px', minWidth: '120px', flexShrink: 0 }}>
           <TextField
             id="name-search"
@@ -709,7 +630,7 @@ const token = localStorage.getItem('token')
             placeholder="Search by name"
             value={searchCandidate}
             onChange={(e) => {
-              handleSearch(e.target.value)
+              handleSearch(e.target.value);
             }}
             style={{ width: '100%' }}
             InputProps={{
@@ -723,7 +644,7 @@ const token = localStorage.getItem('token')
                 background: '#ffffff',
                 justifyContent: 'center',
                 height: '38px',
-                direction: i18n.language === 'ar' ? 'rtl' : 'ltr',
+                direction: 'ltr',
               },
               startAdornment: (
                 <IconButton size="small">
@@ -733,8 +654,6 @@ const token = localStorage.getItem('token')
             }}
           />
         </div>
-
-        {/* Designation Search */}
         <div style={{ flex: '1 1 140px', minWidth: '120px', flexShrink: 0 }}>
           <TextField
             id="filled-basic"
@@ -743,7 +662,7 @@ const token = localStorage.getItem('token')
             placeholder={t('designation')}
             value={selectedRole}
             onChange={(e) => {
-              setSelectedRole(e.target.value)
+              setSelectedRole(e.target.value);
             }}
             style={{ width: '100%' }}
             inputRef={searchRef}
@@ -758,7 +677,7 @@ const token = localStorage.getItem('token')
                 background: '#ffffff',
                 justifyContent: 'center',
                 height: '38px',
-                direction: i18n.language === 'ar' ? 'rtl' : 'ltr',
+                direction: 'ltr',
               },
               startAdornment: (
                 <IconButton size="small">
@@ -768,37 +687,33 @@ const token = localStorage.getItem('token')
             }}
           />
         </div>
-
-        {/* Experience */}
         <div style={{ flex: '1 1 120px', minWidth: '100px', flexShrink: 0 }}>
           <select
             value={selectedExperience || ''}
             onChange={(e) => {
-              const value = e.target.value
-              setSelectedExperience(value)
-              setInputExpValue(value)
-              
-              // Set experience range based on selection
+              const value = e.target.value;
+              setSelectedExperience(value);
+              setInputExpValue(value);
               if (value === '1-3') {
-                setExperienceRange({ min: 1, max: 3 })
+                setExperienceRange({ min: 1, max: 3 });
               } else if (value === '2-5') {
-                setExperienceRange({ min: 2, max: 5 })
+                setExperienceRange({ min: 2, max: 5 });
               } else if (value === '3-6') {
-                setExperienceRange({ min: 3, max: 6 })
+                setExperienceRange({ min: 3, max: 6 });
               } else if (value === '6-8') {
-                setExperienceRange({ min: 6, max: 8 })
+                setExperienceRange({ min: 6, max: 8 });
               } else if (value === '8-10') {
-                setExperienceRange({ min: 8, max: 10 })
+                setExperienceRange({ min: 8, max: 10 });
               } else if (value === '10-12') {
-                setExperienceRange({ min: 10, max: 12 })
+                setExperienceRange({ min: 10, max: 12 });
               } else if (value === '12-15') {
-                setExperienceRange({ min: 12, max: 15 })
+                setExperienceRange({ min: 12, max: 15 });
               } else if (value === '15-18') {
-                setExperienceRange({ min: 15, max: 18 })
+                setExperienceRange({ min: 15, max: 18 });
               } else if (value === '18-20') {
-                setExperienceRange({ min: 18, max: 20 })
+                setExperienceRange({ min: 18, max: 20 });
               } else {
-                setExperienceRange(null)
+                setExperienceRange(null);
               }
             }}
             style={{
@@ -810,7 +725,7 @@ const token = localStorage.getItem('token')
               fontSize: '12px',
               backgroundColor: '#FFFFFF',
               cursor: 'pointer',
-              outline: 'none'
+              outline: 'none',
             }}
           >
             <option value="">Select Experience</option>
@@ -821,14 +736,12 @@ const token = localStorage.getItem('token')
             ))}
           </select>
         </div>
-
-        {/* Location */}
         <div style={{ flex: '1 1 120px', minWidth: '100px', flexShrink: 0 }}>
           <select
             value={selectedLocation}
             onChange={(e) => {
-              setSelectedLocation(e.target.value)
-              setInputLocValue(e.target.value)
+              setSelectedLocation(e.target.value);
+              setInputLocValue(e.target.value);
             }}
             style={{
               width: '100%',
@@ -839,7 +752,7 @@ const token = localStorage.getItem('token')
               fontSize: '12px',
               backgroundColor: '#FFFFFF',
               cursor: 'pointer',
-              outline: 'none'
+              outline: 'none',
             }}
           >
             <option value="">Select Location</option>
@@ -850,8 +763,6 @@ const token = localStorage.getItem('token')
             ))}
           </select>
         </div>
-
-        {/* Status */}
         <div style={{ flex: '1 1 120px', minWidth: '100px', flexShrink: 0 }}>
           <select
             value={selectedInterviewStatus}
@@ -865,7 +776,7 @@ const token = localStorage.getItem('token')
               fontSize: '12px',
               backgroundColor: '#FFFFFF',
               cursor: 'pointer',
-              outline: 'none'
+              outline: 'none',
             }}
           >
             <option value="">Select Status</option>
@@ -876,8 +787,6 @@ const token = localStorage.getItem('token')
             <option value="Not Relevant">Not Relevant</option>
           </select>
         </div>
-
-        {/* Skills */}
         <div style={{ flex: '1 1 140px', minWidth: '140px', flexShrink: 0 }}>
           <Autocomplete
             multiple
@@ -887,10 +796,10 @@ const token = localStorage.getItem('token')
             ref={autocompleteRef}
             inputValue={inputValue}
             onInputChange={(event, newInputValue) => {
-              setInputValue(newInputValue)
+              setInputValue(newInputValue);
             }}
             onChange={(event, newValue) => {
-              setValue(newValue)
+              setValue(newValue);
             }}
             renderTags={(tagValue, getTagProps) =>
               tagValue.map((option, index) => (
@@ -946,21 +855,19 @@ const token = localStorage.getItem('token')
             }}
           />
         </div>
-
-        {/* Clear Filters Button */}
         <div style={{ flex: '0 0 80px', flexShrink: 0 }}>
           <Button
             onClick={() => {
-              setSearchCandidate('')
-              setSelectedRole('')
-              setSelectedExperience(null)
-              setInputExpValue('')
-              setSelectedLocation('')
-              setInputLocValue('')
-              setSelectedInterviewStatus('')
-              setValue([])
-              setInputValue('')
-              setExperienceRange(null)
+              setSearchCandidate('');
+              setSelectedRole('');
+              setSelectedExperience(null);
+              setInputExpValue('');
+              setSelectedLocation('');
+              setInputLocValue('');
+              setSelectedInterviewStatus('');
+              setValue([]);
+              setInputValue('');
+              setExperienceRange(null);
             }}
             style={{
               color: '#FFFFFF',
@@ -976,24 +883,22 @@ const token = localStorage.getItem('token')
             Clear All
           </Button>
         </div>
-
-         <div style={{ flex: '1 1 90px', minWidth: '80px', flexShrink: 0 }}>
+        <div style={{ flex: '1 1 90px', minWidth: '80px', flexShrink: 0 }}>
           <input
             type="date"
             style={{
               width: '80%',
-              height: '38px', // Standardized height
+              height: '38px',
               padding: '0px 6px',
               border: '2px solid #0284C7',
               borderRadius: '10px',
               fontSize: '12px',
               backgroundColor: '#FFFFFF',
               cursor: 'pointer',
-              outline: 'none'
+              outline: 'none',
             }}
           />
         </div>
-        {/* Reset Button */}
         <div style={{ flex: '0 0 70px', flexShrink: 0 }}>
           <Button
             onClick={handleReset}
@@ -1011,11 +916,8 @@ const token = localStorage.getItem('token')
             Reset
           </Button>
         </div>
-
-        {/* Search Button */}
         <div style={{ flex: '0 0 80px', flexShrink: 0 }}>
           <Button
-            // onClick={handleSkillChange}
             style={{
               color: '#FFFFFF',
               backgroundColor: '#0284C7',
@@ -1034,8 +936,6 @@ const token = localStorage.getItem('token')
             Search
           </Button>
         </div>
-
-        {/* Select All */}
         <div style={{ flex: '0 0 80px', flexShrink: 0 }}>
           <button
             onClick={handleSelectAll}
@@ -1052,23 +952,20 @@ const token = localStorage.getItem('token')
               alignItems: 'center',
               justifyContent: 'center',
               gap: '4px',
-              color: selectAll ? '#FFFFFF' : '#000000'
+              color: selectAll ? '#FFFFFF' : '#000000',
             }}
           >
-            <input 
-              type="checkbox" 
+            <input
+              type="checkbox"
               checked={selectAll}
               onChange={handleSelectAll}
               style={{ margin: 0, transform: 'scale(0.8)' }}
             />
-            {selectAll 
-              ? `Deselect All (${selectedCandidates.length})` 
-              : `Select All (${getTotalFilteredResumes()})`
-            }
+            {selectAll
+              ? `Deselect All (${selectedCandidates.length})`
+              : `Select All (${getTotalFilteredResumes()})`}
           </button>
         </div>
-
-        {/* Select All Resumes (Original Data) */}
         {profile.length > filteredData.length && (
           <div style={{ flex: '0 0 100px', flexShrink: 0 }}>
             <button
@@ -1085,7 +982,7 @@ const token = localStorage.getItem('token')
                 display: 'flex',
                 alignItems: 'center',
                 justifyContent: 'center',
-                color: '#FFFFFF'
+                color: '#FFFFFF',
               }}
             >
               Select All ({profile.length})
@@ -1093,8 +990,6 @@ const token = localStorage.getItem('token')
           </div>
         )}
       </div>
-
-      {/* Filter Summary */}
       {(searchCandidate || selectedRole || selectedExperience || selectedLocation || selectedInterviewStatus || value.length > 0) && (
         <div
           style={{
@@ -1123,7 +1018,6 @@ const token = localStorage.getItem('token')
           </div>
         </div>
       )}
-
       <div
         style={{
           backgroundColor: 'white',
@@ -1135,16 +1029,11 @@ const token = localStorage.getItem('token')
         }}
         className="candidate-list"
       >
-        <div
-          style={{
-            paddingBottom: '6px', // Reduced from 10px
-          }}
-        >
-          {/* Selection Counter */}
+        <div style={{ paddingBottom: '6px' }}>
           {selectedCandidates.length > 0 && (
             <div
               style={{
-                padding: '6px 16px', // Reduced from 8px
+                padding: '6px 16px',
                 backgroundColor: '#dbeafe',
                 borderBottom: '1px solid #93c5fd',
                 fontSize: '12px',
@@ -1152,7 +1041,7 @@ const token = localStorage.getItem('token')
                 fontWeight: '500',
                 display: 'flex',
                 justifyContent: 'space-between',
-                alignItems: 'center'
+                alignItems: 'center',
               }}
             >
               <span>
@@ -1160,8 +1049,8 @@ const token = localStorage.getItem('token')
               </span>
               <button
                 onClick={() => {
-                  setSelectedCandidates([])
-                  setSelectAll(false)
+                  setSelectedCandidates([]);
+                  setSelectAll(false);
                 }}
                 style={{
                   background: 'none',
@@ -1169,16 +1058,14 @@ const token = localStorage.getItem('token')
                   color: '#1e40af',
                   fontSize: '11px',
                   cursor: 'pointer',
-                  textDecoration: 'underline'
+                  textDecoration: 'underline',
                 }}
               >
                 Clear Selection
               </button>
             </div>
           )}
-          
-          {/* Loading State */}
-          {loading && (
+{loading && (
             <div
               style={{
                 padding: '40px',
@@ -1190,9 +1077,7 @@ const token = localStorage.getItem('token')
               Loading resumes...
             </div>
           )}
-
-          {/* Error State */}
-          {error && !loading && (
+          {!loading && error && profile.length === 0 && (
             <div
               style={{
                 padding: '40px',
@@ -1212,7 +1097,7 @@ const token = localStorage.getItem('token')
                 {error}
               </div>
               <button
-                onClick={() => jobId && handleProfile(jobId)}
+                onClick={fetchScoredResumes}
                 style={{
                   marginTop: '12px',
                   padding: '8px 16px',
@@ -1228,37 +1113,20 @@ const token = localStorage.getItem('token')
               </button>
             </div>
           )}
-
-          {/* No Data State */}
-          {!loading && !error && profile.length === 0 && (
-            <div
-              style={{
-                padding: '40px',
-                textAlign: 'center',
-                color: '#6b7280',
-                fontSize: '16px',
-              }}
-            >
-              No resumes found for this job.
-            </div>
-          )}
-
-          {/* Resume List */}
-          {!loading && !error && profile.length > 0 && (
+          {!loading && profile.length > 0 && (
             getCurrentPageResumes().map((candidate, index) => (
               <div
                 key={candidate.id || index}
                 style={{
-                  height: '60px', // Reduced from 100px
-                  padding: '10px 16px', // Reduced top/bottom padding from 12px
+                  height: '60px',
+                  padding: '10px 16px',
                   borderBottom: index < getCurrentPageResumes().length - 1 ? '1px solid #e5e7eb' : 'none',
                   display: 'flex',
-                  gap: '10px', // Reduced from 12px
+                  gap: '10px',
                   alignItems: 'flex-start',
-                  overflow: 'hidden', // Prevent content overflow
+                  overflow: 'hidden',
                 }}
               >
-                {/* Checkbox */}
                 <input
                   type="checkbox"
                   checked={selectedCandidates.includes(
@@ -1275,8 +1143,6 @@ const token = localStorage.getItem('token')
                     flexShrink: 0,
                   }}
                 />
-
-                {/* Avatar */}
                 <div
                   style={{
                     width: '32px',
@@ -1294,10 +1160,7 @@ const token = localStorage.getItem('token')
                 >
                   {getInitials(candidate?.resume_data?.name || candidate?.name || 'NA')}
                 </div>
-
-                {/* Main Content */}
                 <div style={{ flex: 1, display: 'flex', gap: '16px', minWidth: 0 }}>
-                  {/* Left Column - Basic Info */}
                   <div style={{ flex: 1, minWidth: 0 }}>
                     <h3
                       style={{
@@ -1348,7 +1211,6 @@ const token = localStorage.getItem('token')
                     >
                       {candidate?.resume_data?.phone || candidate?.phone || 'N/A'}
                     </p>
-
                     <div
                       style={{
                         display: 'flex',
@@ -1378,7 +1240,6 @@ const token = localStorage.getItem('token')
                         </span>
                       </div>
                     </div>
-
                     <div style={{ display: 'flex', gap: '12px', fontSize: '10px' }}>
                       <button
                         style={{
@@ -1408,8 +1269,6 @@ const token = localStorage.getItem('token')
                       </button>
                     </div>
                   </div>
-
-                  {/* Key Skills Column */}
                   <div style={{ width: '100px', flexShrink: 0 }}>
                     <h4
                       style={{
@@ -1431,8 +1290,8 @@ const token = localStorage.getItem('token')
                       }}
                     >
                       {(candidate?.resume_data?.skills || candidate?.skills || [])
-                        .slice(0, 4) // Reduced to fit in 100px height
-                        .map((skill : any, idx : any) => (
+                        .slice(0, 4)
+                        .map((skill: any, idx: any) => (
                           <span
                             key={idx}
                             style={{
@@ -1462,8 +1321,6 @@ const token = localStorage.getItem('token')
                         ))}
                     </div>
                   </div>
-
-                  {/* Previous Interview Column */}
                   <div style={{ width: '80px', flexShrink: 0 }}>
                     <h4
                       style={{
@@ -1485,36 +1342,27 @@ const token = localStorage.getItem('token')
                         textOverflow: 'ellipsis',
                       }}
                     >
-                      {/* {candidate.previousInterview ||
-                        candidate.interviewHistory ||
-                        '-'} */}
+                      -
                     </p>
                   </div>
                 </div>
               </div>
             ))
           )}
-        </div>
-        
-        {/* Pagination and Add to Collection Controls */}
-        <div
+        </div>        <div
           style={{
             display: 'flex',
             justifyContent: 'space-between',
             alignItems: 'center',
-            padding: '12px 16px', // Reduced from 16px
+            padding: '12px 16px',
             borderTop: '1px solid #e5e7eb',
-            backgroundColor: '#f9fafb'
+            backgroundColor: '#f9fafb',
           }}
         >
-          {/* Pagination Info */}
           <div style={{ fontSize: '12px', color: '#6b7280' }}>
             Showing {((currentPage - 1) * resumesPerPage) + 1} to {Math.min(currentPage * resumesPerPage, filteredData.length)} of {filteredData.length} resumes
           </div>
-
-          {/* Pagination Controls */}
           <div style={{ display: 'flex', alignItems: 'center', gap: '6px' }}>
-            {/* Previous Page Button */}
             <button
               onClick={() => handlePageChange(currentPage - 1)}
               disabled={currentPage === 1}
@@ -1526,16 +1374,14 @@ const token = localStorage.getItem('token')
                 borderRadius: '6px',
                 fontSize: '12px',
                 cursor: currentPage === 1 ? 'not-allowed' : 'pointer',
-                fontWeight: '500'
+                fontWeight: '500',
               }}
             >
               Previous
             </button>
-
-            {/* Page Numbers */}
             <div style={{ display: 'flex', gap: '2px' }}>
               {Array.from({ length: Math.min(5, totalPages) }, (_, i) => {
-                let pageNumber : any;
+                let pageNumber: any;
                 if (totalPages <= 5) {
                   pageNumber = i + 1;
                 } else if (currentPage <= 3) {
@@ -1545,7 +1391,6 @@ const token = localStorage.getItem('token')
                 } else {
                   pageNumber = currentPage - 2 + i;
                 }
-
                 return (
                   <button
                     key={pageNumber}
@@ -1559,7 +1404,7 @@ const token = localStorage.getItem('token')
                       fontSize: '12px',
                       cursor: 'pointer',
                       fontWeight: '500',
-                      minWidth: '28px'
+                      minWidth: '28px',
                     }}
                   >
                     {pageNumber}
@@ -1567,8 +1412,6 @@ const token = localStorage.getItem('token')
                 );
               })}
             </div>
-
-            {/* Next Page Button */}
             <button
               onClick={() => handlePageChange(currentPage + 1)}
               disabled={currentPage === totalPages}
@@ -1580,17 +1423,15 @@ const token = localStorage.getItem('token')
                 borderRadius: '6px',
                 fontSize: '12px',
                 cursor: currentPage === totalPages ? 'not-allowed' : 'pointer',
-                fontWeight: '500'
+                fontWeight: '500',
               }}
             >
               Next
             </button>
-
-            {/* Add to Collection Button */}
             <button
               aria-label="Add selected candidates to collection"
               style={{
-                padding: '6px 14px', // Reduced from 8px 16px
+                padding: '6px 14px',
                 backgroundColor: selectedCandidates.length > 0 ? '#0284C7' : '#9CA3AF',
                 color: 'white',
                 border: 'none',
@@ -1598,21 +1439,19 @@ const token = localStorage.getItem('token')
                 fontSize: '12px',
                 fontWeight: '500',
                 cursor: selectedCandidates.length > 0 ? 'pointer' : 'not-allowed',
-                marginLeft: '10px', // Reduced from 12px
-                whiteSpace: 'nowrap'
+                marginLeft: '10px',
+                whiteSpace: 'nowrap',
               }}
               onClick={selectedCandidates.length > 0 ? handleOpenModal : undefined}
               onKeyDown={(e) => e.key === 'Enter' && selectedCandidates.length > 0 && handleOpenModal()}
             >
-              {selectedCandidates.length > 0 
+              {selectedCandidates.length > 0
                 ? `${t('addCollectionBtn')} (${selectedCandidates.length})`
-                : t('addCollectionBtn')
-              }
+                : t('addCollectionBtn')}
             </button>
           </div>
         </div>
       </div>
-
       <Modal
         open={openModal}
         onClose={handleCloseModal}
@@ -1642,8 +1481,6 @@ const token = localStorage.getItem('token')
           >
             {t('selectJobTitle')}
           </h2>
-          
-          {/* Selection Summary */}
           <div
             style={{
               padding: '12px',
@@ -1664,7 +1501,6 @@ const token = localStorage.getItem('token')
               )}
             </div>
           </div>
-
           {jobs.length === 0 ? (
             <p style={{ color: '#6b7280' }}>No active jobs available.</p>
           ) : (
@@ -1687,7 +1523,7 @@ const token = localStorage.getItem('token')
                   }
                   .job-list::-webkit-scrollbar-thumb {
                     background: #9ca3af;
-                    border-radius: 4px;
+                    borderRadius: 4px;
                   }
                   .job-list::-webkit-scrollbar-thumb:hover {
                     background: #6b7280;
@@ -1720,8 +1556,7 @@ const token = localStorage.getItem('token')
         </Box>
       </Modal>
     </div>
-  )
-}
+  );
+};
 
-export default JdProfile
-
+export default JdProfile;

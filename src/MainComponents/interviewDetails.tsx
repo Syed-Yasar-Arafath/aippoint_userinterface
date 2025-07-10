@@ -184,6 +184,7 @@ import {
 import { Trash2, Edit2 } from 'lucide-react'
 import { useParams } from 'react-router-dom'
 import axios from 'axios'
+import Header from '../CommonComponents/topheader'
 
 // Interfaces
 interface Question {
@@ -331,6 +332,13 @@ const InterviewDetails: React.FC = () => {
 
   // if (!candidate) return <Typography>Loading candidate details...</Typography>
   return (
+    <>
+     <Header
+                          // title="Collection"
+                          title='Interview Details'
+                          // userProfileImage={userProfileImage}
+                          path=""
+                      />
     <Box
       sx={{
         maxWidth: '1100px',
@@ -840,6 +848,7 @@ const InterviewDetails: React.FC = () => {
         </Box>
       </Box>
     </Box>
+    </>
   )
 }
 

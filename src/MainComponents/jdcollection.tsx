@@ -527,6 +527,7 @@ import { loaderOff, loaderOn, openSnackbar } from '../redux/actions'
 import { t } from 'i18next'
 import { useDispatch, useSelector } from 'react-redux'
 import { useTranslation } from 'react-i18next';
+import Header from '../CommonComponents/topheader'
 
 interface Job {
   jobid: number
@@ -915,6 +916,13 @@ const JdCollection: React.FC = () => {
   )
 
   return (
+    <>
+     <Header
+                      // title="Collection"
+                      title='JD Collection'
+                      // userProfileImage={userProfileImage}
+                      path=""
+                  />
     <div style={{ padding: '35px', maxWidth: '1280px', margin: '0 auto' }}>
       {/* Filters */}
       {/* <Grid container spacing={2} alignItems="center" wrap="nowrap" sx={{ overflowX: 'auto', mb: 2 }}>
@@ -1099,6 +1107,7 @@ const JdCollection: React.FC = () => {
         </Grid>
       </Grid>
     </div>
+    </>
   )
 }
 

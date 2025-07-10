@@ -41,6 +41,7 @@ import {
 } from 'lucide-react'
 import { useNavigate } from 'react-router-dom'
 import axios from 'axios'
+import Header from '../CommonComponents/topheader'
 
 // Enhanced candidate type with resume details
 export interface Candidate {
@@ -348,6 +349,12 @@ const UpcomingInterview: React.FC = () => {
 
   return (
     <LocalizationProvider dateAdapter={AdapterDateFns}>
+       <Header
+                            // title="Collection"
+                            title='Upcoming Interview'
+                            // userProfileImage={userProfileImage}
+                            path=""
+                        />
       <Container style={{ paddingTop: '20px' }}>
         {/* Search and Filter Section */}
         <Grid container spacing={2} sx={{ mb: 3 }}>

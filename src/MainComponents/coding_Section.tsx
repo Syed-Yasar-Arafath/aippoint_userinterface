@@ -778,38 +778,37 @@ const { t } = useTranslation();
 
   const id = objId
 
-  useEffect(() => {
-    // if (!id) return
-    if (!id || hasFetched.current) return
+ useEffect(() => {
+  if (!id || hasFetched.current) return;
 
-    const fetchData = async () => {
-      const organisation: any = localStorage.getItem('organisation')
-      try {
-        const response = await fetch(
-          `${process.env.REACT_APP_DJANGO_PYTHON_MODULE_SERVICE}/get_interview_data/`,
-          {
-            method: 'POST',
-            headers: {
-              'Content-Type': 'application/x-www-form-urlencoded',
-              Organization: organisation,
-            },
-            body: new URLSearchParams({ object_id: id }),
+  const fetchData = async () => {
+    const organisation = localStorage.getItem('organisation');
+    try {
+      const response = await axios.post(
+        `${process.env.REACT_APP_DJANGO_PYTHON_MODULE_SERVICE}/get_interview_data/`,
+        { object_id: objId },
+        {
+          headers: {
+            'Content-Type': 'application/json',
+            organization: organisation,
           },
-        )
+        },
+      );
 
-        const result = await response.json()
-        const codingQuestions = result.data.questions.map(
-          (que: any) => que.problem_statement,
-        )
-        console.log('debugging:', codingQuestions)
-        setCodingQuestions(codingQuestions)
-      } catch (error) {
-        console.log('Failed to fetch data')
-      }
+      // Access the questions array from response.data.data.questions
+      const codingQuestions = response.data.data.questions.map(
+        (que: any) => que.problem_statement,
+      );
+      console.log('debugging:', codingQuestions);
+      setCodingQuestions(codingQuestions);
+      hasFetched.current = true; // Set to prevent duplicate fetches
+    } catch (error) {
+      console.error('Failed to fetch interview data:', error);
     }
+  };
 
-    fetchData()
-  }, [id])
+  fetchData();
+}, [id, objId]); // Include objId in dependencies if it's different from id
   useEffect(() => {
     let interval = 5000
     const maxInterval = 3000

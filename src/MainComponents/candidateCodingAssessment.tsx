@@ -131,133 +131,120 @@ function CandidateCodingAssessment() {
         }
     };
 
-    useEffect(() => {
-        const fetchInterviewData = async () => {
-            const organisation = localStorage.getItem('organisation');
-            try {
-                const response = await axios.post("http://localhost:8000/get_interview_data/", {
-                    object_id: objectId,
-                }, {
-                    headers: {
-                        "Content-Type": "application/json",
-                        Organization: organisation || ''
-                    }
-                });
-                // const response = await axios.post(
-                //     "http://localhost:8000/get_interview_data/",
-                //     new URLSearchParams({
-                //         object_id: objectId,
-                //     }),
-                //     {
-                //         headers: {
-                //             "Content-Type": "application/x-www-form-urlencoded",
-                //             Organization: organisation || ''
-                //         }
-                //     }
-                // );
+ useEffect(() => {
+    const fetchInterviewData = async () => {
+        const organisation = localStorage.getItem('organisation');
+        try {
+            const response = await axios.post("http://localhost:8000/get_interview_data/", {
+                object_id: objectId,
+            }, {
+                headers: {
+                    "Content-Type": "application/json",
+                    Organization: organisation || ''
+                }
+            });
 
-                const report = response.data.data
-                console.log("Interview Data:", report);
+            const report = response.data.data
+            console.log("Interview Data:", report);
 
-                setQuestions(report.questions);
-                setCodeAnalysis(report.code_analysis)
+            setQuestions(report.questions);
+            setCodeAnalysis(report.code_analysis)
 
-                setInterviewData(report)
+            setInterviewData(report)
 
-                // ✅ Default selection logic
-                if (report.questions.length > 0) {
-                    const firstTitle = report.questions[0].title;
-                    setSelectedTitle(firstTitle);
+            // ✅ Default selection logic
+            if (report.questions.length > 0) {
+                const firstTitle = report.questions[0].title;
+                setSelectedTitle(firstTitle);
 
-                    // Try to match code_analysis with this question
-                    const matched = report.code_analysis.find(
-                        (item: any) =>
-                            item.question.trim().toLowerCase() ===
-                            report.questions[0].problem_statement.trim().toLowerCase()
-                    );
+                // Try to match code_analysis with this question
+                const matched = report.code_analysis.find(
+                    (item: any) =>
+                        item.question.trim().toLowerCase() ===
+                        report.questions[0].problem_statement.trim().toLowerCase()
+                );
 
-                    if (matched) {
-                        setMatchedAnswer(matched.answer);
-                        setMatchedQuestion(matched.question);
+                if (matched) {
+                    setMatchedAnswer(matched.answer);
+                    setMatchedQuestion(matched.question);
 
-                        const metrics = matched.analysis?.assessment_metrics;
+                    const metrics = matched.analysis?.assessment_metrics;
 
-                        if (metrics) {
-                            const skillValue = {
-                                Correctness: metrics.correctness_score,
-                                Time_Comple: metrics.time_complexity_score,
-                                Space_Compl: metrics.space_complexity_score,
-                                Error_Report: metrics.error_report_percentage,
-                            };
-                            setMatchedMetrics(skillValue);
-                        } else {
-                            // Optional: clear skill values if missing
-                            setMatchedMetrics({});
-                        }
-
+                    if (metrics) {
+                        const skillValue = {
+                            Correctness: metrics.correctness_score,
+                            Time_Comple: metrics.time_complexity_score,
+                            Space_Compl: metrics.space_complexity_score,
+                            Error_Report: metrics.error_report_percentage,
+                        };
+                        setMatchedMetrics(skillValue);
                     } else {
-                        setMatchedAnswer('');
-                        setMatchedQuestion('');
                         setMatchedMetrics({});
                     }
+                } else {
+                    setMatchedAnswer('');
+                    setMatchedQuestion('');
+                    setMatchedMetrics({});
                 }
-
-                // ✅ PROCTORING
-                const proctoringTemplate = [
-                    { key: "identity_verification", heading: "Identity Verification", icon: <AccountCircleIcon /> },
-                    { key: "multiple_face_result", heading: "Multiple Faces Detection", icon: <FaceRetouchingNaturalIcon /> },
-                    { key: "noise_detection_result", heading: "Background Noise", icon: <GraphicEqIcon /> },
-                    { key: "tab_switching", heading: "Tab Switching Detected", icon: <TabIcon /> },
-                    { key: "eye_movement", heading: "Eye Movement Analysis", icon: <VisibilityIcon /> },
-                ];
-
-                const proctoring_formatted_data = proctoringTemplate.map(item => {
-                    let text = 'Not Available';
-
-                    switch (item.key) {
-                        case "identity_verification":
-                            text = report.identity_verification?.identity === "true" ? "Successfully completed" : "Failed";
-                            break;
-
-                        case "multiple_face_result":
-                            text = report.multiple_face_result?.Multiple_faces_detected_frames > 1 ? "Yes, detected" : "No faces detected";
-                            break;
-
-                        case "noise_detection_result":
-                            text = report.noise_detection_result?.external_voice_analysis?.external_voice_detected === "true" ? "Yes, detected" : "Minimal";
-                            break;
-
-                        case "tab_switching":
-                            text = report.tab_switching?.tab === "true" ? "Yes, detected" : "No major issues";
-                            break;
-
-                        case "eye_movement":
-                            const percentStr = report.eye_movement?.sustained_eye_contact || "0%";
-                            const percentNum = Math.round(parseFloat(percentStr.replace('%', '')));
-                            text =
-                                percentNum > 50
-                                    ? `Normal, No excessive sideways glances`
-                                    : `Abnormal, excessive sideways glances detected`;
-                            break;
-
-                        default:
-                            break;
-                    }
-                    return {
-                        icon: item.icon,
-                        heading: item.heading,
-                        text: text
-                    };
-                });
-
-                setProctoringDetails(proctoring_formatted_data);
-            } catch (error) {
-                console.log('Error')
             }
-        };
 
-        fetchInterviewData();
-    }, []);
+            // ✅ PROCTORING
+            const proctoringTemplate = [
+                { key: "identity_verification", heading: "Identity Verification", icon: <AccountCircleIcon /> },
+                { key: "multiple_face_result", heading: "Multiple Faces Detection", icon: <FaceRetouchingNaturalIcon /> },
+                { key: "noise_detection_result", heading: "Background Noise", icon: <GraphicEqIcon /> },
+                { key: "tab_switching", heading: "Tab Switching Detected", icon: <TabIcon /> },
+                { key: "eye_movement", heading: "Eye Movement Analysis", icon: <VisibilityIcon /> },
+            ];
+
+            const proctoring_formatted_data = proctoringTemplate.map(item => {
+                let text = 'Not Available';
+
+                switch (item.key) {
+                    case "identity_verification":
+                        text = report.identity_verification?.identity === "true" ? "Successfully completed" : "Failed";
+                        break;
+
+                    case "multiple_face_result":
+                        text = report.multiple_face_result?.Multiple_faces_detected_frames > 1 ? "Yes, detected" : "No faces detected";
+                        break;
+
+                    case "noise_detection_result":
+                        text = report.noise_detection_result?.external_voice_analysis?.external_voice_detected === "true" ? "Yes, detected" : "Minimal";
+                        break;
+
+                    case "tab_switching":
+                        text = report.tab_switching?.tab === "true" ? "Yes, detected" : "No major issues";
+                        break;
+
+                    case "eye_movement": {
+                        const percentStr = report.eye_movement?.sustained_eye_contact || "0%";
+                        const percentNum = Math.round(parseFloat(percentStr.replace('%', '')));
+                        text =
+                            percentNum > 50
+                                ? `Normal, No excessive sideways glances`
+                                : `Abnormal, excessive sideways glances detected`;
+                        break;
+                    }
+
+                    default:
+                        break;
+                }
+                return {
+                    icon: item.icon,
+                    heading: item.heading,
+                    text: text
+                };
+            });
+
+            setProctoringDetails(proctoring_formatted_data);
+        } catch (error) {
+            console.log('Error', error);
+        }
+    };
+
+    fetchInterviewData();
+}, []);
 
     const downloadPDF = async (objectId: string) => {
         try {

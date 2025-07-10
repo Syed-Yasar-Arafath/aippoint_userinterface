@@ -234,7 +234,7 @@ function SignIn() {
   }, [email])
 
   localStorage.setItem('organisation', temporg)
-  
+
   const organisation = localStorage.getItem('organisation')
   console.log('orggggg', organisation)
   const handleSignIn = async (e: React.MouseEvent) => {
@@ -268,14 +268,15 @@ function SignIn() {
           // dispatch(openSnackbar(t('accountNotActivatedSnackbar'), 'red'))
         } else if (res.length >= 50) {
           localStorage.setItem('token', res)
-          localStorage.setItem('email',email)
+          localStorage.setItem('email', email)
           dispatch(updateToken('login successful'))
           dispatch(openSnackbar('User logged In successfully', 'dodgerblue'))
           // dispatch(updateToken(t('loginSuccessfulSnackbar')))
           // dispatch(openSnackbar(t('userLoggedInSnackbar'), 'dodgerblue'))
-          navigate('/RecruitmentDashboard')
- fetchDiagnostic()
-    sendOrg(organisation);
+          // navigate('/RecruitmentDashboard')
+          navigate('/uploadCV')
+          fetchDiagnostic()
+          sendOrg(organisation);
         } else if (
           res.data === 'User not found' ||
           res.data === 'Invalid username or password'
@@ -440,9 +441,9 @@ function SignIn() {
   const handleClickShowPassword = () => {
     setShowPassword(!showPassword)
   }
-const [keepLoggedIn, setKeepLoggedIn] = useState(false)
+  const [keepLoggedIn, setKeepLoggedIn] = useState(false)
 
-//code to send organisation
+  //code to send organisation
 
   const sendOrg = async (dbName: any) => {
     try {
@@ -461,23 +462,23 @@ const [keepLoggedIn, setKeepLoggedIn] = useState(false)
     }
   }
   const fetchDiagnostic = async () => {
-      try {
-        // Call the Django diagnostic endpoint using an absolute URL.
-        const response = await fetch(
-          `${process.env.REACT_APP_DJANGO_PYTHON_MODULE_SERVICE}/diagnostic/?org=${organisation}`,
-        )
-        if (!response.ok) {
-          throw new Error(`HTTP error: ${response.status}`)
-        }
-        const data = await response.json()
-        // setActiveDatabase(data.active_database);
-      } catch (err: any) {
-        setError(err.message)
+    try {
+      // Call the Django diagnostic endpoint using an absolute URL.
+      const response = await fetch(
+        `${process.env.REACT_APP_DJANGO_PYTHON_MODULE_SERVICE}/diagnostic/?org=${organisation}`,
+      )
+      if (!response.ok) {
+        throw new Error(`HTTP error: ${response.status}`)
       }
+      const data = await response.json()
+      // setActiveDatabase(data.active_database);
+    } catch (err: any) {
+      setError(err.message)
     }
+  }
 
-   
-  
+
+
 
   return (
     // <div style={{ background: '#FFFFFF', overflowY: 'hidden' }}>
@@ -558,7 +559,7 @@ const [keepLoggedIn, setKeepLoggedIn] = useState(false)
     //           color: '#1C1C1E',
     //           paddingTop:'11px',
     //         }}>Login to access your dashboard, manage job descriptions, assessments, and candidate interactions.</Typography>
-          
+
     //       <div>
     //         <p style={labels}>
     //           Email
@@ -778,181 +779,181 @@ const [keepLoggedIn, setKeepLoggedIn] = useState(false)
     // </div>
     <Box sx={{ display: 'flex', minHeight: '100vh' }}>
       {/* Left image */}
-      <Grid container spacing={0} sx={{paddingTop:'11px',paddingLeft:'9px'}}>
-      <Grid item lg={6}>
-      <Box
-        sx={{
-          // flex: 1,
-          // display: { xs: 'none', md: 'flex' },
-          // justifyContent: 'center',
-          // alignItems: 'center',
-          backgroundColor: '#fff',
-        }}
-      >
-        <img
-          src="/assets/static/images/logimg.png"
-          alt="login"
-          style={{
-            width: '100%',
-            height: '95vh',
-            
-            
-          }}
-        />
-      </Box>
-      </Grid>
-
-      {/* Right login form */}
-      <Grid item lg={5}>
-      <Box
-        sx={{
-          flex: 1,
-          display: 'flex',
-          flexDirection: 'column',
-          justifyContent: 'center',
-          alignItems: 'center',
-          px: 4,
-          py: 6,
-          backgroundColor: '#fff',
-        }}
-      >
-        <Box sx={{ width: '100%', maxWidth: 400 }}>
-          <img
-            src="/assets/static/images/aippointlogo.png"
-            alt="logo"
-            style={{ height: '57px', width: '198.79px', marginBottom: 24 }}
-          />
-          <Typography fontSize={14} fontWeight={500} color="#0284C7">
-            Welcome Back!
-          </Typography>
-          <Typography fontSize={12} fontWeight={400} mt={1} color="#1C1C1E">
-            Login to access your dashboard, manage job descriptions, assessments, and candidate interactions.
-          </Typography>
-
-          {/* Email */}
-          <Typography mt={3} fontSize={16} color="#0A0B5C" fontWeight={300}>
-            Email
-          </Typography>
-          <TextField
-            fullWidth
-            name="email"
-            placeholder="Your email"
-            variant="outlined"
-            size='small'
-            value={formValues.email.value}
-            onChange={(e) => {
-              setEmail(e.target.value)
-              handleChange(e)
-            }}
-            error={formValues.email.error}
-            sx={{ mt: 1, mb: 1 }}
-            InputProps={{
-              startAdornment: (
-                <InputAdornment position="start">
-                  <EmailIcon />
-                </InputAdornment>
-              ),
-            }}
-          />
-           {formValues.email.error && (
-              <Typography variant="body2" color="error">
-                {formValues.email.errorMessage}
-              </Typography>
-            )}
-
-          {/* Password */}
-          <Typography fontSize={16} color="#0A0B5C" fontWeight={300}>
-            Password
-          </Typography>
-          <TextField
-            fullWidth
-            name="password"
-            size='small'
-            type={showPassword ? 'text' : 'password'}
-            placeholder="Enter password"
-            variant="outlined"
-            value={formValues.password.value}
-            onChange={handleChange}
-            error={formValues.password.error}
-            sx={{ mt: 1 }}
-            InputProps={{
-              startAdornment: (
-                <InputAdornment position="start">
-                  <LockIcon />
-                </InputAdornment>
-              ),
-              endAdornment: (
-                <InputAdornment position="end">
-                  <IconButton onClick={handleClickShowPassword}>
-                    {showPassword ? <Visibility /> : <VisibilityOff />}
-                  </IconButton>
-                </InputAdornment>
-              ),
-            }}
-          />
-           {formValues.password.error && (
-              <Typography variant="body2" color="error">
-                {formValues.password.errorMessage.slice(0, 35)}
-                {/* <br /> */}
-                {formValues.password.errorMessage.slice(35, 70)}
-                {/* <br /> */}
-                {formValues.password.errorMessage.slice(70)}
-              </Typography>
-            )}
-
-          {/* Forgot Password */}
-         <Box
-            display="flex"
-            justifyContent="space-between"
-            alignItems="center"
-            mt={2}
-          >
-            <FormControlLabel
-              control={
-                <Checkbox
-                  checked={keepLoggedIn}
-                  onChange={(e) => setKeepLoggedIn(e.target.checked)}
-                  sx={{
-                    color: '#0A0B5C',
-                    '&.Mui-checked': {
-                      color: '#0284C7',
-                    },
-                  }}
-                />
-              }
-              label={
-                <Typography fontSize={14} color="#0A0B5C">
-                  Keep me logged in
-                </Typography>
-              }
-            />
-
-            <Link
-              to="/forgotpassword_ai"
-              style={{ fontSize: 14, color: '#E33629', textDecoration: 'none' }}
-            >
-              Forgot Password?
-            </Link>
-          </Box>
-
-          {/* Submit */}
-          <Button
-            fullWidth
-            variant="contained"
+      <Grid container spacing={0} sx={{ paddingTop: '11px', paddingLeft: '9px' }}>
+        <Grid item lg={6}>
+          <Box
             sx={{
-              backgroundColor: '#0284C7',
-              color: '#fff',
-              mt: 3,
-              textTransform: 'none',
-              '&:hover': { backgroundColor: '#0369a1' },
+              // flex: 1,
+              // display: { xs: 'none', md: 'flex' },
+              // justifyContent: 'center',
+              // alignItems: 'center',
+              backgroundColor: '#fff',
             }}
-            onClick={handleSignIn}
           >
-            Login
-          </Button>
-        </Box>
-      </Box>
-      </Grid>
+            <img
+              src="/assets/static/images/logimg.png"
+              alt="login"
+              style={{
+                width: '100%',
+                height: '95vh',
+
+
+              }}
+            />
+          </Box>
+        </Grid>
+
+        {/* Right login form */}
+        <Grid item lg={5}>
+          <Box
+            sx={{
+              flex: 1,
+              display: 'flex',
+              flexDirection: 'column',
+              justifyContent: 'center',
+              alignItems: 'center',
+              px: 4,
+              py: 6,
+              backgroundColor: '#fff',
+            }}
+          >
+            <Box sx={{ width: '100%', maxWidth: 400 }}>
+              <img
+                src="/assets/static/images/aippointlogo.png"
+                alt="logo"
+                style={{ height: '57px', width: '198.79px', marginBottom: 24 }}
+              />
+              <Typography fontSize={14} fontWeight={500} color="#0284C7">
+                Welcome Back!
+              </Typography>
+              {/* <Typography fontSize={12} fontWeight={400} mt={1} color="#1C1C1E">
+                Login to access your dashboard, manage job descriptions, assessments, and candidate interactions.
+              </Typography> */}
+
+              {/* Email */}
+              <Typography mt={3} fontSize={16} color="#0A0B5C" fontWeight={300}>
+                Email
+              </Typography>
+              <TextField
+                fullWidth
+                name="email"
+                placeholder="Your email"
+                variant="outlined"
+                size='small'
+                value={formValues.email.value}
+                onChange={(e) => {
+                  setEmail(e.target.value)
+                  handleChange(e)
+                }}
+                error={formValues.email.error}
+                sx={{ mt: 1, mb: 1 }}
+                InputProps={{
+                  startAdornment: (
+                    <InputAdornment position="start">
+                      <EmailIcon />
+                    </InputAdornment>
+                  ),
+                }}
+              />
+              {formValues.email.error && (
+                <Typography variant="body2" color="error">
+                  {formValues.email.errorMessage}
+                </Typography>
+              )}
+
+              {/* Password */}
+              <Typography fontSize={16} color="#0A0B5C" fontWeight={300}>
+                Password
+              </Typography>
+              <TextField
+                fullWidth
+                name="password"
+                size='small'
+                type={showPassword ? 'text' : 'password'}
+                placeholder="Enter password"
+                variant="outlined"
+                value={formValues.password.value}
+                onChange={handleChange}
+                error={formValues.password.error}
+                sx={{ mt: 1 }}
+                InputProps={{
+                  startAdornment: (
+                    <InputAdornment position="start">
+                      <LockIcon />
+                    </InputAdornment>
+                  ),
+                  endAdornment: (
+                    <InputAdornment position="end">
+                      <IconButton onClick={handleClickShowPassword}>
+                        {showPassword ? <Visibility /> : <VisibilityOff />}
+                      </IconButton>
+                    </InputAdornment>
+                  ),
+                }}
+              />
+              {formValues.password.error && (
+                <Typography variant="body2" color="error">
+                  {formValues.password.errorMessage.slice(0, 35)}
+                  {/* <br /> */}
+                  {formValues.password.errorMessage.slice(35, 70)}
+                  {/* <br /> */}
+                  {formValues.password.errorMessage.slice(70)}
+                </Typography>
+              )}
+
+              {/* Forgot Password */}
+              <Box
+                display="flex"
+                justifyContent="space-between"
+                alignItems="center"
+                mt={2}
+              >
+                <FormControlLabel
+                  control={
+                    <Checkbox
+                      checked={keepLoggedIn}
+                      onChange={(e) => setKeepLoggedIn(e.target.checked)}
+                      sx={{
+                        color: '#0A0B5C',
+                        '&.Mui-checked': {
+                          color: '#0284C7',
+                        },
+                      }}
+                    />
+                  }
+                  label={
+                    <Typography fontSize={14} color="#0A0B5C">
+                      Keep me logged in
+                    </Typography>
+                  }
+                />
+
+                <Link
+                  to="/forgotpassword_ai"
+                  style={{ fontSize: 14, color: '#E33629', textDecoration: 'none' }}
+                >
+                  Forgot Password?
+                </Link>
+              </Box>
+
+              {/* Submit */}
+              <Button
+                fullWidth
+                variant="contained"
+                sx={{
+                  backgroundColor: '#0284C7',
+                  color: '#fff',
+                  mt: 3,
+                  textTransform: 'none',
+                  '&:hover': { backgroundColor: '#0369a1' },
+                }}
+                onClick={handleSignIn}
+              >
+                Login
+              </Button>
+            </Box>
+          </Box>
+        </Grid>
       </Grid>
     </Box>
   )

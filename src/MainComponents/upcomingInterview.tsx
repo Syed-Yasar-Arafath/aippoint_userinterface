@@ -46,6 +46,7 @@ import axios from 'axios'
 export interface Candidate {
   id: number
   created_by: string
+  object_id: string
   resume_id: string
   name: string
   interviewDate: string
@@ -121,47 +122,48 @@ const UpcomingInterview: React.FC = () => {
 
   // Function to schedule interviews and send emails
   const scheduleInterviews = async () => {
-    const selectedCandidateDetails = allCandidates.filter((candidate) =>
-      selectedCandidates.includes(candidate.id),
-    )
+    // const selectedCandidateDetails = allCandidates.filter((candidate) =>
+    //   selectedCandidates.includes(candidate.id),
+    // )
 
-    // Hardcode organisation for now (replace with dynamic value if needed)
-    const organisation = 'wipro'
+    // // Hardcode organisation for now (replace with dynamic value if needed)
+    // const organisation = 'wipro'
 
-    try {
-      for (const candidate of selectedCandidateDetails) {
-        const interviewDto: InterviewDto = {
-          email: candidate.email,
-          interview_time: candidate.interview_time,
-          candidateName: candidate.name,
-          organisation: organisation,
-          interviewStatus: 'Scheduled',
-          date: new Date(candidate.interviewDate).toISOString(),
-          isInterviewLinkEmailSent: false, // Ensure email is triggered
-        }
+    // try {
+    //   for (const candidate of selectedCandidateDetails) {
+    //     const interviewDto: InterviewDto = {
+    //       email: candidate.email,
+    //       interview_time: candidate.interview_time,
+    //       candidateName: candidate.name,
+    //       organisation: organisation,
+    //       interviewStatus: 'Scheduled',
+    //       date: new Date(candidate.interviewDate).toISOString(),
+    //       isInterviewLinkEmailSent: false, // Ensure email is triggered
+    //     }
 
-        await axios.post(`${API_BASE_URL}/interview/${organisation}`, interviewDto, {
-          headers: {
-            'Content-Type': 'application/json',
-          },
-        })
-      }
+    //     await axios.post(`${API_BASE_URL}/interview/${organisation}`, interviewDto, {
+    //       headers: {
+    //         'Content-Type': 'application/json',
+    //       },
+    //     })
+    //   }
 
-      alert(
-        `Successfully scheduled ${selectedCandidateDetails.length} interview(s)! Email(s) will be sent soon.`,
-      )
-      setSelectedCandidates([]) // Clear selection after scheduling
-    } catch (error: any) {
-      console.error('Error scheduling interviews:', error)
-      alert('Failed to schedule interviews: ' + error.message)
-    }
+    //   alert(
+    //     `Successfully scheduled ${selectedCandidateDetails.length} interview(s)! Email(s) will be sent soon.`,
+    //   )
+    //   setSelectedCandidates([]) // Clear selection after scheduling
+    // } catch (error: any) {
+    //   console.error('Error scheduling interviews:', error)
+    //   alert('Failed to schedule interviews: ' + error.message)
+    // }
+    navigate('/questionformat')
   }
 
   // Apply filters
   const organisation = localStorage.getItem('organisation')
   const [allCandidates, setAllCandidates] = useState<Candidate[]>([])
   const [jobRoles, setJobRoles] = useState<string[]>([])
-
+  const [objectid, setObjectid] = useState('')
   const getAvailableresumes = async (user_id: any) => {
     console.log(user_id)
     try {
@@ -178,12 +180,17 @@ const UpcomingInterview: React.FC = () => {
         const awaitedInterviews = res.data.interviews.filter(
           (interview: any) => interview.interview_status === 'awaited'
         )
+        const objectIds = awaitedInterviews.map((i: any) => i._id)
+        // setObjectid(objectIds)
+        // console.log(objectIds)
+        console.log('Awaited Interview Object IDs:', objectIds)
 
         const formattedCandidates = awaitedInterviews.map(
           (item: any, index: number) => ({
             id: index + 1,
-            created_by:item.resume_data?.created_by||'' ,
-            resume_id:item.resume_data?.resume_id||'' ,
+            created_by: item.resume_data?.created_by || '',
+            object_id: objectIds[index],
+            resume_id: item.resume_data?.resume_id || '',
             name: item.resume_data?.name ?? 'Unknown',
             interviewDate: item.uploaded_at || 'N/A',
             interview_time: item.interview_time || 'N/A',
@@ -317,7 +324,7 @@ const UpcomingInterview: React.FC = () => {
   }
 
   const handleViewDetails = (candidate: Candidate) => {
-    navigate(`/interviewDetails/${candidate.resume_id}`)
+    navigate(`/interviewDetails/${candidate.object_id}`)
   }
 
   const resetFilters = () => {
@@ -369,21 +376,18 @@ const UpcomingInterview: React.FC = () => {
                 value={filters.jobRole}
                 onChange={(e) => handleFilterChange('jobRole', e.target.value)}
                 renderValue={
-                  filters.jobRole !== '' ? undefined : () => 'Job Role'
+                  filters.jobRole !== '' ? undefined : () => <em style={{ color: '#aaa' }}>Job Role</em>
                 }
               >
-                {/* <MenuItem value="">All Roles</MenuItem>
-                <MenuItem value="full-stack">Full-Stack Developer</MenuItem>
-                <MenuItem value="frontend">Frontend Developer</MenuItem>
-                <MenuItem value="backend">Backend Developer</MenuItem>
-                <MenuItem value="ui/ux">UI/UX Developer</MenuItem> */}
-                <MenuItem value="">All Roles</MenuItem>
-                {jobRoles.map((role, index) => (
-                  <MenuItem key={index} value={role}>
+
+                <MenuItem value="">All Job Role</MenuItem>
+                {jobRoles.map((role) => (
+                  <MenuItem key={role} value={role}>
                     {role}
                   </MenuItem>
                 ))}
               </Select>
+
             </FormControl>
           </Grid>
 
@@ -395,20 +399,27 @@ const UpcomingInterview: React.FC = () => {
                 onChange={(e) =>
                   handleFilterChange('experience', e.target.value)
                 }
+
                 renderValue={
-                  filters.experience !== '' ? undefined : () => 'Experience'
+                  filters.experience !== '' ? undefined : () => <em style={{ color: '#aaa' }}>Experience</em>
                 }
               >
                 <MenuItem value="">All Experience</MenuItem>
-                <MenuItem value="1 year">1 Year</MenuItem>
-                <MenuItem value="2-3">2-3 Years</MenuItem>
-                <MenuItem value="5+">5+ Years</MenuItem>
-                <MenuItem value="fresh">Fresh Graduate</MenuItem>
+                <MenuItem value="1">1 </MenuItem>
+                <MenuItem value="2">2</MenuItem>
+                <MenuItem value="3">3</MenuItem>
+                <MenuItem value="4">4</MenuItem>
+                <MenuItem value="5">5</MenuItem>
+                <MenuItem value="6">6</MenuItem>
+                <MenuItem value="7">7</MenuItem>
+                <MenuItem value="8">8</MenuItem>
+                <MenuItem value="9">9</MenuItem>
+                <MenuItem value="10">10</MenuItem>
               </Select>
             </FormControl>
           </Grid>
 
-          <Grid item xs={6} md={2}>
+          {/* <Grid item xs={6} md={2}>
             <Button
               variant="outlined"
               color="inherit"
@@ -419,14 +430,14 @@ const UpcomingInterview: React.FC = () => {
             >
               Date Range
             </Button>
-          </Grid>
+          </Grid> */}
 
-          <Grid item xs={6} md={2}>
+          <Grid item xs={6} md={2} color="#9e9e9e">
             <Button
               variant="outlined"
               color="inherit"
               fullWidth
-              style={{textTransform:'none'}}
+              style={{ textTransform: 'none' }}
               startIcon={<Clock size={20} />}
               onClick={() => setTimeSelectOpen(true)}
             >
@@ -434,36 +445,42 @@ const UpcomingInterview: React.FC = () => {
             </Button>
           </Grid>
 
-          <Grid item xs={6} md={1} sx={{display:'flex',gap:'10px'}} >
+          <Grid item xs={6} md={2.5} sx={{ display: 'flex', gap: '10px' }} >
             <Button
               variant="outlined"
               color="error"
               fullWidth
               onClick={resetFilters}
+              style={{ textTransform: 'none' }}
             >
+              
               Reset
             </Button>
             <Grid
-            item
-            xs={6}
-            md={12}
+              item
+              xs={6}
+              md={4}
             // sx={{ display: 'flex', justifyContent: 'flex-end' }}
-          >
-            <Button
-              variant="contained"
-              color="primary"
-              disabled={selectedCandidates.length === 0}
-              onClick={scheduleInterviews}
             >
-              Schedule{' '}
+              <Button
+                variant="contained"
+                color="primary"
+                style={{ textTransform: 'none' }}
+                // disabled={selectedCandidates.length === 0}
+                onClick={scheduleInterviews}
+              >
+                Schedule
+                {/* {' '}
               {selectedCandidates.length > 0
                 ? `(${selectedCandidates.length})`
-                : ''}
-            </Button>
-          </Grid>
+                : ''} */}
+              </Button>
+            </Grid>
           </Grid>
 
-          
+
+
+
         </Grid>
 
         {/* Active Filters Display */}
@@ -533,7 +550,7 @@ const UpcomingInterview: React.FC = () => {
         </Typography>
         {filters.jobRole && (
 
-          <div style={{display:'flex'}}><Typography sx={{ mb: 2 }}>
+          <div style={{ display: 'flex' }}><Typography sx={{ mb: 2 }}>
             Available profiles for
             <Chip
               label={`${filters.jobRole}`}
@@ -562,12 +579,12 @@ const UpcomingInterview: React.FC = () => {
                   }}
                 >
                   <CardContent>
-                    <Radio
+                    {/* <Radio
                       checked={selectedCandidates.includes(candidate.id)}
                       onChange={() => handleCandidateSelect(candidate.id)}
                       size="small"
                       style={{ float: 'right' }}
-                    />
+                    /> */}
                     <Box sx={{ display: 'flex', alignItems: 'flex-start' }}>
                       <div
                         style={{
@@ -581,7 +598,7 @@ const UpcomingInterview: React.FC = () => {
                           overflow: 'hidden',
                         }}
                       >
-                        <img
+                        {/* <img
                           src="https://plus.unsplash.com/premium_photo-1664474619075-644dd191935f?fm=jpg&q=60&w=3000&ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxzZWFyY2h8MXx8aW1hZ2V8ZW58MHx8MHx8fDA%3D"
                           alt={candidate.name}
                           style={{
@@ -589,7 +606,27 @@ const UpcomingInterview: React.FC = () => {
                             height: '100%',
                             objectFit: 'cover',
                           }}
-                        />
+                        /> */}
+                        <Typography
+                          variant="h6"
+                          sx={{
+                            color: '#fff',
+                            fontWeight: 'bold',
+                            fontSize: '16px',
+                          }}
+                        >
+                          {(() => {
+                            const words = candidate.name.trim().split(' ').filter(Boolean)
+                            if (words.length >= 2) {
+                              return `${words[0][0]}${words[words.length - 1][0]}`.toUpperCase()
+                            } else if (words.length === 1) {
+                              return words[0][0].toUpperCase()
+                            }
+                            return ''
+                          })()}
+
+                        </Typography>
+
                       </div>
                       <Box sx={{ ml: 1, flex: 1 }}>
                         <Typography

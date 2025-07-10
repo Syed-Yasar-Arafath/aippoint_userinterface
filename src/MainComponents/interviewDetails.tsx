@@ -1,3 +1,175 @@
+// import React, { useEffect, useState } from 'react'
+// import {
+//   Box,
+//   Button,
+//   Typography,
+//   Select,
+//   MenuItem,
+//   FormControl,
+//   TextField,
+//   IconButton,
+// } from '@mui/material'
+// import { Trash2, Edit2 } from 'lucide-react'
+// import { useParams } from 'react-router-dom'
+// import { Candidate } from './upcomingInterview'
+// import axios from 'axios'
+
+// // Interface for questions
+// interface Question {
+//   id: number
+//   type: 'AI' | 'Question Bank'
+//   text: string
+//   editable?: boolean
+// }
+
+
+// // Interface for interview settings
+// interface InterviewSettings {
+//   mode: 'AI Avatar' | 'No Avatar' | 'Custom Avatar'
+//   country: string
+//   language: string
+//   questionFormat: string
+//   numberOfQuestions: string
+//   difficultyLevel: string
+//   voiceTone: string
+// }
+
+// const InterviewDetails: React.FC = () => {
+//   const { id } = useParams<{ id: string }>()
+//   // const candidate = allCandidates.find((c: any) => c.id === parseInt(id || '0'))
+
+
+//   // State for interview settings
+//   // const [settings, setSettings] = useState<InterviewSettings>({
+//   //   mode: 'AI Avatar',
+//   //   country: 'America',
+//   //   language: 'English US',
+//   //   questionFormat: 'AI + Question Format',
+//   //   numberOfQuestions: 'AI (04) + Question Bank (02)',
+//   //   difficultyLevel: 'Beginner',
+//   //   voiceTone: 'Angel (Female)',
+//   // })
+// const [settings, setSettings] = useState<InterviewSettings | null>(null)
+
+//   // State for questions
+//   // const [questions, setQuestions] = useState<Question[]>([
+//   //   {
+//   //     id: 1,
+//   //     type: 'AI',
+//   //     text: 'Can you explain the SOLID principles in object-oriented programming and provide examples?',
+//   //   },
+//   //   {
+//   //     id: 2,
+//   //     type: 'Question Bank',
+//   //     text: 'What are the key differences between microservices and monolithic architecture?',
+//   //   },
+//   // ])
+//   const [questions, setQuestions] = useState<Question[]>([])
+
+
+//   // Handlers
+// const handleSettingChange = (
+//   field: keyof InterviewSettings,
+//   value: string,
+// ) => {
+//   setSettings((prev) => {
+//     if (!prev) return prev // or optionally: throw an error or show a warning
+//     return { ...prev, [field]: value }
+//   })
+// }
+
+
+//   const handleDeleteQuestion = (id: number) => {
+//     setQuestions((prev) => prev.filter((q) => q.id !== id))
+//   }
+
+//   const handleEditQuestion = (id: number) => {
+//     setQuestions((prev) =>
+//       prev.map((q) => (q.id === id ? { ...q, editable: !q.editable } : q)),
+//     )
+//   }
+
+//   const handleQuestionTextChange = (id: number, text: string) => {
+//     setQuestions((prev) => prev.map((q) => (q.id === id ? { ...q, text } : q)))
+//   }
+
+//   const handleSaveChanges = () => {
+//     console.log('Saving changes:', { settings, questions })
+//     // In a real app, send to backend API
+//   }
+
+//   // if (!candidate) {
+//   //   return <Typography variant="h6">Candidate not found</Typography>
+//   // }
+//  const [candidate, setCandidate] :any= useState(null)
+//   const organisation = localStorage.getItem('organisation')
+
+//   useEffect(() => {
+//   const fetchCandidateDetails = async () => {
+//     try {
+//       const res = await axios.post(
+//         'http://localhost:8000/get_interview_data/',
+//         { object_id: id },
+//         {
+//           headers: {
+//             Organization: organisation,
+//             'Content-Type': 'application/json',
+//           },
+//         }
+//       );
+
+//       if (res.status === 200 && res.data && res.data.data) {
+//         const data = res.data.data;
+
+//         // Interview Settings (not available in this response, but placeholder)
+//         // setSettings(data.interview_settings || defaultInterviewSettings)
+
+//         // Questions Mapping (You may want to map more fields if needed)
+//         if (Array.isArray(data.questions)) {
+//           const mappedQuestions = data.questions.map((q:any, index:any) => ({
+//             id: index + 1,
+//             type: 'AI',
+//             text: q.question,
+//             editable: false,
+//           }));
+//           setQuestions(mappedQuestions);
+//         }
+
+//         // Resume Data → Candidate Object
+//         if (data.resume_data) {
+//           const resume = data.resume_data;
+
+//           const candidateObj = {
+//             id: 1,
+//             name: resume.name ?? 'Unknown',
+//             uploaded_at: data.uploaded_at || 'N/A',
+//             timeSlot: '10:00AM - 10:35 AM', // Hardcoded — replace if dynamic
+//             position: resume.job_role ?? 'N/A',
+//             email: resume.email ?? '',
+//             phone: resume.phone ?? '',
+//             experience: resume.experience_in_number
+//               ? `${resume.experience_in_number} years`
+//               : 'N/A',
+//             skills: resume.skills || [],
+//             education: resume.education?.Degree ?? 'N/A',
+//             currentCompany: resume.work?.[0]?.company ?? '',
+//             currentRole: resume.work?.[0]?.designation_at_company ?? '',
+//             created_by: resume.created_by ?? '',
+//             resume_id: resume.resume_id ?? ''
+//           };
+
+//           setCandidate(candidateObj);
+//         }
+//       }
+//     } catch (error) {
+//       console.error('Failed to fetch candidate details', error);
+//     }
+//   };
+
+//   fetchCandidateDetails();
+// }, [id]);
+
+
 import React, { useEffect, useState } from 'react'
 import {
   Box,
@@ -11,10 +183,9 @@ import {
 } from '@mui/material'
 import { Trash2, Edit2 } from 'lucide-react'
 import { useParams } from 'react-router-dom'
-import { Candidate } from './upcomingInterview'
 import axios from 'axios'
 
-// Interface for questions
+// Interfaces
 interface Question {
   id: number
   type: 'AI' | 'Question Bank'
@@ -22,7 +193,6 @@ interface Question {
   editable?: boolean
 }
 
-// Interface for interview settings
 interface InterviewSettings {
   mode: 'AI Avatar' | 'No Avatar' | 'Custom Avatar'
   country: string
@@ -35,48 +205,17 @@ interface InterviewSettings {
 
 const InterviewDetails: React.FC = () => {
   const { id } = useParams<{ id: string }>()
-  // const candidate = allCandidates.find((c: any) => c.id === parseInt(id || '0'))
- 
-
-  // State for interview settings
-  // const [settings, setSettings] = useState<InterviewSettings>({
-  //   mode: 'AI Avatar',
-  //   country: 'America',
-  //   language: 'English US',
-  //   questionFormat: 'AI + Question Format',
-  //   numberOfQuestions: 'AI (04) + Question Bank (02)',
-  //   difficultyLevel: 'Beginner',
-  //   voiceTone: 'Angel (Female)',
-  // })
-const [settings, setSettings] = useState<InterviewSettings | null>(null)
-
-  // State for questions
-  // const [questions, setQuestions] = useState<Question[]>([
-  //   {
-  //     id: 1,
-  //     type: 'AI',
-  //     text: 'Can you explain the SOLID principles in object-oriented programming and provide examples?',
-  //   },
-  //   {
-  //     id: 2,
-  //     type: 'Question Bank',
-  //     text: 'What are the key differences between microservices and monolithic architecture?',
-  //   },
-  // ])
+  const [settings, setSettings] = useState<InterviewSettings | null>(null)
   const [questions, setQuestions] = useState<Question[]>([])
+  const [candidate, setCandidate]: any = useState(null)
+  const organisation = localStorage.getItem('organisation')
 
-
-  // Handlers
-const handleSettingChange = (
-  field: keyof InterviewSettings,
-  value: string,
-) => {
-  setSettings((prev) => {
-    if (!prev) return prev // or optionally: throw an error or show a warning
-    return { ...prev, [field]: value }
-  })
-}
-
+  const handleSettingChange = (field: keyof InterviewSettings, value: string) => {
+    setSettings((prev) => {
+      if (!prev) return prev
+      return { ...prev, [field]: value }
+    })
+  }
 
   const handleDeleteQuestion = (id: number) => {
     setQuestions((prev) => prev.filter((q) => q.id !== id))
@@ -94,76 +233,101 @@ const handleSettingChange = (
 
   const handleSaveChanges = () => {
     console.log('Saving changes:', { settings, questions })
-    // In a real app, send to backend API
+    // You can call an API here to save the updated interview
   }
-
-  // if (!candidate) {
-  //   return <Typography variant="h6">Candidate not found</Typography>
-  // }
- const [candidate, setCandidate] = useState<Candidate | null>(null)
-  const organisation = localStorage.getItem('organisation')
+  const defaultSettings: InterviewSettings = {
+    mode: 'AI Avatar',
+    country: 'America',
+    language: 'English US',
+    questionFormat: 'AI + Question Format',
+    numberOfQuestions: 'AI (04) + Question Bank (02)',
+    difficultyLevel: 'Beginner',
+    voiceTone: 'Angel (Female)',
+  }
 
   useEffect(() => {
-  const fetchCandidateDetails = async () => {
-  try {
-    const res = await axios.post(
-      'http://localhost:8000/get_resume/',
-      { resume_id: [id] },
-      {
-        headers: {
-          Organization: organisation,
-          'Content-Type': 'application/json',
-        },
-      }
-    )
+    const fetchCandidateDetails = async () => {
+      try {
+        const res = await axios.post(
+          'http://localhost:8000/get_interview_data/',
+          { object_id: id },
+          {
+            headers: {
+              Organization: organisation,
+              'Content-Type': 'application/json',
+            },
+          }
+        )
 
-    if (res.status === 200 && Array.isArray(res.data) && res.data.length > 0) {
-      const data = res.data[0] // Get the first resume object
+        if (res.status === 202 && res.data && res.data.data) {
+          const data = res.data.data
 
-      // ✅ Interview Settings
-      if (data.interview_settings) {
-        setSettings(data.interview_settings)
-      }
+          // Set Interview Settings if available
+          if (data.interview_settings) {
+            setSettings({
+              mode: data.interview_settings.mode ?? '',
+              country: data.interview_settings.country ?? '',
+              language: data.interview_settings.language ?? '',
+              questionFormat: data.interview_settings.questionFormat ?? '',
+              numberOfQuestions: data.interview_settings.numberOfQuestions ?? '',
+              difficultyLevel: data.interview_settings.difficultyLevel ?? '',
+              voiceTone: data.interview_settings.voiceTone ?? '',
+            })
+          } else {
+            // setSettings({
+            //   mode: '',
+            //   country: '',
+            //   language: '',
+            //   questionFormat: '',
+            //   numberOfQuestions: '',
+            //   difficultyLevel: '',
+            //   voiceTone: '',
+            // })
+            setSettings(defaultSettings)
+          }
 
-      // ✅ Questions
-      if (Array.isArray(data.questions)) {
-        setQuestions(data.questions)
-      }
+          // Set Questions
+          if (Array.isArray(data.questions)) {
+            const mappedQuestions = data.questions.map((q: any, index: number) => ({
+              id: index + 1,
+              type: 'AI',
+              text: q.question,
+              editable: false,
+            }))
+            setQuestions(mappedQuestions)
+          }
 
-      // ✅ Resume Data
-      if (data.resume_data) {
-        const resume = data.resume_data
+          // Set Candidate Info
+          if (data.resume_data) {
+            const resume = data.resume_data
 
-        const candidateObj: Candidate = {
-          id: 1,
-          name: resume.name ?? 'Unknown',
-          interviewDate: resume.uploaded_at || 'N/A',
-          interview_time: '',
-          timeSlot: '10:00AM - 10:35 AM',
-          position: resume.job_role ?? 'N/A',
-          email: resume.email ?? '',
-          phone: resume.phone ?? '',
-          experience: resume.experience_in_number
-            ? `${resume.experience_in_number} years`
-            : 'N/A',
-          skills: resume.skills || [],
-          education: resume.education?.[0]?.Degree || 'N/A',
-          currentCompany: resume.work?.[0]?.company ?? '',
-          currentRole: resume.work?.[0]?.designation_at_company ?? '',
-          created_by: '',
-          resume_id: ''
+            setCandidate({
+              id: 1,
+              name: resume.name ?? 'Unknown',
+              interview_time: data.interview_time || 'N/A',
+              timeSlot: '10:00AM - 10:35 AM',
+              position: resume.job_role ?? 'N/A',
+              email: resume.email ?? '',
+              phone: resume.phone ?? '',
+              experience: resume.experience_in_number
+                ? `${resume.experience_in_number} years`
+                : 'N/A',
+              skills: resume.skills || [],
+              education: resume.education?.Degree ?? 'N/A',
+              currentCompany: resume.work?.[0]?.company ?? '',
+              currentRole: resume.work?.[0]?.designation_at_company ?? '',
+              created_by: resume.created_by ?? '',
+              resume_id: resume.resume_id ?? ''
+            })
+          }
         }
-
-        setCandidate(candidateObj)
+      } catch (error) {
+        console.error('Failed to fetch candidate details', error)
       }
     }
-  } catch (error) {
-    console.error('Failed to fetch candidate details', error)
-  }
-}
-fetchCandidateDetails()
-}, [id])
 
+    fetchCandidateDetails()
+  }, [id])
 
   // if (!candidate) return <Typography>Loading candidate details...</Typography>
   return (
@@ -196,27 +360,56 @@ fetchCandidateDetails()
               height: '80px',
               borderRadius: '50%',
               overflow: 'hidden',
+              backgroundColor: '#e0e0e0',
+              display: 'flex',
+              alignItems: 'center',
+              justifyContent: 'center',
               mr: 2,
             }}
           >
-            <img
+            {/* <img
               src="https://plus.unsplash.com/premium_photo-1664474619075-644dd191935f?fm=jpg&q=60&w=3000&ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxzZWFyY2h8MXx8aW1hZ2V8ZW58MHx8MHx8fDA%3D"
               alt={candidate?.name||''}
               style={{ width: '100%', height: '100%', objectFit: 'cover' }}
-            />
+            /> */}
+            <Typography
+              variant="h6"
+              sx={{
+                color: '#fff',
+                fontWeight: 'bold',
+                fontSize: '16px',
+              }}
+            >
+              {candidate?.name
+                ? (() => {
+                  const words = candidate.name.trim().split(' ').filter(Boolean)
+                  if (words.length >= 2) {
+                    return `${words[0][0]}${words[words.length - 1][0]}`.toUpperCase()
+                  } else if (words.length === 1) {
+                    return words[0][0].toUpperCase()
+                  }
+                  return ''
+                })()
+                : ''
+              }
+
+
+            </Typography>
+
           </Box>
           <Box>
             <Typography
               variant="h6"
               sx={{ mb: 0.5, fontWeight: 'bold', fontSize: '14px' }}
             >
-              {candidate?.name||''}
+              {candidate?.name || ''}
             </Typography>
             <Typography variant="body2" sx={{ mb: 1, color: '#666' }}>
-              {candidate?.interviewDate||''} {candidate?.timeSlot||''}
+              {candidate?.interview_time || ''}
+              {/* {candidate?.timeSlot||''} */}
             </Typography>
             <Typography variant="body1" sx={{ fontWeight: 'bold' }}>
-              {candidate?.position||''}
+              {candidate?.position || ''}
             </Typography>
             <Box
               sx={{
@@ -251,7 +444,7 @@ fetchCandidateDetails()
               {candidate?.currentCompany || 'N/A'}
             </Typography>
             <Typography sx={{ fontWeight: 'bold' }}>
-              {candidate?.experience||''}
+              {candidate?.experience || ''}
             </Typography>
           </Box>
           <Box sx={{ display: 'flex', justifyContent: 'space-between', mb: 1 }}>
@@ -294,62 +487,60 @@ fetchCandidateDetails()
           </Typography>
 
           {/* Interview Mode Selection */}
-          <Box sx={{ mb: 2 }}>
-            <Typography sx={{ display: 'block', mb: 1 }}>
-              Selected Mode of Interview
+          <Box sx={{ mt: 2 }}>
+            <Typography variant="subtitle2" gutterBottom>
+              Select Avatar Mode
             </Typography>
             <Box sx={{ display: 'flex', gap: 2 }}>
-              {['AI Avatar', 'No Avatar', 'Custom Avatar'].map((mode) => (
-                <Box
-                  key={mode}
-                  sx={{
-                    flex: 1,
-                    p: 2,
-                    border:
-                      settings?.mode||'' === mode
-                        ? '2px solid #0277BD'
-                        : '1px solid #ddd',
-                    borderRadius: '5px',
-                    backgroundColor: 'white',
-                    cursor: 'pointer',
-                  }}
-                  onClick={() => handleSettingChange('mode', mode)}
-                >
-                  <Box sx={{ display: 'flex', alignItems: 'center' }}>
-                    <Box
-                      sx={{
-                        width: '20px',
-                        height: '20px',
-                        borderRadius: '50%',
-                        border:
-                          settings?.mode||'' === mode
-                            ? '2px solid #0277BD'
-                            : '1px solid #aaa',
-                        backgroundColor:
-                          settings?.mode||'' === mode ? '#0277BD' : 'transparent',
-                        mr: 1,
-                        display: 'flex',
-                        alignItems: 'center',
-                        justifyContent: 'center',
-                      }}
-                    >
-                      {settings?.mode||'' === mode && (
-                        <Box
-                          sx={{
-                            width: '8px',
-                            height: '8px',
-                            borderRadius: '50%',
-                            backgroundColor: 'white',
-                          }}
-                        />
-                      )}
+              {['AI Avatar', 'No Avatar', 'Custom Avatar'].map((mode) => {
+                const isSelected = (settings?.mode || '') === mode
+
+                return (
+                  <Box
+                    key={mode}
+                    sx={{
+                      flex: 1,
+                      p: 2,
+                      border: isSelected ? '2px solid #0277BD' : '1px solid #ddd',
+                      borderRadius: '5px',
+                      backgroundColor: 'white',
+                      cursor: 'pointer',
+                    }}
+                    onClick={() => handleSettingChange('mode', mode)}
+                  >
+                    <Box sx={{ display: 'flex', alignItems: 'center' }}>
+                      <Box
+                        sx={{
+                          width: '20px',
+                          height: '20px',
+                          borderRadius: '50%',
+                          border: isSelected ? '2px solid #0277BD' : '1px solid #aaa',
+                          backgroundColor: isSelected ? '#0277BD' : 'transparent',
+                          mr: 1,
+                          display: 'flex',
+                          alignItems: 'center',
+                          justifyContent: 'center',
+                        }}
+                      >
+                        {isSelected && (
+                          <Box
+                            sx={{
+                              width: '8px',
+                              height: '8px',
+                              borderRadius: '50%',
+                              backgroundColor: 'white',
+                            }}
+                          />
+                        )}
+                      </Box>
+                      <Typography>{mode}</Typography>
                     </Box>
-                    <Typography>{mode}</Typography>
                   </Box>
-                </Box>
-              ))}
+                )
+              })}
             </Box>
           </Box>
+
 
           {/* Country and Language Dropdowns */}
           <Box
@@ -366,7 +557,7 @@ fetchCandidateDetails()
               </Typography>
               <FormControl fullWidth>
                 <Select
-                  value={settings?.country||''}
+                  value={settings?.country || ''}
                   onChange={(e) =>
                     handleSettingChange('country', e.target.value as string)
                   }
@@ -391,7 +582,7 @@ fetchCandidateDetails()
               </Typography>
               <FormControl fullWidth>
                 <Select
-                  value={settings?.language||''}
+                  value={settings?.language || ''}
                   onChange={(e) =>
                     handleSettingChange('language', e.target.value as string)
                   }
@@ -427,7 +618,7 @@ fetchCandidateDetails()
               </Typography>
               <FormControl fullWidth>
                 <Select
-                  value={settings?.questionFormat||''}
+                  value={settings?.questionFormat || ''}
                   onChange={(e) =>
                     handleSettingChange(
                       'questionFormat',
@@ -458,7 +649,7 @@ fetchCandidateDetails()
               </Typography>
               <FormControl fullWidth>
                 <Select
-                  value={settings?.numberOfQuestions||''}
+                  value={settings?.numberOfQuestions || ''}
                   onChange={(e) =>
                     handleSettingChange(
                       'numberOfQuestions',
@@ -500,7 +691,7 @@ fetchCandidateDetails()
               </Typography>
               <FormControl fullWidth>
                 <Select
-                  value={settings?.difficultyLevel||''}
+                  value={settings?.difficultyLevel || ''}
                   onChange={(e) =>
                     handleSettingChange(
                       'difficultyLevel',
@@ -527,7 +718,7 @@ fetchCandidateDetails()
               </Typography>
               <FormControl fullWidth>
                 <Select
-                  value={settings?.voiceTone||''}
+                  value={settings?.voiceTone || ''}
                   onChange={(e) =>
                     handleSettingChange('voiceTone', e.target.value as string)
                   }
@@ -610,26 +801,27 @@ fetchCandidateDetails()
                 </Box>
               </Box>
               {question.id === 1 && (
-                <Box
-                  sx={{
-                    display: 'flex',
-                    alignItems: 'center',
-                    borderTop: '1px solid #eee',
-                    pt: 2,
-                    color: '#666',
-                  }}
-                >
-                  <IconButton onClick={() => handleEditQuestion(question.id)}>
-                    <Edit2
-                      size={20}
-                      color={question.editable ? '#0277BD' : '#666'}
-                    />
-                  </IconButton>
-                  <Typography>
-                    Feel free to edit the question if it is needed in 1-2
-                    sentences to further tailor the question (optional)
-                  </Typography>
-                </Box>
+                <></>
+                // <Box
+                //   sx={{
+                //     display: 'flex',
+                //     alignItems: 'center',
+                //     borderTop: '1px solid #eee',
+                //     pt: 2,
+                //     color: '#666',
+                //   }}
+                // >
+                //   <IconButton onClick={() => handleEditQuestion(question.id)}>
+                //     <Edit2
+                //       size={20}
+                //       color={question.editable ? '#0277BD' : '#666'}
+                //     />
+                //   </IconButton>
+                //   <Typography>
+                //     Feel free to edit the question if it is needed in 1-2
+                //     sentences to further tailor the question (optional)
+                //   </Typography>
+                // </Box>
               )}
             </Box>
           ))}
@@ -641,6 +833,7 @@ fetchCandidateDetails()
             variant="contained"
             color="primary"
             onClick={handleSaveChanges}
+            disabled
           >
             Save Changes
           </Button>

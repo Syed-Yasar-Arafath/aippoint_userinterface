@@ -157,7 +157,7 @@ const UpcomingInterview: React.FC = () => {
     //   console.error('Error scheduling interviews:', error)
     //   alert('Failed to schedule interviews: ' + error.message)
     // }
-    navigate('/questionformat')
+    navigate('/interviewSchedule')
   }
 
   // Apply filters

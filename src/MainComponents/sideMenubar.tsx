@@ -58,7 +58,7 @@ function SideMenuBars() {
       ],
     },
     // { text: 'Search Resumes', link: '/', icon: <SearchIcon /> },
-    // { text: 'Collections', link: '/collectiondefault', icon: <CollectionsIcon /> },
+    { text: 'Collections', link: '/collectiondefault', icon: <CollectionsIcon /> },
     {
       text: 'AI Interview Suite',
       link: '/interviewSchedule',

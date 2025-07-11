@@ -49,11 +49,12 @@ import { logIn, updateInterview } from '../services/InterviewService'
 import { t } from 'i18next'
 import { MicIcon } from 'lucide-react'
 // import useProctoring from './useProctoring'
-  import { useTranslation } from 'react-i18next';
+import { useTranslation } from 'react-i18next';
 
 function ConfirmJoinInterview() {
   const organisation = localStorage.getItem('organisation')
-const { t } = useTranslation();
+
+  const { t } = useTranslation();
   const labels: React.CSSProperties = {
     fontWeight: 300,
     fontSize: '16px',
@@ -143,7 +144,8 @@ const { t } = useTranslation();
       field: t('cameraAndMic'),
       value: t('ensureWebCamAndMicAreWorking'),
     },
-    { field: t('powerBackup'), 
+    {
+      field: t('powerBackup'),
       value: t('keepYourDeviceCharged')
     },
     {
@@ -453,6 +455,25 @@ const { t } = useTranslation();
   const theme = useTheme()
   const isSmallScreen = useMediaQuery(theme.breakpoints.down('sm'))
 
+  const handleInterviewTime = async (objectId: any) => {
+    try {
+      const response = await axios.post(
+        `http://localhost:8000/interview_time/${objectId}/`,
+        {},
+        {
+          headers: {
+            'Content-Type': 'application/json',
+            'Organization': organisation,
+          },
+        }
+      );
+
+      console.log('Interview time updated:', response.data);
+    } catch (error) {
+      console.error('Error updating interview time:', error);
+    }
+  };
+
   return (
     <div style={{ background: '#FFFFFF', overflowY: 'hidden' }}>
       <Grid
@@ -558,8 +579,7 @@ const { t } = useTranslation();
             }}
             onClick={handleModal}
           >
-            {/* Join Interview */}
-            {t('joinInterview')}
+            Join Interview
           </Button>
         </Grid>
       </Grid>
@@ -868,7 +888,10 @@ const { t } = useTranslation();
               <div style={{ textAlign: 'center', marginTop: 10 }}>
                 {isEnable && (
                   <Button
-                    onClick={handleLogin}
+                    onClick={() => {
+                      handleLogin()
+                      handleInterviewTime(objId)
+                    }}
                     sx={{
                       padding: '10px 30px',
                       fontSize: '14px',

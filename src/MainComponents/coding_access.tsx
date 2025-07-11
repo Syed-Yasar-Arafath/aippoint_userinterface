@@ -143,6 +143,26 @@ function CodingAccess() {
     }
     return num
   }
+
+   const handleInterviewTime = async (objectId: any) => {
+      try {
+        const response = await axios.post(
+          `http://localhost:8000/interview_time/${objectId}/`,
+          {},
+          {
+            headers: {
+              'Content-Type': 'application/json',
+              'Organization': organisation,
+            },
+          }
+        );
+  
+        console.log('Interview time updated:', response.data);
+      } catch (error) {
+        console.error('Error updating interview time:', error);
+      }
+    };
+
   return (
     <div style={{ margin: '20px' }}>
       <Grid container>
@@ -361,7 +381,10 @@ function CodingAccess() {
           <div>
             {isEnable && (
               <Button
-                onClick={handleLogin}
+                onClick={()=>{
+                  handleLogin()
+                  handleInterviewTime(objId)
+                }}
                 sx={{
                   padding: '10px 70px',
                   fontSize: '14px',

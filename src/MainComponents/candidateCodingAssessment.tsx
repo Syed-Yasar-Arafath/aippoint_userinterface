@@ -291,15 +291,15 @@ function CandidateCodingAssessment() {
                 // userProfileImage={userProfileImage}
                 path="/analytics_report"
             />
-            <Grid container spacing={0} padding={2} gap={2} sx={{ background: '#F7F7F7' }}>
+            <Grid container spacing={1} pl={2} pb={1} sx={{ background: '#F7F7F7' }}>
                 {interviewData ? (
                     <>
-                        <Grid item xs={12} md={7.5}>
+                        <Grid item xs={12} md={7.9}>
                             <Card sx={{ background: '#FFFFFF', borderRadius: '12px', height: '100%' }} elevation={0}>
                                 <CardContent>
                                     <Box sx={{ display: 'flex', justifyContent: 'space-between', flexDirection: 'row' }}>
                                         <Box sx={{ display: 'flex', flexDirection: 'row' }}>
-                                            <Typography sx={cardTitleStyle}>Question {questions.findIndex(q => q.title === selectedTitle) + 1}:</Typography>
+                                            <Typography variant="inherit" sx={cardTitleStyle}>Question {questions.findIndex(q => q.title === selectedTitle) + 1}:</Typography>
                                             <FormControl>
                                                 <Select
                                                     value={selectedTitle}
@@ -317,6 +317,7 @@ function CandidateCodingAssessment() {
 
                                                             {/* <Tooltip title={item.title} arrow> */}
                                                             <Typography
+                                                            variant="inherit"
                                                                 sx={{
                                                                     color: '#1C1C1E',
                                                                     fontSize: '12px',
@@ -358,7 +359,9 @@ function CandidateCodingAssessment() {
                                     </Box>
 
                                     <Box mt={2}>
-                                        <Typography sx={{
+                                        <Typography 
+                                        variant="inherit"
+                                        sx={{
                                             color: '#1C1C1E',
                                             fontSize: '14px',
                                             fontWeight: 500,
@@ -369,6 +372,7 @@ function CandidateCodingAssessment() {
                                         {/* <Tooltip title={codingInterview[selectedInterview].objective} arrow></Tooltip> */}
                                         <Tooltip title={matchedQuestion} arrow>
                                             <Typography
+                                            variant="inherit"
                                                 sx={{
                                                     color: '#1C1C1E',
                                                     fontSize: '12px',
@@ -387,7 +391,9 @@ function CandidateCodingAssessment() {
                                                     : matchedQuestion}
                                             </Typography>
                                         </Tooltip>
-                                        <Typography mt={1} sx={{
+                                        <Typography mt={1} 
+                                        variant="inherit"
+                                        sx={{
                                             color: '#1C1C1E',
                                             fontSize: '12px',
                                             fontWeight: 400,
@@ -395,6 +401,7 @@ function CandidateCodingAssessment() {
                                         }}>Candidate’s Code Submission</Typography>
                                         <Box border="1px solid #0284C7" borderRadius="12px" p={2} mt={1}>
                                             <Typography
+                                            variant="inherit"
                                                 sx={{
                                                     color: '#999999',
                                                     fontSize: '12px',
@@ -438,16 +445,18 @@ function CandidateCodingAssessment() {
 
 
                         <Grid item xs={12} md={4} >
-                            <Grid container direction="column" gap={2}>
+                            <Grid container direction="column" gap={1}>
                                 <Card sx={{ background: '#FFFFFF', borderRadius: '12px', height: '200px' }} elevation={0}>
                                     <CardContent>
-                                        <Typography sx={cardTitleStyle}>Overall Coding Assessment Score</Typography>
+                                        <Typography variant="inherit" sx={cardTitleStyle}>Overall Coding Assessment Score</Typography>
                                         <Box sx={{
                                             display: 'flex',
                                             justifyContent: 'center',
                                             alignItems: 'center',
+                                            marginTop:'10px'
                                         }}>
                                             <Typography
+                                            variant="inherit"
                                                 sx={{
                                                     width: '120px',
                                                     height: '120px',
@@ -464,7 +473,9 @@ function CandidateCodingAssessment() {
                                                     alignItems: 'center',
                                                 }}
                                             >{interviewData.coding_overall_score * 10 || '0'}%
-                                                <Typography sx={{
+                                                <Typography 
+                                                variant="inherit"
+                                                sx={{
                                                     color: '#FFFFFF',
                                                     fontSize: '14px',
                                                     fontWeight: 500,
@@ -481,7 +492,7 @@ function CandidateCodingAssessment() {
                                             justifyContent: 'space-between',
                                             flexDirection: 'row'
                                         }}>
-                                            <Typography sx={cardTitleStyle}>Code Assesment Metrics</Typography>
+                                            <Typography variant="inherit" sx={cardTitleStyle}>Code Assesment Metrics</Typography>
                                             {/* <Typography sx={{
                                                 color: '#1C1C1E',
                                                 fontSize: '10px',
@@ -511,6 +522,7 @@ function CandidateCodingAssessment() {
                                                         <Box display="flex" flexDirection="row" justifyContent="space-between" alignItems="center">
                                                             <Tooltip title={skill} arrow>
                                                                 <Typography
+                                                                variant="inherit"
                                                                     sx={{
                                                                         color: '#1C1C1E',
                                                                         fontSize: '12px',
@@ -533,7 +545,9 @@ function CandidateCodingAssessment() {
                                                                     },
                                                                 }}
                                                             />
-                                                            <Typography sx={{
+                                                            <Typography
+                                                            variant="inherit"
+                                                             sx={{
                                                                 color: '#1C1C1E',
                                                                 fontSize: '10px',
                                                                 fontWeight: 400,
@@ -547,7 +561,7 @@ function CandidateCodingAssessment() {
                                 </Card>
                                 <Card sx={{ background: '#FFFFFF', borderRadius: '12px', height: '200px' }} elevation={0}>
                                     <CardContent>
-                                        <Typography sx={cardTitleStyle}>Proctoring Details</Typography>
+                                        <Typography variant="inherit" sx={cardTitleStyle}>Proctoring Details</Typography>
                                         <Box mt={1} sx={{
                                             height: '140px',
                                             overflow: 'auto'
@@ -560,8 +574,8 @@ function CandidateCodingAssessment() {
                                                     gap: '20px'
                                                 }}>
                                                     <Box
-                                                        height="10px"
-                                                        width="10px"
+                                                        height="0px"
+                                                        width="0px"
                                                         display="flex"
                                                         alignItems="center"
                                                         justifyContent="center"
@@ -576,13 +590,17 @@ function CandidateCodingAssessment() {
                                                         display: 'flex',
                                                         flexDirection: 'column',
                                                     }}>
-                                                        <Typography sx={{
+                                                        <Typography 
+                                                        variant="inherit"
+                                                        sx={{
                                                             color: '#1C1C1E',
                                                             fontSize: '12px',
                                                             fontWeight: 500,
                                                             fontFamily: 'SF Pro Display',
                                                         }}>{item.heading}</Typography>
-                                                        <Typography sx={{
+                                                        <Typography 
+                                                        variant="inherit"
+                                                        sx={{
                                                             color: (item.text === 'Yes, detected' || item.text === 'Failed' || item.text === 'Abnormal, excessive sideways glances detected') ? '#FF3B30' : '#22973F',
                                                             fontSize: '10px',
                                                             fontWeight: 400,

@@ -181,6 +181,7 @@ function AnalyticsReport() {
         if (value.trim() === '') {
             setInterviewProfileData(interviewData);
             setIsSelected(true);
+            setPage(0);
         } else {
             const filteredData = interviewData.filter(
                 (item: any) =>
@@ -226,7 +227,7 @@ function AnalyticsReport() {
         fontWeight: 500,
         fontFamily: 'SF Pro Display',
         gap: '5px',
-        width:'70%'
+        width: '70%'
     }
 
     const tableHeading: React.CSSProperties = {
@@ -237,6 +238,17 @@ function AnalyticsReport() {
     }
 
     const navigate = useNavigate();
+
+    const handleResetFilters = () => {
+        setSelectedJobRole('');
+        setSelectedInterviewStatus('');
+        setSelectedDate(null);
+        setSearchCandidate('');
+        setInterviewProfileData(interviewData); // Reset filtered data to original
+        setIsSelected(false);
+        setPage(0);
+    };
+
 
     return (
         <>
@@ -422,6 +434,10 @@ function AnalyticsReport() {
                                 </Box>
                             </Grid>
 
+                            <Grid item display={{ xs: 'none', md: 'block' }}>
+                                <Box sx={{ height: '36px', width: '1px', backgroundColor: '#1C1C1E' }} />
+                            </Grid>
+
                             <Grid item xs={12} sm={6} md={2}>
                                 <Box
                                     sx={{
@@ -430,51 +446,53 @@ function AnalyticsReport() {
                                         justifyContent: 'space-between',
                                     }}
                                 >
-                                    {/* <Button
-                                sx={{
-                                    textTransform: 'none',
-                                    border: '0.5px solid #0284C780',
-                                    borderRadius: '6px',
-                                    color: '#1C1C1E',
-                                    fontSize: '10px',
-                                    fontWeight: 500,
-                                    fontFamily: 'SF Pro Display',
-                                }}
-                            >
-                                Filter
-                            </Button> */}
+                                    <Button
+                                        sx={{
+                                            textTransform: 'none',
+                                            border: '0.5px solid #0284C780',
+                                            borderRadius: '6px',
+                                            color: '#1C1C1E',
+                                            fontSize: '10px',
+                                            fontWeight: 500,
+                                            fontFamily: 'SF Pro Display',
+                                        }}
+                                        onClick={handleResetFilters}
+                                    >
+                                        Reset
+                                    </Button>
                                     <Button
                                         sx={{
                                             textTransform: 'none',
                                             background: '#0284C7',
                                             borderRadius: '6px',
                                             color: '#FFFFFF',
-                                            fontSize: '12px',
+                                            fontSize: '10px',
                                             fontWeight: 500,
                                             fontFamily: 'SF Pro Display',
-                                            width:'100%',
                                             '&:hover': {
                                                 background: '#0284C7',
                                             },
                                         }}
-                                        onClick={()=>navigate('/interviewSchedule')}
+                                        onClick={() => navigate('/interviewSchedule')}
                                     >
                                         Schedule Interview
                                     </Button>
                                 </Box>
                             </Grid>
                         </Grid>
-                        {/* <Box mt={2}>
+                        <Box mt={1}>
                             {isSelected && (
-                                <Typography sx={{
-                                    fontSize: '12px',
-                                    fontFamily: 'SF Pro Display',
-                                    fontWeight: 500,
-                                    color: '#1C1C1E',
-                                }}>Candidates interview details for {selectedJobRole}:</Typography>
+                                <Typography
+                                    variant="inherit"
+                                    sx={{
+                                        fontSize: '12px',
+                                        fontFamily: 'SF Pro Display',
+                                        fontWeight: 500,
+                                        color: '#1C1C1E',
+                                    }}>Candidates interview details for <span style={{ fontWeight: 700 }}>{selectedJobRole}</span></Typography>
                             )}
-                        </Box> */}
-                        <Grid item xs={12} sm={12} md={12} display='flex' justifyContent='center' mt={2}>
+                        </Box>
+                        <Grid item xs={12} sm={12} md={12} display='flex' justifyContent='center' mt={1}>
                             {isSelected ? (
                                 <Box width='100%' height='60vh'>
                                     <TableContainer component={Paper}>
@@ -512,11 +530,11 @@ function AnalyticsReport() {
                                                         const isItemSelected = isChecked(profile.id);
                                                         return (
                                                             <TableRow key={profile.id} hover
-                                                              sx={{
-                                                        '& td': {
-                                                            padding: '0px',
-                                                        },
-                                                    }}
+                                                                sx={{
+                                                                    '& td': {
+                                                                        padding: '2px',
+                                                                    },
+                                                                }}
                                                             >
                                                                 <TableCell padding="checkbox">
                                                                     <Checkbox
@@ -548,35 +566,46 @@ function AnalyticsReport() {
                                                                             display: 'flex',
                                                                             flexDirection: 'column'
                                                                         }}>
-                                                                            <Typography sx={{
-                                                                                fontSize: '12px',
-                                                                                fontFamily: 'SF Pro Display',
-                                                                                fontWeight: 400,
-                                                                                color: '#1C1C1E',
-                                                                            }}>{profile.name}</Typography>
-                                                                            <Typography sx={{
-                                                                                fontSize: '10px',
-                                                                                fontFamily: 'SF Pro Display',
-                                                                                fontWeight: 400,
-                                                                                color: '#1C1C1E80',
-                                                                            }}>{profile.email}</Typography>
+                                                                            <Typography
+                                                                                variant="inherit"
+                                                                                sx={{
+                                                                                    fontSize: '12px',
+                                                                                    fontFamily: 'SF Pro Display',
+                                                                                    fontWeight: 400,
+                                                                                    color: '#1C1C1E',
+                                                                                }}>{profile.name}</Typography>
+                                                                            <Typography
+                                                                                variant="inherit"
+                                                                                sx={{
+                                                                                    fontSize: '10px',
+                                                                                    fontFamily: 'SF Pro Display',
+                                                                                    fontWeight: 400,
+                                                                                    color: '#1C1C1E80',
+                                                                                }}>{profile.email}</Typography>
                                                                         </Box>
                                                                     </Box>
                                                                 </TableCell>
-                                                                <TableCell> <Typography sx={{
-                                                                    ...interviewScoreStyle,
-                                                                    padding: '5px',
-                                                                    textAlign: 'center'
-                                                                }}>{profile.position}</Typography></TableCell>
                                                                 <TableCell>
-                                                                    <Typography sx={{
+                                                                    <Typography
+                                                                        variant="inherit"
+                                                                        sx={{
+                                                                            ...interviewScoreStyle,
+                                                                            padding: '5px',
+                                                                            textAlign: 'center'
+                                                                        }}>{profile.position}</Typography></TableCell>
+                                                                <TableCell>
+                                                                    <Typography 
+                                                                    variant="inherit"
+                                                                    sx={{
                                                                         ...interviewScoreStyle,
                                                                         padding: '5px',
                                                                         textAlign: 'center'
                                                                     }}>{profile.date.split(', ')[1] || 'N/A'}</Typography>
                                                                 </TableCell>
                                                                 <TableCell>
-                                                                    <Typography sx={{
+                                                                    <Typography 
+                                                                    variant="inherit"
+                                                                    sx={{
                                                                         ...interviewScoreStyle,
                                                                         color: interviewStatusColor(profile.status),
                                                                         padding: '5px',

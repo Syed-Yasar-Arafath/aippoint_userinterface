@@ -10,6 +10,7 @@ import {
   Modal,
   Box,
   Avatar,
+  TextField,
 } from '@mui/material';
 import { Search } from 'lucide-react';
 import React, { useEffect, useState } from 'react';
@@ -26,6 +27,7 @@ interface JobDescription {
   job_title: string;
   resume_data: { id: string; status: string }[];
   created_on: string;
+  job_description?: string; // Add job_description to interface
 }
 
 interface UserData {
@@ -53,6 +55,9 @@ const CollectionDefault: React.FC = () => {
   const [openModal, setOpenModal] = useState(false);
   const [resumeData, setResumeData] = useState<ResumeData[]>([]);
   const [filteredCollections, setFilteredCollections] = useState<any[]>([]);
+  const [openNoteModal, setOpenNoteModal] = useState(false); // State for note modal
+  const [note, setNote] = useState<string>(''); // State for note input
+  const [noteLoading, setNoteLoading] = useState(false); // State for note submission loading
 
   // Filter states
   const [jobRole, setJobRole] = useState('');
@@ -90,26 +95,26 @@ const CollectionDefault: React.FC = () => {
 
   // Transform API data for table display
   const collectionList = userData?.job_description?.map((job) => ({
+    jobid: job.jobid,
     job_title: job.job_title,
     profiles: job.resume_data?.length || 0,
     addedBy: userData.email,
     lastUpdated: job.created_on,
     resume_ids: job.resume_data.map((resume) => resume.id),
-    status: job.resume_data[0]?.status || 'Not interviewed', // Assuming first resume's status for filtering
+    status: job.resume_data[0]?.status || 'Not interviewed',
+    job_description: job.job_description || '', // Include job_description
   })) || [];
 
   // Apply filters to collectionList
   useEffect(() => {
     let filtered = collectionList;
 
-    // Job Role filter
     if (jobRole) {
       filtered = filtered.filter((collection) =>
         collection.job_title.toLowerCase().includes(jobRole.toLowerCase()),
       );
     }
 
-    // Experience filter (assuming experience is derived from resume_data)
     if (experience) {
       const expYears = parseInt(experience);
       filtered = filtered.filter((collection) =>
@@ -135,35 +140,30 @@ const CollectionDefault: React.FC = () => {
       );
     }
 
-    // User filter
     if (user) {
       filtered = filtered.filter((collection) =>
         collection.addedBy.toLowerCase().includes(user.toLowerCase()),
       );
     }
 
-    // Status filter
     if (status) {
       filtered = filtered.filter((collection) =>
         collection.status.toLowerCase().includes(status.toLowerCase()),
       );
     }
 
-    // Select filter (assuming it's a placeholder; customize as needed)
     if (select) {
       filtered = filtered.filter((collection) =>
         collection.job_title.toLowerCase().includes(select.toLowerCase()),
       );
     }
 
-    // Date filter
     if (selectedDate) {
       filtered = filtered.filter((collection) =>
         dayjs(collection.lastUpdated).isSame(selectedDate, 'day'),
       );
     }
 
-    // Search query filter
     if (searchQuery) {
       filtered = filtered.filter(
         (collection) =>
@@ -189,7 +189,6 @@ const CollectionDefault: React.FC = () => {
     <ExpandMore sx={{ fontSize: '20px', color: '#000', marginRight: '10px' }} />
   );
 
-  // Date Picker
   const [anchorEl, setAnchorEl] = useState<null | HTMLElement>(null);
   const handleDateClick = (event: React.MouseEvent<HTMLElement>) => {
     setAnchorEl(event.currentTarget);
@@ -200,7 +199,6 @@ const CollectionDefault: React.FC = () => {
   const open = Boolean(anchorEl);
   const id = open ? 'date-picker-popover' : undefined;
 
-  // Filter options
   const jobRoleOptions = [
     'Software Engineer - Frontend',
     'Software Analyst',
@@ -216,7 +214,6 @@ const CollectionDefault: React.FC = () => {
 
   const navigate = useNavigate();
 
-  // Handle View Profiles
   const handleViewProfiles = async (job: any) => {
     setSelectedJob(job);
     try {
@@ -234,7 +231,7 @@ const CollectionDefault: React.FC = () => {
       setOpenModal(true);
     } catch (error) {
       console.error('Error fetching resume data:', error);
-      setError('');
+      setError('Failed to fetch resume data');
     }
   };
 
@@ -257,6 +254,113 @@ const CollectionDefault: React.FC = () => {
       setTimeout(() => URL.revokeObjectURL(url), 100);
     } else {
       alert('No resume file available.');
+    }
+  };
+
+  const [scoreLoading, setScoreLoading] = useState(false);
+
+  const handleScoreNow = async () => {
+    if (!selectedJob?.jobid) {
+      setError('Job ID is missing');
+      return;
+    }
+    setScoreLoading(true);
+    setError(null);
+    try {
+      const response = await axios.post(
+        `${process.env.REACT_APP_DJANGO_PYTHON_MODULE_SERVICE}/get_jd_score/`,
+        { jd_id: selectedJob.jobid },
+        {
+          headers: {
+            Authorization: `Bearer ${token}`,
+            Organization: organisation,
+            'Content-Type': 'application/json',
+          },
+        },
+      );
+
+      if (response.status === 200 && Array.isArray(response.data)) {
+        setResumeData((prevResumeData) =>
+          prevResumeData.map((resume) => {
+            const scoredResume = response.data.find((scored: any) => scored.id === resume.id);
+            if (scoredResume) {
+              return {
+                ...resume,
+                score: scoredResume.score,
+                explanation: scoredResume.explanation,
+              };
+            }
+            return resume;
+          }),
+        );
+      } else if (response.status === 404) {
+        setError('No matching resumes found for this job description.');
+      } else {
+        setError('Unexpected response from server.');
+      }
+    } catch (error) {
+      console.error('Error scoring resumes:', error);
+      setError('Failed to score resumes');
+    } finally {
+      setScoreLoading(false);
+    }
+  };
+
+  // Handle Note Modal
+  const handleOpenNoteModal = (jobDescription: string) => {
+    setNote(jobDescription || ''); // Pre-fill with existing job_description
+    setOpenNoteModal(true);
+  };
+
+  const handleCloseNoteModal = () => {
+    setOpenNoteModal(false);
+    setNote('');
+  };
+
+  const handleSaveNote = async () => {
+    if (!selectedJob?.jobid) {
+      setError('Job ID is missing');
+      return;
+    }
+    setNoteLoading(true);
+    setError(null);
+    try {
+      const response = await axios.put(
+        `${process.env.REACT_APP_SPRINGBOOT_BACKEND_SERVICE}/job/update/${selectedJob.jobid}`,
+        { job_description: note },
+        {
+          headers: {
+            Authorization: `Bearer ${token}`,
+            'Content-Type': 'application/json',
+          },
+        },
+      );
+
+      if (response.status === 200) {
+        // Update userData to reflect the new job_description
+        setUserData((prev) =>
+          prev
+            ? {
+                ...prev,
+                job_description: prev.job_description.map((job) =>
+                  job.jobid === selectedJob.jobid ? { ...job, job_description: note } : job,
+                ),
+              }
+            : prev,
+        );
+        // Update selectedJob to reflect the new job_description
+        setSelectedJob((prev: any) => ({ ...prev, job_description: note }));
+        handleCloseNoteModal();
+      } else {
+        // setError('Failed to save note');
+                setError('');
+
+      }
+    } catch (error) {
+      console.error('Error saving note:', error);
+      setError('');
+    } finally {
+      setNoteLoading(false);
     }
   };
 
@@ -514,7 +618,7 @@ const CollectionDefault: React.FC = () => {
                     '&.Mui-selected': {
                       color: '#0284C7',
                       backgroundColor: '#e3f2fd',
-                      '&:hover': { backgroundColor: '#f1f5f9' },
+                      '&:hover': { backgroundColor: '#f1f5f929' },
                     },
                   }}
                 >
@@ -561,11 +665,9 @@ const CollectionDefault: React.FC = () => {
           </Grid>
         </Grid>
 
-        {/* Loading and Error States */}
         {dispatchLoading && <Typography>Loading...</Typography>}
         {error && <Typography color="error">{error}</Typography>}
 
-        {/* Table */}
         <p
           style={{
             fontSize: '0.875rem',
@@ -723,7 +825,6 @@ const CollectionDefault: React.FC = () => {
           </table>
         </div>
 
-        {/* Pagination & Button */}
         <Grid
           container
           justifyContent="center"
@@ -788,7 +889,7 @@ const CollectionDefault: React.FC = () => {
           </Grid>
         </Grid>
 
-        {/* Modal for Resume Details */}
+        {/* Resume Details Modal */}
         <Modal open={openModal} onClose={handleCloseModal}>
           <Box
             sx={{
@@ -847,14 +948,22 @@ const CollectionDefault: React.FC = () => {
                       <Typography variant="h6" sx={{ fontSize: 10, color: '#000', paddingTop: '5px' }}>
                         <strong>Prev Interview:</strong> N/A
                       </Typography>
-                      <Button
-                        variant="contained"
-                        color="primary"
-                        sx={{ mt: 1 }}
-                        onClick={() => handleViewResume(resume.file_data)}
-                      >
-                        View CV/Resume
-                      </Button>
+                      <Box sx={{ display: 'flex', gap: 1, mt: 1 }}>
+                        <Button
+                          variant="contained"
+                          color="primary"
+                          onClick={() => handleViewResume(resume.file_data)}
+                        >
+                          View CV/Resume
+                        </Button>
+                        <Button
+                          variant="contained"
+                          color="primary"
+                          onClick={() => handleOpenNoteModal(selectedJob?.job_description)}
+                        >
+                          Note
+                        </Button>
+                      </Box>
                     </Box>
                     <Box sx={{ ml: 2 }}>
                       <Typography variant="h6" sx={{ fontSize: 10, color: '#000', paddingTop: '5px' }}>
@@ -870,6 +979,15 @@ const CollectionDefault: React.FC = () => {
                       </Typography>
                     </Box>
                     <Box sx={{ ml: 2 }}>
+                      <Button
+                        variant="contained"
+                        color="primary"
+                        sx={{ mt: 1 }}
+                        onClick={handleScoreNow}
+                        disabled={scoreLoading}
+                      >
+                        {scoreLoading ? 'Scoring...' : 'Score Now'}
+                      </Button>
                       <Typography variant="h6" sx={{ fontSize: 10, color: '#000', paddingTop: '5px' }}>
                         <strong>Uploaded By:</strong> {resume.resume_data?.created_by || createdBy}
                       </Typography>
@@ -889,6 +1007,54 @@ const CollectionDefault: React.FC = () => {
                 </Grid>
               ))}
             </Grid>
+          </Box>
+        </Modal>
+
+        {/* Note Modal */}
+        <Modal open={openNoteModal} onClose={handleCloseNoteModal}>
+          <Box
+            sx={{
+              position: 'absolute',
+              top: '50%',
+              left: '50%',
+              transform: 'translate(-50%, -50%)',
+              width: '400px',
+              bgcolor: 'background.paper',
+              boxShadow: 24,
+              p: 4,
+              borderRadius: '8px',
+            }}
+          >
+            <Typography variant="h6" sx={{ mb: 2 }}>
+              Add/Edit Note for {selectedJob?.job_title}
+            </Typography>
+            <TextField
+              label="Note"
+              multiline
+              rows={4}
+              value={note}
+              onChange={(e) => setNote(e.target.value)}
+              fullWidth
+              variant="outlined"
+              sx={{ mb: 2 }}
+            />
+            <Box sx={{ display: 'flex', justifyContent: 'flex-end', gap: 1 }}>
+              <Button
+                variant="outlined"
+                onClick={handleCloseNoteModal}
+                disabled={noteLoading}
+              >
+                Cancel
+              </Button>
+              <Button
+                variant="contained"
+                color="primary"
+                onClick={handleSaveNote}
+                disabled={noteLoading}
+              >
+                {noteLoading ? 'Saving...' : 'Save'}
+              </Button>
+            </Box>
           </Box>
         </Modal>
       </div>

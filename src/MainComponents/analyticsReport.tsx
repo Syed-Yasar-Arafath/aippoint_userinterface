@@ -244,7 +244,7 @@ function AnalyticsReport() {
             <Header
                 title="Analytics Report"
                 userProfileImage={userProfileImage}
-                path="/analytics_report"
+                path=""
             />
 
             <Grid
@@ -456,6 +456,7 @@ function AnalyticsReport() {
                                                 background: '#0284C7',
                                             },
                                         }}
+                                        onClick={()=>navigate('/interviewSchedule')}
                                     >
                                         Schedule Interview
                                     </Button>

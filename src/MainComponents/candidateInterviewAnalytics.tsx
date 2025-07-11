@@ -496,7 +496,7 @@ function CandidateInterviewAnalytics() {
                 options: {
                     chart: {
                         width: 350,
-                        height: 170,
+                        height: 150,
                     },
                     legend: {
                         position: 'bottom',
@@ -618,17 +618,18 @@ function CandidateInterviewAnalytics() {
                 // userProfileImage={userProfileImage}
                 path="/analytics_report"
             />
-            <Grid container spacing={1} padding={1} sx={{ background: '#F7F7F7' }}>
+            <Grid container spacing={1} pl={2} pr={1} pb={1} sx={{ background: '#F7F7F7' }}>
                 {interviewData ? (
                     <>
                         <Grid item xs={12} sm={6} md={4}>
-                            <Card sx={{ background: '#FFFFFF', borderRadius: '12px', height: '230px' }} elevation={0}>
+                            <Card sx={{ background: '#FFFFFF', borderRadius: '12px', height: '200px' }} elevation={0}>
                                 <CardContent>
-                                    <Typography sx={cardTitleStyle}>Candidate Overview</Typography>
-                                    <Box mt={1} sx={{
+                                    <Typography variant="inherit" sx={cardTitleStyle}>Candidate Overview</Typography>
+                                    <Box mt={1} mb={1} sx={{
                                         display: 'flex',
                                         justifyContent: 'space-between',
                                         flexDirection: 'row',
+                                        alignItems:'center'
                                     }}>
                                         <Avatar
                                             alt={interviewData.resume_data.name}
@@ -644,20 +645,26 @@ function CandidateInterviewAnalytics() {
                                                     .toUpperCase()}
                                         </Avatar>
                                         <Box>
-                                            <Typography sx={{
+                                            <Typography 
+                                            variant="inherit"
+                                            sx={{
                                                 color: '#1C1C1E',
                                                 fontSize: '12px',
                                                 fontWeight: 500,
                                                 fontFamily: 'SF Pro Display',
                                             }}>{interviewData.resume_data.name || 'N/A'}</Typography>
-                                            <Typography sx={{
+                                            <Typography 
+                                            variant="inherit"
+                                            sx={{
                                                 color: '#1C1C1E80',
                                                 fontSize: '10px',
                                                 fontWeight: 400,
                                                 fontFamily: 'SF Pro Display',
                                             }}>{interviewData.resume_data.email || 'N/A'}</Typography>
                                         </Box>
-                                        {/* <Typography sx={{
+                                        <Typography 
+                                        variant="inherit"
+                                        sx={{
                                             border: '0.5px solid #1C1C1E1A',
                                             borderRadius: '6px',
                                             color: '#1C1C1E',
@@ -665,24 +672,27 @@ function CandidateInterviewAnalytics() {
                                             fontWeight: 400,
                                             fontFamily: 'SF Pro Display',
                                             alignContent: 'center',
-                                            padding: '0px 10px',
-                                            height: '30px'
-                                        }}>Date: {interviewData.interview_time.split(', ')[1] || 'N/A'}</Typography> */}
+                                            padding: '5px 10px',
+                                        }}>Date: {interviewData.interview_time.split(', ')[1] || 'N/A'}</Typography>
                                     </Box>
-                                    <Typography mt={1} sx={{
+                                    <Typography mt={1} 
+                                    variant="inherit"
+                                    sx={{
                                         color: '#1C1C1E80',
                                         fontSize: '10px',
                                         fontWeight: 400,
                                         fontFamily: 'SF Pro Display',
-                                        height: '80px',
+                                        height: '60px',
                                         overflow: 'auto'
-                                    }}>{interviewData.resume_data.Resume_Category || 'N/A'}</Typography>
+                                    }}>{interviewData.resume_data.job_role || 'N/A'}</Typography>
                                     <Box mt={1} sx={{
                                         display: 'flex',
                                         justifyContent: 'space-between',
                                         flexDirection: 'row',
                                     }}>
-                                         <Typography sx={{
+                                         <Typography 
+                                         variant="inherit"
+                                         sx={{
                                             alignContent: 'center',
                                             border: '0.5px solid #1C1C1E1A',
                                             borderRadius: '6px',
@@ -690,19 +700,8 @@ function CandidateInterviewAnalytics() {
                                             fontSize: '10px',
                                             fontWeight: 500,
                                             fontFamily: 'SF Pro Display',
-                                            padding: '0px 10px'
+                                            padding: '5px 10px'
                                         }}>{interviewData.interview_status || 'N/A'}</Typography>
-                                        <Typography sx={{
-                                            border: '0.5px solid #1C1C1E1A',
-                                            borderRadius: '6px',
-                                            color: '#1C1C1E',
-                                            fontSize: '10px',
-                                            fontWeight: 400,
-                                            fontFamily: 'SF Pro Display',
-                                            alignContent: 'center',
-                                            padding: '0px 10px',
-                                            height: '30px'
-                                        }}>Date: {interviewData.interview_time.split(', ')[1] || 'N/A'}</Typography>
                                         {/* <Button sx={{
                                             textTransform: 'none',
                                             border: '0.5px solid #1C1C1E1A',
@@ -722,9 +721,9 @@ function CandidateInterviewAnalytics() {
                         </Grid>
 
                         <Grid item xs={12} sm={6} md={4}>
-                            <Card sx={{ background: '#FFFFFF', borderRadius: '12px', height: '230px' }} elevation={0}>
+                            <Card sx={{ background: '#FFFFFF', borderRadius: '12px', height: '200px' }} elevation={0}>
                                 <CardContent>
-                                    <Typography sx={cardTitleStyle}>Total Number of Questions</Typography>
+                                    <Typography variant="inherit" sx={cardTitleStyle}>Total Number of Questions</Typography>
                                     <Box mt={1} width="100%">
                                         <ReactApexChart options={pieChart.options as ApexOptions} series={pieChart.series} type="donut" />
                                     </Box>
@@ -733,18 +732,20 @@ function CandidateInterviewAnalytics() {
                         </Grid>
 
                         <Grid item xs={12} sm={6} md={4} >
-                            <Card sx={{ background: '#FFFFFF', borderRadius: '12px', height: '230px' }} elevation={0}>
+                            <Card sx={{ background: '#FFFFFF', borderRadius: '12px', height: '200px' }} elevation={0}>
                                 <CardContent>
-                                    <Typography sx={cardTitleStyle}>Overall Interview Score</Typography>
+                                    <Typography variant="inherit" sx={cardTitleStyle}>Overall Interview Score</Typography>
                                     <Box mt={1} sx={{
                                         display: 'flex',
                                         justifyContent: 'center',
                                         alignItems: 'center',
+                                        marginTop:'10px'
                                     }}>
                                         <Typography
+                                        variant="inherit"
                                             sx={{
-                                                width: '150px',
-                                                height: '150px',
+                                                width: '120px',
+                                                height: '120px',
                                                 background: getColorByRange(interviewData.overall_score * 10),
                                                 border: `10px solid ${reduceColorOpacityByRange(interviewData.overall_score * 10)}`,
                                                 color: '#FFFFFF',
@@ -758,7 +759,9 @@ function CandidateInterviewAnalytics() {
                                                 alignItems: 'center',
                                             }}
                                         >{interviewData.overall_score * 10 || '0'}%
-                                            <Typography sx={{
+                                            <Typography 
+                                            variant="inherit"
+                                            sx={{
                                                 color: '#FFFFFF',
                                                 fontSize: '14px',
                                                 fontWeight: 500,
@@ -771,14 +774,14 @@ function CandidateInterviewAnalytics() {
                         </Grid>
 
                         <Grid item xs={12} sm={6} md={4} >
-                            <Card sx={{ background: '#FFFFFF', borderRadius: '12px', height: '230px' }} elevation={0}>
+                            <Card sx={{ background: '#FFFFFF', borderRadius: '12px', height: '200px' }} elevation={0}>
                                 <CardContent>
                                     <Box sx={{
                                         display: 'flex',
                                         justifyContent: 'space-between',
                                         flexDirection: 'row'
                                     }}>
-                                        <Typography sx={cardTitleStyle}>Skill Analysis</Typography>
+                                        <Typography variant="inherit" sx={cardTitleStyle}>Skill Analysis</Typography>
                                         <FormControl>
                                             <Select
                                                 labelId="skill-select-label"
@@ -791,7 +794,7 @@ function CandidateInterviewAnalytics() {
                                             </Select>
                                         </FormControl>
                                     </Box>
-                                    <Box mt={1} sx={{ height: '170px', overflow: 'auto' }}>
+                                    <Box mt={1} sx={{ height: '150px', overflow: 'auto' }}>
                                         {selectedSkills ? (
                                             softSkill &&
                                             Object.entries(softSkill).map(([skill, rating]) => (
@@ -806,6 +809,7 @@ function CandidateInterviewAnalytics() {
                                                     }}
                                                 >
                                                     <Typography
+                                                    variant="inherit"
                                                         sx={{
                                                             color: '#1C1C1E',
                                                             fontSize: '12px',
@@ -830,13 +834,17 @@ function CandidateInterviewAnalytics() {
                                             Object.entries(technicalSkill).map(([skill, value]) => (
                                                 <Box key={skill} mb={1}>
                                                     <Box display="flex" flexDirection="row" justifyContent="space-between">
-                                                        <Typography sx={{
+                                                        <Typography 
+                                                        variant="inherit"
+                                                        sx={{
                                                             color: '#1C1C1E',
                                                             fontSize: '12px',
                                                             fontWeight: 400,
                                                             fontFamily: 'SF Pro Display',
                                                         }}>{skill}</Typography>
-                                                        <Typography sx={{
+                                                        <Typography
+                                                        variant="inherit"
+                                                         sx={{
                                                             color: '#0284C7',
                                                             fontSize: '12px',
                                                             fontWeight: 400,
@@ -853,14 +861,14 @@ function CandidateInterviewAnalytics() {
                         </Grid>
 
                         <Grid item xs={12} sm={6} md={4} >
-                            <Card sx={{ background: '#FFFFFF', borderRadius: '12px', height: '230px' }} elevation={0}>
+                            <Card sx={{ background: '#FFFFFF', borderRadius: '12px', height: '200px' }} elevation={0}>
                                 <CardContent>
                                     <Box sx={{
                                         display: 'flex',
                                         justifyContent: 'space-between',
                                         flexDirection: 'row'
                                     }}>
-                                        <Typography sx={cardTitleStyle}>Question-wise Performance</Typography>
+                                        <Typography variant="inherit" sx={cardTitleStyle}>Question-wise Performance</Typography>
                                         {/* <FormControl>
                                             <Select
                                                 labelId="skill-select-label"
@@ -874,7 +882,7 @@ function CandidateInterviewAnalytics() {
                                         </FormControl> */}
                                     </Box>
                                     <Box mt={1} sx={{
-                                        height: '170px',
+                                        height: '150px',
                                         overflow: 'auto'
                                     }}>
                                         {/* {selectedQuestionType ? (
@@ -902,7 +910,9 @@ function CandidateInterviewAnalytics() {
                                         )} */}
                                         {technicalQuestions.map((item: any, index: any) => (
                                             <Box key={index} mb={2}>
-                                                <Typography sx={{
+                                                <Typography 
+                                                variant="inherit"
+                                                sx={{
                                                     fontSize: '12px',
                                                     fontWeight: 500,
                                                     fontFamily: 'SF Pro Display',
@@ -912,10 +922,11 @@ function CandidateInterviewAnalytics() {
                                                     display: 'flex',
                                                     flexDirection: 'row',
                                                     justifyContent: 'space-between',
+                                                    marginTop:'5px'
                                                 }}>
-                                                    <Typography sx={{ ...questionPerformanceStyle, color: getColorByRange(item.analysis.correctness), }}>Correctness: {item.analysis.correctness}%</Typography>
-                                                    <Typography sx={{ ...questionPerformanceStyle, color: getColorByRange(item.analysis.clarity), }}>Clarity: {item.analysis.clarity}%</Typography>
-                                                    <Typography sx={{ ...questionPerformanceStyle, color: getColorByRange(item.analysis.Perfection), }}>Perfection: {item.analysis.Perfection}%</Typography>
+                                                    <Typography variant="inherit" sx={{ ...questionPerformanceStyle, color: getColorByRange(item.analysis.correctness), }}>Correctness: {item.analysis.correctness}%</Typography>
+                                                    <Typography variant="inherit" sx={{ ...questionPerformanceStyle, color: getColorByRange(item.analysis.clarity), }}>Clarity: {item.analysis.clarity}%</Typography>
+                                                    <Typography variant="inherit" sx={{ ...questionPerformanceStyle, color: getColorByRange(item.analysis.Perfection), }}>Perfection: {item.analysis.Perfection}%</Typography>
                                                 </Box>
                                             </Box>
                                         ))}
@@ -925,14 +936,14 @@ function CandidateInterviewAnalytics() {
                         </Grid>
 
                         <Grid item xs={12} sm={6} md={4} >
-                            <Card sx={{ background: '#FFFFFF', borderRadius: '12px', height: '230px' }} elevation={0}>
+                            <Card sx={{ background: '#FFFFFF', borderRadius: '12px', height: '200px' }} elevation={0}>
                                 <CardContent>
                                     <Box sx={{
                                         display: 'flex',
                                         justifyContent: 'space-between',
                                         flexDirection: 'row'
                                     }}>
-                                        <Typography sx={cardTitleStyle}>Interview Outcome</Typography>
+                                        <Typography variant="inherit" sx={cardTitleStyle}>Interview Outcome</Typography>
                                         {/* <FormControl>
                                             <Select
                                                 labelId="skill-select-label"
@@ -962,11 +973,11 @@ function CandidateInterviewAnalytics() {
                         </Grid>
 
                         <Grid item xs={12} sm={6} md={4} >
-                            <Card sx={{ background: '#FFFFFF', borderRadius: '12px', height: '230px' }} elevation={0}>
+                            <Card sx={{ background: '#FFFFFF', borderRadius: '12px', height: '200px' }} elevation={0}>
                                 <CardContent>
-                                    <Typography sx={cardTitleStyle}>Proctoring Details</Typography>
+                                    <Typography variant="inherit" sx={cardTitleStyle}>Proctoring Details</Typography>
                                     <Box mt={1} sx={{
-                                        height: '170px',
+                                        height: '150px',
                                         overflow: 'auto'
                                     }}>
                                         {proctoringDetails.map((item, index) => (
@@ -977,8 +988,8 @@ function CandidateInterviewAnalytics() {
                                                 gap: '20px'
                                             }}>
                                                 <Box
-                                                    height="3px"
-                                                    width="3px"
+                                                    height="0px"
+                                                    width="0px"
                                                     display="flex"
                                                     alignItems="center"
                                                     justifyContent="center"
@@ -993,13 +1004,17 @@ function CandidateInterviewAnalytics() {
                                                     display: 'flex',
                                                     flexDirection: 'column',
                                                 }}>
-                                                    <Typography sx={{
+                                                    <Typography
+                                                    variant="inherit"
+                                                     sx={{
                                                         color: '#1C1C1E',
                                                         fontSize: '12px',
                                                         fontWeight: 500,
                                                         fontFamily: 'SF Pro Display',
                                                     }}>{item.heading}</Typography>
-                                                    <Typography sx={{
+                                                    <Typography 
+                                                    variant="inherit"
+                                                    sx={{
                                                         color: (item.text === 'Yes, detected' || item.text === 'Failed' || item.text === 'Abnormal, excessive sideways glances detected') ? '#FF3B30' : '#22973F',
                                                         fontSize: '10px',
                                                         fontWeight: 400,
@@ -1014,14 +1029,14 @@ function CandidateInterviewAnalytics() {
                         </Grid>
 
                         <Grid item xs={12} sm={6} md={4} >
-                            <Card sx={{ background: '#FFFFFF', borderRadius: '12px', height: '230px' }} elevation={0}>
+                            <Card sx={{ background: '#FFFFFF', borderRadius: '12px', height: '200px' }} elevation={0}>
                                 <CardContent>
                                     <Box sx={{
                                         display: 'flex',
                                         justifyContent: 'space-between',
                                         flexDirection: 'row'
                                     }}>
-                                        <Typography sx={cardTitleStyle}>Interview Summary</Typography>
+                                        <Typography variant="inherit" sx={cardTitleStyle}>Interview Summary</Typography>
                                         {/* <FormControl>
                                             <Select
                                                 labelId="skill-select-label"
@@ -1034,7 +1049,7 @@ function CandidateInterviewAnalytics() {
                                             </Select>
                                         </FormControl> */}
                                     </Box>
-                                    <Box mt={1} sx={{ height: '170px', overflow: 'auto' }}>
+                                    <Box mt={1} sx={{ height: '150px', overflow: 'auto' }}>
                                         {/* {selectedType ? (
                                             'No Data'
                                         ) : ( */}
@@ -1044,38 +1059,46 @@ function CandidateInterviewAnalytics() {
                                             gap: '10px'
                                         }}>
                                             <Box>
-                                                <Typography sx={{ ...interviewSummaryHeadingStyle, color: '#22973F', }}>
+                                                <Typography variant="inherit" sx={{ ...interviewSummaryHeadingStyle, color: '#22973F' }}>
                                                     Strengths
                                                 </Typography>
                                                 {strengths.map((str: any, index: number) => (
                                                     <Typography
+                                                        variant="inherit"
                                                         key={`strength-${index}`}
                                                         sx={{
                                                             color: '#1C1C1E',
                                                             fontSize: '12px',
                                                             fontWeight: 400,
                                                             fontFamily: 'SF Pro Display',
+                                                            display:'flex',
+                                                            alignItems:'center',
+                                                            paddingTop:'5px'
                                                         }}
                                                     >
-                                                        <CircleCheck color='#22973F' height='20px' /> {str}
+                                                        <CircleCheck color='#22973F' height='15px' /> {str}
                                                     </Typography>
                                                 ))}
                                             </Box>
                                             <Box>
-                                                <Typography sx={{ ...interviewSummaryHeadingStyle, color: '#FF3B30', }}>
+                                                <Typography variant="inherit" sx={{ ...interviewSummaryHeadingStyle, color: '#FF3B30', }}>
                                                     Improvements
                                                 </Typography>
                                                 {improvements.map((imp: any, index: number) => (
                                                     <Typography
+                                                        variant="inherit"
                                                         key={`improvement-${index}`}
                                                         sx={{
                                                             color: '#1C1C1E',
                                                             fontSize: '12px',
                                                             fontWeight: 400,
                                                             fontFamily: 'SF Pro Display',
+                                                            display:'flex',
+                                                            alignItems:'center',
+                                                            paddingTop:'5px'
                                                         }}
                                                     >
-                                                        <CircleAlert color='#FF3B30' height='20px' /> {imp}
+                                                        <CircleAlert color='#FF3B30' height='15px' /> {imp}
                                                     </Typography>
                                                 ))}
                                             </Box>
@@ -1087,16 +1110,18 @@ function CandidateInterviewAnalytics() {
                         </Grid>
 
                         <Grid item xs={12} sm={6} md={4} >
-                            <Card sx={{ background: '#FFFFFF', borderRadius: '12px', height: '230px' }} elevation={0}>
+                            <Card sx={{ background: '#FFFFFF', borderRadius: '12px', height: '200px' }} elevation={0}>
                                 <CardContent>
-                                    <Typography sx={cardTitleStyle}>Interview Outcome</Typography>
+                                    <Typography variant="inherit" sx={cardTitleStyle}>Interview Outcome</Typography>
                                     <Box mt={1}>
-                                        <Typography sx={{
+                                        <Typography
+                                        variant="inherit"
+                                         sx={{
                                             color: '#1C1C1E',
                                             fontSize: '12px',
                                             fontWeight: 400,
                                             fontFamily: 'SF Pro Display',
-                                            height: '120px',
+                                            height: '100px',
                                             overflow: 'auto'
                                         }}>{'N/A'}</Typography>
                                         <Box mt={2} sx={{

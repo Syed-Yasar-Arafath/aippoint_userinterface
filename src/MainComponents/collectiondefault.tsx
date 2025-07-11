@@ -1,4 +1,4 @@
-import { ExpandMore } from '@mui/icons-material'
+import { ExpandMore } from '@mui/icons-material';
 import {
   Button,
   Grid,
@@ -7,124 +7,120 @@ import {
   Select,
   Typography,
   Popover,
-} from '@mui/material'
-import { Search } from 'lucide-react'
-import React, { useEffect, useState } from 'react'
-import { AdapterDayjs } from '@mui/x-date-pickers/AdapterDayjs'
-import { LocalizationProvider } from '@mui/x-date-pickers/LocalizationProvider'
-import { DatePicker } from '@mui/x-date-pickers/DatePicker'
-import dayjs from 'dayjs'
-import EventIcon from '@mui/icons-material/Event'
-import axios from 'axios'
+  Modal,
+  Box,
+  Avatar,
+} from '@mui/material';
+import { Search } from 'lucide-react';
+import React, { useEffect, useState } from 'react';
+import { AdapterDayjs } from '@mui/x-date-pickers/AdapterDayjs';
+import { LocalizationProvider } from '@mui/x-date-pickers/LocalizationProvider';
+import { DatePicker } from '@mui/x-date-pickers/DatePicker';
+import dayjs from 'dayjs';
+import EventIcon from '@mui/icons-material/Event';
+import axios from 'axios';
+import { useNavigate } from 'react-router-dom';
+
+interface JobDescription {
+  jobid: number;
+  job_title: string;
+  resume_data: { id: string; status: string }[];
+  created_on: string;
+}
+
+interface UserData {
+  email: string;
+  job_description: JobDescription[];
+}
+
+interface ResumeData {
+  id: string;
+  resume_name: string;
+  resume_data: any;
+  file_data: string | null;
+  explanation: any;
+}
 
 const CollectionDefault: React.FC = () => {
+  const token = localStorage.getItem('token');
+  const organisation = localStorage.getItem('organisation');
+  const [loading, setLoading] = useState(false);
+  const [dispatchLoading, setDispatchLoading] = useState(false);
+  const [error, setError] = useState<string | null>(null);
+  const [userData, setUserData] = useState<UserData | null>(null);
+  const [createdBy, setCreatedBy] = useState('');
+  const [selectedJob, setSelectedJob] = useState<any | null>(null); // Adjusted type to any for flexibility
+  const [openModal, setOpenModal] = useState(false);
+  const [resumeData, setResumeData] = useState<ResumeData[]>([]);
 
-  const collections = [
-
-    {
-      name: 'Junior Data Analyst',
-      profiles: 63,
-      addedBy: 'Kiran Naidu',
-      lastUpdated: '25-Mar-2025',
-      image: 'https://picsum.photos/seed/kiran4/24/24',
-      experience: '2 years',
-      status: 'Scheduled',
-    },
-    {
-      name: 'Junior Data Analyst',
-      profiles: 63,
-      addedBy: 'Kiran Naidu',
-      lastUpdated: '25-Mar-2025',
-      image: 'https://picsum.photos/seed/kiran4/24/24',
-      experience: '2 years',
-      status: 'Scheduled',
-    }, {
-      name: 'Junior Data Analyst',
-      profiles: 63,
-      addedBy: 'Kiran Naidu',
-      lastUpdated: '25-Mar-2025',
-      image: 'https://picsum.photos/seed/kiran4/24/24',
-      experience: '2 years',
-      status: 'Scheduled',
-    },
-    {
-      name: 'Software Engineer - Java Developer',
-      profiles: 120,
-      addedBy: 'Rahul Sharma',
-      lastUpdated: '25-Mar-2025',
-      image: 'https://picsum.photos/seed/rahul4/24/24',
-      experience: '6 years',
-      status: 'Interview Completed',
-    },
-  ]
-    const [collectionArray, setCollectionArray] = useState([])
-  const organisation = localStorage.getItem('organisation')
-  const getCollectionData = async () => {
-    const res = await axios.get(`http://localhost:8082/job/read/${'nvidia'}`)
-    if (res!=null) {
-      setCollectionArray(res.data)
-    }
-  }
   useEffect(() => {
-    getCollectionData();
-  }, []);
-  // Grouping job_title with their counts
-const groupedCollections = collectionArray.reduce((acc: any, item: any) => {
-  const title = item.job_title.trim().toLowerCase(); // normalize for consistency
-
-  const resumeCount = Array.isArray(item.resume_data) ? item.resume_data.length : 0;
-
-  if (!acc[title]) {
-    acc[title] = {
-      job_title: item.job_title, // Keep original casing
-      profiles: resumeCount,     // total resume count
-      addedBy: item.added_by ?? null, // optional chaining if added_by might be missing
-      lastUpdated: item.created_on || item.last_updated || null,
+    const getUserData = async () => {
+      setDispatchLoading(true);
+      try {
+        const res = await axios.get(
+          `${process.env.REACT_APP_SPRINGBOOT_BACKEND_SERVICE}/user/read/${organisation}`,
+          {
+            headers: {
+              Authorization: `Bearer ${token}`,
+            },
+          },
+        );
+        setUserData(res.data);
+        setCreatedBy(res.data.email);
+        setDispatchLoading(false);
+      } catch (error) {
+        console.error('Error fetching data:', error);
+        setError('Failed to fetch user data');
+        setDispatchLoading(false);
+      }
     };
-  } else {
-    acc[title].profiles += resumeCount;
-  }
 
-  return acc;
-}, {});
+    getUserData();
+  }, [organisation, token]);
 
-// Convert object to array
-const collectionList = Object.values(groupedCollections);
+  // Transform API data for table display
+  const collectionList = userData?.job_description?.map((job) => ({
+    job_title: job.job_title,
+    profiles: job.resume_data?.length || 0,
+    addedBy: userData.email,
+    lastUpdated: job.created_on,
+    resume_ids: job.resume_data.map((resume) => resume.id),
+  })) || [];
 
-  const [currentPage, setCurrentPage] = useState(1)
-  const itemsPerPage = 9
-  const totalPages = Math.ceil(collections.length / itemsPerPage)
-  const paginatedCollections = collections.slice(
+  const [currentPage, setCurrentPage] = useState(1);
+  const itemsPerPage = 9;
+  const totalPages = Math.ceil(collectionList.length / itemsPerPage);
+  const paginatedCollections = collectionList.slice(
     (currentPage - 1) * itemsPerPage,
     currentPage * itemsPerPage,
-  )
-  const [selectedRow, setSelectedRow] = useState<number | null>(null)
+  );
+  const [selectedRow, setSelectedRow] = useState<number | null>(null);
 
   // State for filter selections
-  const [jobRole, setJobRole] = useState('')
-  const [experience, setExperience] = useState('')
-  const [user, setUser] = useState('')
-  const [status, setStatus] = useState('')
-  const [select, setSelect] = useState('')
+  const [jobRole, setJobRole] = useState('');
+  const [experience, setExperience] = useState('');
+  const [user, setUser] = useState('');
+  const [status, setStatus] = useState('');
+  const [select, setSelect] = useState('');
 
   const CustomExpandMore = () => (
-    <ExpandMore sx={{ fontSize: '20px', color: '#666', marginRight: '10px' }} />
-  )
+    <ExpandMore sx={{ fontSize: '20px', color: '#000', marginRight: '10px' }} />
+  );
 
   // Date Picker States
-  const [anchorEl, setAnchorEl] = useState<null | HTMLElement>(null)
-  const [selectedDate, setSelectedDate] = useState<dayjs.Dayjs | null>(null)
+  const [anchorEl, setAnchorEl] = useState<null | HTMLElement>(null);
+  const [selectedDate, setSelectedDate] = useState<dayjs.Dayjs | null>(null);
 
   const handleDateClick = (event: React.MouseEvent<HTMLElement>) => {
-    setAnchorEl(event.currentTarget)
-  }
+    setAnchorEl(event.currentTarget);
+  };
 
   const handleDateClose = () => {
-    setAnchorEl(null)
-  }
+    setAnchorEl(null);
+  };
 
-  const open = Boolean(anchorEl)
-  const id = open ? 'date-picker-popover' : undefined
+  const open = Boolean(anchorEl);
+  const id = open ? 'date-picker-popover' : undefined;
 
   // Filter options
   const jobRoleOptions = [
@@ -133,18 +129,56 @@ const collectionList = Object.values(groupedCollections);
     'Software Engineer - Full Stack',
     'Senior Product Manager',
     'DevOps Engineer',
-  ]
-  const experienceOptions = [
-    '1 years',
-    '3 years',
-    '5 years',
-    '7 years',
-    '9 years',
-  ]
-  const userOptions = ['Rahul Sharma', 'Kiran Naidu', 'Samer Khan']
-  const statusOptions = ['Not interviewed', 'Scheduled', 'Interview Completed']
-  const selectOptions = ['Option 1', 'Option 2', 'Option 3'] // Replace with actual options
+    'Java Developer',
+  ];
+  const experienceOptions = ['1 years', '3 years', '5 years', '7 years', '9 years'];
+  const userOptions = userData ? [userData.email] : [];
+  const statusOptions = ['Not interviewed', 'Scheduled', 'Interview Completed'];
+  const selectOptions = ['Option 1', 'Option 2', 'Option 3'];
+const navigate = useNavigate();
+  // Handle View Profiles click
+  const handleViewProfiles = async (job: any) => {
+    setSelectedJob(job);
+    try {
+      const response = await axios.post(
+        `${process.env.REACT_APP_DJANGO_PYTHON_MODULE_SERVICE}/get_resume/`,
+        { resume_id: job.resume_ids },
+        {
+          headers: {
+            Authorization: `Bearer ${token}`, // Added token for authentication
+            Organization: organisation,
+          },
+        },
+      );
+      setResumeData(response.data);
+      setOpenModal(true);
+    } catch (error) {
+      console.error('Error fetching resume data:', error);
+      setError('');
+    }
+  };
 
+  const handleCloseModal = () => {
+    setOpenModal(false);
+    setResumeData([]);
+  };
+const handleViewResume = (fileData: string | null) => {
+    if (fileData) {
+      const byteCharacters = atob(fileData);
+      const byteNumbers = new Array(byteCharacters.length);
+      for (let i = 0; i < byteCharacters.length; i++) {
+        byteNumbers[i] = byteCharacters.charCodeAt(i);
+      }
+      const byteArray = new Uint8Array(byteNumbers);
+      const blob = new Blob([byteArray], { type: 'application/pdf' });
+      const url = URL.createObjectURL(blob);
+      window.open(url, '_blank');
+      // Optionally, revoke the URL after the tab is opened to free memory
+      setTimeout(() => URL.revokeObjectURL(url), 100);
+    } else {
+      alert('No resume file available.');
+    }
+  };
   return (
     <LocalizationProvider dateAdapter={AdapterDayjs}>
       <div style={{ padding: '16px', maxWidth: '1280px', margin: '0 auto' }}>
@@ -169,17 +203,14 @@ const collectionList = Object.values(groupedCollections);
                 paddingLeft: '12px',
               }}
             >
-              <InputBase
-                placeholder="Search..."
-                sx={{ fontSize: '12px', width: '100%' }}
-              />
+              <InputBase placeholder="Search..." sx={{ fontSize: '12px', width: '100%' }} />
               <Search
                 style={{
                   position: 'absolute',
                   right: '8px',
                   top: '50%',
                   transform: 'translateY(-50%)',
-                  color: '#666',
+                  color: '#000',
                 }}
               />
             </div>
@@ -199,17 +230,10 @@ const collectionList = Object.values(groupedCollections);
                 border: '1px solid #ccc',
                 borderRadius: '4px',
                 backgroundColor: '#fff',
-                '& .MuiSelect-select': {
-                  color: '#0284C7',
-                },
+                '& .MuiSelect-select': { color: '#0284C7' },
               }}
               renderValue={(selected) => (
-                <Typography
-                  sx={{
-                    color: selected ? '#0284C7' : '#666',
-                    fontSize: '12px',
-                  }}
-                >
+                <Typography sx={{ color: selected ? '#0284C7' : '#000', fontSize: '12px' }}>
                   {selected || 'Select Job Role'}
                 </Typography>
               )}
@@ -217,14 +241,7 @@ const collectionList = Object.values(groupedCollections);
               <MenuItem
                 value=""
                 disabled
-                sx={{
-                  color: '#666',
-                  fontSize: '12px',
-                  '&:hover': {
-                    color: '#0284C7',
-                    backgroundColor: '#f1f5f9',
-                  },
-                }}
+                sx={{ color: '#000', fontSize: '12px', '&:hover': { color: '#0284C7', backgroundColor: '#f1f5f9' } }}
               >
                 Select Job Role
               </MenuItem>
@@ -233,19 +250,10 @@ const collectionList = Object.values(groupedCollections);
                   key={option}
                   value={option}
                   sx={{
-                    color: '#666',
+                    color: '#000',
                     fontSize: '12px',
-                    '&:hover': {
-                      color: '#0284C7',
-                      backgroundColor: '#f1f5f9',
-                    },
-                    '&.Mui-selected': {
-                      color: '#0284C7',
-                      backgroundColor: '#e3f2fd',
-                      '&:hover': {
-                        backgroundColor: '#f1f5f9',
-                      },
-                    },
+                    '&:hover': { color: '#0284C7', backgroundColor: '#f1f5f9' },
+                    '&.Mui-selected': { color: '#0284C7', backgroundColor: '#e3f2fd', '&:hover': { backgroundColor: '#f1f5f9' } },
                   }}
                 >
                   {option}
@@ -253,6 +261,7 @@ const collectionList = Object.values(groupedCollections);
               ))}
             </Select>
           </Grid>
+          {/* Other filter selects remain unchanged */}
           <Grid item>
             <Select
               displayEmpty
@@ -266,17 +275,10 @@ const collectionList = Object.values(groupedCollections);
                 border: '1px solid #ccc',
                 borderRadius: '4px',
                 backgroundColor: '#fff',
-                '& .MuiSelect-select': {
-                  color: '#0284C7',
-                },
+                '& .MuiSelect-select': { color: '#0284C7' },
               }}
               renderValue={(selected) => (
-                <Typography
-                  sx={{
-                    color: selected ? '#0284C7' : '#666',
-                    fontSize: '12px',
-                  }}
-                >
+                <Typography sx={{ color: selected ? '#0284C7' : '#000', fontSize: '12px' }}>
                   {selected || 'Select Experience'}
                 </Typography>
               )}
@@ -284,14 +286,7 @@ const collectionList = Object.values(groupedCollections);
               <MenuItem
                 value=""
                 disabled
-                sx={{
-                  color: '#666',
-                  fontSize: '12px',
-                  '&:hover': {
-                    color: '#0284C7',
-                    backgroundColor: '#f1f5f9',
-                  },
-                }}
+                sx={{ color: '#000', fontSize: '12px', '&:hover': { color: '#0284C7', backgroundColor: '#f1f5f9' } }}
               >
                 Select Experience
               </MenuItem>
@@ -300,19 +295,10 @@ const collectionList = Object.values(groupedCollections);
                   key={option}
                   value={option}
                   sx={{
-                    color: '#666',
+                    color: '#000',
                     fontSize: '12px',
-                    '&:hover': {
-                      color: '#0284C7',
-                      backgroundColor: '#f1f5f9',
-                    },
-                    '&.Mui-selected': {
-                      color: '#0284C7',
-                      backgroundColor: '#e3f2fd',
-                      '&:hover': {
-                        backgroundColor: '#f1f5f9',
-                      },
-                    },
+                    '&:hover': { color: '#0284C7', backgroundColor: '#f1f5f9' },
+                    '&.Mui-selected': { color: '#0284C7', backgroundColor: '#e3f2fd', '&:hover': { backgroundColor: '#f1f5f9' } },
                   }}
                 >
                   {option}
@@ -333,17 +319,10 @@ const collectionList = Object.values(groupedCollections);
                 border: '1px solid #ccc',
                 borderRadius: '4px',
                 backgroundColor: '#fff',
-                '& .MuiSelect-select': {
-                  color: '#0284C7',
-                },
+                '& .MuiSelect-select': { color: '#0284C7' },
               }}
               renderValue={(selected) => (
-                <Typography
-                  sx={{
-                    color: selected ? '#0284C7' : '#666',
-                    fontSize: '12px',
-                  }}
-                >
+                <Typography sx={{ color: selected ? '#0284C7' : '#000', fontSize: '12px' }}>
                   {selected || 'Select User'}
                 </Typography>
               )}
@@ -351,14 +330,7 @@ const collectionList = Object.values(groupedCollections);
               <MenuItem
                 value=""
                 disabled
-                sx={{
-                  color: '#666',
-                  fontSize: '12px',
-                  '&:hover': {
-                    color: '#0284C7',
-                    backgroundColor: '#f1f5f9',
-                  },
-                }}
+                sx={{ color: '#000', fontSize: '12px', '&:hover': { color: '#0284C7', backgroundColor: '#f1f5f9' } }}
               >
                 Select User
               </MenuItem>
@@ -367,19 +339,10 @@ const collectionList = Object.values(groupedCollections);
                   key={option}
                   value={option}
                   sx={{
-                    color: '#666',
+                    color: '#000',
                     fontSize: '12px',
-                    '&:hover': {
-                      color: '#0284C7',
-                      backgroundColor: '#f1f5f9',
-                    },
-                    '&.Mui-selected': {
-                      color: '#0284C7',
-                      backgroundColor: '#e3f2fd',
-                      '&:hover': {
-                        backgroundColor: '#f1f5f9',
-                      },
-                    },
+                    '&:hover': { color: '#0284C7', backgroundColor: '#f1f5f9' },
+                    '&.Mui-selected': { color: '#0284C7', backgroundColor: '#e3f2fd', '&:hover': { backgroundColor: '#f1f5f9' } },
                   }}
                 >
                   {option}
@@ -400,17 +363,10 @@ const collectionList = Object.values(groupedCollections);
                 border: '1px solid #ccc',
                 borderRadius: '4px',
                 backgroundColor: '#fff',
-                '& .MuiSelect-select': {
-                  color: '#0284C7',
-                },
+                '& .MuiSelect-select': { color: '#0284C7' },
               }}
               renderValue={(selected) => (
-                <Typography
-                  sx={{
-                    color: selected ? '#0284C7' : '#666',
-                    fontSize: '12px',
-                  }}
-                >
+                <Typography sx={{ color: selected ? '#0284C7' : '#000', fontSize: '12px' }}>
                   {selected || 'Select Status'}
                 </Typography>
               )}
@@ -418,14 +374,7 @@ const collectionList = Object.values(groupedCollections);
               <MenuItem
                 value=""
                 disabled
-                sx={{
-                  color: '#666',
-                  fontSize: '12px',
-                  '&:hover': {
-                    color: '#0284C7',
-                    backgroundColor: '#f1f5f9',
-                  },
-                }}
+                sx={{ color: '#000', fontSize: '12px', '&:hover': { color: '#0284C7', backgroundColor: '#f1f5f9' } }}
               >
                 Select Status
               </MenuItem>
@@ -434,19 +383,10 @@ const collectionList = Object.values(groupedCollections);
                   key={option}
                   value={option}
                   sx={{
-                    color: '#666',
+                    color: '#000',
                     fontSize: '12px',
-                    '&:hover': {
-                      color: '#0284C7',
-                      backgroundColor: '#f1f5f9',
-                    },
-                    '&.Mui-selected': {
-                      color: '#0284C7',
-                      backgroundColor: '#e3f2fd',
-                      '&:hover': {
-                        backgroundColor: '#f1f5f9',
-                      },
-                    },
+                    '&:hover': { color: '#0284C7', backgroundColor: '#f1f5f9' },
+                    '&.Mui-selected': { color: '#0284C7', backgroundColor: '#e3f2fd', '&:hover': { backgroundColor: '#f1f5f9' } },
                   }}
                 >
                   {option}
@@ -467,17 +407,10 @@ const collectionList = Object.values(groupedCollections);
                 border: '1px solid #ccc',
                 borderRadius: '4px',
                 backgroundColor: '#fff',
-                '& .MuiSelect-select': {
-                  color: '#0284C7',
-                },
+                '& .MuiSelect-select': { color: '#0284C7' },
               }}
               renderValue={(selected) => (
-                <Typography
-                  sx={{
-                    color: selected ? '#0284C7' : '#666',
-                    fontSize: '12px',
-                  }}
-                >
+                <Typography sx={{ color: selected ? '#0284C7' : '#000', fontSize: '12px' }}>
                   {selected || 'Select'}
                 </Typography>
               )}
@@ -485,14 +418,7 @@ const collectionList = Object.values(groupedCollections);
               <MenuItem
                 value=""
                 disabled
-                sx={{
-                  color: '#666',
-                  fontSize: '12px',
-                  '&:hover': {
-                    color: '#0284C7',
-                    backgroundColor: '#f1f5f9',
-                  },
-                }}
+                sx={{ color: '#000', fontSize: '12px', '&:hover': { color: '#0284C7', backgroundColor: '#f1f5f9' } }}
               >
                 Select
               </MenuItem>
@@ -501,19 +427,10 @@ const collectionList = Object.values(groupedCollections);
                   key={option}
                   value={option}
                   sx={{
-                    color: '#666',
+                    color: '#000',
                     fontSize: '12px',
-                    '&:hover': {
-                      color: '#0284C7',
-                      backgroundColor: '#f1f5f9',
-                    },
-                    '&.Mui-selected': {
-                      color: '#0284C7',
-                      backgroundColor: '#e3f2fd',
-                      '&:hover': {
-                        backgroundColor: '#f1f5f9',
-                      },
-                    },
+                    '&:hover': { color: '#0284C7', backgroundColor: '#f1f5f9' },
+                    '&.Mui-selected': { color: '#0284C7', backgroundColor: '#e3f2fd', '&:hover': { backgroundColor: '#f1f5f9' } },
                   }}
                 >
                   {option}
@@ -533,40 +450,38 @@ const collectionList = Object.values(groupedCollections);
                 border: '1px solid #ccc',
                 borderRadius: '4px',
                 backgroundColor: '#fff',
-                color: '#666',
+                color: '#000',
                 justifyContent: 'flex-start',
                 textTransform: 'none',
                 paddingRight: '35px',
-                '& .MuiButton-endIcon': {
-                  marginLeft: '20px',
-                },
+                '& .MuiButton-endIcon': { marginLeft: '20px' },
               }}
               endIcon={<EventIcon />}
             >
-              {selectedDate
-                ? selectedDate.format('DD-MMM-YYYY')
-                : 'Select Date'}
+              {selectedDate ? selectedDate.format('DD-MMM-YYYY') : 'Select Date'}
             </Button>
             <Popover
               id={id}
               open={open}
               anchorEl={anchorEl}
               onClose={handleDateClose}
-              anchorOrigin={{
-                vertical: 'bottom',
-                horizontal: 'left',
-              }}
+              anchorOrigin={{ vertical: 'bottom', horizontal: 'left' }}
             >
               <DatePicker
                 value={selectedDate}
                 onChange={(newValue) => {
-                  setSelectedDate(newValue)
-                  handleDateClose()
+                  setSelectedDate(newValue);
+                  handleDateClose();
                 }}
               />
             </Popover>
           </Grid>
         </Grid>
+
+        {/* Loading and Error States */}
+        {dispatchLoading && <Typography>Loading...</Typography>}
+        {error && <Typography color="error">{error}</Typography>}
+
         {/* Table */}
         <p
           style={{
@@ -605,11 +520,7 @@ const collectionList = Object.values(groupedCollections);
                 ].map((text, i) => (
                   <th
                     key={i}
-                    style={{
-                      padding: '10px',
-                      textAlign: 'left',
-                      border: '1px solid #ddd',
-                    }}
+                    style={{ padding: '10px', textAlign: 'left', border: '1px solid #ddd' }}
                   >
                     {text}
                   </th>
@@ -617,7 +528,7 @@ const collectionList = Object.values(groupedCollections);
               </tr>
             </thead>
             <tbody>
-              {collectionList.map((collection:any, index) => (
+              {paginatedCollections.map((collection: any, index: number) => (
                 <tr
                   key={index}
                   onClick={() => setSelectedRow(index)}
@@ -630,12 +541,10 @@ const collectionList = Object.values(groupedCollections);
                     transition: 'background-color 0.2s',
                   }}
                   onMouseEnter={(e) =>
-                    selectedRow !== index &&
-                    (e.currentTarget.style.backgroundColor = '#f1f5f9')
+                    selectedRow !== index && (e.currentTarget.style.backgroundColor = '#f1f5f9')
                   }
                   onMouseLeave={(e) =>
-                    selectedRow !== index &&
-                    (e.currentTarget.style.backgroundColor = '#fff')
+                    selectedRow !== index && (e.currentTarget.style.backgroundColor = '#fff')
                   }
                 >
                   <td
@@ -680,45 +589,8 @@ const collectionList = Object.values(groupedCollections);
                       fontFamily: 'SF Pro Display',
                     }}
                   >
-                    <div
-                      style={{
-                        display: 'flex',
-                        alignItems: 'center',
-                        gap: '5px',
-                      }}
-                    >
-                      <img
-                        src={collection.image}
-                        alt={collection.addedBy}
-                        style={{
-                          width: '24px',
-                          height: '24px',
-                          borderRadius: '50%',
-                          fontFamily: 'SF Pro Display',
-                          fontWeight: 400,
-                        }}
-                      />
+                    <div style={{ display: 'flex', alignItems: 'center', gap: '5px' }}>
                       {collection.addedBy}
-                      {index < 3 && (
-                        <span
-                          style={{
-                            border: '1px solid #ccc',
-                            borderRadius: '4px',
-                            padding: '2px 6px',
-                            display: 'inline-block',
-                            fontFamily: 'SF Pro Display',
-                          }}
-                        >
-                          <span
-                            style={{
-                              color: '#0284C7',
-                              fontFamily: 'SF Pro Display',
-                            }}
-                          >
-                            +{index + 1} more
-                          </span>
-                        </span>
-                      )}
                     </div>
                   </td>
                   <td
@@ -737,13 +609,14 @@ const collectionList = Object.values(groupedCollections);
                         fontFamily: 'SF Pro Display',
                       }}
                     >
-                      {collection.lastUpdated}
+                      {dayjs(collection.lastUpdated).format('DD-MMM-YYYY')}
                     </span>
                   </td>
                   <td style={{ padding: '10px', border: '1px solid #ddd' }}>
                     <Button
                       variant="outlined"
                       size="small"
+                      onClick={() => handleViewProfiles(collection)}
                       sx={{
                         backgroundColor: 'transparent',
                         borderColor: '#0284C7',
@@ -766,19 +639,14 @@ const collectionList = Object.values(groupedCollections);
             </tbody>
           </table>
         </div>
+
         {/* Pagination & Button */}
         <Grid
           container
           justifyContent="center"
           alignItems="center"
           spacing={1}
-          sx={{
-            position: 'fixed',
-            bottom: 20,
-            left: '0',
-            right: '0',
-            zIndex: 10,
-          }}
+          sx={{ position: 'fixed', bottom: 20, left: '0', right: '0', zIndex: 10 }}
         >
           <Grid item>
             <Button
@@ -797,8 +665,7 @@ const collectionList = Object.values(groupedCollections);
                   minWidth: '32px',
                   height: '32px',
                   borderRadius: '4px',
-                  backgroundColor:
-                    i + 1 === currentPage ? '#1976d2' : 'transparent',
+                  backgroundColor: i + 1 === currentPage ? '#1976d2' : 'transparent',
                   color: i + 1 === currentPage ? 'white' : '#1976d2',
                   fontSize: '12px',
                 }}
@@ -808,9 +675,7 @@ const collectionList = Object.values(groupedCollections);
             </Grid>
           ))}
           <Grid item>
-            <Typography
-              sx={{ fontSize: '12px', color: '#0284C7', padding: '8px' }}
-            >
+            <Typography sx={{ fontSize: '12px', color: '#0284C7', padding: '8px' }}>
               ...
             </Typography>
           </Grid>
@@ -831,19 +696,121 @@ const collectionList = Object.values(groupedCollections);
                 fontSize: '12px',
                 ml: 2,
                 backgroundColor: '#0284C7',
-                '&:hover': {
-                  backgroundColor: '#0284C7',
-                },
+                '&:hover': { backgroundColor: '#0284C7' },
               }}
-              onClick={() => alert('Schedule Interview clicked')}
+              onClick={() => navigate('/interviewSchedule')}
             >
               Schedule Interview
             </Button>
           </Grid>
         </Grid>
+
+        {/* Modal for Resume Details */}
+        <Modal open={openModal} onClose={handleCloseModal}>
+          <Box
+            sx={{
+              position: 'absolute',
+              top: '50%',
+              left: '50%',
+              transform: 'translate(-50%, -50%)',
+              width: '80%',
+              maxHeight: '80vh',
+              bgcolor: 'background.paper',
+              boxShadow: 24,
+              p: 2,
+              overflowY: 'auto',
+            }}
+          >
+            <Typography  variant="h6" sx={{ fontSize: 10, color: '#000', paddingTop: '5px' }}>
+              Available profiles for {selectedJob?.job_title}: {resumeData.length}
+            </Typography>
+            <Grid container spacing={2}>
+              {resumeData.map((resume) => (
+                <Grid item xs={12} key={resume.id}>
+                  <Box
+                    sx={{
+                      display: 'flex',
+                      alignItems: 'center',
+                      border: '1px solid #ddd',
+                      borderRadius: '4px',
+                      p: 2,
+                      mb: 2,
+                    }}
+                  >
+                    <Avatar sx={{ mr: 2 }}>
+                      {resume.resume_data?.name?.charAt(0) || 'N'}
+                    </Avatar>
+                    <Box sx={{ flexGrow: 1 }}>
+                      <Typography  variant="h6" sx={{ fontSize: 10, color: '#000', paddingTop: '5px' }}>
+                        <strong>Current Position:</strong>{' '}
+                        {resume.resume_data?.work?.[0]?.designation_at_company || 'N/A'}
+                      </Typography>
+                      <Typography  variant="h6" sx={{ fontSize: 10, color: '#000', paddingTop: '5px' }}>
+                        <strong>Experience:</strong>{' '}
+                        {resume.resume_data?.experience_in_number
+                          ? `${resume.resume_data.experience_in_number} year(s)`
+                          : 'N/A'}
+                      </Typography>
+                      <Typography  variant="h6" sx={{ fontSize: 10, color: '#000', paddingTop: '5px' }}>
+                        <strong>Education:</strong>{' '}
+                        {`${resume.resume_data?.education?.Degree || ''} - ${
+                          resume.resume_data?.education?.institution || ''
+                        } (${resume.resume_data?.education?.year_of_graduation || ''})` || 'N/A'}
+                      </Typography>
+                      <Typography  variant="h6" sx={{ fontSize: 10, color: '#000', paddingTop: '5px' }}>
+                        <strong>Contact:</strong>{' '}
+                        {resume.resume_data?.phone || resume.resume_data?.email || 'N/A'}
+                      </Typography>
+                      <Typography  variant="h6" sx={{ fontSize: 10, color: '#000', paddingTop: '5px' }}>
+                        <strong>Prev Interview:</strong> N/A
+                      </Typography>
+                      <Button
+                        variant="contained"
+                        color="primary"
+                        sx={{ mt: 1 }}
+                        // onClick={() =>
+                        //   resume.file_data &&
+                        //   window.open(`data:application/pdf;base64,${resume.file_data}`)
+                        // }
+                                                onClick={() => handleViewResume(resume.file_data)}
+
+                      >
+                        View CV/Resume
+                      </Button>
+                    </Box>
+                    <Box sx={{ ml: 2 }}>
+                      <Typography  variant="h6" sx={{ fontSize: 10, color: '#000', paddingTop: '5px' }}>
+                        <strong>About:</strong> N/A
+                      </Typography>
+                      <Typography  variant="h6" sx={{ fontSize: 10, color: '#000', paddingTop: '5px' }}>
+                        <strong>Key Skills:</strong>
+                        <ul>
+                          {resume.resume_data?.skills?.map((skill: string, idx: number) => (
+                            <li key={idx}>{skill}</li>
+                          )) || <li>N/A</li>}
+                        </ul>
+                      </Typography>
+                    </Box>
+                    <Box sx={{ ml: 2 }}>
+                      <Typography  variant="h6" sx={{ fontSize: 10, color: '#000', paddingTop: '5px' }}>
+                        <strong>Uploaded By:</strong> {resume.resume_data?.created_by || createdBy}
+                      </Typography>
+                      <Typography  variant="h6" sx={{ fontSize: 10, color: '#000', paddingTop: '5px' }}>
+                        <strong>Upcoming Interview:</strong> Not Scheduled
+                      </Typography>
+                      <Button variant="contained" color="primary" sx={{ mt: 1 }} onClick={() => navigate('/interviewSchedule')}>
+                        Schedule Interview
+                      </Button>
+                    </Box>
+                  </Box>
+                </Grid>
+              ))}
+            </Grid>
+          </Box>
+        </Modal>
       </div>
     </LocalizationProvider>
-  )
-}
+  );
+};
 
-export default CollectionDefault
+export default CollectionDefault;

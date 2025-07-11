@@ -49,9 +49,19 @@ const CollectionDefault: React.FC = () => {
   const [error, setError] = useState<string | null>(null);
   const [userData, setUserData] = useState<UserData | null>(null);
   const [createdBy, setCreatedBy] = useState('');
-  const [selectedJob, setSelectedJob] = useState<any | null>(null); // Adjusted type to any for flexibility
+  const [selectedJob, setSelectedJob] = useState<any | null>(null);
   const [openModal, setOpenModal] = useState(false);
   const [resumeData, setResumeData] = useState<ResumeData[]>([]);
+  const [filteredCollections, setFilteredCollections] = useState<any[]>([]);
+
+  // Filter states
+  const [jobRole, setJobRole] = useState('');
+  const [experience, setExperience] = useState('');
+  const [user, setUser] = useState('');
+  const [status, setStatus] = useState('');
+  const [select, setSelect] = useState('');
+  const [selectedDate, setSelectedDate] = useState<dayjs.Dayjs | null>(null);
+  const [searchQuery, setSearchQuery] = useState('');
 
   useEffect(() => {
     const getUserData = async () => {
@@ -85,40 +95,108 @@ const CollectionDefault: React.FC = () => {
     addedBy: userData.email,
     lastUpdated: job.created_on,
     resume_ids: job.resume_data.map((resume) => resume.id),
+    status: job.resume_data[0]?.status || 'Not interviewed', // Assuming first resume's status for filtering
   })) || [];
 
+  // Apply filters to collectionList
+  useEffect(() => {
+    let filtered = collectionList;
+
+    // Job Role filter
+    if (jobRole) {
+      filtered = filtered.filter((collection) =>
+        collection.job_title.toLowerCase().includes(jobRole.toLowerCase()),
+      );
+    }
+
+    // Experience filter (assuming experience is derived from resume_data)
+    if (experience) {
+      const expYears = parseInt(experience);
+      filtered = filtered.filter((collection) =>
+        collection.resume_ids.some(async (resumeId: string) => {
+          try {
+            const response = await axios.post(
+              `${process.env.REACT_APP_DJANGO_PYTHON_MODULE_SERVICE}/get_resume/`,
+              { resume_id: [resumeId] },
+              {
+                headers: {
+                  Authorization: `Bearer ${token}`,
+                  Organization: organisation,
+                },
+              },
+            );
+            const resume = response.data[0];
+            const resumeExp = resume?.resume_data?.experience_in_number || 0;
+            return resumeExp >= expYears;
+          } catch (error) {
+            return false;
+          }
+        }),
+      );
+    }
+
+    // User filter
+    if (user) {
+      filtered = filtered.filter((collection) =>
+        collection.addedBy.toLowerCase().includes(user.toLowerCase()),
+      );
+    }
+
+    // Status filter
+    if (status) {
+      filtered = filtered.filter((collection) =>
+        collection.status.toLowerCase().includes(status.toLowerCase()),
+      );
+    }
+
+    // Select filter (assuming it's a placeholder; customize as needed)
+    if (select) {
+      filtered = filtered.filter((collection) =>
+        collection.job_title.toLowerCase().includes(select.toLowerCase()),
+      );
+    }
+
+    // Date filter
+    if (selectedDate) {
+      filtered = filtered.filter((collection) =>
+        dayjs(collection.lastUpdated).isSame(selectedDate, 'day'),
+      );
+    }
+
+    // Search query filter
+    if (searchQuery) {
+      filtered = filtered.filter(
+        (collection) =>
+          collection.job_title.toLowerCase().includes(searchQuery.toLowerCase()) ||
+          collection.addedBy.toLowerCase().includes(searchQuery.toLowerCase()),
+      );
+    }
+
+    setFilteredCollections(filtered);
+  }, [jobRole, experience, user, status, select, selectedDate, searchQuery, collectionList]);
+
+  // Pagination
   const [currentPage, setCurrentPage] = useState(1);
   const itemsPerPage = 9;
-  const totalPages = Math.ceil(collectionList.length / itemsPerPage);
-  const paginatedCollections = collectionList.slice(
+  const totalPages = Math.ceil(filteredCollections.length / itemsPerPage);
+  const paginatedCollections = filteredCollections.slice(
     (currentPage - 1) * itemsPerPage,
     currentPage * itemsPerPage,
   );
   const [selectedRow, setSelectedRow] = useState<number | null>(null);
 
-  // State for filter selections
-  const [jobRole, setJobRole] = useState('');
-  const [experience, setExperience] = useState('');
-  const [user, setUser] = useState('');
-  const [status, setStatus] = useState('');
-  const [select, setSelect] = useState('');
-
   const CustomExpandMore = () => (
     <ExpandMore sx={{ fontSize: '20px', color: '#000', marginRight: '10px' }} />
   );
 
-  // Date Picker States
+  // Date Picker
   const [anchorEl, setAnchorEl] = useState<null | HTMLElement>(null);
-  const [selectedDate, setSelectedDate] = useState<dayjs.Dayjs | null>(null);
-
   const handleDateClick = (event: React.MouseEvent<HTMLElement>) => {
     setAnchorEl(event.currentTarget);
   };
-
   const handleDateClose = () => {
     setAnchorEl(null);
   };
-
   const open = Boolean(anchorEl);
   const id = open ? 'date-picker-popover' : undefined;
 
@@ -135,8 +213,10 @@ const CollectionDefault: React.FC = () => {
   const userOptions = userData ? [userData.email] : [];
   const statusOptions = ['Not interviewed', 'Scheduled', 'Interview Completed'];
   const selectOptions = ['Option 1', 'Option 2', 'Option 3'];
-const navigate = useNavigate();
-  // Handle View Profiles click
+
+  const navigate = useNavigate();
+
+  // Handle View Profiles
   const handleViewProfiles = async (job: any) => {
     setSelectedJob(job);
     try {
@@ -145,7 +225,7 @@ const navigate = useNavigate();
         { resume_id: job.resume_ids },
         {
           headers: {
-            Authorization: `Bearer ${token}`, // Added token for authentication
+            Authorization: `Bearer ${token}`,
             Organization: organisation,
           },
         },
@@ -162,7 +242,8 @@ const navigate = useNavigate();
     setOpenModal(false);
     setResumeData([]);
   };
-const handleViewResume = (fileData: string | null) => {
+
+  const handleViewResume = (fileData: string | null) => {
     if (fileData) {
       const byteCharacters = atob(fileData);
       const byteNumbers = new Array(byteCharacters.length);
@@ -173,12 +254,12 @@ const handleViewResume = (fileData: string | null) => {
       const blob = new Blob([byteArray], { type: 'application/pdf' });
       const url = URL.createObjectURL(blob);
       window.open(url, '_blank');
-      // Optionally, revoke the URL after the tab is opened to free memory
       setTimeout(() => URL.revokeObjectURL(url), 100);
     } else {
       alert('No resume file available.');
     }
   };
+
   return (
     <LocalizationProvider dateAdapter={AdapterDayjs}>
       <div style={{ padding: '16px', maxWidth: '1280px', margin: '0 auto' }}>
@@ -203,7 +284,12 @@ const handleViewResume = (fileData: string | null) => {
                 paddingLeft: '12px',
               }}
             >
-              <InputBase placeholder="Search..." sx={{ fontSize: '12px', width: '100%' }} />
+              <InputBase
+                placeholder="Search..."
+                sx={{ fontSize: '12px', width: '100%' }}
+                value={searchQuery}
+                onChange={(e) => setSearchQuery(e.target.value)}
+              />
               <Search
                 style={{
                   position: 'absolute',
@@ -238,11 +324,7 @@ const handleViewResume = (fileData: string | null) => {
                 </Typography>
               )}
             >
-              <MenuItem
-                value=""
-                disabled
-                sx={{ color: '#000', fontSize: '12px', '&:hover': { color: '#0284C7', backgroundColor: '#f1f5f9' } }}
-              >
+              <MenuItem value="" sx={{ color: '#000', fontSize: '12px' }}>
                 Select Job Role
               </MenuItem>
               {jobRoleOptions.map((option) => (
@@ -253,7 +335,11 @@ const handleViewResume = (fileData: string | null) => {
                     color: '#000',
                     fontSize: '12px',
                     '&:hover': { color: '#0284C7', backgroundColor: '#f1f5f9' },
-                    '&.Mui-selected': { color: '#0284C7', backgroundColor: '#e3f2fd', '&:hover': { backgroundColor: '#f1f5f9' } },
+                    '&.Mui-selected': {
+                      color: '#0284C7',
+                      backgroundColor: '#e3f2fd',
+                      '&:hover': { backgroundColor: '#f1f5f9' },
+                    },
                   }}
                 >
                   {option}
@@ -261,7 +347,6 @@ const handleViewResume = (fileData: string | null) => {
               ))}
             </Select>
           </Grid>
-          {/* Other filter selects remain unchanged */}
           <Grid item>
             <Select
               displayEmpty
@@ -283,11 +368,7 @@ const handleViewResume = (fileData: string | null) => {
                 </Typography>
               )}
             >
-              <MenuItem
-                value=""
-                disabled
-                sx={{ color: '#000', fontSize: '12px', '&:hover': { color: '#0284C7', backgroundColor: '#f1f5f9' } }}
-              >
+              <MenuItem value="" sx={{ color: '#000', fontSize: '12px' }}>
                 Select Experience
               </MenuItem>
               {experienceOptions.map((option) => (
@@ -298,7 +379,11 @@ const handleViewResume = (fileData: string | null) => {
                     color: '#000',
                     fontSize: '12px',
                     '&:hover': { color: '#0284C7', backgroundColor: '#f1f5f9' },
-                    '&.Mui-selected': { color: '#0284C7', backgroundColor: '#e3f2fd', '&:hover': { backgroundColor: '#f1f5f9' } },
+                    '&.Mui-selected': {
+                      color: '#0284C7',
+                      backgroundColor: '#e3f2fd',
+                      '&:hover': { backgroundColor: '#f1f5f9' },
+                    },
                   }}
                 >
                   {option}
@@ -327,11 +412,7 @@ const handleViewResume = (fileData: string | null) => {
                 </Typography>
               )}
             >
-              <MenuItem
-                value=""
-                disabled
-                sx={{ color: '#000', fontSize: '12px', '&:hover': { color: '#0284C7', backgroundColor: '#f1f5f9' } }}
-              >
+              <MenuItem value="" sx={{ color: '#000', fontSize: '12px' }}>
                 Select User
               </MenuItem>
               {userOptions.map((option) => (
@@ -342,7 +423,11 @@ const handleViewResume = (fileData: string | null) => {
                     color: '#000',
                     fontSize: '12px',
                     '&:hover': { color: '#0284C7', backgroundColor: '#f1f5f9' },
-                    '&.Mui-selected': { color: '#0284C7', backgroundColor: '#e3f2fd', '&:hover': { backgroundColor: '#f1f5f9' } },
+                    '&.Mui-selected': {
+                      color: '#0284C7',
+                      backgroundColor: '#e3f2fd',
+                      '&:hover': { backgroundColor: '#f1f5f9' },
+                    },
                   }}
                 >
                   {option}
@@ -371,11 +456,7 @@ const handleViewResume = (fileData: string | null) => {
                 </Typography>
               )}
             >
-              <MenuItem
-                value=""
-                disabled
-                sx={{ color: '#000', fontSize: '12px', '&:hover': { color: '#0284C7', backgroundColor: '#f1f5f9' } }}
-              >
+              <MenuItem value="" sx={{ color: '#000', fontSize: '12px' }}>
                 Select Status
               </MenuItem>
               {statusOptions.map((option) => (
@@ -386,7 +467,11 @@ const handleViewResume = (fileData: string | null) => {
                     color: '#000',
                     fontSize: '12px',
                     '&:hover': { color: '#0284C7', backgroundColor: '#f1f5f9' },
-                    '&.Mui-selected': { color: '#0284C7', backgroundColor: '#e3f2fd', '&:hover': { backgroundColor: '#f1f5f9' } },
+                    '&.Mui-selected': {
+                      color: '#0284C7',
+                      backgroundColor: '#e3f2fd',
+                      '&:hover': { backgroundColor: '#f1f5f9' },
+                    },
                   }}
                 >
                   {option}
@@ -415,11 +500,7 @@ const handleViewResume = (fileData: string | null) => {
                 </Typography>
               )}
             >
-              <MenuItem
-                value=""
-                disabled
-                sx={{ color: '#000', fontSize: '12px', '&:hover': { color: '#0284C7', backgroundColor: '#f1f5f9' } }}
-              >
+              <MenuItem value="" sx={{ color: '#000', fontSize: '12px' }}>
                 Select
               </MenuItem>
               {selectOptions.map((option) => (
@@ -430,7 +511,11 @@ const handleViewResume = (fileData: string | null) => {
                     color: '#000',
                     fontSize: '12px',
                     '&:hover': { color: '#0284C7', backgroundColor: '#f1f5f9' },
-                    '&.Mui-selected': { color: '#0284C7', backgroundColor: '#e3f2fd', '&:hover': { backgroundColor: '#f1f5f9' } },
+                    '&.Mui-selected': {
+                      color: '#0284C7',
+                      backgroundColor: '#e3f2fd',
+                      '&:hover': { backgroundColor: '#f1f5f9' },
+                    },
                   }}
                 >
                   {option}
@@ -438,8 +523,6 @@ const handleViewResume = (fileData: string | null) => {
               ))}
             </Select>
           </Grid>
-
-          {/* Date Picker */}
           <Grid item>
             <Button
               onClick={handleDateClick}
@@ -491,7 +574,7 @@ const handleViewResume = (fileData: string | null) => {
             fontFamily: 'SF Pro Display',
           }}
         >
-          Available Collections:
+          Available Collections: {filteredCollections.length}
         </p>
         <div style={{ overflowX: 'auto', borderRadius: '10px' }}>
           <table
@@ -721,7 +804,7 @@ const handleViewResume = (fileData: string | null) => {
               overflowY: 'auto',
             }}
           >
-            <Typography  variant="h6" sx={{ fontSize: 10, color: '#000', paddingTop: '5px' }}>
+            <Typography variant="h6" sx={{ fontSize: 10, color: '#000', paddingTop: '5px' }}>
               Available profiles for {selectedJob?.job_title}: {resumeData.length}
             </Typography>
             <Grid container spacing={2}>
@@ -741,48 +824,43 @@ const handleViewResume = (fileData: string | null) => {
                       {resume.resume_data?.name?.charAt(0) || 'N'}
                     </Avatar>
                     <Box sx={{ flexGrow: 1 }}>
-                      <Typography  variant="h6" sx={{ fontSize: 10, color: '#000', paddingTop: '5px' }}>
+                      <Typography variant="h6" sx={{ fontSize: 10, color: '#000', paddingTop: '5px' }}>
                         <strong>Current Position:</strong>{' '}
                         {resume.resume_data?.work?.[0]?.designation_at_company || 'N/A'}
                       </Typography>
-                      <Typography  variant="h6" sx={{ fontSize: 10, color: '#000', paddingTop: '5px' }}>
+                      <Typography variant="h6" sx={{ fontSize: 10, color: '#000', paddingTop: '5px' }}>
                         <strong>Experience:</strong>{' '}
                         {resume.resume_data?.experience_in_number
                           ? `${resume.resume_data.experience_in_number} year(s)`
                           : 'N/A'}
                       </Typography>
-                      <Typography  variant="h6" sx={{ fontSize: 10, color: '#000', paddingTop: '5px' }}>
+                      <Typography variant="h6" sx={{ fontSize: 10, color: '#000', paddingTop: '5px' }}>
                         <strong>Education:</strong>{' '}
                         {`${resume.resume_data?.education?.Degree || ''} - ${
                           resume.resume_data?.education?.institution || ''
                         } (${resume.resume_data?.education?.year_of_graduation || ''})` || 'N/A'}
                       </Typography>
-                      <Typography  variant="h6" sx={{ fontSize: 10, color: '#000', paddingTop: '5px' }}>
+                      <Typography variant="h6" sx={{ fontSize: 10, color: '#000', paddingTop: '5px' }}>
                         <strong>Contact:</strong>{' '}
                         {resume.resume_data?.phone || resume.resume_data?.email || 'N/A'}
                       </Typography>
-                      <Typography  variant="h6" sx={{ fontSize: 10, color: '#000', paddingTop: '5px' }}>
+                      <Typography variant="h6" sx={{ fontSize: 10, color: '#000', paddingTop: '5px' }}>
                         <strong>Prev Interview:</strong> N/A
                       </Typography>
                       <Button
                         variant="contained"
                         color="primary"
                         sx={{ mt: 1 }}
-                        // onClick={() =>
-                        //   resume.file_data &&
-                        //   window.open(`data:application/pdf;base64,${resume.file_data}`)
-                        // }
-                                                onClick={() => handleViewResume(resume.file_data)}
-
+                        onClick={() => handleViewResume(resume.file_data)}
                       >
                         View CV/Resume
                       </Button>
                     </Box>
                     <Box sx={{ ml: 2 }}>
-                      <Typography  variant="h6" sx={{ fontSize: 10, color: '#000', paddingTop: '5px' }}>
+                      <Typography variant="h6" sx={{ fontSize: 10, color: '#000', paddingTop: '5px' }}>
                         <strong>About:</strong> N/A
                       </Typography>
-                      <Typography  variant="h6" sx={{ fontSize: 10, color: '#000', paddingTop: '5px' }}>
+                      <Typography variant="h6" sx={{ fontSize: 10, color: '#000', paddingTop: '5px' }}>
                         <strong>Key Skills:</strong>
                         <ul>
                           {resume.resume_data?.skills?.map((skill: string, idx: number) => (
@@ -792,13 +870,18 @@ const handleViewResume = (fileData: string | null) => {
                       </Typography>
                     </Box>
                     <Box sx={{ ml: 2 }}>
-                      <Typography  variant="h6" sx={{ fontSize: 10, color: '#000', paddingTop: '5px' }}>
+                      <Typography variant="h6" sx={{ fontSize: 10, color: '#000', paddingTop: '5px' }}>
                         <strong>Uploaded By:</strong> {resume.resume_data?.created_by || createdBy}
                       </Typography>
-                      <Typography  variant="h6" sx={{ fontSize: 10, color: '#000', paddingTop: '5px' }}>
+                      <Typography variant="h6" sx={{ fontSize: 10, color: '#000', paddingTop: '5px' }}>
                         <strong>Upcoming Interview:</strong> Not Scheduled
                       </Typography>
-                      <Button variant="contained" color="primary" sx={{ mt: 1 }} onClick={() => navigate('/interviewSchedule')}>
+                      <Button
+                        variant="contained"
+                        color="primary"
+                        sx={{ mt: 1 }}
+                        onClick={() => navigate('/interviewSchedule')}
+                      >
                         Schedule Interview
                       </Button>
                     </Box>

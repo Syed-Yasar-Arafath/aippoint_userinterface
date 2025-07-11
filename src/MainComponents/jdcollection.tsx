@@ -917,12 +917,12 @@ const JdCollection: React.FC = () => {
 
   return (
     <>
-     <Header
+     {/* <Header
                       // title="Collection"
                       title='JD Collection'
                       // userProfileImage={userProfileImage}
                       path=""
-                  />
+                  /> */}
     <div style={{ padding: '35px', maxWidth: '1280px', margin: '0 auto' }}>
       {/* Filters */}
       {/* <Grid container spacing={2} alignItems="center" wrap="nowrap" sx={{ overflowX: 'auto', mb: 2 }}>

@@ -237,7 +237,7 @@ const ForgotPassword: React.FC = () => {
                             src='/assets/static/images/logimg.png'
                             alt='login'
                             style={{
-                                width: '100%',
+                                width: 'auto',
                                 height: '95vh',
 
 
@@ -245,7 +245,7 @@ const ForgotPassword: React.FC = () => {
                         />
                     </Box>
                 </Grid>
-                <Grid item xs={12} md={6}>
+                <Grid item xs={12} md={4}>
                     {matchedotp === false ? (
                         <>
                             <Box
@@ -309,7 +309,7 @@ const ForgotPassword: React.FC = () => {
                                                             />
                                                         ))}
                                                     </Box>
-                                                    <Typography variant='caption' mt={1}>
+                                                    {/* <Typography variant='caption' mt={1}>
                                                         Didn&nbsp;t receive?{' '}
                                                         <Button
                                                             onClick={handleResend}
@@ -319,7 +319,7 @@ const ForgotPassword: React.FC = () => {
                                                         >
                                                             Resend OTP in {timer > 0 ? `00:${String(timer).padStart(2, '0')}` : 'now'}
                                                         </Button>
-                                                    </Typography>
+                                                    </Typography> */}
                                                 </>
                                             ) : (
                                                 ''

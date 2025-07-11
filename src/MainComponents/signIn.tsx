@@ -794,7 +794,7 @@ function SignIn() {
               src="/assets/static/images/logimg.png"
               alt="login"
               style={{
-                width: '100%',
+                width: 'auto',
                 height: '95vh',
 
 
@@ -804,7 +804,7 @@ function SignIn() {
         </Grid>
 
         {/* Right login form */}
-        <Grid item lg={5}>
+        <Grid item lg={4}>
           <Box
             sx={{
               flex: 1,

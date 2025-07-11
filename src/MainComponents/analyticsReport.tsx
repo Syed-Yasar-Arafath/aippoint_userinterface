@@ -452,6 +452,7 @@ function AnalyticsReport() {
                                             fontSize: '12px',
                                             fontWeight: 500,
                                             fontFamily: 'SF Pro Display',
+                                            width:'100%',
                                             '&:hover': {
                                                 background: '#0284C7',
                                             },

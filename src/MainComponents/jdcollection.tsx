@@ -797,7 +797,7 @@ const JdCollection: React.FC = () => {
         borderColor: '#e0e0e0',
         px: 2,
         py: 1.5,
-        height: '100px'
+        // height: '100px'
       }}
     >
       <Grid container spacing={2} alignItems="flex-start">
@@ -809,14 +809,14 @@ const JdCollection: React.FC = () => {
           <Typography sx={{ fontFamily: 'SF Pro Display', color: '#0284C7', fontWeight: 500, fontSize: '14px', lineHeight: '100%' }}>
             {job.job_title}
           </Typography>
-          <Typography variant="h6" sx={{ fontSize: 10, color: '#666', paddingTop: '9px' }}>
-            Created: <strong>{job.created_on}</strong>
+          <Typography sx={{ fontSize: 10, color: '#666', paddingTop: '9px' }}>
+            Created: <span>{job.created_on}</span>
           </Typography>
-          <Typography variant="h6" sx={{ fontSize: 10, color: '#666', paddingTop: '9px' }}>
-            Job ID: <strong>{job.referenceNumber}</strong>
+          <Typography sx={{ fontSize: 10, color: '#666', paddingTop: '9px' }}>
+            Job ID: <span>{job.referenceNumber}</span>
           </Typography>
-          <Typography variant="h6" sx={{ fontSize: 10, color: '#666', paddingTop: '9px' }}>
-            Created By: <strong>{creator}</strong>
+          <Typography sx={{ fontSize: 10, color: '#666', paddingTop: '9px' }}>
+            Created By: <span>{creator}</span>
           </Typography>
 
           {/* <Typography variant="body2" sx={{ fontSize: 10, color: '#666' }}>
@@ -852,20 +852,49 @@ const JdCollection: React.FC = () => {
 
         <Divider orientation="vertical" flexItem sx={{ mx: 2, my: 2, borderColor: '#333', borderWidth: '1.5px' }} />
 
-        <Grid item xs={4}>
-          <Grid container spacing={0}>
-            <Grid item xs={4}><Typography sx={pillStyle}>Experience: {job.experience_required}</Typography></Grid>
+        {/* <Grid item xs={4} >
+          <Grid container spacing={2}>
+            <Grid item xs={5}><Typography sx={pillStyle}>Experience: {job.experience_required}</Typography></Grid>
             <Grid item xs={4}><Typography sx={pillStyle}>{job.job_type[0]}</Typography></Grid>
             <Grid item xs={4}><Typography sx={pillStyle}>{job.modeOfWork}</Typography></Grid>
             <Grid item xs={4}><Typography sx={pillStyle}>Open: {job.no_of_open_positions}</Typography></Grid>
             <Grid item xs={4}><Typography sx={pillStyle}>Skills: {job.skills} </Typography></Grid>
             <Grid item xs={4}><Typography sx={pillStyle}>{job.newLocation.city},{job.newLocation.country}</Typography></Grid>
           </Grid>
+        </Grid> */}
+        <Grid item xs={4}>
+          <Grid container spacing={1}>
+            <Grid item>
+              <Typography sx={pillStyle}>
+                Experience: {job.experience_required}
+              </Typography>
+            </Grid>
+            <Grid item>
+              <Typography sx={pillStyle}>{job.job_type[0]}</Typography>
+            </Grid>
+            <Grid item>
+              <Typography sx={pillStyle}>{job.modeOfWork}</Typography>
+            </Grid>
+            <Grid item>
+              <Typography sx={pillStyle}>
+                Open: {job.no_of_open_positions}
+              </Typography>
+            </Grid>
+            <Grid item>
+              <Typography sx={pillStyle}>Skills: {job.skills}</Typography>
+            </Grid>
+            <Grid item>
+              <Typography sx={pillStyle}>
+                {job.newLocation.city}, {job.newLocation.country}
+              </Typography>
+            </Grid>
+          </Grid>
         </Grid>
 
         <Divider orientation="vertical" flexItem sx={{ mx: 2, my: 2, borderColor: '#333', borderWidth: '1.5px' }} />
 
-        <Grid item xs={2} sx={{ display: 'flex', flexDirection: 'column', alignItems: 'flex-end', justifyContent: 'center', marginLeft: '180px' }}>
+        {/* <Grid item xs={2} sx={{ display: 'flex', flexDirection: 'column', alignItems: 'flex-end', justifyContent: 'center', marginLeft: '180px' }}> */}
+        <Grid item xs={3} sx={{ display: 'flex', flexDirection: 'column', alignItems: 'flex-end', justifyContent: 'center', marginLeft: '15px' }}>
           <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', gap: '16px' }}>
             <div style={{ display: 'flex', gap: '12px', flexWrap: 'nowrap' }}>
               <div style={{ border: '1px solid #e5e7eb', borderRadius: '8px', padding: '0px 16px', color: '#6b7280', fontSize: '10px', display: 'flex', alignItems: 'center', height: '40px', justifyContent: 'flex-start', whiteSpace: 'nowrap' }}>
@@ -908,24 +937,24 @@ const JdCollection: React.FC = () => {
           </div>
         </Grid>
 
-        <Grid item>
+        {/* <Grid item>
           <MoreVert sx={{ color: '#666', fontSize: '15px' }} />
-        </Grid>
+        </Grid> */}
       </Grid>
     </Card>
   )
 
   return (
     <>
-     {/* <Header
-                      // title="Collection"
-                      title='JD Collection'
-                      // userProfileImage={userProfileImage}
-                      path=""
-                  /> */}
-    <div style={{ padding: '35px', maxWidth: '1280px', margin: '0 auto' }}>
-      {/* Filters */}
-      {/* <Grid container spacing={2} alignItems="center" wrap="nowrap" sx={{ overflowX: 'auto', mb: 2 }}>
+      <Header
+        // title="Collection"
+        title='JD Collection'
+        // userProfileImage={userProfileImage}
+        path=""
+      />
+      <div style={{ padding: '35px', maxWidth: '1280px', margin: '0 auto' }}>
+        {/* Filters */}
+        {/* <Grid container spacing={2} alignItems="center" wrap="nowrap" sx={{ overflowX: 'auto', mb: 2 }}>
         <Grid item>
           <div style={{ position: 'relative', width: '200px', height: '40px', border: '1px solid #ccc', borderRadius: '4px', display: 'flex', alignItems: 'center', paddingLeft: '12px' }}>
             <InputBase placeholder="Search..." sx={{ fontSize: '12px', width: '100%' }} />
@@ -948,63 +977,82 @@ const JdCollection: React.FC = () => {
           </Grid>
         ))}
       </Grid> */}
-      <Grid container spacing={2} alignItems="center" wrap="nowrap" sx={{ mb: 2 }}>
-        <Grid item>
-          <div style={{ position: 'relative', width: '200px', height: '40px', border: '1px solid #ccc', borderRadius: '4px', display: 'flex', alignItems: 'center', paddingLeft: '12px' }}>
-            {/* <InputBase placeholder="Search..." sx={{ fontSize: '12px', width: '100%' }} /> */}
-            <InputBase
-              placeholder="Search..."
-              sx={{ fontSize: '12px', width: '100%' }}
-              value={searchText}
-              onChange={(e) => setSearchText(e.target.value)}
-            />
+        <Grid container spacing={2} alignItems="center" wrap="nowrap" sx={{ mb: 2 }}>
+          <Grid item>
+            <div style={{ position: 'relative', width: '200px', height: '40px', border: '1px solid #ccc', borderRadius: '4px', display: 'flex', alignItems: 'center', paddingLeft: '12px' }}>
+              {/* <InputBase placeholder="Search..." sx={{ fontSize: '12px', width: '100%' }} /> */}
+              <InputBase
+                placeholder="Search..."
+                sx={{ fontSize: '12px', width: '100%' }}
+                value={searchText}
+                onChange={(e) => setSearchText(e.target.value)}
+              />
 
-            <Search fontSize="small" sx={{ position: 'absolute', right: '8px', top: '50%', transform: 'translateY(-50%)', color: '#666' }} />
-          </div>
-        </Grid>
+              <Search fontSize="small" sx={{ position: 'absolute', right: '8px', top: '50%', transform: 'translateY(-50%)', color: '#666' }} />
+            </div>
+          </Grid>
 
-        <Grid item>
-          <Select
-            displayEmpty
-            value={jobRoleFilter}
-            onChange={(e) => setJobRoleFilter(e.target.value)}
-            IconComponent={CustomExpandMore}
-            sx={{ height: '40px', width: '158px', fontSize: '14px', border: '1px solid #ccc', borderRadius: '4px', backgroundColor: '#fff' }}
-            renderValue={() => (
-              <Typography sx={{ color: '#666', fontSize: '12px' }}>
-                {jobRoleFilter || 'Select Job Role'}
-              </Typography>
-            )}
-          >
-            <MenuItem value="" disabled>Select Job Role</MenuItem>
-            {jobRoles.map((role, idx) => (
-              <MenuItem key={idx} value={role}>{role}</MenuItem>
-            ))}
-          </Select>
-        </Grid>
+          <Grid item>
+            <Select
+              displayEmpty
+              value={jobRoleFilter}
+              onChange={(e) => setJobRoleFilter(e.target.value)}
+              IconComponent={CustomExpandMore}
+              sx={{ height: '40px', width: '158px', fontSize: '14px', border: '1px solid #ccc', borderRadius: '4px', backgroundColor: '#fff' }}
+              // renderValue={() => (
+              //   <Typography sx={{ color: '#666', fontSize: '12px' }}>
+              //     {jobRoleFilter || 'Select Job Role'}
+              //   </Typography>
+              // )}
+              renderValue={(selected) =>
+                selected ? (
+                  <Typography sx={{ color: '#666', fontSize: '12px' }}>{selected}</Typography>
+                ) : (
+                  <Typography sx={{ color: '#aaa', fontSize: '12px' }}>
+                    Select Job Role
+                  </Typography>
+                )
+              }
+            >
+              <MenuItem value="" disabled>Select Job Role</MenuItem>
+              {jobRoles.map((role, idx) => (
+                <MenuItem key={idx} value={role}>{role}</MenuItem>
+              ))}
+            </Select>
+          </Grid>
 
-        <Grid item>
-          <Select
-            displayEmpty
-            value={experienceFilter}
-            onChange={(e) => setExperienceFilter(e.target.value)}
-            IconComponent={CustomExpandMore}
-            sx={{ height: '40px', width: '158px', fontSize: '14px', border: '1px solid #ccc', borderRadius: '4px', backgroundColor: '#fff' }}
-            renderValue={() => (
-              <Typography sx={{ color: '#666', fontSize: '12px' }}>
-                {experienceFilter || 'Select Experience'}
-              </Typography>
-            )}
-          >
-            <MenuItem value="" disabled>Select Experience</MenuItem>
-            {experiences.map((exp, idx) => (
-              <MenuItem key={idx} value={exp}>{exp}</MenuItem>
-            ))}
-          </Select>
-        </Grid>
+          <Grid item>
+            <Select
+              displayEmpty
+              value={experienceFilter}
+              onChange={(e) => setExperienceFilter(e.target.value)}
+              IconComponent={CustomExpandMore}
+              sx={{ height: '40px', width: '158px', fontSize: '14px', border: '1px solid #ccc', borderRadius: '4px', backgroundColor: '#fff' }}
+              // renderValue={() => (
+              //   <Typography sx={{ color: '#666', fontSize: '12px' }}>
+              //     {experienceFilter || 'Select Experience'}
+              //   </Typography>
+              // )}
+              renderValue={(selected) =>
+  selected ? (
+    <Typography sx={{ color: '#000', fontSize: '12px' }}>{selected}</Typography>
+  ) : (
+    <Typography sx={{ color: '#aaa', fontSize: '12px' }}>
+      Select Experience
+    </Typography>
+  )
+}
 
-        <Grid item>
-          {/* <Select
+            >
+              <MenuItem value="" disabled>Select Experience</MenuItem>
+              {experiences.map((exp, idx) => (
+                <MenuItem key={idx} value={exp}>{exp}</MenuItem>
+              ))}
+            </Select>
+          </Grid>
+
+          <Grid item>
+            {/* <Select
             displayEmpty
             value={locationFilter}
             onChange={(e) => setLocationFilter(e.target.value)}
@@ -1021,92 +1069,101 @@ const JdCollection: React.FC = () => {
               <MenuItem key={idx} value={loc}>{loc}</MenuItem>
             ))}
           </Select> */}
-          <Select
-            value={locationFilter}
-            onChange={(e) => setLocationFilter(e.target.value)}
-            displayEmpty
-            sx={{ height: '40px', width: '158px', fontSize: '14px', border: '1px solid #ccc', borderRadius: '4px', backgroundColor: '#fff' }}
-          >
-            <MenuItem value="" disabled>Select Location</MenuItem>
-            {locations.map((loc) => (
-              <MenuItem key={loc} value={loc}>
-                {loc}
-              </MenuItem>
-            ))}
-          </Select>
+            <Select
+              value={locationFilter}
+              onChange={(e) => setLocationFilter(e.target.value)}
+              displayEmpty
+              sx={{ height: '40px', width: '158px', fontSize: '14px', border: '1px solid #ccc', borderRadius: '4px', backgroundColor: '#fff' }}
+             renderValue={(selected) =>
+    selected ? (
+      <Typography sx={{ color: '#000', fontSize: '12px' }}>{selected}</Typography>
+    ) : (
+      <Typography sx={{ color: '#aaa', fontSize: '12px' }}>
+        Select Location
+      </Typography>
+    )
+  }
+           >
+              <MenuItem value="" disabled>Select Location</MenuItem>
+              {locations.map((loc) => (
+                <MenuItem key={loc} value={loc}>
+                  {loc}
+                </MenuItem>
+              ))}
+            </Select>
 
-        </Grid>
-        <Grid item>
-          <Button
-            variant="outlined"
-            size="small"
-            sx={{
-              height: '40px',
-              textTransform: 'none',
-              fontSize: '12px',
-              borderRadius: '4px',
-              padding: '0 16px',
-            }}
-            onClick={() => {
-              setSearchText('');
-              setJobRoleFilter('');
-              setExperienceFilter('');
-              setLocationFilter('');
-            }}
-          >
-            Clear Filters
-          </Button>
-        </Grid>
-
-      </Grid>
-
-
-
-      {/* Job Cards */}
-      {loading ? (
-        <Typography>Loading jobs...</Typography>
-      ) : error ? (
-        <Typography color="error">{error}</Typography>
-      ) : jobs.length === 0 ? (
-        <Typography>No jobs found.</Typography>
-      ) : (
-        paginatedJobs.map((job) => <JobCard key={job.jobid} job={job} />)
-      )}
-
-      {/* Pagination */}
-      <Grid container justifyContent="center" spacing={1} mt={2}>
-        <Grid item>
-          <Button disabled={currentPage === 1} onClick={() => setCurrentPage(currentPage - 1)} sx={{ textTransform: 'none', fontSize: '12px' }}>
-            Prev
-          </Button>
-        </Grid>
-        {Array.from({ length: totalPages }, (_, idx) => idx + 1).map((n) => (
-          <Grid item key={n}>
+          </Grid>
+          <Grid item>
             <Button
-              onClick={() => setCurrentPage(n)}
+              variant="outlined"
+              size="small"
               sx={{
-                minWidth: '32px',
-                height: '32px',
-                borderRadius: '4px',
-                backgroundColor: n === currentPage ? '#1976d2' : 'transparent',
-                color: n === currentPage ? 'white' : '#1976d2',
+                height: '40px',
+                textTransform: 'none',
                 fontSize: '12px',
+                borderRadius: '4px',
+                padding: '0 16px',
+              }}
+              onClick={() => {
+                setSearchText('');
+                setJobRoleFilter('');
+                setExperienceFilter('');
+                setLocationFilter('');
               }}
             >
-              {n}
+              Clear Filters
             </Button>
           </Grid>
-        ))}
-        <Grid item>
-          <Typography sx={{ fontSize: '12px', color: '#666', padding: '8px' }}>...</Typography>
+
         </Grid>
-        <Grid item>
-          <Button disabled={currentPage === totalPages} onClick={() => setCurrentPage(currentPage + 1)} sx={{ textTransform: 'none', fontSize: '12px' }}>
-            Next
-          </Button>
+
+
+
+        {/* Job Cards */}
+        {loading ? (
+          <Typography>Loading jobs...</Typography>
+        ) : error ? (
+          <Typography color="error">{error}</Typography>
+        ) : jobs.length === 0 ? (
+          <Typography>No jobs found.</Typography>
+        ) : (
+          paginatedJobs.map((job) => <JobCard key={job.jobid} job={job} />)
+        )}
+
+        {/* Pagination */}
+        <Grid container justifyContent="center" spacing={1} mt={2}>
+          <Grid item>
+            <Button disabled={currentPage === 1} onClick={() => setCurrentPage(currentPage - 1)} sx={{ textTransform: 'none', fontSize: '12px' }}>
+              Prev
+            </Button>
+          </Grid>
+          {Array.from({ length: totalPages }, (_, idx) => idx + 1).map((n) => (
+            <Grid item key={n}>
+              <Button
+                onClick={() => setCurrentPage(n)}
+                sx={{
+                  minWidth: '32px',
+                  height: '32px',
+                  borderRadius: '4px',
+                  backgroundColor: n === currentPage ? '#1976d2' : 'transparent',
+                  color: n === currentPage ? 'white' : '#1976d2',
+                  fontSize: '12px',
+                }}
+              >
+                {n}
+              </Button>
+            </Grid>
+          ))}
+          <Grid item>
+            <Typography sx={{ fontSize: '12px', color: '#666', padding: '8px' }}>...</Typography>
+          </Grid>
+          <Grid item>
+            <Button disabled={currentPage === totalPages} onClick={() => setCurrentPage(currentPage + 1)} sx={{ textTransform: 'none', fontSize: '12px' }}>
+              Next
+            </Button>
+          </Grid>
         </Grid>
-      </Grid>
-    </div>
+      </div>
     </>
   )
 }

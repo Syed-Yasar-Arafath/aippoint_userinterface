@@ -32,7 +32,7 @@ import {
   IconButton,
   Modal,
 } from '@mui/material'
-import axios from 'axios'
+import axios, { AxiosResponse } from 'axios'
 import { Link, useLocation, useNavigate } from 'react-router-dom'
 import { t } from 'i18next'
 import { Snackbar, Alert } from '@mui/material'
@@ -40,6 +40,7 @@ import useProctoring from '../useProctoring'
 import { useDispatch } from 'react-redux'
 import { loaderOff, loaderOn } from '../../redux/actions'
 import { useTranslation } from 'react-i18next';
+import { OutputOutlined } from '@mui/icons-material'
 interface MergeVideoRequest {
   video_urls: string[]
   meeting_id: string
@@ -605,44 +606,44 @@ const generateQuestions = async () => {
   //     return () => mic.stop()
   //   }
   // }, [liveParticipant, currentQuestionIndex, isReadingQuestion])
-  useEffect(() => {
+useEffect(() => {
     if (liveParticipant > 0 && !isReadingQuestion) {
       const SpeechRecognition =
         (window as any).SpeechRecognition ||
-        (window as any).webkitSpeechRecognition
+        (window as any).webkitSpeechRecognition;
       if (!SpeechRecognition) {
-        console.error('Speech Recognition not supported')
-        return
+        console.error('Speech Recognition not supported');
+        setTranscript('Speech recognition not supported');
+        return;
       }
-      const mic = new SpeechRecognition()
-      mic.continuous = true
-      mic.interimResults = true
-      // Set language based on selectedLanguage
-      mic.lang = selectedLanguage === 'ar' ? 'ar-EG' : 'en-US'
+      const mic = new SpeechRecognition();
+      mic.continuous = true;
+      mic.interimResults = true;
+      mic.lang = selectedLanguage === 'ar' ? 'ar-EG' : 'en-US';
       mic.onresult = (event: any) => {
-        let interim = ''
-        let final = ''
+        let interim = '';
+        let final = '';
         for (let i = 0; i < event.results.length; i++) {
-          const result = event.results[i]
-          const transcriptPart = result[0].transcript
+          const result = event.results[i];
+          const transcriptPart = result[0].transcript;
           if (result.isFinal) {
-            final += transcriptPart + ' '
+            final += transcriptPart + ' ';
           } else {
-            interim += transcriptPart
+            interim += transcriptPart;
           }
         }
-        setTranscript(final)
-        setInterimTranscript(interim)
-      }
-      mic.start()
-      return () => mic.stop()
+        console.log('Speech Recognition - Final:', final, 'Interim:', interim);
+        setTranscript(final);
+        setInterimTranscript(interim);
+      };
+      mic.onerror = (event: any) => {
+        console.error('Speech Recognition error:', event.error);
+        setTranscript('Error in speech recognition');
+      };
+      mic.start();
+      return () => mic.stop();
     }
-  }, [
-    liveParticipant,
-    currentQuestionIndex,
-    isReadingQuestion,
-    selectedLanguage,
-  ])
+  }, [liveParticipant, currentQuestionIndex, isReadingQuestion, selectedLanguage]);
   const checkSessionStatus = async () => {
     try {
       const response = await axios.get(
@@ -686,43 +687,51 @@ const generateQuestions = async () => {
     setOpenDialog(false)
   }
 
-  const handleNextQuestion = async () => {
-    if (nextClicked) return
-    setNextClicked(true)
+ const handleNextQuestion = async () => {
+    if (nextClicked) {
+      console.log('Next button already clicked, skipping...');
+      return;
+    }
+    setNextClicked(true);
     try {
-      setTranscript('')
-      setInterimTranscript('')
+      console.log('Starting handleNextQuestion for question index:', currentQuestionIndex);
       if (currentQuestionIndex === 0 && liveParticipant === 0) {
-        checkSessionStatus()
-        setShowDialog(true)
-        return
+        await checkSessionStatus();
+        setShowDialog(true);
+        return;
       }
       if (liveParticipant > 0) {
-        setShowDialog(false)
+        setShowDialog(false);
       }
       if (currentQuestionIndex >= 1 && liveParticipant === 0) {
-        checkSessionStatus()
-        setShowDialog(true)
-        return
+        await checkSessionStatus();
+        setShowDialog(true);
+        return;
       }
       if (currentQuestionIndex < questionGenerated.length - 1) {
         if (recordingId) {
-          await stopRecording()
-          await new Promise((resolve) => setTimeout(resolve, 1000))
-          await handleDownloadRecording()
-          setRecordingId(null)
+          console.log('Stopping recording:', recordingId);
+          await stopRecording();
+          await new Promise((resolve) => setTimeout(resolve, 1000));
+          console.log('Downloading recording');
+          await handleDownloadRecording();
+          setRecordingId(null);
         }
-        setCode('')
-        setCurrentQuestionIndex(currentQuestionIndex + 1)
-        setTimeLeft(300)
-        await startRecording()
+        setCode('');
+        setCurrentQuestionIndex(currentQuestionIndex + 1);
+        setTimeLeft(300);
+        setTranscript('');
+        setInterimTranscript('');
+        console.log('Starting new recording');
+        await startRecording();
       }
     } catch (error) {
-      console.error('Error handling next question:', error)
+      console.error('Error handling next question:', error);
     } finally {
-      setNextClicked(false)
+      setNextClicked(false);
+      console.log('Finished handleNextQuestion');
     }
-  }
+  };
 
   const SendThankYouMail = async () => {
     try {
@@ -735,45 +744,112 @@ const generateQuestions = async () => {
       console.error('Error sending thank-you email:', error)
     }
   }
+ const handleQuestionDistribution = async (
+  objId: any,
+  organisation: any,
+): Promise<any | null> => {
+  try {
+    const response = await axios.post(
+      `${process.env.REACT_APP_DJANGO_PYTHON_MODULE_SERVICE}/question_distribution/`,
+      {
+        object_id: objId,
+      },
+      {
+        headers: {
+          'Content-Type': 'application/json',
+          Organization: organisation,
+        },
+      }
+    )
+
+    if (response.status === 200) {
+      console.log('✅ Question distribution completed:', response.data)
+      return response.data
+    } else {
+      console.warn('⚠️ Unexpected response:', response)
+      return null
+    }
+  } catch (error: any) {
+    if (error.response) {
+      console.error('❌ Server error:', error.response.data)
+    } else if (error.request) {
+      console.error('❌ No response received:', error.request)
+    } else {
+      console.error('❌ Request setup error:', error.message)
+    }
+    return null
+  }
+}
+  const handleInterviewStatus = async (
+  objId: string,
+  organisation: any
+): Promise<{ object_id: string; updated_status: string } | null> => {
+  try {
+    const response = await axios.get(
+      `${process.env.REACT_APP_DJANGO_PYTHON_MODULE_SERVICE}/interview_status/${objId}/`,
+      {
+        headers: {
+          'Content-Type': 'application/json',
+          Organization: organisation,
+        },
+      }
+    )
+    console.log('✅ Interview status updated:', response.data)
+    return response.data
+  } catch (error: any) {
+    if (error.response) {
+      console.error('❌ Server error:', error.response.data)
+    } else if (error.request) {
+      console.error('❌ No response received:', error.request)
+    } else {
+      console.error('❌ Request setup error:', error.message)
+    }
+    return null
+  }
+}
 
   const handleSubmit = async () => {
     try {
-      dispatch(loaderOn())
+      dispatch(loaderOn());
       if (liveParticipant >= 0 && recordingId) {
-        // Stop recording and download
-        await stopRecording()
-        await new Promise((resolve) => setTimeout(resolve, 1500))
-        await handleDownloadRecording()
-        setQuestionsSubmitted(true)
+        // Ensure the last answer is saved
+        const codeInput = code.trim();
+        const voiceInput = transcript + interimTranscript;
+        const finalAnswer = codeInput !== '' ? codeInput : voiceInput;
+        console.log('handleSubmit - Saving last answer:', finalAnswer);
+        await updateanswer(
+          objId,
+          questionGenerated[currentQuestionIndex],
+          finalAnswer || 'No answer provided',
+        );
 
-        // Wait for all async operations to complete
+        console.log('Stopping recording in handleSubmit');
+        await stopRecording();
+        await new Promise((resolve) => setTimeout(resolve, 1500));
+        console.log('Downloading recording in handleSubmit');
+        await handleDownloadRecording();
+        setQuestionsSubmitted(true);
+
         await Promise.all([
           generatefeedback(),
-          // handleQuestionAnalysis(),
-          // handleSoftSkills(),
-          // handleStrengths(),
-          // handleTechnicalScore(),
+          handleInterviewStatus(objId,organisation),
+          handleQuestionDistribution(objId,organisation),
           handleBatchInterviewAnalysis(),
           SendThankYouMail(),
           handleProctoring(objId),
-        ])
+        ]);
 
-        // Open dialog and navigate after all operations complete
-        setOpenDialog(true)
-        // setTimeout(() => {
-        //   navigate('/SubmitInterview')
-        // }, 1000)
-        dispatch(loaderOff())
+        setOpenDialog(true);
+        dispatch(loaderOff());
       }
     } catch (error) {
-      console.error('Error in handleSubmit:', error)
-      // Optionally, still open the dialog or handle the error case
-      setOpenDialog(true)
+      console.error('Error in handleSubmit:', error);
+      setOpenDialog(true);
       setTimeout(() => {
-        navigate('/SubmitInterview')
-      }, 1000)
+        navigate('/SubmitInterview');
+      }, 1000);
     }
-  }
+  };
   // const handleSubmit = async () => {
   //   try {
   //     if (liveParticipant >= 0 && recordingId) {
@@ -797,29 +873,44 @@ const generateQuestions = async () => {
   //   }
   // }
 
-  const updateanswer = async (
-    reference_number: any,
-    question_text: any,
-    answer: any,
-  ) => {
-    try {
-      const data = {
-        object_id: reference_number,
-        question_text: question_text,
-        answer: answer,
-      }
-      setTranscript('')
-      setInterimTranscript('')
-      await axios.post(
-        `${process.env.REACT_APP_DJANGO_PYTHON_MODULE_SERVICE}/update_answer/`,
-        data,
-        { headers: { organization: organisation } },
-      )
-    } catch (error) {
-      console.error('Error updating answer:', error)
-    }
-  }
+ const updateanswer = async (
+  reference_number: any,
+  question_text: any,
+  answer: any,
+) => {
+  try {
+    const data = {
+      object_id: reference_number,
+      question_text: question_text,
+      answer: answer || 'No answer provided',
+    };
+    console.log('Calling update_answer API with:', data);
 
+    const axiosPromise = axios.post(
+      `${process.env.REACT_APP_DJANGO_PYTHON_MODULE_SERVICE}/update_answer/`,
+      data,
+      { headers: { organization: organisation } }
+    );
+
+    const response = await Promise.race([
+      axiosPromise,
+      new Promise<never>((_, reject) =>
+        setTimeout(() => reject(new Error('API timeout')), 5000)
+      ),
+    ]) as AxiosResponse<any>; // 👈 Cast the response type here
+
+    console.log('update_answer response:', response.data);
+    setTranscript('');
+    setInterimTranscript('');
+    return response.data;
+
+  } catch (error: any) {
+    console.error('Error updating answer:', error.response?.data || error.message);
+    throw error;
+  }
+};
+
+ 
   const sendOrg = async (dbName: any) => {
     try {
       await axios.get(
@@ -1000,23 +1091,29 @@ const generateQuestions = async () => {
     }
   }
 
-  const handleClick = async () => {
-    const codeInput = code.trim()
-    const voiceInput = transcript + interimTranscript
-    const finalAnswer = codeInput !== '' ? codeInput : voiceInput
-    if (finalAnswer !== '') {
-      await updateanswer(
-        objId,
-        questionGenerated[currentQuestionIndex],
-        finalAnswer,
-      )
+ const handleClick = async () => {
+    if (!questionGenerated[currentQuestionIndex]) {
+      console.error('Invalid question at index:', currentQuestionIndex);
+      return;
     }
+    const codeInput = code.trim();
+    const voiceInput = transcript + interimTranscript;
+    const finalAnswer = codeInput !== '' ? codeInput : voiceInput;
+    console.log('handleClick - finalAnswer:', finalAnswer, 'codeInput:', codeInput, 'voiceInput:', voiceInput);
+
+    // Always call updateanswer, even if no answer is provided
+    await updateanswer(
+      objId,
+      questionGenerated[currentQuestionIndex],
+      finalAnswer || 'No answer provided',
+    );
+
     if (currentQuestionIndex === questionGenerated.length - 1) {
-      await handleSubmit()
+      await handleSubmit();
     } else {
-      await handleNextQuestion()
+      await handleNextQuestion();
     }
-  }
+  };
 
   const startRecording = async () => {
     // Feathers (https://feathersjs.com/) recommends adding a delay to ensure the recording starts properly

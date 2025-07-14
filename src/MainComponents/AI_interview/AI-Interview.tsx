@@ -102,7 +102,7 @@ export default function InterviewAttend() {
   const audioRef = useRef<HTMLAudioElement>(null)
   const editorRef = useRef<HTMLDivElement>(null)
   const navigate = useNavigate()
-const { t } = useTranslation();
+  const { t } = useTranslation();
 
   const handleChange1 = (event: React.ChangeEvent<HTMLInputElement>) => {
     setChecked1(event.target.checked)
@@ -229,6 +229,8 @@ const { t } = useTranslation();
 
     return null // Return null if the process fails
   }
+
+
   const handleProctoring = async (objectId?: string): Promise<File | null> => {
     try {
       const response = await axios.get(
@@ -539,31 +541,31 @@ const { t } = useTranslation();
   //     console.error('Error fetching questions:', error)
   //   }
   // }
-const generateQuestions = async () => {
-  try {
-    const response = await axios.post(
-      `${process.env.REACT_APP_DJANGO_PYTHON_MODULE_SERVICE}/get_interview_data/`,
-      { object_id: objId }, // Send JSON
-      {
-        headers: {
-          'Content-Type': 'application/json',
-          organization: organisation,
+  const generateQuestions = async () => {
+    try {
+      const response = await axios.post(
+        `${process.env.REACT_APP_DJANGO_PYTHON_MODULE_SERVICE}/get_interview_data/`,
+        { object_id: objId }, // Send JSON
+        {
+          headers: {
+            'Content-Type': 'application/json',
+            organization: organisation,
+          },
         },
-      },
-    );
-    const responseData = response.data.data.questions;
-    const candidatename = response.data.data.resume_data.name;
-    setQuestions(responseData);
-    setCandidateName(candidatename);
-    const concatenatedQuestions = responseData.map((questionObj:any) => questionObj.question);
-    setQuestionGenerated(concatenatedQuestions);
-  } catch (error:any) {
-    console.error('Error fetching questions:', error);
-    if (error.response) {
-      console.log('Error response:', error.response.data); // Log the server error message
+      );
+      const responseData = response.data.data.questions;
+      const candidatename = response.data.data.resume_data.name;
+      setQuestions(responseData);
+      setCandidateName(candidatename);
+      const concatenatedQuestions = responseData.map((questionObj: any) => questionObj.question);
+      setQuestionGenerated(concatenatedQuestions);
+    } catch (error: any) {
+      console.error('Error fetching questions:', error);
+      if (error.response) {
+        console.log('Error response:', error.response.data); // Log the server error message
+      }
     }
-  }
-};
+  };
   useEffect(() => {
     generateQuestions()
   }, [objId])
@@ -606,7 +608,7 @@ const generateQuestions = async () => {
   //     return () => mic.stop()
   //   }
   // }, [liveParticipant, currentQuestionIndex, isReadingQuestion])
-useEffect(() => {
+  useEffect(() => {
     if (liveParticipant > 0 && !isReadingQuestion) {
       const SpeechRecognition =
         (window as any).SpeechRecognition ||
@@ -687,7 +689,7 @@ useEffect(() => {
     setOpenDialog(false)
   }
 
- const handleNextQuestion = async () => {
+  const handleNextQuestion = async () => {
     if (nextClicked) {
       console.log('Next button already clicked, skipping...');
       return;
@@ -744,15 +746,76 @@ useEffect(() => {
       console.error('Error sending thank-you email:', error)
     }
   }
- const handleQuestionDistribution = async (
-  objId: any,
-  organisation: any,
-): Promise<any | null> => {
+  // const handleQuestionDistribution = async (
+  //   objId: any,
+  //   organisation: any,
+  // ): Promise<any | null> => {
+  //   try {
+  //     const response = await axios.post(
+  //       `${process.env.REACT_APP_DJANGO_PYTHON_MODULE_SERVICE}/question_distribution/`,
+  //       {
+  //         object_id: objId,
+  //       },
+  //       {
+  //         headers: {
+  //           'Content-Type': 'application/json',
+  //           Organization: organisation,
+  //         },
+  //       }
+  //     )
+
+  //     if (response.status === 200) {
+  //       console.log('✅ Question distribution completed:', response.data)
+  //       return response.data
+  //     } else {
+  //       console.warn('⚠️ Unexpected response:', response)
+  //       return null
+  //     }
+  //   } catch (error: any) {
+  //     if (error.response) {
+  //       console.error('❌ Server error:', error.response.data)
+  //     } else if (error.request) {
+  //       console.error('❌ No response received:', error.request)
+  //     } else {
+  //       console.error('❌ Request setup error:', error.message)
+  //     }
+  //     return null
+  //   }
+  // }
+  // const handleInterviewStatus = async (
+  //   objId: string,
+  //   organisation: any
+  // ): Promise<{ object_id: string; updated_status: string } | null> => {
+  //   try {
+  //     const response = await axios.get(
+  //       `${process.env.REACT_APP_DJANGO_PYTHON_MODULE_SERVICE}/interview_status/${objId}/`,
+  //       {
+  //         headers: {
+  //           'Content-Type': 'application/json',
+  //           Organization: organisation,
+  //         },
+  //       }
+  //     )
+  //     console.log('✅ Interview status updated:', response.data)
+  //     return response.data
+  //   } catch (error: any) {
+  //     if (error.response) {
+  //       console.error('❌ Server error:', error.response.data)
+  //     } else if (error.request) {
+  //       console.error('❌ No response received:', error.request)
+  //     } else {
+  //       console.error('❌ Request setup error:', error.message)
+  //     }
+  //     return null
+  //   }
+  // }
+  const handleInterviewStatus = async (objectId: string, organisation: any) => {
   try {
     const response = await axios.post(
-      `${process.env.REACT_APP_DJANGO_PYTHON_MODULE_SERVICE}/question_distribution/`,
+      `${process.env.REACT_APP_DJANGO_PYTHON_MODULE_SERVICE}/interview_status/`,
       {
-        object_id: objId,
+        object_id: objectId,
+        interview_status: "completed",
       },
       {
         headers: {
@@ -760,53 +823,12 @@ useEffect(() => {
           Organization: organisation,
         },
       }
-    )
-
-    if (response.status === 200) {
-      console.log('✅ Question distribution completed:', response.data)
-      return response.data
-    } else {
-      console.warn('⚠️ Unexpected response:', response)
-      return null
-    }
-  } catch (error: any) {
-    if (error.response) {
-      console.error('❌ Server error:', error.response.data)
-    } else if (error.request) {
-      console.error('❌ No response received:', error.request)
-    } else {
-      console.error('❌ Request setup error:', error.message)
-    }
-    return null
+    );
+    console.log(response.data.message);
+  } catch (error) {
+    console.error('Failed to update status:', error);
   }
-}
-  const handleInterviewStatus = async (
-  objId: string,
-  organisation: any
-): Promise<{ object_id: string; updated_status: string } | null> => {
-  try {
-    const response = await axios.get(
-      `${process.env.REACT_APP_DJANGO_PYTHON_MODULE_SERVICE}/interview_status/${objId}/`,
-      {
-        headers: {
-          'Content-Type': 'application/json',
-          Organization: organisation,
-        },
-      }
-    )
-    console.log('✅ Interview status updated:', response.data)
-    return response.data
-  } catch (error: any) {
-    if (error.response) {
-      console.error('❌ Server error:', error.response.data)
-    } else if (error.request) {
-      console.error('❌ No response received:', error.request)
-    } else {
-      console.error('❌ Request setup error:', error.message)
-    }
-    return null
-  }
-}
+};
 
   const handleSubmit = async () => {
     try {
@@ -832,8 +854,11 @@ useEffect(() => {
 
         await Promise.all([
           generatefeedback(),
-          handleInterviewStatus(objId,organisation),
-          handleQuestionDistribution(objId,organisation),
+          handleQuestionAnalysis(),
+          handleSoftSkills(),
+          handleStrengths(),
+          handleTechnicalScore(),
+          handleInterviewStatus(objId, organisation),
           handleBatchInterviewAnalysis(),
           SendThankYouMail(),
           handleProctoring(objId),
@@ -848,6 +873,9 @@ useEffect(() => {
       setTimeout(() => {
         navigate('/SubmitInterview');
       }, 1000);
+    } finally {
+      dispatch(loaderOff());
+      setLoading(false)
     }
   };
   // const handleSubmit = async () => {
@@ -873,44 +901,44 @@ useEffect(() => {
   //   }
   // }
 
- const updateanswer = async (
-  reference_number: any,
-  question_text: any,
-  answer: any,
-) => {
-  try {
-    const data = {
-      object_id: reference_number,
-      question_text: question_text,
-      answer: answer || 'No answer provided',
-    };
-    console.log('Calling update_answer API with:', data);
+  const updateanswer = async (
+    reference_number: any,
+    question_text: any,
+    answer: any,
+  ) => {
+    try {
+      const data = {
+        object_id: reference_number,
+        question_text: question_text,
+        answer: answer || 'No answer provided',
+      };
+      console.log('Calling update_answer API with:', data);
 
-    const axiosPromise = axios.post(
-      `${process.env.REACT_APP_DJANGO_PYTHON_MODULE_SERVICE}/update_answer/`,
-      data,
-      { headers: { organization: organisation } }
-    );
+      const axiosPromise = axios.post(
+        `${process.env.REACT_APP_DJANGO_PYTHON_MODULE_SERVICE}/update_answer/`,
+        data,
+        { headers: { organization: organisation } }
+      );
 
-    const response = await Promise.race([
-      axiosPromise,
-      new Promise<never>((_, reject) =>
-        setTimeout(() => reject(new Error('API timeout')), 5000)
-      ),
-    ]) as AxiosResponse<any>; // 👈 Cast the response type here
+      const response = await Promise.race([
+        axiosPromise,
+        new Promise<never>((_, reject) =>
+          setTimeout(() => reject(new Error('API timeout')), 5000)
+        ),
+      ]) as AxiosResponse<any>; // 👈 Cast the response type here
 
-    console.log('update_answer response:', response.data);
-    setTranscript('');
-    setInterimTranscript('');
-    return response.data;
+      console.log('update_answer response:', response.data);
+      setTranscript('');
+      setInterimTranscript('');
+      return response.data;
 
-  } catch (error: any) {
-    console.error('Error updating answer:', error.response?.data || error.message);
-    throw error;
-  }
-};
+    } catch (error: any) {
+      console.error('Error updating answer:', error.response?.data || error.message);
+      throw error;
+    }
+  };
 
- 
+
   const sendOrg = async (dbName: any) => {
     try {
       await axios.get(
@@ -1088,10 +1116,13 @@ useEffect(() => {
       }, 1000)
     } catch (error) {
       console.error('Error kicking session:', error)
+    } finally {
+      dispatch(loaderOff());
+      setLoading(false)
     }
   }
 
- const handleClick = async () => {
+  const handleClick = async () => {
     if (!questionGenerated[currentQuestionIndex]) {
       console.error('Invalid question at index:', currentQuestionIndex);
       return;
@@ -1185,8 +1216,7 @@ useEffect(() => {
         recordingEntity,
       )
       console.log(
-        `Recording written to backend: question_${
-          currentQuestionIndex + 1
+        `Recording written to backend: question_${currentQuestionIndex + 1
         }.mp4`,
       )
       setUserProfileImage(url)
@@ -1211,6 +1241,9 @@ useEffect(() => {
       } catch (error) {
         setLoading(false)
         console.error('Failed to initialize Dyte meeting:', error)
+      }finally{
+        dispatch(loaderOff())
+        setLoading(false)
       }
     }
     setupMeeting()
@@ -1753,7 +1786,7 @@ useEffect(() => {
                       color: '#E8F1FF',
                       textTransform: 'none',
                     }}
-                    //{t('exitButton')}
+                  //{t('exitButton')}
                   >
                     {t('confirmBtn')}
                   </Button>

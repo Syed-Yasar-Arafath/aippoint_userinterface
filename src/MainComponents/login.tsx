@@ -636,10 +636,10 @@ const { t } = useTranslation();
         </Grid>
         <Grid item lg={6}>
           <img
-            src="assets/static/SVG/Select Candidates.png"
+            src="assets/static/images/Select Candidate.png"
             style={{
-              width: '70%',
-              height: '580px',
+              width: '95%',
+              height: '630px',
               minHeight: '60vh',
               borderRadius: '20px',
               borderLeft: '50px',

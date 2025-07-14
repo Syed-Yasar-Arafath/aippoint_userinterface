@@ -425,14 +425,14 @@ function CandidateCodingAssessment() {
                                         <Button
                                             sx={{
                                                 textTransform: 'none',
-                                                background: getColorByRange(interviewData.coding_overall_score * 10),
+                                                background: getColorByRange(interviewData.coding_overall_score),
                                                 borderRadius: '6px',
                                                 color: '#FFFFFF',
                                                 fontSize: '12px',
                                                 fontWeight: 500,
                                                 fontFamily: 'SF Pro Display',
                                                 '&:hover': {
-                                                    background: getColorByRange(interviewData.coding_overall_score * 10),
+                                                    background: getColorByRange(interviewData.coding_overall_score),
                                                 }
                                             }}
                                         >
@@ -460,8 +460,8 @@ function CandidateCodingAssessment() {
                                                 sx={{
                                                     width: '120px',
                                                     height: '120px',
-                                                    background: getColorByRange(interviewData.coding_overall_score * 10),
-                                                    border: `10px solid ${reduceColorOpacityByRange(interviewData.coding_overall_score * 10)}`,
+                                                    background: getColorByRange(interviewData.coding_overall_score),
+                                                    border: `10px solid ${reduceColorOpacityByRange(interviewData.coding_overall_score)}`,
                                                     color: '#FFFFFF',
                                                     fontSize: '14px',
                                                     fontWeight: 500,
@@ -472,7 +472,7 @@ function CandidateCodingAssessment() {
                                                     justifyContent: 'center',
                                                     alignItems: 'center',
                                                 }}
-                                            >{interviewData.coding_overall_score * 10 || '0'}%
+                                            >{interviewData.coding_overall_score || '0'}%
                                                 <Typography 
                                                 variant="inherit"
                                                 sx={{
@@ -480,7 +480,7 @@ function CandidateCodingAssessment() {
                                                     fontSize: '14px',
                                                     fontWeight: 500,
                                                     fontFamily: 'SF Pro Display',
-                                                }}>{ratingScalesByRange(interviewData.coding_overall_score * 10)}</Typography>
+                                                }}>{ratingScalesByRange(interviewData.coding_overall_score)}</Typography>
                                             </Typography>
                                         </Box>
                                     </CardContent>

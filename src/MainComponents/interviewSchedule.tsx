@@ -471,7 +471,7 @@ const InterviewScheduler: React.FC = () => {
     t('designation'),
     t('email'),
     // 'Score',
-    t('viewDownload'),
+    // t('viewDownload'),
     // 'Action',
     t('select'),
   ]
@@ -664,104 +664,104 @@ const InterviewScheduler: React.FC = () => {
   // }
 
   const handleChange = (field: string) => async (e: any) => {
-  const selectedValue = e.target.value;
+    const selectedValue = e.target.value;
 
-  // setFormValues((prevState: any) => ({
-  //   ...prevState,
-  //   [field]: {
-  //     ...prevState[field],
-  //     value: selectedValue,
-  //     error: false,
-  //   },
-  // }));
+    // setFormValues((prevState: any) => ({
+    //   ...prevState,
+    //   [field]: {
+    //     ...prevState[field],
+    //     value: selectedValue,
+    //     error: false,
+    //   },
+    // }));
 
-  setFormValues((prevState: any) => {
-    const newState = {
-      ...prevState,
-      [field]: {
-        ...prevState[field],
-        value: selectedValue,
-        error: false,
-      },
-    };
-
-   // Reset the opposite field if this one is selected
-    if (field === 'jobDescription') {
-      newState.programmingLanguage = {
-        ...prevState.programmingLanguage,
-        value: '',
-        error: false,
+    setFormValues((prevState: any) => {
+      const newState = {
+        ...prevState,
+        [field]: {
+          ...prevState[field],
+          value: selectedValue,
+          error: false,
+        },
       };
-    } else if (field === 'programmingLanguage') {
-      newState.jobDescription = {
-        ...prevState.jobDescription,
-        value: '',
-        error: false,
-      };
-    }
 
-    return newState;
+      // Reset the opposite field if this one is selected
+      if (field === 'jobDescription') {
+        newState.programmingLanguage = {
+          ...prevState.programmingLanguage,
+          value: '',
+          error: false,
+        };
+      } else if (field === 'programmingLanguage') {
+        newState.jobDescription = {
+          ...prevState.jobDescription,
+          value: '',
+          error: false,
+        };
+      }
+
+      return newState;
     });
-  
-  if (field === 'jobDescription' || field === 'programmingLanguage') {
-    const selectedJobObject = jobs.find((job) => job.jobid === selectedValue);
 
-    if (selectedJobObject) {
-      const { skills, job_title, experience_required, location } = selectedJobObject;
-      const filteredJobObject = {
-        skills,
-        job_title,
-        experience_required,
-        location,
-      };
-      setSelectedJob(filteredJobObject);
+    if (field === 'jobDescription' || field === 'programmingLanguage') {
+      const selectedJobObject = jobs.find((job) => job.jobid === selectedValue);
 
-      const resumeDataArray = selectedJobObject.resume_data || [];
-      if (resumeDataArray.length > 0) {
-        const resumeIds = resumeDataArray.map((resume: any) => resume.id);
-        try {
-          const requestData = { resume_id: resumeIds };
-          const resumeResponse = await getResumeById(requestData);
-          const resumeData = resumeResponse.map((resume: any) => resume.resume_data);
-          setProfile(resumeData);
-        } catch (error) {
-          console.error('Error fetching resumes:', error);
+      if (selectedJobObject) {
+        const { skills, job_title, experience_required, location } = selectedJobObject;
+        const filteredJobObject = {
+          skills,
+          job_title,
+          experience_required,
+          location,
+        };
+        setSelectedJob(filteredJobObject);
+
+        const resumeDataArray = selectedJobObject.resume_data || [];
+        if (resumeDataArray.length > 0) {
+          const resumeIds = resumeDataArray.map((resume: any) => resume.id);
+          try {
+            const requestData = { resume_id: resumeIds };
+            const resumeResponse = await getResumeById(requestData);
+            const resumeData = resumeResponse.map((resume: any) => resume.resume_data);
+            setProfile(resumeData);
+          } catch (error) {
+            console.error('Error fetching resumes:', error);
+          }
         }
       }
     }
-  }
-};
+  };
 
-   const handleCancel = () => {
-        setFormValues((prevState: any) => ({
-            ...prevState,
-            jobDescription: {
-                ...prevState.jobDescription,
-                value: '',
-                error: false,
-            },
-            programmingLanguage: {
-                ...prevState.programmingLanguage,
-                value: '',
-                error: false,
-            },
-            questionLength: {
-                ...prevState.questionLength,
-                value: '',
-                error: false,
-            },
-            questionLevel: {
-                ...prevState.questionLevel,
-                value: '',
-                error: false,
-            }
-        }));
-    };
+  const handleCancel = () => {
+    setFormValues((prevState: any) => ({
+      ...prevState,
+      jobDescription: {
+        ...prevState.jobDescription,
+        value: '',
+        error: false,
+      },
+      programmingLanguage: {
+        ...prevState.programmingLanguage,
+        value: '',
+        error: false,
+      },
+      questionLength: {
+        ...prevState.questionLength,
+        value: '',
+        error: false,
+      },
+      questionLevel: {
+        ...prevState.questionLevel,
+        value: '',
+        error: false,
+      }
+    }));
+  };
 
 
   const [select1, setSelect1] = useState(false)
-  const [select2, setSelect2] = useState(false)
-  const [select3, setSelect3] = useState(false)
+  // const [select2, setSelect2] = useState(false)
+  // const [select3, setSelect3] = useState(false)
 
   const convertNumberToArabic = (num: number, selectedLanguage: any) => {
     if (selectedLanguage === 'ar') {
@@ -880,7 +880,8 @@ const InterviewScheduler: React.FC = () => {
                 borderRadius: '6px',
                 padding: '0px 12px',
                 height: '40px',
-                backgroundColor: '#FFFFFF',
+                // backgroundColor: '#FFFFFF',
+                backgroundColor: '#C0C0C0',
                 display: 'flex',
                 alignItems: 'center',
                 justifyContent: 'space-between',
@@ -920,7 +921,8 @@ const InterviewScheduler: React.FC = () => {
                 fontSize: '14px',
                 fontFamily: 'SF Pro Display',
                 height: '40px',
-                background: '#FFFFFF'
+                // background: '#FFFFFF'
+                backgroundColor: '#C0C0C0',
               }}
               sx={{
                 '.MuiOutlinedInput-notchedOutline': { border: '1px solid #1C1C1E80', },
@@ -973,7 +975,8 @@ const InterviewScheduler: React.FC = () => {
                 fontSize: '14px',
                 fontFamily: 'SF Pro Display',
                 height: '40px',
-                background: '#FFFFFF'
+                // background: '#FFFFFF'
+                backgroundColor: '#C0C0C0',
               }}
               sx={{
                 '.MuiOutlinedInput-notchedOutline': { border: '1px solid #1C1C1E80', },
@@ -1026,7 +1029,8 @@ const InterviewScheduler: React.FC = () => {
                 fontSize: '14px',
                 fontFamily: 'SF Pro Display',
                 height: '40px',
-                background: '#FFFFFF'
+                // background: '#FFFFFF'
+                backgroundColor: '#C0C0C0',
               }}
               sx={{
                 '.MuiOutlinedInput-notchedOutline': { border: '1px solid #1C1C1E80', },
@@ -1182,7 +1186,7 @@ const InterviewScheduler: React.FC = () => {
                 // value={questionLength}
                 value={formValues.questionLength.value}
                 onChange={handleChange('questionLength')}
-                onClick={() => setSelect2(true)}
+                // onClick={() => setSelect2(true)}
                 sx={{
                   border: '1px solid #1C1C1E80',
                   borderRadius: '6px',
@@ -1257,7 +1261,8 @@ const InterviewScheduler: React.FC = () => {
                 fontSize: '14px',
                 fontFamily: 'SF Pro Display',
                 height: '40px',
-                background: '#FFFFFF'
+                // background: '#FFFFFF'
+                backgroundColor: '#C0C0C0',
               }}
               sx={{
                 '.MuiOutlinedInput-notchedOutline': { border: '1px solid #1C1C1E80', },
@@ -1338,7 +1343,7 @@ const InterviewScheduler: React.FC = () => {
                 // value={questionLevel}
                 value={formValues.questionLevel.value}
                 onChange={handleChange('questionLevel')}
-                onClick={() => setSelect3(true)}
+                // onClick={() => setSelect3(true)}
                 sx={{
                   border: '1px solid #1C1C1E80',
                   borderRadius: '6px',
@@ -1616,6 +1621,7 @@ const InterviewScheduler: React.FC = () => {
         </Button>
       </div> */}
         </div>
+        <div style={{ color: '#6891ff', fontSize: '12px' }}>Note: Gray-colored fields are disabled</div>
         <div
           style={{
             display: 'flex',
@@ -1649,8 +1655,8 @@ const InterviewScheduler: React.FC = () => {
               setCollection('')
               handleCancel()
               setSelect1(false)
-              setSelect2(false)
-              setSelect3(false)
+              // setSelect2(false)
+              // setSelect3(false)
             }}
           >
             Cancel
@@ -1683,7 +1689,7 @@ const InterviewScheduler: React.FC = () => {
           </Button>
         </div>
         <div style={{ marginTop: '10px' }}>
-          {select1 && select2 && select3 && (
+          {select1 && (
             <div style={{ height: 230, width: '100%' }}>
               <TableContainer
                 component={Paper}
@@ -1721,12 +1727,26 @@ const InterviewScheduler: React.FC = () => {
                               style={{
                                 display: 'flex',
                                 flexDirection: 'row',
-                                justifyContent: 'space-evenly',
+                                // justifyContent: 'space-evenly',
+                                gap:'20px',
+                                marginLeft:'20px',
                                 alignItems: 'center',
                                 ...tableRow,
                               }}
                             >
-                              <Avatar src="/broken-image.jpg" />
+                              <Avatar
+                                alt={e.name}
+                                src={e.profile_picture || ''}
+                                sx={{ width: 40, height: 40, bgcolor: '#0284C7', fontSize: '14px', fontWeight: 700 }}
+                              >
+                                {!e.profile_picture &&
+                                  (e.name as string)
+                                    .split(' ')
+                                    .map((word: string) => word[0])
+                                    .slice(0, 2)
+                                    .join('')
+                                    .toUpperCase()}
+                              </Avatar>
                               {e.name}
                             </p>
                           </TableCell>
@@ -1755,7 +1775,7 @@ const InterviewScheduler: React.FC = () => {
                                   100%
                                 </p>
                               </TableCell> */}
-                          <TableCell>
+                          {/* <TableCell>
                             <p
                               style={{
                                 color: '000000',
@@ -1769,7 +1789,7 @@ const InterviewScheduler: React.FC = () => {
                                 onClick={() => handleDownload(e.id)}
                               />
                             </p>
-                          </TableCell>
+                          </TableCell> */}
                           {/* <TableCell>
                                 <p
                                   style={{
@@ -1808,7 +1828,7 @@ const InterviewScheduler: React.FC = () => {
             </div>
           )}
 
-          {select1 && select2 && select3 && (
+          {select1 && (
             <div>
               <Box display="flex" justifyContent="center" marginTop={7}>
                 <Box sx={{ flexShrink: 0 }}>

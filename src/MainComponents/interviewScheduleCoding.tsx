@@ -504,7 +504,7 @@ function InterviewScheduleCoding() {
         t('designation'),
         t('email'),
         // 'Score',
-        t('viewDownload'),
+        // t('viewDownload'),
         // 'Action',
         t('select'),
     ]
@@ -801,8 +801,8 @@ function InterviewScheduleCoding() {
     };
 
     const [select1, setSelect1] = useState(false)
-    const [select2, setSelect2] = useState(false)
-    const [select3, setSelect3] = useState(false)
+    // const [select2, setSelect2] = useState(false)
+    // const [select3, setSelect3] = useState(false)
 
     const convertNumberToArabic = (num: number, selectedLanguage: any) => {
         if (selectedLanguage === 'ar') {
@@ -923,7 +923,8 @@ function InterviewScheduleCoding() {
                                 borderRadius: '6px',
                                 padding: '0px 12px',
                                 height: '40px',
-                                backgroundColor: '#FFFFFF',
+                                // backgroundColor: '#FFFFFF',
+                                 backgroundColor:'#C0C0C0',
                                 display: 'flex',
                                 alignItems: 'center',
                                 justifyContent: 'space-between',
@@ -963,7 +964,8 @@ function InterviewScheduleCoding() {
                                 fontSize: '14px',
                                 fontFamily: 'SF Pro Display',
                                 height: '40px',
-                                background: '#FFFFFF'
+                                // background: '#FFFFFF'
+                                 backgroundColor:'#C0C0C0',
                             }}
                             sx={{
                                 '.MuiOutlinedInput-notchedOutline': { border: '1px solid #1C1C1E80', },
@@ -1016,7 +1018,8 @@ function InterviewScheduleCoding() {
                                 fontSize: '14px',
                                 fontFamily: 'SF Pro Display',
                                 height: '40px',
-                                background: '#FFFFFF'
+                                // background: '#FFFFFF'
+                                 backgroundColor:'#C0C0C0',
                             }}
                             sx={{
                                 '.MuiOutlinedInput-notchedOutline': { border: '1px solid #1C1C1E80', },
@@ -1069,7 +1072,8 @@ function InterviewScheduleCoding() {
                                 fontSize: '14px',
                                 fontFamily: 'SF Pro Display',
                                 height: '40px',
-                                background: '#FFFFFF'
+                                // background: '#FFFFFF'
+                                 backgroundColor:'#C0C0C0',
                             }}
                             sx={{
                                 '.MuiOutlinedInput-notchedOutline': { border: '1px solid #1C1C1E80', },
@@ -1225,7 +1229,7 @@ function InterviewScheduleCoding() {
                                 // value={questionLength}
                                 value={formValues.questionLength.value}
                                 onChange={handleChange('questionLength')}
-                                onClick={() => setSelect2(true)}
+                                // onClick={() => setSelect2(true)}
                                 sx={{
                                     border: '1px solid #1C1C1E80',
                                     borderRadius: '6px',
@@ -1300,7 +1304,8 @@ function InterviewScheduleCoding() {
                                 fontSize: '14px',
                                 fontFamily: 'SF Pro Display',
                                 height: '40px',
-                                background: '#FFFFFF'
+                                // background: '#FFFFFF'
+                                 backgroundColor:'#C0C0C0',
                             }}
                             sx={{
                                 '.MuiOutlinedInput-notchedOutline': { border: '1px solid #1C1C1E80', },
@@ -1381,7 +1386,7 @@ function InterviewScheduleCoding() {
                                 // value={questionLevel}
                                 value={formValues.questionLevel.value}
                                 onChange={handleChange('questionLevel')}
-                                onClick={() => setSelect3(true)}
+                                // onClick={() => setSelect3(true)}
                                 sx={{
                                     border: '1px solid #1C1C1E80',
                                     borderRadius: '6px',
@@ -1659,6 +1664,7 @@ function InterviewScheduleCoding() {
         </Button>
       </div> */}
                 </div>
+                <div style={{color:'#6891ff', fontSize:'12px'}}>Note: Gray-colored fields are disabled</div>
                 <div
                     style={{
                         display: 'flex',
@@ -1692,8 +1698,8 @@ function InterviewScheduleCoding() {
                             setCollection('')
                             handleCancel()
                             setSelect1(false)
-                            setSelect2(false)
-                            setSelect3(false)
+                            // setSelect2(false)
+                            // setSelect3(false)
                         }}
                     >
                         Cancel
@@ -1726,7 +1732,7 @@ function InterviewScheduleCoding() {
                     </Button>
                 </div>
                 <div style={{ marginTop: '10px' }}>
-                    {select1 && select2 && select3 && (
+                    {select1 && (
                         <div style={{ height: 230, width: '100%' }}>
                             <TableContainer
                                 component={Paper}
@@ -1759,20 +1765,33 @@ function InterviewScheduleCoding() {
                                                         },
                                                     }}
                                                 >
-                                                    <TableCell>
-                                                        <p
-                                                            style={{
-                                                                display: 'flex',
-                                                                flexDirection: 'row',
-                                                                justifyContent: 'space-evenly',
-                                                                alignItems: 'center',
-                                                                ...tableRow,
-                                                            }}
-                                                        >
-                                                            <Avatar src="/broken-image.jpg" />
-                                                            {e.name}
-                                                        </p>
-                                                    </TableCell>
+                                                     <TableCell>
+                                                                                <p
+                                                                                  style={{
+                                                                                    display: 'flex',
+                                                                                    flexDirection: 'row',
+                                                                                    gap:'20px',
+                                                                                    marginLeft:'20px',
+                                                                                    alignItems: 'center',
+                                                                                    ...tableRow,
+                                                                                  }}
+                                                                                >
+                                                                                  <Avatar
+                                                                                    alt={e.name}
+                                                                                    src={e.profile_picture || ''}
+                                                                                    sx={{ width: 40, height: 40, bgcolor: '#0284C7', fontSize: '14px', fontWeight: 700 }}
+                                                                                  >
+                                                                                    {!e.profile_picture &&
+                                                                                      (e.name as string)
+                                                                                        .split(' ')
+                                                                                        .map((word: string) => word[0])
+                                                                                        .slice(0, 2)
+                                                                                        .join('')
+                                                                                        .toUpperCase()}
+                                                                                  </Avatar>
+                                                                                  {e.name}
+                                                                                </p>
+                                                                              </TableCell>
                                                     <TableCell>
                                                         <p style={tableRow}>
                                                             {e.work && e.work.length > 0
@@ -1798,7 +1817,7 @@ function InterviewScheduleCoding() {
                                   100%
                                 </p>
                               </TableCell> */}
-                                                    <TableCell>
+                                                    {/* <TableCell>
                                                         <p
                                                             style={{
                                                                 color: '000000',
@@ -1812,7 +1831,7 @@ function InterviewScheduleCoding() {
                                                                 onClick={() => handleDownload(e.id)}
                                                             />
                                                         </p>
-                                                    </TableCell>
+                                                    </TableCell> */}
                                                     {/* <TableCell>
                                 <p
                                   style={{
@@ -1851,7 +1870,7 @@ function InterviewScheduleCoding() {
                         </div>
                     )}
 
-                    {select1 && select2 && select3 && (
+                    {select1 && (
                         <div>
                             <Box display="flex" justifyContent="center" marginTop={7}>
                                 <Box sx={{ flexShrink: 0 }}>

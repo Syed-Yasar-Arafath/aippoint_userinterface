@@ -242,8 +242,7 @@ export async function getResumeById(requestData: any) {
 
 // ✅ Get All Resumes (Fixed Organisation Handling)
 export async function getAllResume(data: any) {
-  // const organisation = localStorage.getItem('organisation')
-  const organisation = 'tcs'
+  const organisation = localStorage.getItem('organisation')
 
   try {
     const response = await internalApi.post('/get_score/', data, {

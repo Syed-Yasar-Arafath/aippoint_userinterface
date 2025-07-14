@@ -113,6 +113,8 @@ const ResumeList = () => {
   const [collectionNames, setCollectionNames] = useState<Collection[]>([])
   const [userId, setUserId] = useState('')
   const [openModal, setOpenModal] = useState(false)
+    const [openModal1, setOpenModal1] = useState(false)
+
   const [jobs, setJobs] = useState<any[]>([])
   const [collection, setCollection] = useState<string | number>('')
   const [resumes, setResumes] = useState<any[]>([])
@@ -341,14 +343,14 @@ const ResumeList = () => {
         : [...prev, candidateId],
     )
   }
- const handleOpen = async (proId: any) => {
+ const handleOpen1 = async (proId: any) => {
     const jsonData = {
       resume_id: [proId],
     }
     try {
       const res = await postResume(jsonData)
       setBase64Pdf(res[0].file_data)
-      setOpenModal(true)
+      setOpenModal1(true)
     } catch (error) {
       // Handle errors
       console.error('Error fetching data:', error)
@@ -434,6 +436,8 @@ const ResumeList = () => {
   const handleCloseModal = () => {
     setOpenModal(false)
   }
+  
+  const handleClose1 = () => setOpenModal1(false)
 
   const colors = {
     green: '#dcfce7',
@@ -1354,7 +1358,7 @@ const ResumeList = () => {
     boxShadow: '0 1px 2px rgba(0,0,0,0.05)',
     height: '14px',
   }}
-  onClick={() => handleOpen(candidate.resume_data?.id)} // ✅ Fixed here
+  onClick={() => handleOpen1(candidate.resume_data?.id)} // ✅ Fixed here
 >
   View CV
 </Button>
@@ -1672,7 +1676,7 @@ const ResumeList = () => {
         </Box>
       </Modal>
         <Modal
-                open={openModal}
+                open={openModal1}
                 aria-labelledby="modal-modal-title"
                 aria-describedby="modal-modal-description"
               >
@@ -1715,7 +1719,7 @@ const ResumeList = () => {
                       }}
                     ></iframe>
                     <CloseIcon
-                      onClick={handleClose}
+                      onClick={handleClose1}
                       style={{
                         top: '25px',
                         right: '0px',

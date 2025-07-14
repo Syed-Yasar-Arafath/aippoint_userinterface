@@ -32,7 +32,7 @@ function CodingSection() {
   // dyte integration////////////////////////////////
   const organisation = localStorage.getItem('organisation')
   const selectedLanguage: any = localStorage.getItem('i18nextLng')
-const { t } = useTranslation();
+  const { t } = useTranslation();
 
   const currentLanguage = selectedLanguage === 'ar' ? 'Arabic' : 'English'
   console.log(currentLanguage)
@@ -182,6 +182,7 @@ const { t } = useTranslation();
     setupMeeting()
   }, [authToken]) // 👈 only depend on authToken, not initMeeting or meeting
 
+
   useEffect(() => {
     const timer = setTimeout(() => {
       meeting?.self?.enableVideo()
@@ -190,11 +191,15 @@ const { t } = useTranslation();
 
     return () => clearTimeout(timer)
   }, [meeting])
+
+
   useEffect(() => {
     if (initialConditionMet && authToken) {
       startRecording()
     }
   }, [initialConditionMet, authToken])
+
+
   const checkSessionStatus = async () => {
     try {
       const response = await axios.get(
@@ -276,13 +281,10 @@ const { t } = useTranslation();
         },
       )
       console.log(response.data)
-      if (response.status == 200) {
-        // setTimeout(() => {
-        // handleDownloadRecording()
-        // }, 2000)
-        // setTimeLimit(300)
-      }
+
       handleRecordingSubmit()
+      handleQuestionAnalysis()
+
     } catch (error) {
       console.error(error)
     }
@@ -416,6 +418,27 @@ const { t } = useTranslation();
     }
   }
 
+  const handleInterviewStatus = async (objectId: string, organisation: any) => {
+    try {
+      const response = await axios.post(
+        `${process.env.REACT_APP_DJANGO_PYTHON_MODULE_SERVICE}/interview_status/`,
+        {
+          object_id: objectId,
+          interview_status: "completed",
+        },
+        {
+          headers: {
+            'Content-Type': 'application/json',
+            Organization: organisation,
+          },
+        }
+      );
+      console.log(response.data.message);
+    } catch (error) {
+      console.error('Failed to update status:', error);
+    }
+  };
+
   const generatefeedback = async () => {
     try {
       const formData = new FormData()
@@ -462,69 +485,69 @@ const { t } = useTranslation();
     }
   }
 
-  const handleSoftSkills = async () => {
-    try {
-      const response = await axios.post(
-        `${process.env.REACT_APP_DJANGO_PYTHON_MODULE_SERVICE}/extract_soft_skills_coding/`,
-        {
-          object_id: id,
-          language_selected: languge,
-        },
-        {
-          headers: {
-            'Content-Type': 'application/json',
-            organization: organisation,
-          },
-        },
-      )
-      console.log('soft skills response: ', response)
-    } catch (error) {
-      console.error('Error fetching user data:', error)
-    }
-  }
+  // const handleSoftSkills = async () => {
+  //   try {
+  //     const response = await axios.post(
+  //       `${process.env.REACT_APP_DJANGO_PYTHON_MODULE_SERVICE}/extract_soft_skills_coding/`,
+  //       {
+  //         object_id: id,
+  //         language_selected: languge,
+  //       },
+  //       {
+  //         headers: {
+  //           'Content-Type': 'application/json',
+  //           organization: organisation,
+  //         },
+  //       },
+  //     )
+  //     console.log('soft skills response: ', response)
+  //   } catch (error) {
+  //     console.error('Error fetching user data:', error)
+  //   }
+  // }
 
-  const handleStrengths = async () => {
-    try {
-      const response = await axios.post(
-        `${process.env.REACT_APP_DJANGO_PYTHON_MODULE_SERVICE}/extract_strengths_areas_coding/`,
-        {
-          object_id: id,
-          language_selected: languge,
-        },
-        {
-          headers: {
-            'Content-Type': 'application/json',
-            organization: organisation,
-          },
-        },
-      )
-      console.log('strengths response: ', response)
-    } catch (error) {
-      console.error('Error fetching user data:', error)
-    }
-  }
+  // const handleStrengths = async () => {
+  //   try {
+  //     const response = await axios.post(
+  //       `${process.env.REACT_APP_DJANGO_PYTHON_MODULE_SERVICE}/extract_strengths_areas_coding/`,
+  //       {
+  //         object_id: id,
+  //         language_selected: languge,
+  //       },
+  //       {
+  //         headers: {
+  //           'Content-Type': 'application/json',
+  //           organization: organisation,
+  //         },
+  //       },
+  //     )
+  //     console.log('strengths response: ', response)
+  //   } catch (error) {
+  //     console.error('Error fetching user data:', error)
+  //   }
+  // }
 
-  const handleTechnicalScore = async () => {
-    try {
-      const response = await axios.post(
-        `${process.env.REACT_APP_DJANGO_PYTHON_MODULE_SERVICE}/extract-techskills-scores-coding/`,
-        {
-          object_id: id,
-          language_selected: languge,
-        },
-        {
-          headers: {
-            'Content-Type': 'application/json',
-            organization: organisation,
-          },
-        },
-      )
+  // const handleTechnicalScore = async () => {
+  //   try {
+  //     const response = await axios.post(
+  //       `${process.env.REACT_APP_DJANGO_PYTHON_MODULE_SERVICE}/extract-techskills-scores-coding/`,
+  //       {
+  //         object_id: id,
+  //         language_selected: languge,
+  //       },
+  //       {
+  //         headers: {
+  //           'Content-Type': 'application/json',
+  //           organization: organisation,
+  //         },
+  //       },
+  //     )
 
-      console.log('technical score response: ', response)
-    } catch (error) {
-      console.error('Error fetching user data:', error)
-    }
-  }
+  //     console.log('technical score response: ', response)
+  //   } catch (error) {
+  //     console.error('Error fetching user data:', error)
+  //   }
+  // }
 
   const [currentQuestionIndex, setCurrentQuestionIndex] = useState(0)
 
@@ -542,6 +565,7 @@ const { t } = useTranslation();
   //     setCurrentQuestionIndex((prevIndex) => prevIndex + 1)
   //   }
   // }
+
   const handleExit = async () => {
     stopRecording()
     handleSubmit()
@@ -558,8 +582,8 @@ const { t } = useTranslation();
           },
         },
       )
-      SendThankYouMail()
-      navigate('/coding_submit')
+      // SendThankYouMail()
+      // navigate('/coding_submit')
     } catch (error) {
       console.error('Error kicking session:', error)
     }
@@ -577,33 +601,113 @@ const { t } = useTranslation();
         await Promise.all([
           generatefeedback(),
           handleQuestionAnalysis(),
-          handleSoftSkills(),
-          handleStrengths(),
-          handleTechnicalScore(),
-
+          SendThankYouMail(),
           handleProctoring(objId),
+          handleInterviewStatus(objId, organisation),
         ])
         dispatch(loaderOff())
       }
     } catch (error) {
       console.error('Error in handleSubmit:', error)
-      // Optionally, still open the dialog or handle the error case
       setOpenDialog(true)
-      // setTimeout(() => {
-      //   navigate('/SubmitInterview')
-      // }, 1000)
     }
   }
 
+  // const handleProctoring = async (objectId?: string): Promise<File | null> => {
+  //   try {
+  //     // Step 1: Fetch recording data
+  //     const response = await axios.get(
+  //       `${process.env.REACT_APP_SPRINGBOOT_BACKEND_SERVICE}/recording/meeting/${objectId}/${organisation}`,
+  //     )
+
+  //     if (Array.isArray(response.data)) {
+  //       // Extract and deduplicate valid URLs
+  //       const videoUrls = [
+  //         ...new Set(
+  //           response.data
+  //             .map((recording: any) => recording.outputFileName)
+  //             .filter((url: string) => url),
+  //         ),
+  //       ]
+
+  //       if (videoUrls.length === 0) {
+  //         console.error('No valid video URLs found')
+  //         return null
+  //       }
+
+  //       // Step 2: Prepare request data for merge API
+  //       const requestData: MergeVideoRequest = {
+  //         video_urls: videoUrls,
+  //         meeting_id: objId,
+  //       }
+
+  //       if (objectId) {
+  //         requestData.object_id = objId
+  //       }
+
+  //       // Step 3: Call the merge API
+  //       const mergeResponse = await axios.post<MergeVideoResponse>(
+  //         `${process.env.REACT_APP_DJANGO_PYTHON_MODULE_SERVICE}/merge_videos/`, // Update with your actual Django endpoint
+  //         requestData,
+  //         {
+  //           headers: {
+  //             'Content-Type': 'application/json',
+  //             Organization: organisation,
+  //           },
+  //         },
+  //       )
+
+  //       // Step 4: Handle response
+  //       if (mergeResponse.status === 202) {
+  //         console.log('Video processing queued:', mergeResponse.data.message)
+  //         // Since processing is async, we can't return the file immediately
+  //         // You might want to implement polling or websocket to get the result
+  //         console.log(
+  //           'Processing started. Implement polling/websocket to get final video.',
+  //         )
+  //         return null // Return null since the file isn't available yet
+  //       } else {
+  //         console.error('Unexpected status code:', mergeResponse.status)
+  //         return null
+  //       }
+  //     } else {
+  //       console.error('Unexpected data format:', response.data)
+  //       return null
+  //     }
+  //   } catch (error) {
+  //     if (axios.isAxiosError(error)) {
+  //       if (error.response) {
+  //         // Handle specific status codes from the backend
+  //         switch (error.response.status) {
+  //           case 400:
+  //             console.error('Bad request:', error.response.data.error)
+  //             break
+  //           case 405:
+  //             console.error('Method not allowed')
+  //             break
+  //           case 500:
+  //             console.error('Server error:', error.response.data.error)
+  //             break
+  //           default:
+  //             console.error('Unexpected error:', error.response.data)
+  //         }
+  //       } else {
+  //         console.error('Network error:', error.message)
+  //       }
+  //     } else {
+  //       console.error('Unknown error merging videos:', error)
+  //     }
+  //     return null
+  //   }
+  // }
+
+
   const handleProctoring = async (objectId?: string): Promise<File | null> => {
     try {
-      // Step 1: Fetch recording data
       const response = await axios.get(
-        `${process.env.REACT_APP_SPRINGBOOT_BACKEND_SERVICE}/recording/meeting/${objectId}/${organisation}`,
+        `${process.env.REACT_APP_SPRINGBOOT_BACKEND_SERVICE}/recording/meeting/${objId}/${organisation}`,
       )
-
       if (Array.isArray(response.data)) {
-        // Extract and deduplicate valid URLs
         const videoUrls = [
           ...new Set(
             response.data
@@ -611,25 +715,14 @@ const { t } = useTranslation();
               .filter((url: string) => url),
           ),
         ]
-
-        if (videoUrls.length === 0) {
-          console.error('No valid video URLs found')
-          return null
-        }
-
-        // Step 2: Prepare request data for merge API
+        if (videoUrls.length === 0) return null
         const requestData: MergeVideoRequest = {
           video_urls: videoUrls,
           meeting_id: objId,
         }
-
-        if (objectId) {
-          requestData.object_id = objId
-        }
-
-        // Step 3: Call the merge API
+        if (objectId) requestData.object_id = objId
         const mergeResponse = await axios.post<MergeVideoResponse>(
-          `${process.env.REACT_APP_DJANGO_PYTHON_MODULE_SERVICE}/merge_videos/`, // Update with your actual Django endpoint
+          `${process.env.REACT_APP_DJANGO_PYTHON_MODULE_SERVICE}/merge_videos/`,
           requestData,
           {
             headers: {
@@ -638,50 +731,19 @@ const { t } = useTranslation();
             },
           },
         )
-
-        // Step 4: Handle response
         if (mergeResponse.status === 202) {
           console.log('Video processing queued:', mergeResponse.data.message)
-          // Since processing is async, we can't return the file immediately
-          // You might want to implement polling or websocket to get the result
-          console.log(
-            'Processing started. Implement polling/websocket to get final video.',
-          )
-          return null // Return null since the file isn't available yet
-        } else {
-          console.error('Unexpected status code:', mergeResponse.status)
           return null
         }
-      } else {
-        console.error('Unexpected data format:', response.data)
-        return null
       }
+      return null
     } catch (error) {
-      if (axios.isAxiosError(error)) {
-        if (error.response) {
-          // Handle specific status codes from the backend
-          switch (error.response.status) {
-            case 400:
-              console.error('Bad request:', error.response.data.error)
-              break
-            case 405:
-              console.error('Method not allowed')
-              break
-            case 500:
-              console.error('Server error:', error.response.data.error)
-              break
-            default:
-              console.error('Unexpected error:', error.response.data)
-          }
-        } else {
-          console.error('Network error:', error.message)
-        }
-      } else {
-        console.error('Unknown error merging videos:', error)
-      }
+      console.error('Error in proctoring:', error)
       return null
     }
   }
+
+
   const handleNextQuestion = async () => {
     if (!initialConditionMet) {
       console.log('Condition not met, skipping function execution.')
@@ -697,13 +759,13 @@ const { t } = useTranslation();
         await handleExit()
 
         // Call required functions
-        generatefeedback()
+        // generatefeedback()
 
-        handleProctoring(id)
+        // handleProctoring(id)
         handleQuestionAnalysis()
-        handleSoftSkills()
-        handleStrengths()
-        handleTechnicalScore()
+        // handleSoftSkills()
+        // handleStrengths()
+        // handleTechnicalScore()
         // SendThankYouMail()
         // Navigate after all processes are complete
         navigate('/coding_submit')
@@ -778,37 +840,37 @@ const { t } = useTranslation();
 
   const id = objId
 
- useEffect(() => {
-  if (!id || hasFetched.current) return;
+  useEffect(() => {
+    if (!id || hasFetched.current) return;
 
-  const fetchData = async () => {
-    const organisation = localStorage.getItem('organisation');
-    try {
-      const response = await axios.post(
-        `${process.env.REACT_APP_DJANGO_PYTHON_MODULE_SERVICE}/get_interview_data/`,
-        { object_id: objId },
-        {
-          headers: {
-            'Content-Type': 'application/json',
-            organization: organisation,
+    const fetchData = async () => {
+      const organisation = localStorage.getItem('organisation');
+      try {
+        const response = await axios.post(
+          `${process.env.REACT_APP_DJANGO_PYTHON_MODULE_SERVICE}/get_interview_data/`,
+          { object_id: objId },
+          {
+            headers: {
+              'Content-Type': 'application/json',
+              organization: organisation,
+            },
           },
-        },
-      );
+        );
 
-      // Access the questions array from response.data.data.questions
-      const codingQuestions = response.data.data.questions.map(
-        (que: any) => que.problem_statement,
-      );
-      console.log('debugging:', codingQuestions);
-      setCodingQuestions(codingQuestions);
-      hasFetched.current = true; // Set to prevent duplicate fetches
-    } catch (error) {
-      console.error('Failed to fetch interview data:', error);
-    }
-  };
+        // Access the questions array from response.data.data.questions
+        const codingQuestions = response.data.data.questions.map(
+          (que: any) => que.problem_statement,
+        );
+        console.log('debugging:', codingQuestions);
+        setCodingQuestions(codingQuestions);
+        hasFetched.current = true; // Set to prevent duplicate fetches
+      } catch (error) {
+        console.error('Failed to fetch interview data:', error);
+      }
+    };
 
-  fetchData();
-}, [id, objId]); // Include objId in dependencies if it's different from id
+    fetchData();
+  }, [id, objId]); // Include objId in dependencies if it's different from id
   useEffect(() => {
     let interval = 5000
     const maxInterval = 3000
@@ -1203,9 +1265,9 @@ const { t } = useTranslation();
               {/* {formatTime(timeLeft)} */}
               {initialConditionMet
                 ? convertNumberToArabic(
-                    parseInt(formatTime(timeLeft)),
-                    selectedLanguage,
-                  )
+                  parseInt(formatTime(timeLeft)),
+                  selectedLanguage,
+                )
                 : '00:00'}
             </span>{' '}
             {t('codeSubmitAlertMessage')}

@@ -206,7 +206,7 @@ function CodingLogin() {
   }
   return (
     <div style={{ padding: '4px 33px 15px 38px' }}>
-      <Header
+      {/* <Header
         title={t('loginToYourAccountHeader')}
         // title={t('collectionHeader')}
         userProfileImage={userProfileImage}
@@ -224,25 +224,23 @@ function CodingLogin() {
         }}
       >
         {t('toAccessCodingAssessment')}
-      </Typography>
+      </Typography> */}
       <Grid container>
-        <Grid item lg={5.9}>
-          {/* <img
-            src="assets/static/images/logimg.png"
+        <Grid item lg={6}>
+          <img
+            src="assets/static/images/Select Candidate.png"
             style={{
-              width: '70%',
-              height: '480px',
+              width: '95%',
+              height: '630px',
               minHeight: '60vh',
               borderRadius: '20px',
-              marginLeft: '80px',
-              marginTop: '20px',
-              // borderLeft: '70px',
+              borderLeft: '50px',
             }}
-          /> */}
+          />
         </Grid>
         <Grid
           item
-          lg={5.9}
+          lg={6}
           style={{
             display: 'flex',
             flexDirection: 'column',

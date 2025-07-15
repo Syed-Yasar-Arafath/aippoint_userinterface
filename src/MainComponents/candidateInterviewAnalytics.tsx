@@ -14,6 +14,7 @@ import { styled } from '@mui/material/styles';
 import axios from 'axios';
 import { useLocation } from 'react-router-dom';
 import Header from '../CommonComponents/topheader';
+import nlp from 'compromise';
 
 function CandidateInterviewAnalytics() {
 
@@ -27,6 +28,49 @@ function CandidateInterviewAnalytics() {
     const [technicalQuestions, setTechnicalQuestions] = useState<any>([]);
     const [proctoringDetails, setProctoringDetails] = useState<any[]>([]);
     const [summary, setSummary] = useState<any>(null);
+
+    const classifyQuestion = (text: string): string => {
+        const doc = nlp(text.toLowerCase());
+
+        if (
+            doc.has('project') ||
+            doc.has('architecture') ||
+            doc.has('your role') ||
+            doc.has('responsibilities') ||
+            doc.has('team') ||
+            doc.has('contribution')
+        ) {
+            return 'project';
+        }
+
+        if (
+            doc.has('challenge') ||
+            doc.has('difficult situation') ||
+            doc.has('pressure') ||
+            doc.has('conflict') ||
+            doc.has('stress') ||
+            doc.has('scenario') ||
+            doc.has('how did you deal')
+        ) {
+            return 'situational';
+        }
+
+        if (
+            doc.has('algorithm') ||
+            doc.has('sql') ||
+            doc.has('java') ||
+            doc.has('react') ||
+            doc.has('api') ||
+            doc.has('data structure') ||
+            doc.has('spring boot') ||
+            doc.has('technical')
+        ) {
+            return 'technical';
+        }
+
+        return 'general';
+    };
+
 
     useEffect(() => {
         const fetchInterviewData = async () => {
@@ -115,21 +159,41 @@ function CandidateInterviewAnalytics() {
                 setProctoringDetails(proctoring_formatted_data);
 
                 // ✅ QUESTION TYPE COUNT
-                const technicalKeywords = ['technical', 'algorithm', 'plsql', 'java', 'sql', 'api'];
-                const projectKeywords = ['project', 'responsibilities', 'role', 'architecture'];
-                // const situationalKeywords = ['challenge', 'difficult', 'situation', 'pressure', 'deal'];
-    
-                let technical = 0, project = 0, situational = 0;
+                // const technicalKeywords = ['technical', 'algorithm', 'plsql', 'java', 'sql', 'api'];
+                // const projectKeywords = ['project', 'responsibilities', 'role', 'architecture'];
+                // // const situationalKeywords = ['challenge', 'difficult', 'situation', 'pressure', 'deal'];
+
+                // let technical = 0, project = 0, situational = 0;
+
+                // report.analysis.forEach((item: any) => {
+                //     const question = item.question.toLowerCase();
+
+                //     if (technicalKeywords.some(kw => question.includes(kw))) {
+                //         technical++;
+                //     } else if (projectKeywords.some(kw => question.includes(kw))) {
+                //         project++;
+                //     } else {
+                //         situational++;
+                //     }
+                // });
+
+                let technical = 0, project = 0, situational = 0, general = 0;
 
                 report.analysis.forEach((item: any) => {
-                    const question = item.question.toLowerCase();
-
-                    if (technicalKeywords.some(kw => question.includes(kw))) {
-                        technical++;
-                    } else if (projectKeywords.some(kw => question.includes(kw))) {
-                        project++;
-                    } else {
-                        situational++;
+                    const category = classifyQuestion(item.question);
+                    switch (category) {
+                        case 'technical':
+                            technical++;
+                            break;
+                        case 'project':
+                            project++;
+                            break;
+                        case 'situational':
+                            situational++;
+                            break;
+                        default:
+                            general++;
+                            break;
                     }
                 });
 
@@ -137,9 +201,11 @@ function CandidateInterviewAnalytics() {
                     `Technical Questions: ${technical}`,
                     `Project-Based Questions: ${project}`,
                     `Situational Questions: ${situational}`,
+                    `General Questions: ${general}`,
                 ];
-                const questionCount = [technical, project, situational,];
-                const updatedColors = ['#22973F', '#FFCC00', '#0284C7'];
+                
+                const questionCount = [technical, project, situational, general];
+                const updatedColors = ['#22973F', '#FFCC00', '#0284C7', '#FF3B30'];
 
                 setColumnChart((prevState: any) => ({
                     ...prevState,
@@ -633,7 +699,7 @@ function CandidateInterviewAnalytics() {
                                         display: 'flex',
                                         justifyContent: 'space-between',
                                         flexDirection: 'row',
-                                        alignItems:'center'
+                                        alignItems: 'center'
                                     }}>
                                         <Avatar
                                             alt={interviewData.resume_data.name}
@@ -649,63 +715,63 @@ function CandidateInterviewAnalytics() {
                                                     .toUpperCase()}
                                         </Avatar>
                                         <Box>
-                                            <Typography 
+                                            <Typography
+                                                variant="inherit"
+                                                sx={{
+                                                    color: '#1C1C1E',
+                                                    fontSize: '12px',
+                                                    fontWeight: 500,
+                                                    fontFamily: 'SF Pro Display',
+                                                }}>{interviewData.resume_data.name || 'N/A'}</Typography>
+                                            <Typography
+                                                variant="inherit"
+                                                sx={{
+                                                    color: '#1C1C1E80',
+                                                    fontSize: '10px',
+                                                    fontWeight: 400,
+                                                    fontFamily: 'SF Pro Display',
+                                                }}>{interviewData.resume_data.email || 'N/A'}</Typography>
+                                        </Box>
+                                        <Typography
                                             variant="inherit"
                                             sx={{
+                                                border: '0.5px solid #1C1C1E1A',
+                                                borderRadius: '6px',
                                                 color: '#1C1C1E',
-                                                fontSize: '12px',
-                                                fontWeight: 500,
-                                                fontFamily: 'SF Pro Display',
-                                            }}>{interviewData.resume_data.name || 'N/A'}</Typography>
-                                            <Typography 
-                                            variant="inherit"
-                                            sx={{
-                                                color: '#1C1C1E80',
                                                 fontSize: '10px',
                                                 fontWeight: 400,
                                                 fontFamily: 'SF Pro Display',
-                                            }}>{interviewData.resume_data.email || 'N/A'}</Typography>
-                                        </Box>
-                                        <Typography 
+                                                alignContent: 'center',
+                                                padding: '5px 10px',
+                                            }}>Date: {interviewData.interview_time.split(', ')[1] || 'N/A'}</Typography>
+                                    </Box>
+                                    <Typography mt={1}
                                         variant="inherit"
                                         sx={{
-                                            border: '0.5px solid #1C1C1E1A',
-                                            borderRadius: '6px',
-                                            color: '#1C1C1E',
+                                            color: '#1C1C1E80',
                                             fontSize: '10px',
                                             fontWeight: 400,
                                             fontFamily: 'SF Pro Display',
-                                            alignContent: 'center',
-                                            padding: '5px 10px',
-                                        }}>Date: {interviewData.interview_time.split(', ')[1] || 'N/A'}</Typography>
-                                    </Box>
-                                    <Typography mt={1} 
-                                    variant="inherit"
-                                    sx={{
-                                        color: '#1C1C1E80',
-                                        fontSize: '10px',
-                                        fontWeight: 400,
-                                        fontFamily: 'SF Pro Display',
-                                        height: '60px',
-                                        overflow: 'auto'
-                                    }}>{interviewData.resume_data.job_role || 'N/A'}</Typography>
+                                            height: '60px',
+                                            overflow: 'auto'
+                                        }}>{interviewData.resume_data.job_role || 'N/A'}</Typography>
                                     <Box mt={1} sx={{
                                         display: 'flex',
                                         justifyContent: 'space-between',
                                         flexDirection: 'row',
                                     }}>
-                                         <Typography 
-                                         variant="inherit"
-                                         sx={{
-                                            alignContent: 'center',
-                                            border: '0.5px solid #1C1C1E1A',
-                                            borderRadius: '6px',
-                                            color: '#22973F',
-                                            fontSize: '10px',
-                                            fontWeight: 500,
-                                            fontFamily: 'SF Pro Display',
-                                            padding: '5px 10px'
-                                        }}>{interviewData.interview_status || 'N/A'}</Typography>
+                                        <Typography
+                                            variant="inherit"
+                                            sx={{
+                                                alignContent: 'center',
+                                                border: '0.5px solid #1C1C1E1A',
+                                                borderRadius: '6px',
+                                                color: '#22973F',
+                                                fontSize: '10px',
+                                                fontWeight: 500,
+                                                fontFamily: 'SF Pro Display',
+                                                padding: '5px 10px'
+                                            }}>{interviewData.interview_status || 'N/A'}</Typography>
                                         {/* <Button sx={{
                                             textTransform: 'none',
                                             border: '0.5px solid #1C1C1E1A',
@@ -743,10 +809,10 @@ function CandidateInterviewAnalytics() {
                                         display: 'flex',
                                         justifyContent: 'center',
                                         alignItems: 'center',
-                                        marginTop:'10px'
+                                        marginTop: '10px'
                                     }}>
                                         <Typography
-                                        variant="inherit"
+                                            variant="inherit"
                                             sx={{
                                                 width: '120px',
                                                 height: '120px',
@@ -763,14 +829,14 @@ function CandidateInterviewAnalytics() {
                                                 alignItems: 'center',
                                             }}
                                         >{interviewData.overall_score * 10 || '0'}%
-                                            <Typography 
-                                            variant="inherit"
-                                            sx={{
-                                                color: '#FFFFFF',
-                                                fontSize: '14px',
-                                                fontWeight: 500,
-                                                fontFamily: 'SF Pro Display',
-                                            }}>{ratingScalesByRange(interviewData.overall_score * 10)}</Typography>
+                                            <Typography
+                                                variant="inherit"
+                                                sx={{
+                                                    color: '#FFFFFF',
+                                                    fontSize: '14px',
+                                                    fontWeight: 500,
+                                                    fontFamily: 'SF Pro Display',
+                                                }}>{ratingScalesByRange(interviewData.overall_score * 10)}</Typography>
                                         </Typography>
                                     </Box>
                                 </CardContent>
@@ -813,7 +879,7 @@ function CandidateInterviewAnalytics() {
                                                     }}
                                                 >
                                                     <Typography
-                                                    variant="inherit"
+                                                        variant="inherit"
                                                         sx={{
                                                             color: '#1C1C1E',
                                                             fontSize: '12px',
@@ -838,22 +904,22 @@ function CandidateInterviewAnalytics() {
                                             Object.entries(technicalSkill).map(([skill, value]) => (
                                                 <Box key={skill} mb={1}>
                                                     <Box display="flex" flexDirection="row" justifyContent="space-between">
-                                                        <Typography 
-                                                        variant="inherit"
-                                                        sx={{
-                                                            color: '#1C1C1E',
-                                                            fontSize: '12px',
-                                                            fontWeight: 400,
-                                                            fontFamily: 'SF Pro Display',
-                                                        }}>{skill}</Typography>
                                                         <Typography
-                                                        variant="inherit"
-                                                         sx={{
-                                                            color: '#0284C7',
-                                                            fontSize: '12px',
-                                                            fontWeight: 400,
-                                                            fontFamily: 'SF Pro Display',
-                                                        }}>{value}%</Typography>
+                                                            variant="inherit"
+                                                            sx={{
+                                                                color: '#1C1C1E',
+                                                                fontSize: '12px',
+                                                                fontWeight: 400,
+                                                                fontFamily: 'SF Pro Display',
+                                                            }}>{skill}</Typography>
+                                                        <Typography
+                                                            variant="inherit"
+                                                            sx={{
+                                                                color: '#0284C7',
+                                                                fontSize: '12px',
+                                                                fontWeight: 400,
+                                                                fontFamily: 'SF Pro Display',
+                                                            }}>{value}%</Typography>
                                                     </Box>
                                                     <CustomLinearProgress variant="determinate" value={value} />
                                                 </Box>
@@ -914,19 +980,19 @@ function CandidateInterviewAnalytics() {
                                         )} */}
                                         {technicalQuestions.map((item: any, index: any) => (
                                             <Box key={index} mb={2}>
-                                                <Typography 
-                                                variant="inherit"
-                                                sx={{
-                                                    fontSize: '12px',
-                                                    fontWeight: 500,
-                                                    fontFamily: 'SF Pro Display',
-                                                    color: '#1C1C1E'
-                                                }}>{index + 1}.{item.question}</Typography>
+                                                <Typography
+                                                    variant="inherit"
+                                                    sx={{
+                                                        fontSize: '12px',
+                                                        fontWeight: 500,
+                                                        fontFamily: 'SF Pro Display',
+                                                        color: '#1C1C1E'
+                                                    }}>{index + 1}.{item.question}</Typography>
                                                 <Box sx={{
                                                     display: 'flex',
                                                     flexDirection: 'row',
                                                     justifyContent: 'space-between',
-                                                    marginTop:'5px'
+                                                    marginTop: '5px'
                                                 }}>
                                                     <Typography variant="inherit" sx={{ ...questionPerformanceStyle, color: getColorByRange(item.analysis.correctness), }}>Correctness: {item.analysis.correctness}%</Typography>
                                                     <Typography variant="inherit" sx={{ ...questionPerformanceStyle, color: getColorByRange(item.analysis.clarity), }}>Clarity: {item.analysis.clarity}%</Typography>
@@ -1009,21 +1075,21 @@ function CandidateInterviewAnalytics() {
                                                     flexDirection: 'column',
                                                 }}>
                                                     <Typography
-                                                    variant="inherit"
-                                                     sx={{
-                                                        color: '#1C1C1E',
-                                                        fontSize: '12px',
-                                                        fontWeight: 500,
-                                                        fontFamily: 'SF Pro Display',
-                                                    }}>{item.heading}</Typography>
-                                                    <Typography 
-                                                    variant="inherit"
-                                                    sx={{
-                                                        color: (item.text === 'Yes, detected' || item.text === 'Failed' || item.text === 'Abnormal, excessive sideways glances detected') ? '#FF3B30' : '#22973F',
-                                                        fontSize: '10px',
-                                                        fontWeight: 400,
-                                                        fontFamily: 'SF Pro Display',
-                                                    }}>{item.text}</Typography>
+                                                        variant="inherit"
+                                                        sx={{
+                                                            color: '#1C1C1E',
+                                                            fontSize: '12px',
+                                                            fontWeight: 500,
+                                                            fontFamily: 'SF Pro Display',
+                                                        }}>{item.heading}</Typography>
+                                                    <Typography
+                                                        variant="inherit"
+                                                        sx={{
+                                                            color: (item.text === 'Yes, detected' || item.text === 'Failed' || item.text === 'Abnormal, excessive sideways glances detected') ? '#FF3B30' : '#22973F',
+                                                            fontSize: '10px',
+                                                            fontWeight: 400,
+                                                            fontFamily: 'SF Pro Display',
+                                                        }}>{item.text}</Typography>
                                                 </Box>
                                             </Box>
                                         ))}
@@ -1075,9 +1141,9 @@ function CandidateInterviewAnalytics() {
                                                             fontSize: '12px',
                                                             fontWeight: 400,
                                                             fontFamily: 'SF Pro Display',
-                                                            display:'flex',
-                                                            alignItems:'center',
-                                                            paddingTop:'5px'
+                                                            display: 'flex',
+                                                            alignItems: 'center',
+                                                            paddingTop: '5px'
                                                         }}
                                                     >
                                                         <CircleCheck color='#22973F' height='15px' /> {str}
@@ -1097,9 +1163,9 @@ function CandidateInterviewAnalytics() {
                                                             fontSize: '12px',
                                                             fontWeight: 400,
                                                             fontFamily: 'SF Pro Display',
-                                                            display:'flex',
-                                                            alignItems:'center',
-                                                            paddingTop:'5px'
+                                                            display: 'flex',
+                                                            alignItems: 'center',
+                                                            paddingTop: '5px'
                                                         }}
                                                     >
                                                         <CircleAlert color='#FF3B30' height='15px' /> {imp}
@@ -1119,15 +1185,15 @@ function CandidateInterviewAnalytics() {
                                     <Typography variant="inherit" sx={cardTitleStyle}>Interview Outcome</Typography>
                                     <Box mt={1}>
                                         <Typography
-                                        variant="inherit"
-                                         sx={{
-                                            color: '#1C1C1E',
-                                            fontSize: '12px',
-                                            fontWeight: 400,
-                                            fontFamily: 'SF Pro Display',
-                                            height: '100px',
-                                            overflow: 'auto'
-                                        }}>{'N/A'}</Typography>
+                                            variant="inherit"
+                                            sx={{
+                                                color: '#1C1C1E',
+                                                fontSize: '12px',
+                                                fontWeight: 400,
+                                                fontFamily: 'SF Pro Display',
+                                                height: '100px',
+                                                overflow: 'auto'
+                                            }}>{'N/A'}</Typography>
                                         <Box mt={2} sx={{
                                             display: 'flex',
                                             justifyContent: 'center',

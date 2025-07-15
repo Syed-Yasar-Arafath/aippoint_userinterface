@@ -29,8 +29,8 @@ function AnalyticsReport() {
     const organisation = localStorage.getItem('organisation')
 
     const jobRoles = ['Java Developer', 'Python Developer', 'React Developer', 'Full Stack Developer']
-    const interviewStatus = ['Completed', 'Awaited', 'Cancelled', 'Rescheduled']
-    // const interviewStatus = ['Coding', 'AI']
+    // const interviewStatus = ['Completed', 'Awaited', 'Cancelled', 'Rescheduled']
+    const interviewStatus = ['Completed', 'Awaited']
 
     const handleJobRole = (event: SelectChangeEvent) => {
         console.log('Job Role:', event.target.value)

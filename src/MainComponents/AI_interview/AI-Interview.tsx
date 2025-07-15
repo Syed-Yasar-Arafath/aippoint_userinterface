@@ -746,69 +746,7 @@ export default function InterviewAttend() {
       console.error('Error sending thank-you email:', error)
     }
   }
-  // const handleQuestionDistribution = async (
-  //   objId: any,
-  //   organisation: any,
-  // ): Promise<any | null> => {
-  //   try {
-  //     const response = await axios.post(
-  //       `${process.env.REACT_APP_DJANGO_PYTHON_MODULE_SERVICE}/question_distribution/`,
-  //       {
-  //         object_id: objId,
-  //       },
-  //       {
-  //         headers: {
-  //           'Content-Type': 'application/json',
-  //           Organization: organisation,
-  //         },
-  //       }
-  //     )
-
-  //     if (response.status === 200) {
-  //       console.log('✅ Question distribution completed:', response.data)
-  //       return response.data
-  //     } else {
-  //       console.warn('⚠️ Unexpected response:', response)
-  //       return null
-  //     }
-  //   } catch (error: any) {
-  //     if (error.response) {
-  //       console.error('❌ Server error:', error.response.data)
-  //     } else if (error.request) {
-  //       console.error('❌ No response received:', error.request)
-  //     } else {
-  //       console.error('❌ Request setup error:', error.message)
-  //     }
-  //     return null
-  //   }
-  // }
-  // const handleInterviewStatus = async (
-  //   objId: string,
-  //   organisation: any
-  // ): Promise<{ object_id: string; updated_status: string } | null> => {
-  //   try {
-  //     const response = await axios.get(
-  //       `${process.env.REACT_APP_DJANGO_PYTHON_MODULE_SERVICE}/interview_status/${objId}/`,
-  //       {
-  //         headers: {
-  //           'Content-Type': 'application/json',
-  //           Organization: organisation,
-  //         },
-  //       }
-  //     )
-  //     console.log('✅ Interview status updated:', response.data)
-  //     return response.data
-  //   } catch (error: any) {
-  //     if (error.response) {
-  //       console.error('❌ Server error:', error.response.data)
-  //     } else if (error.request) {
-  //       console.error('❌ No response received:', error.request)
-  //     } else {
-  //       console.error('❌ Request setup error:', error.message)
-  //     }
-  //     return null
-  //   }
-  // }
+  
   const handleInterviewStatus = async (objectId: string, organisation: any) => {
   try {
     const response = await axios.post(
@@ -870,36 +808,16 @@ export default function InterviewAttend() {
     } catch (error) {
       console.error('Error in handleSubmit:', error);
       setOpenDialog(true);
-      setTimeout(() => {
-        navigate('/SubmitInterview');
-      }, 1000);
+      // setTimeout(() => {
+
+      //   navigate('/');
+      // }, 1000);
     } finally {
       dispatch(loaderOff());
       setLoading(false)
     }
   };
-  // const handleSubmit = async () => {
-  //   try {
-  //     if (liveParticipant >= 0 && recordingId) {
-  //       await stopRecording()
-  //       await new Promise((resolve) => setTimeout(resolve, 1500))
-  //       await handleDownloadRecording()
-  //       setQuestionsSubmitted(true)
-  //       setTimeout(() => {
-  //         generatefeedback()
-  //         handleQuestionAnalysis()
-  //         handleSoftSkills()
-  //         handleStrengths()
-  //         handleTechnicalScore()
-  //         SendThankYouMail()
-  //         handleProctoring(objId)
-  //         setOpenDialog(true)
-  //       }, 1000)
-  //     }
-  //   } catch (error) {
-  //     console.error('Error submitting questions:', error)
-  //   }
-  // }
+ 
 
   const updateanswer = async (
     reference_number: any,
@@ -1112,7 +1030,7 @@ export default function InterviewAttend() {
         },
       )
       setTimeout(() => {
-        navigate('/SubmitInterview')
+        navigate('/')
       }, 1000)
     } catch (error) {
       console.error('Error kicking session:', error)

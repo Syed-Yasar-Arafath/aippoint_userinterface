@@ -594,23 +594,23 @@ function AnalyticsReport() {
                                                                             textAlign: 'center'
                                                                         }}>{profile.position}</Typography></TableCell>
                                                                 <TableCell>
-                                                                    <Typography 
-                                                                    variant="inherit"
-                                                                    sx={{
-                                                                        ...interviewScoreStyle,
-                                                                        padding: '5px',
-                                                                        textAlign: 'center'
-                                                                    }}>{profile.date.split(', ')[1] || 'N/A'}</Typography>
+                                                                    <Typography
+                                                                        variant="inherit"
+                                                                        sx={{
+                                                                            ...interviewScoreStyle,
+                                                                            padding: '5px',
+                                                                            textAlign: 'center'
+                                                                        }}>{profile.date.split(', ')[1] || 'N/A'}</Typography>
                                                                 </TableCell>
                                                                 <TableCell>
-                                                                    <Typography 
-                                                                    variant="inherit"
-                                                                    sx={{
-                                                                        ...interviewScoreStyle,
-                                                                        color: interviewStatusColor(profile.status),
-                                                                        padding: '5px',
-                                                                        textAlign: 'center'
-                                                                    }}>{profile.status}</Typography>
+                                                                    <Typography
+                                                                        variant="inherit"
+                                                                        sx={{
+                                                                            ...interviewScoreStyle,
+                                                                            color: interviewStatusColor(profile.status),
+                                                                            padding: '5px',
+                                                                            textAlign: 'center'
+                                                                        }}>{profile.status}</Typography>
                                                                 </TableCell>
                                                                 {/* <TableCell>
                                                                     {profile.status === 'completed' ? (
@@ -698,7 +698,11 @@ function AnalyticsReport() {
                                                                     <Button
                                                                         sx={{
                                                                             textTransform: 'none',
-                                                                            background: '#0284C7',
+                                                                            // background: '#0284C7',
+                                                                            background:
+                                                                                profile.status === 'awaited' || profile.status === 'cancelled'
+                                                                                    ? '#94A3B8'
+                                                                                    : '#0284C7',
                                                                             borderRadius: '6px',
                                                                             color: '#FFFFFF',
                                                                             fontSize: '12px',
@@ -708,11 +712,19 @@ function AnalyticsReport() {
                                                                                 background: '#0284C7',
                                                                             },
                                                                         }}
-                                                                        onClick={() =>
-                                                                            profile.type === 'AI'
-                                                                                ? navigate('/candidate_interview_analytics', { state: { id: profile.candidateId } })
-                                                                                : navigate('/candidate_coding_assessment', { state: { id: profile.candidateId } })
-                                                                        }
+                                                                        // onClick={() =>
+                                                                        //     profile.type === 'AI'
+                                                                        //         ? navigate('/candidate_interview_analytics', { state: { id: profile.candidateId } })
+                                                                        //         : navigate('/candidate_coding_assessment', { state: { id: profile.candidateId } })
+                                                                        // }
+                                                                        disabled={profile.status === 'awaited' || profile.status === 'cancelled'}
+                                                                        onClick={() => {
+                                                                            if (profile.status !== 'awaited' || profile.status !== 'cancelled') {
+                                                                                profile.type === 'AI'
+                                                                                    ? navigate('/candidate_interview_analytics', { state: { id: profile.candidateId } })
+                                                                                    : navigate('/candidate_coding_assessment', { state: { id: profile.candidateId } });
+                                                                            }
+                                                                        }}
                                                                     >
                                                                         View
                                                                     </Button>

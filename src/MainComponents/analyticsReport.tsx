@@ -402,6 +402,7 @@ function AnalyticsReport() {
                                 <Box>
                                     <LocalizationProvider dateAdapter={AdapterDayjs}>
                                         <DatePicker
+                                            value={selectedDate}
                                             format="DD/MM/YYYY"
                                             // onChange={(newValue) => {
                                             onChange={(newValue: Dayjs | null) => {

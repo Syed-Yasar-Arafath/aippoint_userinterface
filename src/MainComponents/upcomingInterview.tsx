@@ -41,7 +41,7 @@ const UpcomingInterview: React.FC = () => {
 
   const getUserId = async () => {
     try {
-      const res = await axios.get(`http://localhost:8082/user/getuserid/${organisation}/${email}`)
+      const res = await axios.get(`https://parseez.ai/parseez-spring-service/user/getuserid/${organisation}/${email}`)
 
       setUserId(res.data.user_id)
 
@@ -52,22 +52,19 @@ const UpcomingInterview: React.FC = () => {
 
   const fetchAllInterviewData = async () => {
     try {
-      const result = await axios.get(
-        `http://localhost:8000/get_all_interview_data`,
-        {
-          headers: {
-            "Content-Type": "application/json",
-            Organization: organisation
-          }
+      const result = await axios.get("https://parseez.ai/parseez-django-service/get_all_interview_data/", {
+        headers: {
+          "Content-Type": "application/json",
+          Organization: organisation || ''
         }
-      );
+      });
 
       const allData = Array.isArray(result.data.data)
         ? result.data.data
         : result.data;
 
       const filtered = allData.filter((item: any) =>
-        item.resume_data?.created_by?.toString().trim() === userId.toString().trim() &&
+        // item.resume_data?.created_by?.toString().trim() === userId.toString().trim() &&
         item.interview_status?.toLowerCase() === "awaited"
       );
 
@@ -83,11 +80,14 @@ const UpcomingInterview: React.FC = () => {
     getUserId()
   }, [])
 
+  // useEffect(() => {
+  //   if (userId) {
+  //     fetchAllInterviewData();
+  //   }
+  // }, [userId]);
   useEffect(() => {
-    if (userId) {
       fetchAllInterviewData();
-    }
-  }, [userId]);
+  }, []);
 
   const navigate = useNavigate()
 

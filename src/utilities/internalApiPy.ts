@@ -1,7 +1,7 @@
 import axios from 'axios'
 import { getAuthToken } from './TokenUtility'
 const internalApi = axios.create({
-  baseURL: 'http://localhost:8000/',
+  baseURL: 'https://parseez.ai/parseez-django-service/',
 })
 internalApi.interceptors.request.use((config: any) => {
   console.log('token')

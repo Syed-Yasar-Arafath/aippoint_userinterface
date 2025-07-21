@@ -404,18 +404,21 @@ const UploadCV: React.FC = () => {
 
       {/* If No Files */}
       {resumeFiles.length === 0 ? (
-        <div style={{
-          textAlign: 'center',
-          padding: '40px',
-          color: '#6B7280',
-          fontSize: '14px',
-          border: '1px dashed #D1D5DB',
-          borderRadius: '8px'
-        }}>
-          <p style={{ marginBottom: '8px' }}>No resumes uploaded.</p>
-          <p>Please upload resumes or connect to ATS.</p>
-        </div>
-      ) : (
+        // <div style={{
+        //   textAlign: 'center',
+        //   padding: '40px',
+        //   color: '#6B7280',
+        //   fontSize: '14px',
+        //   border: '1px dashed #D1D5DB',
+        //   borderRadius: '8px'
+        // }}>
+        //   <p style={{ marginBottom: '8px' }}>No resumes uploaded.</p>
+        //   <p>Please upload resumes or connect to ATS.</p>
+        // </div>
+        <>
+        </>
+      ) 
+      : (
         <div>
           {/* Progress Bar */}
           <div style={{

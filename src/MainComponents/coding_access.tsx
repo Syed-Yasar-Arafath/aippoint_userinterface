@@ -147,7 +147,7 @@ function CodingAccess() {
    const handleInterviewTime = async (objectId: any) => {
       try {
         const response = await axios.post(
-          `http://localhost:8000/interview_time/${objectId}/`,
+          `https://parseez.ai/parseez-django-service/interview_time/${objectId}/`,
           {},
           {
             headers: {
@@ -176,7 +176,7 @@ function CodingAccess() {
           }}
         >
           <img
-            src="assets/static/images/aippoint logo 1.png"
+            src="assets/static/images/aippointlogo.png"
             alt="Logo"
             height="30px"
           />

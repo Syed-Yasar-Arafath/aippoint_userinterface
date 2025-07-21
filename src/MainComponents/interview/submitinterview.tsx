@@ -56,7 +56,7 @@ function SubmitInterview() {
           }}
         >
           <img
-            src="assets/static/images/aippoint logo 1.png"
+            src="assets/static/images/aippointlogo.png"
             alt="Logo"
             height="30px"
           />

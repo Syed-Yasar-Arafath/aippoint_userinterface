@@ -79,7 +79,7 @@ const Settings: React.FC = () => {
       formData.append('image', selectedImage)
 
       try {
-        const response = await axios.post('http://localhost:8082', formData, {
+        const response = await axios.post('https://parseez.ai/parseez-spring-service', formData, {
           headers: { 'Content-Type': 'multipart/form-data' },
         })
 
@@ -283,7 +283,7 @@ const Settings: React.FC = () => {
       setUserEmail(res.email)
     if (res.imageUrl) {
       setProfileImage(
-        `http://localhost:8082/user/read/downloadFile/${res.imageUrl}/${organisation}`
+        `https://parseez.ai/parseez-spring-service/user/read/downloadFile/${res.imageUrl}/${organisation}`
       )
     } else {
       setProfileImage('https://www.gravatar.com/avatar/?d=mp') // fallback
@@ -300,7 +300,7 @@ const Settings: React.FC = () => {
         email:userEmail
       }
     try{
-      const res=await axios.post(`http://localhost:8082/admin/updateuserbytoken/${organisation}`,
+      const res=await axios.post(`https://parseez.ai/parseez-spring-service/admin/updateuserbytoken/${organisation}`,
         {
           data
         },
@@ -351,7 +351,7 @@ console.log('Error = ', error)
     if (selectedImage) {
       formData.append('image', selectedImage)
     }
-    const res = await axios.put(`http://localhost:8082/user/update-profile/${organisation}`, formData, {
+    const res = await axios.put(`https://parseez.ai/parseez-spring-service/user/update-profile/${organisation}`, formData, {
       headers: {
         Authorization: `Bearer ${token}`,
       },
@@ -373,7 +373,7 @@ console.log('Error = ', error)
   //       email:userEmail,
   //       appearance:appearance
   //     }
-  //     const res=await axios.post('http://localhost:8082/user',data,{
+  //     const res=await axios.post('https://parseez.ai/parseez-spring-service/user',data,{
   //       headers:{
   //         Authorization:`Bearer ${token}`
   //       }

@@ -11,7 +11,10 @@ import {
   Checkbox,
   Avatar,
   IconButton,
+  Modal,
+  Typography,
 } from '@mui/material'
+import CloseIcon from '@mui/icons-material/Close'
 
 import VisibilityIcon from '@mui/icons-material/Visibility'
 import FileDownloadOutlinedIcon from '@mui/icons-material/FileDownloadOutlined'
@@ -26,6 +29,8 @@ import { useTranslation } from 'react-i18next'
 import { useDispatch } from 'react-redux'
 import i18n from '../i18n'
 import Header from '../CommonComponents/topheader'
+import EditOutlinedIcon from '@mui/icons-material/EditOutlined';
+import DeleteOutlineIcon from '@mui/icons-material/DeleteOutline';
 
 const InterviewScheduler: React.FC = () => {
   const [aiAvatar, setAiAvatar] = useState(true)
@@ -472,7 +477,7 @@ const InterviewScheduler: React.FC = () => {
     t('email'),
     // 'Score',
     // t('viewDownload'),
-    // 'Action',
+    'Action',
     t('select'),
   ]
 
@@ -532,7 +537,8 @@ const InterviewScheduler: React.FC = () => {
 
   const handleClose = () => setOpenModal(false)
 
-  const handleOpen = async (proId: any) => {
+   const handleOpen = async (proId: any) => {
+    console.log('proId', proId)
     const jsonData = {
       resume_id: [proId],
     }
@@ -573,7 +579,6 @@ const InterviewScheduler: React.FC = () => {
       console.error('Error downloading the PDF:', error)
     }
   }
-
   // const queLength = [3, 5, 10, 15, 20]
   const queLength = [t('three'), t('five'), t('ten'), t('fifteen'), t('twenty')]
 
@@ -1305,38 +1310,7 @@ const InterviewScheduler: React.FC = () => {
             >
               Select Question Difficulty Level
             </label>
-            {/* <Select
-          value={difficulty}
-          // onChange={handleChange(setDifficulty)}
-          displayEmpty
-          style={{
-            borderRadius: '8px',
-            fontSize: '14px',
-            fontFamily: 'SF Pro Display',
-            height: '50px',
-          }}
-          sx={{
-            '.MuiOutlinedInput-notchedOutline': { borderColor: '#ccc' },
-            '& .MuiSelect-select': { padding: '10px 12px', color: '#757575' },
-          }}
-          MenuProps={{
-            PaperProps: {
-              sx: {
-                '& .MuiMenuItem-root:hover': {
-                  backgroundColor: '#0284C7',
-                  color: '#fff',
-                },
-              },
-            },
-          }}
-        >
-          <MenuItem disabled value="">
-            Question Difficulty Level
-          </MenuItem>
-          <MenuItem value="Medium">Medium</MenuItem>
-          <MenuItem value="Easy">Easy</MenuItem>
-          <MenuItem value="Hard">Hard</MenuItem>
-        </Select> */}
+           
             <FormControl fullWidth>
               <Select
                 displayEmpty
@@ -1762,35 +1736,14 @@ const InterviewScheduler: React.FC = () => {
                           <TableCell>
                             <p style={tableRow}>{e.email}</p>
                           </TableCell>
-                          {/* <TableCell>
-                                <p
-                                  style={{
-                                    border: '2px solid #0284C7',
-                                    borderRadius: '12px',
-                                    textAlign: 'center',
-                                    padding: '10px 0px',
-                                    color: '#0284C7',
-                                  }}
-                                >
-                                  100%
-                                </p>
-                              </TableCell> */}
-                          {/* <TableCell>
-                            <p
-                              style={{
-                                color: '000000',
-                                display: 'flex',
-                                flexDirection: 'row',
-                                justifyContent: 'space-evenly',
-                              }}
-                            >
-                              <VisibilityIcon onClick={() => handleOpen(e.id)} />
-                              <FileDownloadOutlinedIcon
-                                onClick={() => handleDownload(e.id)}
-                              />
-                            </p>
-                          </TableCell> */}
-                          {/* <TableCell>
+                         
+                         <TableCell>
+                             <Box sx={{ display: 'flex', gap: 2 }}>
+    <VisibilityIcon onClick={() => handleOpen(e.resume_id)} />
+    <FileDownloadOutlinedIcon onClick={() => handleDownload(e.resume_id)} />
+  </Box>
+                          </TableCell> 
+                       {/* <TableCell>
                                 <p
                                   style={{
                                     color: '#808080',
@@ -1802,7 +1755,7 @@ const InterviewScheduler: React.FC = () => {
                                   <EditOutlinedIcon />
                                   <DeleteOutlineIcon />
                                 </p>
-                              </TableCell> */}
+                              </TableCell>  */}
                           <TableCell>
                             <p>
                               {' '}
@@ -1902,6 +1855,65 @@ const InterviewScheduler: React.FC = () => {
             </div>
           )}
         </div>
+          <Modal
+          open={openModal}
+          aria-labelledby="modal-modal-title"
+          aria-describedby="modal-modal-description"
+        >
+          <Box
+            sx={{
+              top: 0,
+              left: 0,
+              right: 0,
+              bottom: 0,
+              zIndex: 9999,
+              display: 'flex',
+              position: 'fixed',
+              alignItems: 'center',
+              justifyContent: 'center',
+              backgroundColor: 'rgba(0, 0, 0, 0.8)',
+            }}
+          >
+            <Typography id="modal-modal-title" variant="h6" component="h2">
+              {' '}
+            </Typography>
+
+            <Typography id="modal-modal-description" sx={{ mt: 2 }}>
+              {' '}
+            </Typography>
+            <div
+              style={{
+                width: '100%',
+                height: '100%',
+                position: 'relative',
+              }}
+            >
+              <iframe
+                title="PDF Preview"
+                src={'data:application/pdf;base64,' + base64Pdf}
+                style={{
+                  width: '100vw',
+                  height: '100vh',
+                  border: 'none',
+                  padding: '10px 0px 0px 100px',
+                }}
+              ></iframe>
+              <CloseIcon
+                onClick={handleClose}
+                style={{
+                  top: '25px',
+                  right: '0px',
+                  width: '25px',
+                  height: '25px',
+                  color: '#000000',
+                  position: 'absolute',
+                  background: '#FFFFFF',
+                  padding: '1px 1px 1px 1px',
+                }}
+              />
+            </div>
+          </Box>
+        </Modal>
       </div>
     </>
   )

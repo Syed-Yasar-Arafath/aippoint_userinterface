@@ -168,12 +168,13 @@ const uploadStatusReducer = (state = initialUploadStatusState, action: any): Upl
         uploads: [action.payload, ...state.uploads],
         totalUploads: state.totalUploads + 1
       }
-    case 'UPDATE_UPLOAD_STATUS':
+    case 'UPDATE_UPLOAD_STATUS':{
       const updatedUploads = state.uploads.map(upload => 
         upload.id === action.payload.id 
           ? { ...upload, ...action.payload }
           : upload
       );
+      
       
       const successfulCount = updatedUploads.filter(u => u.status === 'success').length;
       const failedCount = updatedUploads.filter(u => u.status === 'error').length;
@@ -184,8 +185,10 @@ const uploadStatusReducer = (state = initialUploadStatusState, action: any): Upl
         successfulUploads: successfulCount,
         failedUploads: failedCount
       }
-    case 'CLEAR_UPLOADS':
+    }
+    case 'CLEAR_UPLOADS':{
       return initialUploadStatusState;
+    }
     default:
       return state
   }

@@ -505,7 +505,7 @@ function InterviewScheduleCoding() {
         t('email'),
         // 'Score',
         // t('viewDownload'),
-        // 'Action',
+        'Action',
         t('select'),
     ]
 
@@ -569,7 +569,9 @@ function InterviewScheduleCoding() {
 
     const handleClose = () => setOpenModal(false)
 
+
     const handleOpen = async (proId: any) => {
+        console.log('proId', proId)
         const jsonData = {
             resume_id: [proId],
         }
@@ -718,32 +720,32 @@ function InterviewScheduleCoding() {
         // }));
 
         setFormValues((prevState: any) => {
-    const newState = {
-      ...prevState,
-      [field]: {
-        ...prevState[field],
-        value: selectedValue,
-        error: false,
-      },
-    };
+            const newState = {
+                ...prevState,
+                [field]: {
+                    ...prevState[field],
+                    value: selectedValue,
+                    error: false,
+                },
+            };
 
-   // Reset the opposite field if this one is selected
-    if (field === 'jobDescription') {
-      newState.programmingLanguage = {
-        ...prevState.programmingLanguage,
-        value: '',
-        error: false,
-      };
-    } else if (field === 'programmingLanguage') {
-      newState.jobDescription = {
-        ...prevState.jobDescription,
-        value: '',
-        error: false,
-      };
-    }
+            // Reset the opposite field if this one is selected
+            if (field === 'jobDescription') {
+                newState.programmingLanguage = {
+                    ...prevState.programmingLanguage,
+                    value: '',
+                    error: false,
+                };
+            } else if (field === 'programmingLanguage') {
+                newState.jobDescription = {
+                    ...prevState.jobDescription,
+                    value: '',
+                    error: false,
+                };
+            }
 
-    return newState;
-    });
+            return newState;
+        });
 
         if (field === 'jobDescription' || field === 'programmingLanguage') {
             const selectedJobObject = jobs.find((job) => job.jobid === selectedValue);
@@ -924,7 +926,7 @@ function InterviewScheduleCoding() {
                                 padding: '0px 12px',
                                 height: '40px',
                                 // backgroundColor: '#FFFFFF',
-                                 backgroundColor:'#C0C0C0',
+                                backgroundColor: '#C0C0C0',
                                 display: 'flex',
                                 alignItems: 'center',
                                 justifyContent: 'space-between',
@@ -965,7 +967,7 @@ function InterviewScheduleCoding() {
                                 fontFamily: 'SF Pro Display',
                                 height: '40px',
                                 // background: '#FFFFFF'
-                                 backgroundColor:'#C0C0C0',
+                                backgroundColor: '#C0C0C0',
                             }}
                             sx={{
                                 '.MuiOutlinedInput-notchedOutline': { border: '1px solid #1C1C1E80', },
@@ -1019,7 +1021,7 @@ function InterviewScheduleCoding() {
                                 fontFamily: 'SF Pro Display',
                                 height: '40px',
                                 // background: '#FFFFFF'
-                                 backgroundColor:'#C0C0C0',
+                                backgroundColor: '#C0C0C0',
                             }}
                             sx={{
                                 '.MuiOutlinedInput-notchedOutline': { border: '1px solid #1C1C1E80', },
@@ -1073,7 +1075,7 @@ function InterviewScheduleCoding() {
                                 fontFamily: 'SF Pro Display',
                                 height: '40px',
                                 // background: '#FFFFFF'
-                                 backgroundColor:'#C0C0C0',
+                                backgroundColor: '#C0C0C0',
                             }}
                             sx={{
                                 '.MuiOutlinedInput-notchedOutline': { border: '1px solid #1C1C1E80', },
@@ -1305,7 +1307,7 @@ function InterviewScheduleCoding() {
                                 fontFamily: 'SF Pro Display',
                                 height: '40px',
                                 // background: '#FFFFFF'
-                                 backgroundColor:'#C0C0C0',
+                                backgroundColor: '#C0C0C0',
                             }}
                             sx={{
                                 '.MuiOutlinedInput-notchedOutline': { border: '1px solid #1C1C1E80', },
@@ -1664,7 +1666,7 @@ function InterviewScheduleCoding() {
         </Button>
       </div> */}
                 </div>
-                <div style={{color:'#6891ff', fontSize:'12px'}}>Note: Gray-colored fields are disabled</div>
+                <div style={{ color: '#6891ff', fontSize: '12px' }}>Note: Gray-colored fields are disabled</div>
                 <div
                     style={{
                         display: 'flex',
@@ -1765,33 +1767,33 @@ function InterviewScheduleCoding() {
                                                         },
                                                     }}
                                                 >
-                                                     <TableCell>
-                                                                                <p
-                                                                                  style={{
-                                                                                    display: 'flex',
-                                                                                    flexDirection: 'row',
-                                                                                    gap:'20px',
-                                                                                    marginLeft:'20px',
-                                                                                    alignItems: 'center',
-                                                                                    ...tableRow,
-                                                                                  }}
-                                                                                >
-                                                                                  <Avatar
-                                                                                    alt={e.name}
-                                                                                    src={e.profile_picture || ''}
-                                                                                    sx={{ width: 40, height: 40, bgcolor: '#0284C7', fontSize: '14px', fontWeight: 700 }}
-                                                                                  >
-                                                                                    {!e.profile_picture &&
-                                                                                      (e.name as string)
-                                                                                        .split(' ')
-                                                                                        .map((word: string) => word[0])
-                                                                                        .slice(0, 2)
-                                                                                        .join('')
-                                                                                        .toUpperCase()}
-                                                                                  </Avatar>
-                                                                                  {e.name}
-                                                                                </p>
-                                                                              </TableCell>
+                                                    <TableCell>
+                                                        <p
+                                                            style={{
+                                                                display: 'flex',
+                                                                flexDirection: 'row',
+                                                                gap: '20px',
+                                                                marginLeft: '20px',
+                                                                alignItems: 'center',
+                                                                ...tableRow,
+                                                            }}
+                                                        >
+                                                            <Avatar
+                                                                alt={e.name}
+                                                                src={e.profile_picture || ''}
+                                                                sx={{ width: 40, height: 40, bgcolor: '#0284C7', fontSize: '14px', fontWeight: 700 }}
+                                                            >
+                                                                {!e.profile_picture &&
+                                                                    (e.name as string)
+                                                                        .split(' ')
+                                                                        .map((word: string) => word[0])
+                                                                        .slice(0, 2)
+                                                                        .join('')
+                                                                        .toUpperCase()}
+                                                            </Avatar>
+                                                            {e.name}
+                                                        </p>
+                                                    </TableCell>
                                                     <TableCell>
                                                         <p style={tableRow}>
                                                             {e.work && e.work.length > 0
@@ -1817,21 +1819,12 @@ function InterviewScheduleCoding() {
                                   100%
                                 </p>
                               </TableCell> */}
-                                                    {/* <TableCell>
-                                                        <p
-                                                            style={{
-                                                                color: '000000',
-                                                                display: 'flex',
-                                                                flexDirection: 'row',
-                                                                justifyContent: 'space-evenly',
-                                                            }}
-                                                        >
-                                                            <VisibilityIcon onClick={() => handleOpen(e.id)} />
-                                                            <FileDownloadOutlinedIcon
-                                                                onClick={() => handleDownload(e.id)}
-                                                            />
-                                                        </p>
-                                                    </TableCell> */}
+                                                   <TableCell>
+  <Box sx={{ display: 'flex', gap: 2 }}>
+    <VisibilityIcon onClick={() => handleOpen(e.resume_id)} />
+    <FileDownloadOutlinedIcon onClick={() => handleDownload(e.resume_id)} />
+  </Box>
+</TableCell>
                                                     {/* <TableCell>
                                 <p
                                   style={{
@@ -1944,6 +1937,65 @@ function InterviewScheduleCoding() {
                         </div>
                     )}
                 </div>
+                <Modal
+                    open={openModal}
+                    aria-labelledby="modal-modal-title"
+                    aria-describedby="modal-modal-description"
+                >
+                    <Box
+                        sx={{
+                            top: 0,
+                            left: 0,
+                            right: 0,
+                            bottom: 0,
+                            zIndex: 9999,
+                            display: 'flex',
+                            position: 'fixed',
+                            alignItems: 'center',
+                            justifyContent: 'center',
+                            backgroundColor: 'rgba(0, 0, 0, 0.8)',
+                        }}
+                    >
+                        <Typography id="modal-modal-title" variant="h6" component="h2">
+                            {' '}
+                        </Typography>
+
+                        <Typography id="modal-modal-description" sx={{ mt: 2 }}>
+                            {' '}
+                        </Typography>
+                        <div
+                            style={{
+                                width: '100%',
+                                height: '100%',
+                                position: 'relative',
+                            }}
+                        >
+                            <iframe
+                                title="PDF Preview"
+                                src={'data:application/pdf;base64,' + base64Pdf}
+                                style={{
+                                    width: '100vw',
+                                    height: '100vh',
+                                    border: 'none',
+                                    padding: '10px 0px 0px 100px',
+                                }}
+                            ></iframe>
+                            <CloseIcon
+                                onClick={handleClose}
+                                style={{
+                                    top: '25px',
+                                    right: '0px',
+                                    width: '25px',
+                                    height: '25px',
+                                    color: '#000000',
+                                    position: 'absolute',
+                                    background: '#FFFFFF',
+                                    padding: '1px 1px 1px 1px',
+                                }}
+                            />
+                        </div>
+                    </Box>
+                </Modal>
             </div>
         </>
     )

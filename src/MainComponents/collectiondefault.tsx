@@ -13,7 +13,7 @@ import {
   TextField,
 } from '@mui/material';
 import { Search } from 'lucide-react';
-import React, { useEffect, useState } from 'react';
+import React, { useEffect, useRef, useState } from 'react';
 import { AdapterDayjs } from '@mui/x-date-pickers/AdapterDayjs';
 import { LocalizationProvider } from '@mui/x-date-pickers/LocalizationProvider';
 import { DatePicker } from '@mui/x-date-pickers/DatePicker';
@@ -21,13 +21,16 @@ import dayjs from 'dayjs';
 import EventIcon from '@mui/icons-material/Event';
 import axios from 'axios';
 import { useNavigate } from 'react-router-dom';
+import { useTranslation } from 'react-i18next';
+import { useDispatch } from 'react-redux';
+import { openSnackbar } from '../redux/actions';
 
 interface JobDescription {
   jobid: number;
   job_title: string;
   resume_data: { id: string; status: string }[];
   created_on: string;
-  job_description?: string; // Add job_description to interface
+  job_description?: string;
 }
 
 interface UserData {
@@ -43,6 +46,24 @@ interface ResumeData {
   explanation: any;
 }
 
+type Profile = {
+  id: any;
+  resume_data: {
+    id: any;
+    skills: any;
+    experience_in_number: any;
+    name: any;
+    Resume_Category: any;
+    work: any;
+    phone: any;
+    location: any;
+    pdf_data: any;
+    profile_summary: any;
+    notes: any;
+  };
+  score: any;
+};
+
 const CollectionDefault: React.FC = () => {
   const token = localStorage.getItem('token');
   const organisation = localStorage.getItem('organisation');
@@ -55,9 +76,9 @@ const CollectionDefault: React.FC = () => {
   const [openModal, setOpenModal] = useState(false);
   const [resumeData, setResumeData] = useState<ResumeData[]>([]);
   const [filteredCollections, setFilteredCollections] = useState<any[]>([]);
-  const [openNoteModal, setOpenNoteModal] = useState(false); // State for note modal
+  const [openNoteModal, setOpenNoteModal] = useState(false);
   const [note, setNote] = useState<string>(''); // State for note input
-  const [noteLoading, setNoteLoading] = useState(false); // State for note submission loading
+  const [noteLoading, setNoteLoading] = useState(false);
 
   // Filter states
   const [jobRole, setJobRole] = useState('');
@@ -93,7 +114,6 @@ const CollectionDefault: React.FC = () => {
     getUserData();
   }, [organisation, token]);
 
-  // Transform API data for table display
   const collectionList = userData?.job_description?.map((job) => ({
     jobid: job.jobid,
     job_title: job.job_title,
@@ -102,10 +122,9 @@ const CollectionDefault: React.FC = () => {
     lastUpdated: job.created_on,
     resume_ids: job.resume_data.map((resume) => resume.id),
     status: job.resume_data[0]?.status || 'Not interviewed',
-    job_description: job.job_description || '', // Include job_description
+    job_description: job.job_description || '',
   })) || [];
 
-  // Apply filters to collectionList
   useEffect(() => {
     let filtered = collectionList;
 
@@ -175,7 +194,6 @@ const CollectionDefault: React.FC = () => {
     setFilteredCollections(filtered);
   }, [jobRole, experience, user, status, select, selectedDate, searchQuery, collectionList]);
 
-  // Pagination
   const [currentPage, setCurrentPage] = useState(1);
   const itemsPerPage = 9;
   const totalPages = Math.ceil(filteredCollections.length / itemsPerPage);
@@ -213,6 +231,7 @@ const CollectionDefault: React.FC = () => {
   const selectOptions = ['Option 1', 'Option 2', 'Option 3'];
 
   const navigate = useNavigate();
+  const dispatch = useDispatch();
 
   const handleViewProfiles = async (job: any) => {
     setSelectedJob(job);
@@ -300,69 +319,98 @@ const CollectionDefault: React.FC = () => {
       }
     } catch (error) {
       console.error('Error scoring resumes:', error);
-      setError('Failed to score resumes');
+      setError('Failed to fetch resume data');
     } finally {
       setScoreLoading(false);
     }
   };
 
   // Handle Note Modal
-  const handleOpenNoteModal = (jobDescription: string) => {
-    setNote(jobDescription || ''); // Pre-fill with existing job_description
-    setOpenNoteModal(true);
-  };
-
+  // eslint-disable-next-line @typescript-eslint/no-inferrable-types
+const handleOpenNoteModal = (resumeId: string, existingNote: string = '') => {
+  setNote(existingNote);
+  setSelectedJob((prev: any) => ({ ...prev, resumeId }));
+  setOpenNoteModal(true);
+};
   const handleCloseNoteModal = () => {
     setOpenNoteModal(false);
     setNote('');
+    setSelectedJob((prev: any) => ({ ...prev, resumeId: null }));
+    setError(null);
   };
 
-  const handleSaveNote = async () => {
-    if (!selectedJob?.jobid) {
-      setError('Job ID is missing');
+  const handleSaveNotes = async () => {
+    if (!selectedJob?.resumeId || !note.trim()) {
+      setError('Resume ID and notes are required');
+      dispatch(openSnackbar('Resume ID and notes are required', 'red'));
       return;
     }
+
     setNoteLoading(true);
     setError(null);
+
     try {
-      const response = await axios.put(
-        `${process.env.REACT_APP_SPRINGBOOT_BACKEND_SERVICE}/job/update/${selectedJob.jobid}`,
-        { job_description: note },
+      const response = await axios.post(
+        `${process.env.REACT_APP_DJANGO_PYTHON_MODULE_SERVICE}/save_notes/`,
+        {
+          object_id: selectedJob.resumeId,
+          notes: note,
+        },
         {
           headers: {
             Authorization: `Bearer ${token}`,
+            Organization: organisation,
             'Content-Type': 'application/json',
           },
         },
       );
 
       if (response.status === 200) {
-        // Update userData to reflect the new job_description
-        setUserData((prev) =>
-          prev
-            ? {
-                ...prev,
-                job_description: prev.job_description.map((job) =>
-                  job.jobid === selectedJob.jobid ? { ...job, job_description: note } : job,
-                ),
-              }
-            : prev,
+        dispatch(openSnackbar('Notes saved successfully!', 'green'));
+        // Update resumeData with the new note
+        setResumeData((prevResumeData) =>
+          prevResumeData.map((resume) =>
+            resume.id === selectedJob.resumeId
+              ? { ...resume, resume_data: { ...resume.resume_data, notes: note } }
+              : resume,
+          ),
         );
-        // Update selectedJob to reflect the new job_description
-        setSelectedJob((prev: any) => ({ ...prev, job_description: note }));
-        handleCloseNoteModal();
+        setTimeout(() => {
+          handleCloseNoteModal();
+        }, 1500);
       } else {
-        // setError('Failed to save note');
-                setError('');
-
+        setError('Failed to save notes');
+        dispatch(openSnackbar('Failed to save notes', 'red'));
       }
-    } catch (error) {
-      console.error('Error saving note:', error);
-      setError('');
+    } catch (err: any) {
+      console.error('Error saving notes:', err);
+      setError(err.response?.data?.error || 'Something went wrong');
+      dispatch(openSnackbar('Something went wrong while saving notes', 'red'));
     } finally {
       setNoteLoading(false);
     }
   };
+
+  const [selectedCandidates, setSelectedCandidates] = useState<any[]>([]);
+  const [selectAll, setSelectAll] = useState(false);
+  const [profile, setProfile] = useState<Profile[]>([]);
+  const [profileLength, setProfileLength] = useState<number>(0);
+  const [selectedExperience, setSelectedExperience] = useState<string | null>(null);
+  const [selectedSkill, setSelectedSkill] = useState<string[]>([]);
+  const [selectedLoc, setSelectedLoc] = useState<string>('');
+  const [selectedRole, setSelectedRole] = useState<string>('');
+  const [value, setValue] = useState<any[]>([]);
+  const [userId, setUserId] = useState('');
+  const [openModal1, setOpenModal1] = useState(false);
+  const [jobs, setJobs] = useState<any[]>([]);
+  const [collection, setCollection] = useState<string | number>('');
+  const [resumes, setResumes] = useState<any[]>([]);
+  const [resumeId, setResumeId] = useState<any[]>([]);
+  const searchRef = useRef<HTMLInputElement>(null);
+  const [inputValue, setInputValue] = useState<any | null>('');
+  const [inputExpValue, setInputExpValue] = useState<string>('');
+  const [inputLocValue, setInputLocValue] = useState<string>('');
+  const { t } = useTranslation();
 
   return (
     <LocalizationProvider dateAdapter={AdapterDayjs}>
@@ -952,6 +1000,7 @@ const CollectionDefault: React.FC = () => {
                         <Button
                           variant="contained"
                           color="primary"
+                            style={{textTransform:'none'}}
                           onClick={() => handleViewResume(resume.file_data)}
                         >
                           View CV/Resume
@@ -959,9 +1008,10 @@ const CollectionDefault: React.FC = () => {
                         <Button
                           variant="contained"
                           color="primary"
-                          onClick={() => handleOpenNoteModal(selectedJob?.job_description)}
-                        >
-                          Note
+                          onClick={() => handleOpenNoteModal(resume.id, resume.resume_data?.notes || '')}
+                       style={{textTransform:'none'}}
+                       >
+                          {resume.resume_data?.notes ? 'Edit Note' : 'Note'}
                         </Button>
                       </Box>
                     </Box>
@@ -985,6 +1035,7 @@ const CollectionDefault: React.FC = () => {
                         sx={{ mt: 1 }}
                         onClick={handleScoreNow}
                         disabled={scoreLoading}
+                          style={{textTransform:'none'}}
                       >
                         {scoreLoading ? 'Scoring...' : 'Score Now'}
                       </Button>
@@ -997,7 +1048,7 @@ const CollectionDefault: React.FC = () => {
                       <Button
                         variant="contained"
                         color="primary"
-                        sx={{ mt: 1 }}
+                        sx={{ mt: 1, textTransform:'none' }}
                         onClick={() => navigate('/interviewSchedule')}
                       >
                         Schedule Interview
@@ -1018,16 +1069,21 @@ const CollectionDefault: React.FC = () => {
               top: '50%',
               left: '50%',
               transform: 'translate(-50%, -50%)',
-              width: '400px',
+              width: 400,
               bgcolor: 'background.paper',
               boxShadow: 24,
               p: 4,
-              borderRadius: '8px',
+              borderRadius: 2,
             }}
           >
             <Typography variant="h6" sx={{ mb: 2 }}>
-              Add/Edit Note for {selectedJob?.job_title}
+              {note ? 'Edit' : 'Add'} Note for{' '}
+              <strong>
+                {resumeData.find((r) => r.id === selectedJob?.resumeId)?.resume_data?.name ||
+                  'Candidate'}
+              </strong>
             </Typography>
+
             <TextField
               label="Note"
               multiline
@@ -1037,20 +1093,25 @@ const CollectionDefault: React.FC = () => {
               fullWidth
               variant="outlined"
               sx={{ mb: 2 }}
+              error={!!error}
+              helperText={error}
             />
+
             <Box sx={{ display: 'flex', justifyContent: 'flex-end', gap: 1 }}>
               <Button
                 variant="outlined"
                 onClick={handleCloseNoteModal}
                 disabled={noteLoading}
+                  style={{textTransform:'none'}}
               >
                 Cancel
               </Button>
               <Button
                 variant="contained"
                 color="primary"
-                onClick={handleSaveNote}
+                onClick={handleSaveNotes}
                 disabled={noteLoading}
+                  style={{textTransform:'none'}}
               >
                 {noteLoading ? 'Saving...' : 'Save'}
               </Button>

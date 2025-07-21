@@ -114,10 +114,10 @@ const Header: React.FC<HeaderProps> = ({ title, userProfileImage, path }) => {
     //   `wss://parseez.com/parseez-django-service/ws/notifications/${userId}/`,
     // )
 
-    // const ws = new WebSocket(`ws://http://localhost:8000/ws/notifications/${userId}/`)
+    // const ws = new WebSocket(`ws://https://parseez.ai/parseez-django-service/ws/notifications/${userId}/`)
     if (!dbName) return
     const ws = new WebSocket(
-      `ws://http://localhost:8000/ws/notifications/${userId}/`,
+      `ws://https://parseez.ai/parseez-django-service/ws/notifications/${userId}/`,
     )
     // const ws = new WebSocket(
     //   `wss://parseez.ai/parseez-django-service/ws/notifications/${userId}/`,

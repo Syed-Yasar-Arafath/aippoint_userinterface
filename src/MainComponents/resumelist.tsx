@@ -238,6 +238,7 @@ const ResumeList = () => {
   }
  
   const handleSkillChange = async () => {
+   const organisation= localStorage.getItem('organisation')
     // dispatch(loaderOn())
     try {
       const searchText: string | undefined = searchRef.current?.value
@@ -265,7 +266,7 @@ const ResumeList = () => {
         jsonData.location = selectedLocValue
       }
       // dispatch(loaderOn())
-      const response = await getAllResume(jsonData)
+      const response = await getAllResume(jsonData,organisation)
       if (response) {
         setProfile(response)
         setProfileLength(response.length)

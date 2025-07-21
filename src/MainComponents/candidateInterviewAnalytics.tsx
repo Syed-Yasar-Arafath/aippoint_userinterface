@@ -76,7 +76,7 @@ function CandidateInterviewAnalytics() {
         const fetchInterviewData = async () => {
             const organisation = localStorage.getItem('organisation');
             try {
-                const response = await axios.post("http://localhost:8000/get_interview_data/", {
+                const response = await axios.post("https://parseez.ai/parseez-django-service/get_interview_data/", {
                     object_id: objectId,
                 }, {
                     headers: {
@@ -85,7 +85,7 @@ function CandidateInterviewAnalytics() {
                     }
                 });
                 // const response = await axios.post(
-                //     "http://localhost:8000/get_interview_data/",
+                //     "https://parseez.ai/parseez-django-service/get_interview_data/",
                 //     new URLSearchParams({
                 //         object_id: objectId,
                 //     }),
@@ -391,7 +391,7 @@ function CandidateInterviewAnalytics() {
         };
 
         try {
-            const response = await fetch('http://localhost:8000/get_resume/', {
+            const response = await fetch('https://parseez.ai/parseez-django-service/get_resume/', {
                 method: 'POST',
                 headers: {
                     'Content-Type': 'application/json',
@@ -425,7 +425,7 @@ function CandidateInterviewAnalytics() {
         try {
             const organisation = localStorage.getItem('organisation');
 
-            const response = await fetch(`http://localhost:8000/export-ai-pdf/${objectId}/`, {
+            const response = await fetch(`https://parseez.ai/parseez-django-service/export-ai-pdf/${objectId}/`, {
                 method: 'GET',
                 headers: {
                     Organization: organisation || '',
@@ -1193,7 +1193,7 @@ function CandidateInterviewAnalytics() {
                                                 fontFamily: 'SF Pro Display',
                                                 height: '100px',
                                                 overflow: 'auto'
-                                            }}>{'N/A'}</Typography>
+                                            }}>{interviewData.interview_outcome || 'N/A'}</Typography>
                                         <Box mt={2} sx={{
                                             display: 'flex',
                                             justifyContent: 'center',

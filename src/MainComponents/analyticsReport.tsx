@@ -52,7 +52,7 @@ function AnalyticsReport() {
         const fetchInterviewData = async () => {
             const organisation = localStorage.getItem('organisation');
             try {
-                const response = await axios.get("http://localhost:8000/get_all_interview_data/", {
+                const response = await axios.get("https://parseez.ai/parseez-django-service/get_all_interview_data/", {
                     headers: {
                         "Content-Type": "application/json",
                         Organization: organisation || ''
@@ -509,10 +509,9 @@ function AnalyticsReport() {
                                                     </TableCell>
                                                     <TableCell sx={tableHeading}>Full Name & Email</TableCell>
                                                     <TableCell sx={tableHeading}>Position</TableCell>
+                                                    <TableCell sx={tableHeading}>Interview Type</TableCell>
                                                     <TableCell sx={tableHeading}>Interview Date</TableCell>
                                                     <TableCell sx={tableHeading}>Interview Status</TableCell>
-                                                    {/* <TableCell sx={tableHeading}>AI Interview Score</TableCell>
-                                                    <TableCell sx={tableHeading}>AI Coding Assessment Score</TableCell> */}
                                                     <TableCell sx={tableHeading}>View</TableCell>
                                                 </TableRow>
                                             </TableHead>
@@ -594,6 +593,14 @@ function AnalyticsReport() {
                                                                             padding: '5px',
                                                                             textAlign: 'center'
                                                                         }}>{profile.position}</Typography></TableCell>
+                                                                         <TableCell>
+                                                                    <Typography
+                                                                        variant="inherit"
+                                                                        sx={{
+                                                                            ...interviewScoreStyle,
+                                                                            padding: '5px',
+                                                                            textAlign: 'center'
+                                                                        }}>{profile.type}</Typography></TableCell>
                                                                 <TableCell>
                                                                     <Typography
                                                                         variant="inherit"

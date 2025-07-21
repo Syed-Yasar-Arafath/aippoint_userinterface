@@ -108,7 +108,7 @@
 //   const fetchCandidateDetails = async () => {
 //     try {
 //       const res = await axios.post(
-//         'http://localhost:8000/get_interview_data/',
+//         'https://parseez.ai/parseez-django-service/get_interview_data/',
 //         { object_id: id },
 //         {
 //           headers: {
@@ -250,7 +250,7 @@ const InterviewDetails: React.FC = () => {
     const fetchCandidateDetails = async () => {
       try {
         const res = await axios.post(
-          'http://localhost:8000/get_interview_data/',
+          'https://parseez.ai/parseez-django-service/get_interview_data/',
           { object_id: id },
           {
             headers: {

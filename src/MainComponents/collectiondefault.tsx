@@ -1029,7 +1029,7 @@ const handleOpenNoteModal = (resumeId: string, existingNote: string = '') => {
                       </Typography>
                     </Box>
                     <Box sx={{ ml: 2 }}>
-                      <Button
+                      {/* <Button
                         variant="contained"
                         color="primary"
                         sx={{ mt: 1 }}
@@ -1038,7 +1038,7 @@ const handleOpenNoteModal = (resumeId: string, existingNote: string = '') => {
                           style={{textTransform:'none'}}
                       >
                         {scoreLoading ? 'Scoring...' : 'Score Now'}
-                      </Button>
+                      </Button> */}
                       <Typography variant="h6" sx={{ fontSize: 10, color: '#000', paddingTop: '5px' }}>
                         <strong>Uploaded By:</strong> {resume.resume_data?.created_by || createdBy}
                       </Typography>

@@ -787,7 +787,7 @@ const handleChangeSpecificDomainSkillsAi = (e: React.ChangeEvent<HTMLInputElemen
       setCategoryLoading(true);
       try {
         const response = await axios.get<Category[]>(
-          `http://localhost:8082/category/iosys/search?keyword=${value}`
+          `https://parseez.ai/parseez-spring-service/category/iosys/search?keyword=${value}`
         );
         setCategoryOptions(response.data);
       } catch (err) {

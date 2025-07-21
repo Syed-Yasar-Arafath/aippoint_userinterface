@@ -657,7 +657,7 @@ const NoScore = () => {
               jsonData.location = selectedLocValue
             }
 
-            const resumeResponse = await getAllResume(jsonData)
+            const resumeResponse = await getAllResume(jsonData,organisation)
             const jsonDataa = { jd_id: parseInt(jobid, 10) }
 
             // dispatch(loaderOn())

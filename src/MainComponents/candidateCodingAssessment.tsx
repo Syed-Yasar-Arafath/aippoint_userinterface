@@ -135,7 +135,7 @@ function CandidateCodingAssessment() {
     const fetchInterviewData = async () => {
         const organisation = localStorage.getItem('organisation');
         try {
-            const response = await axios.post("http://localhost:8000/get_interview_data/", {
+            const response = await axios.post("https://parseez.ai/parseez-django-service/get_interview_data/", {
                 object_id: objectId,
             }, {
                 headers: {
@@ -250,7 +250,7 @@ function CandidateCodingAssessment() {
         try {
             const organisation = localStorage.getItem('organisation');
 
-            const response = await fetch(`http://localhost:8000/export-coding-pdf/${objectId}/`, {
+            const response = await fetch(`https://parseez.ai/parseez-django-service/export-coding-pdf/${objectId}/`, {
                 method: 'GET',
                 headers: {
                     Organization: organisation || '',

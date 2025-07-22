@@ -52,6 +52,7 @@ import CodingSection from './MainComponents/coding_Section';
 import JdProfile from './MainComponents/jdprofileview';
 import ForgotPassword from './MainComponents/Forgotpassword';
 import InterviewScheduleCoding from './MainComponents/interviewScheduleCoding';
+import InterviewRecording from './MainComponents/interview/interview_recording';
 // import ConfirmJoinInterview from './MainComponents/ConfirmJoinIntreview';
 // import QuestionFormat from './MainComponents/question_format';
 
@@ -188,6 +189,10 @@ const AppContent: React.FC = () => {
               <Route path='/resumetable/:jobId' element={<ResumeTable />} />
               <Route path="/questionformat" element={<QuestionFormat />} />
               <Route path="/scheduleinterview_ai" element={<ScheduleInterviewAI />} />
+               <Route
+                path='/interviewrecording'
+                element={<InterviewRecording />}
+              />
             </>
           ) : (
             // Redirect unauthenticated users to sign in

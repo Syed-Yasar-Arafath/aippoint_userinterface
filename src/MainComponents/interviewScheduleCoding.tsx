@@ -862,80 +862,63 @@ function InterviewScheduleCoding() {
                                 fontFamily: 'SF Pro Display',
                             }}
                         >
-                            AI Avatar
+                            {/* AI Avatar */}
+                            Select JD Collection
                         </label>
-                        {/* <div
-          style={{
-            display: 'flex',
-            alignItems: 'center',
-            justifyContent: 'space-between',
-            padding: '0px 12px',
-            borderRadius: '6px',
-            // border: '1px solid #ccc',
-            border: '1px solid #1C1C1E80',
-            backgroundColor: '#FFFFFF',
-            cursor: 'pointer',
-            fontFamily: 'SF Pro Display',
-            height: '58px',
-          }}
-          onClick={() => setAiAvatar(!aiAvatar)}
-        >
-          <span style={{ fontFamily: 'SF Pro Display' }}>AI Avatar</span>
-          <div
-            style={{
-              position: 'relative',
-              display: 'inline-block',
-              width: '36px',
-              height: '20px',
-              fontFamily: 'SF Pro Display',
-            }}
-          >
-            <div
-              style={{
-                position: 'absolute',
-                top: 0,
-                left: 0,
-                right: 0,
-                bottom: 0,
-                backgroundColor: aiAvatar ? '#0284C7' : '#ccc',
-                borderRadius: '20px',
-                transition: 'background-color 0.3s',
-                fontFamily: 'SF Pro Display',
-              }}
-            >
-              <div
-                style={{
-                  position: 'absolute',
-                  width: '16px',
-                  height: '16px',
-                  backgroundColor: '#fff',
-                  borderRadius: '50%',
-                  top: '2px',
-                  left: aiAvatar ? '18px' : '2px',
-                  transition: 'left 0.3s',
-                  fontFamily: 'SF Pro Display',
-                }}
-              ></div>
-            </div>
-          </div> 
-        </div> */}
-                        <div
-                            style={{
-                                border: isDisabled ? '1px solid #1C1C1E80' : '1px solid #1C1C1E50',
-                                borderRadius: '6px',
-                                padding: '0px 12px',
-                                height: '40px',
-                                // backgroundColor: '#FFFFFF',
-                                backgroundColor: '#C0C0C0',
-                                display: 'flex',
-                                alignItems: 'center',
-                                justifyContent: 'space-between',
-                                fontFamily: 'SF Pro Display',
-                            }}
-                        >
-                            <span style={{ fontFamily: 'SF Pro Display', color: isDisabled ? '#1C1C1C' : '#1C1C1E80' }}>AI Avatar</span>
-                            <Switch {...toggleLabel} defaultChecked disabled />
-                        </div>
+                        <FormControl fullWidth>
+                            <Select
+                                displayEmpty
+                                // value={jd}
+                                value={formValues.jobDescription.value}
+                                // onChange={handleJDChange}
+                                onChange={handleChange('jobDescription')}
+                                onClick={() => setSelect1(true)}
+                                // disabled={Boolean(collection)}
+                                disabled={Boolean(formValues.programmingLanguage.value)}
+                                sx={{
+                                    border: '1px solid #1C1C1E80',
+                                    borderRadius: '6px',
+                                    height: '40px',
+                                    direction: i18n.language === 'ar' ? 'rtl' : 'ltr',
+                                    '& .MuiOutlinedInput-notchedOutline': {
+                                        border: 'none',
+                                    },
+                                    '&:hover .MuiOutlinedInput-notchedOutline': {
+                                        border: 'none',
+                                    },
+                                    '&.Mui-focused .MuiOutlinedInput-notchedOutline': {
+                                        border: 'none',
+                                    },
+                                    backgroundColor: '#FFFFFF',
+                                    '& .MuiSelect-select': {
+                                        fontSize: '14px',
+                                        fontFamily: 'SF Pro Display',
+                                        color: '#9e9e9e',
+                                    },
+                                }}
+                                // renderValue={
+                                //   jd !== '' ? undefined : () => t('selectJobDescription')
+                                // }
+                                renderValue={
+                                    formValues.jobDescription.value !== '' ? undefined : () => t('selectJobDescription')
+                                }
+
+                            >
+                                <MenuItem disabled value="">
+                                    {t('selectJobDescription')}
+                                </MenuItem>
+                                {jobs.map((job) => (
+                                    <MenuItem key={job.jobid} value={job.jobid}>
+                                        {job.job_title}
+                                    </MenuItem>
+                                ))}
+                            </Select>
+                            {formValues.jobDescription.error && (
+                                <div style={{ color: 'red' }}>
+                                    {formValues.jobDescription.errorMessage}
+                                </div>
+                            )}
+                        </FormControl>
                     </div>
 
                     {/* Voice Tone */}
@@ -954,42 +937,60 @@ function InterviewScheduleCoding() {
                                 fontFamily: 'SF Pro Display',
                             }}
                         >
-                            Select Voice Tone
+                            {/* Select Voice Tone */}
+                            Select No.of Questions
                         </label>
-                        <Select
-                            value={voiceTone}
-                            // onChange={handleChange(setVoiceTone)}
-                            disabled
-                            displayEmpty
-                            style={{
-                                borderRadius: '6px',
-                                fontSize: '14px',
-                                fontFamily: 'SF Pro Display',
-                                height: '40px',
-                                // background: '#FFFFFF'
-                                backgroundColor: '#C0C0C0',
-                            }}
-                            sx={{
-                                '.MuiOutlinedInput-notchedOutline': { border: '1px solid #1C1C1E80', },
-                                '& .MuiSelect-select': { padding: '10px 12px', color: '#757575' },
-                            }}
-                            MenuProps={{
-                                PaperProps: {
-                                    sx: {
-                                        '& .MuiMenuItem-root:hover': {
-                                            backgroundColor: '#0284C7',
-                                            color: '#fff',
-                                        },
+                        <FormControl fullWidth>
+                            <Select
+                                displayEmpty
+                                // value={questionLength}
+                                value={formValues.questionLength.value}
+                                onChange={handleChange('questionLength')}
+                                // onClick={() => setSelect2(true)}
+                                sx={{
+                                    border: '1px solid #1C1C1E80',
+                                    borderRadius: '6px',
+                                    height: '40px',
+                                    direction: i18n.language === 'ar' ? 'rtl' : 'ltr',
+                                    '& .MuiOutlinedInput-notchedOutline': {
+                                        border: 'none',
                                     },
-                                },
-                            }}
-                        >
-                            <MenuItem disabled value="">
-                                Select Voice Tone
-                            </MenuItem>
-                            <MenuItem value="Female">Female</MenuItem>
-                            <MenuItem value="Male">Male</MenuItem>
-                        </Select>
+                                    '&:hover .MuiOutlinedInput-notchedOutline': {
+                                        border: 'none',
+                                    },
+                                    '&.Mui-focused .MuiOutlinedInput-notchedOutline': {
+                                        border: 'none',
+                                    },
+                                    backgroundColor: '#FFFFFF',
+                                    '& .MuiSelect-select': {
+                                        fontSize: '14px',
+                                        fontFamily: 'SF Pro Display',
+                                        color: '#9e9e9e',
+                                    },
+                                }}
+                                renderValue={
+                                    formValues.questionLength.value !== ''
+                                        ? undefined
+                                        : () => 'Select Number Of Questions'
+                                }
+                                error={formValues.questionLength.error}
+                            >
+                                <MenuItem disabled value="">
+                                    Select Number Of Questions
+                                    {/* {t('selectNumberHeader')} */}
+                                </MenuItem>
+                                {queLength.map((length: any, index: number) => (
+                                    <MenuItem key={index} value={length}>
+                                        {length}
+                                    </MenuItem>
+                                ))}
+                            </Select>
+                            {formValues.questionLength.error && (
+                                <div style={{ color: 'red' }}>
+                                    {formValues.questionLength.errorMessage}
+                                </div>
+                            )}
+                        </FormControl>
                     </div>
 
                     {/* Accent */}
@@ -1062,11 +1063,158 @@ function InterviewScheduleCoding() {
                                 fontFamily: 'SF Pro Display',
                             }}
                         >
-                            Do you want to include coding exercise?
+                            {/* Do you want to include coding exercise? */}
+                            Select Question Difficulty Level
+                        </label>  
+                        <FormControl fullWidth>
+                            <Select
+                                displayEmpty
+                                // value={questionLevel}
+                                value={formValues.questionLevel.value}
+                                onChange={handleChange('questionLevel')}
+                                // onClick={() => setSelect3(true)}
+                                sx={{
+                                    border: '1px solid #1C1C1E80',
+                                    borderRadius: '6px',
+                                    height: '40px',
+                                    direction: i18n.language === 'ar' ? 'rtl' : 'ltr',
+                                    '& .MuiOutlinedInput-notchedOutline': {
+                                        border: 'none',
+                                    },
+                                    '&:hover .MuiOutlinedInput-notchedOutline': {
+                                        border: 'none',
+                                    },
+                                    '&.Mui-focused .MuiOutlinedInput-notchedOutline': {
+                                        border: 'none',
+                                    },
+                                    backgroundColor: '#FFFFFF',
+                                    '& .MuiSelect-select': {
+                                        fontSize: '14px',
+                                        fontFamily: 'SF Pro Display',
+                                        color: '#9e9e9e',
+                                    },
+                                }}
+                                renderValue={
+                                    formValues.questionLevel.value !== ''
+                                        ? undefined
+                                        : () => 'Select Question Difficulty Level'
+                                }
+                                error={formValues.questionLevel.error}
+                            >
+                                <MenuItem disabled value="">
+                                    Select Question Difficulty Level
+                                    {/* {t('selectQuestionLevelPlaceholder')} */}
+                                </MenuItem>
+                                {/* <MenuItem value="Easy">Easy</MenuItem>
+                        <MenuItem value="Medium">Medium</MenuItem>
+                        <MenuItem value="Hard">Hard</MenuItem> */}
+                                <MenuItem value="Easy">{t('easyDropdown')}</MenuItem>
+                                <MenuItem value="Medium">{t('mediumDropdown')}</MenuItem>
+                                <MenuItem value="Hard">{t('hardDropdown')}</MenuItem>
+                            </Select>
+                            {formValues.questionLevel.error && (
+                                <div style={{ color: 'red' }}>
+                                    {formValues.questionLevel.errorMessage}
+                                </div>
+                            )}
+                        </FormControl>
+                    </div>
+
+                    <div
+                        style={{
+                            display: 'flex',
+                            flexDirection: 'column',
+                            fontFamily: 'SF Pro Display',
+                        }}
+                    >
+                        <label
+                            style={{
+                                fontSize: '14px',
+                                marginBottom: '6px',
+                                fontWeight: 500,
+                                fontFamily: 'SF Pro Display',
+                            }}
+                        >
+                            {/* Select JD Collection */}
+                            Select Programming language
+                        </label>
+                        <FormControl fullWidth>
+                            <Select
+                                displayEmpty
+                                // value={jd}
+                                value={formValues.programmingLanguage.value}
+                                // onChange={handleJDChange}
+                                onChange={handleChange('programmingLanguage')}
+                                onClick={() => setSelect1(true)}
+                                disabled={Boolean(formValues.jobDescription.value)}
+                                sx={{
+                                    border: '1px solid #1C1C1E80',
+                                    borderRadius: '6px',
+                                    height: '40px',
+                                    direction: i18n.language === 'ar' ? 'rtl' : 'ltr',
+                                    '& .MuiOutlinedInput-notchedOutline': {
+                                        border: 'none',
+                                    },
+                                    '&:hover .MuiOutlinedInput-notchedOutline': {
+                                        border: 'none',
+                                    },
+                                    '&.Mui-focused .MuiOutlinedInput-notchedOutline': {
+                                        border: 'none',
+                                    },
+                                    backgroundColor: '#FFFFFF',
+                                    '& .MuiSelect-select': {
+                                        fontSize: '14px',
+                                        fontFamily: 'SF Pro Display',
+                                        color: '#9e9e9e',
+                                    },
+                                }}
+                                // renderValue={
+                                //   jd !== '' ? undefined : () => t('selectJobDescription')
+                                // }
+                                renderValue={
+                                    formValues.programmingLanguage.value !== '' ? undefined : () => 'Select Programming Language'
+                                }
+
+                            >
+                                <MenuItem disabled value="">
+                                    Select Programming Language
+                                </MenuItem>
+                                {jobs.map((job) => (
+                                    <MenuItem key={job.jobid} value={job.jobid}>
+                                        {job.job_title}
+                                    </MenuItem>
+                                ))}
+                            </Select>
+                            {formValues.programmingLanguage.error && (
+                                <div style={{ color: 'red' }}>
+                                    {formValues.programmingLanguage.errorMessage}
+                                </div>
+                            )}
+                        </FormControl>
+                    </div>
+
+                    {/* Number of Questions */}
+                    <div
+                        style={{
+                            display: 'flex',
+                            flexDirection: 'column',
+                            fontFamily: 'SF Pro Display',
+                        }}
+                    >
+                        <label
+                            style={{
+                                fontSize: '14px',
+                                marginBottom: '6px',
+                                fontWeight: 500,
+                                fontFamily: 'SF Pro Display',
+                            }}
+                        >
+                            {/* Select No.of Questions */}
+                            Select Voice Tone
                         </label>
                         <Select
-                            value={codingExercise}
-                            // onChange={handleChange(setCodingExercise)}
+                            value={voiceTone}
+                            // onChange={handleChange(setVoiceTone)}
                             disabled
                             displayEmpty
                             style={{
@@ -1093,189 +1241,11 @@ function InterviewScheduleCoding() {
                             }}
                         >
                             <MenuItem disabled value="">
-                                Yes/No
+                                Select Voice Tone
                             </MenuItem>
-                            <MenuItem value="Yes">Yes</MenuItem>
-                            <MenuItem value="No">No</MenuItem>
+                            <MenuItem value="Female">Female</MenuItem>
+                            <MenuItem value="Male">Male</MenuItem>
                         </Select>
-                    </div>
-
-                    <div
-                        style={{
-                            display: 'flex',
-                            flexDirection: 'column',
-                            fontFamily: 'SF Pro Display',
-                        }}
-                    >
-                        <label
-                            style={{
-                                fontSize: '14px',
-                                marginBottom: '6px',
-                                fontWeight: 500,
-                                fontFamily: 'SF Pro Display',
-                            }}
-                        >
-                            Select JD Collection
-                        </label>
-
-                        <FormControl fullWidth>
-                            <Select
-                                displayEmpty
-                                // value={jd}
-                                value={formValues.jobDescription.value}
-                                // onChange={handleJDChange}
-                                onChange={handleChange('jobDescription')}
-                                onClick={() => setSelect1(true)}
-                                // disabled={Boolean(collection)}
-                                disabled={Boolean(formValues.programmingLanguage.value)}
-                                sx={{
-                                    border: '1px solid #1C1C1E80',
-                                    borderRadius: '6px',
-                                    height: '40px',
-                                    direction: i18n.language === 'ar' ? 'rtl' : 'ltr',
-                                    '& .MuiOutlinedInput-notchedOutline': {
-                                        border: 'none',
-                                    },
-                                    '&:hover .MuiOutlinedInput-notchedOutline': {
-                                        border: 'none',
-                                    },
-                                    '&.Mui-focused .MuiOutlinedInput-notchedOutline': {
-                                        border: 'none',
-                                    },
-                                    backgroundColor: '#FFFFFF',
-                                    '& .MuiSelect-select': {
-                                        fontSize: '14px',
-                                        fontFamily: 'SF Pro Display',
-                                        color: '#9e9e9e',
-                                    },
-                                }}
-                                // renderValue={
-                                //   jd !== '' ? undefined : () => t('selectJobDescription')
-                                // }
-                                renderValue={
-                                    formValues.jobDescription.value !== '' ? undefined : () => t('selectJobDescription')
-                                }
-
-                            >
-                                <MenuItem disabled value="">
-                                    {t('selectJobDescription')}
-                                </MenuItem>
-                                {jobs.map((job) => (
-                                    <MenuItem key={job.jobid} value={job.jobid}>
-                                        {job.job_title}
-                                    </MenuItem>
-                                ))}
-                            </Select>
-                            {formValues.jobDescription.error && (
-                                <div style={{ color: 'red' }}>
-                                    {formValues.jobDescription.errorMessage}
-                                </div>
-                            )}
-                        </FormControl>
-                    </div>
-
-                    {/* Number of Questions */}
-                    <div
-                        style={{
-                            display: 'flex',
-                            flexDirection: 'column',
-                            fontFamily: 'SF Pro Display',
-                        }}
-                    >
-                        <label
-                            style={{
-                                fontSize: '14px',
-                                marginBottom: '6px',
-                                fontWeight: 500,
-                                fontFamily: 'SF Pro Display',
-                            }}
-                        >
-                            Select No.of Questions
-                        </label>
-                        {/* <Select
-          value={numQuestions}
-          // onChange={handleChange(setNumQuestions)}
-          displayEmpty
-          style={{
-            borderRadius: '8px',
-            fontSize: '14px',
-            fontFamily: 'SF Pro Display',
-            height: '50px',
-          }}
-          sx={{
-            '.MuiOutlinedInput-notchedOutline': { borderColor: '#ccc' },
-            '& .MuiSelect-select': { padding: '10px 12px', color: '#757575' },
-          }}
-          MenuProps={{
-            PaperProps: {
-              sx: {
-                '& .MuiMenuItem-root:hover': {
-                  backgroundColor: '#0284C7',
-                  color: '#fff',
-                },
-              },
-            },
-          }}
-        >
-          <MenuItem disabled value="">
-            No.of Questions
-          </MenuItem>
-          <MenuItem value="AI (04) + Question Bank (02)">
-            AI (04) + Question Bank (02)
-          </MenuItem>
-          <MenuItem value="AI (05) + QB (03)">AI (05) + QB (03)</MenuItem>
-        </Select> */}
-                        <FormControl fullWidth>
-                            <Select
-                                displayEmpty
-                                // value={questionLength}
-                                value={formValues.questionLength.value}
-                                onChange={handleChange('questionLength')}
-                                // onClick={() => setSelect2(true)}
-                                sx={{
-                                    border: '1px solid #1C1C1E80',
-                                    borderRadius: '6px',
-                                    height: '40px',
-                                    direction: i18n.language === 'ar' ? 'rtl' : 'ltr',
-                                    '& .MuiOutlinedInput-notchedOutline': {
-                                        border: 'none',
-                                    },
-                                    '&:hover .MuiOutlinedInput-notchedOutline': {
-                                        border: 'none',
-                                    },
-                                    '&.Mui-focused .MuiOutlinedInput-notchedOutline': {
-                                        border: 'none',
-                                    },
-                                    backgroundColor: '#FFFFFF',
-                                    '& .MuiSelect-select': {
-                                        fontSize: '14px',
-                                        fontFamily: 'SF Pro Display',
-                                        color: '#9e9e9e',
-                                    },
-                                }}
-                                renderValue={
-                                    formValues.questionLength.value !== ''
-                                        ? undefined
-                                        : () => 'Select Number Of Questions'
-                                }
-                                error={formValues.questionLength.error}
-                            >
-                                <MenuItem disabled value="">
-                                    Select Number Of Questions
-                                    {/* {t('selectNumberHeader')} */}
-                                </MenuItem>
-                                {queLength.map((length: any, index: number) => (
-                                    <MenuItem key={index} value={length}>
-                                        {length}
-                                    </MenuItem>
-                                ))}
-                            </Select>
-                            {formValues.questionLength.error && (
-                                <div style={{ color: 'red' }}>
-                                    {formValues.questionLength.errorMessage}
-                                </div>
-                            )}
-                        </FormControl>
                     </div>
 
                     {/* Question Format */}
@@ -1348,93 +1318,43 @@ function InterviewScheduleCoding() {
                                 fontFamily: 'SF Pro Display',
                             }}
                         >
-                            Select Question Difficulty Level
+                            {/* Select Question Difficulty Level */}
+                            Do you want to include coding exercise?
                         </label>
-                        {/* <Select
-          value={difficulty}
-          // onChange={handleChange(setDifficulty)}
-          displayEmpty
-          style={{
-            borderRadius: '8px',
-            fontSize: '14px',
-            fontFamily: 'SF Pro Display',
-            height: '50px',
-          }}
-          sx={{
-            '.MuiOutlinedInput-notchedOutline': { borderColor: '#ccc' },
-            '& .MuiSelect-select': { padding: '10px 12px', color: '#757575' },
-          }}
-          MenuProps={{
-            PaperProps: {
-              sx: {
-                '& .MuiMenuItem-root:hover': {
-                  backgroundColor: '#0284C7',
-                  color: '#fff',
-                },
-              },
-            },
-          }}
-        >
-          <MenuItem disabled value="">
-            Question Difficulty Level
-          </MenuItem>
-          <MenuItem value="Medium">Medium</MenuItem>
-          <MenuItem value="Easy">Easy</MenuItem>
-          <MenuItem value="Hard">Hard</MenuItem>
-        </Select> */}
-                        <FormControl fullWidth>
-                            <Select
-                                displayEmpty
-                                // value={questionLevel}
-                                value={formValues.questionLevel.value}
-                                onChange={handleChange('questionLevel')}
-                                // onClick={() => setSelect3(true)}
-                                sx={{
-                                    border: '1px solid #1C1C1E80',
-                                    borderRadius: '6px',
-                                    height: '40px',
-                                    direction: i18n.language === 'ar' ? 'rtl' : 'ltr',
-                                    '& .MuiOutlinedInput-notchedOutline': {
-                                        border: 'none',
+                        <Select
+                            value={codingExercise}
+                            // onChange={handleChange(setCodingExercise)}
+                            disabled
+                            displayEmpty
+                            style={{
+                                borderRadius: '6px',
+                                fontSize: '14px',
+                                fontFamily: 'SF Pro Display',
+                                height: '40px',
+                                // background: '#FFFFFF'
+                                backgroundColor: '#C0C0C0',
+                            }}
+                            sx={{
+                                '.MuiOutlinedInput-notchedOutline': { border: '1px solid #1C1C1E80', },
+                                '& .MuiSelect-select': { padding: '10px 12px', color: '#757575' },
+                            }}
+                            MenuProps={{
+                                PaperProps: {
+                                    sx: {
+                                        '& .MuiMenuItem-root:hover': {
+                                            backgroundColor: '#0284C7',
+                                            color: '#fff',
+                                        },
                                     },
-                                    '&:hover .MuiOutlinedInput-notchedOutline': {
-                                        border: 'none',
-                                    },
-                                    '&.Mui-focused .MuiOutlinedInput-notchedOutline': {
-                                        border: 'none',
-                                    },
-                                    backgroundColor: '#FFFFFF',
-                                    '& .MuiSelect-select': {
-                                        fontSize: '14px',
-                                        fontFamily: 'SF Pro Display',
-                                        color: '#9e9e9e',
-                                    },
-                                }}
-                                renderValue={
-                                    formValues.questionLevel.value !== ''
-                                        ? undefined
-                                        : () => 'Select Question Difficulty Level'
-                                }
-                                error={formValues.questionLevel.error}
-                            >
-                                <MenuItem disabled value="">
-                                    Select Question Difficulty Level
-                                    {/* {t('selectQuestionLevelPlaceholder')} */}
-                                </MenuItem>
-                                {/* <MenuItem value="Easy">Easy</MenuItem>
-                        <MenuItem value="Medium">Medium</MenuItem>
-                        <MenuItem value="Hard">Hard</MenuItem> */}
-                                <MenuItem value="Easy">{t('easyDropdown')}</MenuItem>
-                                <MenuItem value="Medium">{t('mediumDropdown')}</MenuItem>
-                                <MenuItem value="Hard">{t('hardDropdown')}</MenuItem>
-                            </Select>
-                            {formValues.questionLevel.error && (
-                                <div style={{ color: 'red' }}>
-                                    {formValues.questionLevel.errorMessage}
-                                </div>
-                            )}
-                        </FormControl>
-                    </div>
+                                },
+                            }}
+                        >
+                            <MenuItem disabled value="">
+                                Yes/No
+                            </MenuItem>
+                            <MenuItem value="Yes">Yes</MenuItem>
+                            <MenuItem value="No">No</MenuItem>
+                        </Select>                    </div>
 
                     {/* Programming Language */}
                     <div
@@ -1452,164 +1372,26 @@ function InterviewScheduleCoding() {
                                 fontFamily: 'SF Pro Display',
                             }}
                         >
-                            Select Programming language
+                            {/* Select Programming language */}
+                            AI Avatar
                         </label>
-                        {/* <Select
-          value={programmingLanguage}
-          // onChange={handleChange(setProgrammingLanguage)}
-          displayEmpty
-          style={{
-            borderRadius: '8px',
-            fontSize: '14px',
-            fontFamily: 'SF Pro Display',
-            height: '50px',
-          }}
-          sx={{
-            '.MuiOutlinedInput-notchedOutline': { borderColor: '#ccc' },
-            '& .MuiSelect-select': { padding: '10px 12px', color: '#757575' },
-          }}
-          MenuProps={{
-            PaperProps: {
-              sx: {
-                '& .MuiMenuItem-root:hover': {
-                  backgroundColor: '#0284C7',
-                  color: '#fff',
-                },
-              },
-            },
-          }}
-        >
-          <MenuItem disabled value="">
-            Programming language for coding exercise
-          </MenuItem>
-          <MenuItem value="Java Script">Java Script</MenuItem>
-          <MenuItem value="Python">Python</MenuItem>
-          <MenuItem value="Java">Java</MenuItem>
-        </Select> */}
-                        {/* <FormControl fullWidth>
-              <Select
-                displayEmpty
-                value={collection} // Ensure value matches the state
-                onChange={handleCollectionChange} // Update the state on change
-                onClick={() => setSelect1(true)}
-                disabled={Boolean(jd)}
-                sx={{
-                  border: '1px solid #1C1C1E80',
-                  borderRadius: '6px',
-                  height: '40px',
-                  direction: i18n.language === 'ar' ? 'rtl' : 'ltr',
-                  '& .MuiOutlinedInput-notchedOutline': {
-                    border: 'none',
-                  },
-                  '&:hover .MuiOutlinedInput-notchedOutline': {
-                    border: 'none',
-                  },
-                  '&.Mui-focused .MuiOutlinedInput-notchedOutline': {
-                    border: 'none',
-                  },
-                  backgroundColor: '#FFFFFF',
-                  '& .MuiSelect-select': {
-                    fontSize: '14px',
-                    fontFamily: 'SF Pro Display',
-                    color: '#9e9e9e',
-                  },
-                }}
-                renderValue={(selected) => {
-                  if (!selected) return t('selectCollection')
-
-                  const selectedItem = combinedData.find((item) => {
-                    if (item.type === 'job') {
-                      return item.jobid === collection // Use the collection state
-                    }
-                    if (item.type === 'collection') {
-                      return item.collection_id === collection // Use the collection state
-                    }
-                    return false
-                  })
-
-                  return selectedItem
-                    ? selectedItem.type === 'job'
-                      ? selectedItem.job_title
-                      : selectedItem.collection_name
-                    : 'Select Collection'
-                }}
-              >
-                <MenuItem disabled value="">
-                  {t('selectCollection')}
-                </MenuItem>
-                {combinedData.map((item) => (
-                  <MenuItem
-                    key={`${item.type}-${item.type === 'job' ? item.jobid : item.collection_id
-                      }`}
-                    value={
-                      item.type === 'job' ? item.jobid : item.collection_id
-                    }
-                  >
-                    {item.type === 'job'
-                      ? item.job_title
-                      : item.collection_name}
-                  </MenuItem>
-                ))}
-              </Select>
-              {formValues.collection.error && (
-                <div style={{ color: 'red' }}>
-                  {formValues.collection.errorMessage}
-                </div>
-              )}
-            </FormControl> */}
-                        <FormControl fullWidth>
-                            <Select
-                                displayEmpty
-                                // value={jd}
-                                value={formValues.programmingLanguage.value}
-                                // onChange={handleJDChange}
-                                onChange={handleChange('programmingLanguage')}
-                                onClick={() => setSelect1(true)}
-                                disabled={Boolean(formValues.jobDescription.value)}
-                                sx={{
-                                    border: '1px solid #1C1C1E80',
-                                    borderRadius: '6px',
-                                    height: '40px',
-                                    direction: i18n.language === 'ar' ? 'rtl' : 'ltr',
-                                    '& .MuiOutlinedInput-notchedOutline': {
-                                        border: 'none',
-                                    },
-                                    '&:hover .MuiOutlinedInput-notchedOutline': {
-                                        border: 'none',
-                                    },
-                                    '&.Mui-focused .MuiOutlinedInput-notchedOutline': {
-                                        border: 'none',
-                                    },
-                                    backgroundColor: '#FFFFFF',
-                                    '& .MuiSelect-select': {
-                                        fontSize: '14px',
-                                        fontFamily: 'SF Pro Display',
-                                        color: '#9e9e9e',
-                                    },
-                                }}
-                                // renderValue={
-                                //   jd !== '' ? undefined : () => t('selectJobDescription')
-                                // }
-                                renderValue={
-                                    formValues.programmingLanguage.value !== '' ? undefined : () => 'Select Programming Language'
-                                }
-
-                            >
-                                <MenuItem disabled value="">
-                                    Select Programming Language
-                                </MenuItem>
-                                {jobs.map((job) => (
-                                    <MenuItem key={job.jobid} value={job.jobid}>
-                                        {job.job_title}
-                                    </MenuItem>
-                                ))}
-                            </Select>
-                            {formValues.programmingLanguage.error && (
-                                <div style={{ color: 'red' }}>
-                                    {formValues.programmingLanguage.errorMessage}
-                                </div>
-                            )}
-                        </FormControl>
+                        <div
+                            style={{
+                                border: isDisabled ? '1px solid #1C1C1E80' : '1px solid #1C1C1E50',
+                                borderRadius: '6px',
+                                padding: '0px 12px',
+                                height: '38px',
+                                // backgroundColor: '#FFFFFF',
+                                backgroundColor: '#C0C0C0',
+                                display: 'flex',
+                                alignItems: 'center',
+                                justifyContent: 'space-between',
+                                fontFamily: 'SF Pro Display',
+                            }}
+                        >
+                            <span style={{ fontFamily: 'SF Pro Display', color: isDisabled ? '#1C1C1C' : '#1C1C1E80' }}>AI Avatar</span>
+                            <Switch {...toggleLabel} defaultChecked disabled />
+                        </div>
                     </div>
 
                     {/* Buttons in the same row (3rd column) */}
@@ -1819,12 +1601,12 @@ function InterviewScheduleCoding() {
                                   100%
                                 </p>
                               </TableCell> */}
-                                                   <TableCell>
-  <Box sx={{ display: 'flex', gap: 2 }}>
-    <VisibilityIcon onClick={() => handleOpen(e.resume_id)} />
-    <FileDownloadOutlinedIcon onClick={() => handleDownload(e.resume_id)} />
-  </Box>
-</TableCell>
+                                                    <TableCell>
+                                                        <Box sx={{ display: 'flex', gap: 2 }}>
+                                                            <VisibilityIcon onClick={() => handleOpen(e.resume_id)} />
+                                                            <FileDownloadOutlinedIcon onClick={() => handleDownload(e.resume_id)} />
+                                                        </Box>
+                                                    </TableCell>
                                                     {/* <TableCell>
                                 <p
                                   style={{

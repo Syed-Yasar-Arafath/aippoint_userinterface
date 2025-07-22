@@ -169,21 +169,22 @@ function SideMenuBars() {
                         justifyContent: 'center',
                         color:
                           clickedItem === index || pathLocation.pathname === item.link
-                          ? '#ffffff'
-                          : '#000000',
+                            ? '#ffffff'
+                            : '#000000',
                       }}
                     >
                       {item.icon}
                     </Box>
                     <Typography
+                      variant="inherit"
                       sx={{
                         color:
                           clickedItem === index || pathLocation.pathname === item.link
-                          ? '#ffffff'
-                          : '#000000',
+                            ? '#ffffff'
+                            : '#000000',
                         fontFamily: 'SF Pro Display',
                         lineHeight: '20.26px',
-                        fontSize: { xs: '14px', sm: '15px', md: '16px' },
+                        fontSize: { xs: '14px', sm: '14px', md: '14px' },
                         marginLeft: '10px',
                         whiteSpace: 'noWrap',
                         overflow: 'hidden',
@@ -195,12 +196,13 @@ function SideMenuBars() {
                   </Box>
                   {item.subItems && (
                     <Typography
+                      variant="inherit"
                       sx={{
                         fontSize: '20px',
                         color:
                           clickedItem === index || pathLocation.pathname === item.link
-                          ? '#ffffff'
-                          : '#000000',
+                            ? '#ffffff'
+                            : '#000000',
                       }}
                     >
                       {clickedItem === index ? '-' : '+'}
@@ -256,20 +258,21 @@ function SideMenuBars() {
                       }}
                     />
                     <Link to={subItem.link} style={{ textDecoration: 'none', color: 'inherit' }}>
-                      <div
-                        style={{
+                      <Typography
+                      variant="inherit"
+                        sx={{
                           color: pathLocation.pathname === subItem.link ? '#0284C7' : '#000000',
                           fontFamily: 'SF Pro Display',
-                          lineHeight: '20.26px',
-                          marginLeft: '20px',
-                          fontSize: '16px',
-                          whiteSpace: 'noWrap',
-                          overflow: 'hidden',
-                          textOverflow: 'ellipsis',
+                        lineHeight: '20.26px',
+                        fontSize: { xs: '14px', sm: '14px', md: '14px' },
+                        marginLeft: '10px',
+                        whiteSpace: 'noWrap',
+                        overflow: 'hidden',
+                        textOverflow: 'ellipsis',
                         }}
                       >
                         {subItem.text}
-                      </div>
+                      </Typography>
                     </Link>
                   </div>
                 ))}
@@ -278,20 +281,25 @@ function SideMenuBars() {
           </React.Fragment>
         ))}
         <Button
-          style={{
+          sx={{
             color: '#000000',
-            textAlign: 'center',
-            fontWeight: 600,
-            lineHeight: '20px',
-            fontSize: isSmallScreen ? '12px' : '14px',
+            fontFamily: 'SF Pro Display',
+            lineHeight: '20.26px',
+            fontSize: { xs: '14px', sm: '14px', md: '14px' },
+
+            whiteSpace: 'noWrap',
+            overflow: 'hidden',
+            textOverflow: 'ellipsis',
+
             textTransform: 'none',
-            marginLeft: '25px',
+            marginLeft: '20px',
             marginBottom: '20px',
           }}
           onClick={handleOpen}
         >
-          <LogoutIcon style={{ paddingRight: '5px' }} />
-          <span>Log Out</span>
+          <LogoutIcon style={{ paddingRight: '5px', width: '20px',
+                        height: '20px', }} />
+          <span >Log Out</span>
         </Button>
       </List>
 
@@ -309,9 +317,9 @@ function SideMenuBars() {
                 '&:hover': { background: '#E33629' },
               }}
               onClick={() => {
-                  handleLogOut()
-                  handleClose()
-                }}
+                handleLogOut()
+                handleClose()
+              }}
             >
               Ok
             </Button>
@@ -332,7 +340,7 @@ function SideMenuBars() {
     </Box>
   )
 
-const handleLogOut = () => {
+  const handleLogOut = () => {
     dispatch(loaderOn())
     try {
       dispatch(logout())

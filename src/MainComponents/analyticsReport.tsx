@@ -52,7 +52,7 @@ function AnalyticsReport() {
         const fetchInterviewData = async () => {
             const organisation = localStorage.getItem('organisation');
             try {
-                const response = await axios.get("https://parseez.ai/parseez-django-service/get_all_interview_data/", {
+                const response = await axios.get("http://localhost:8000/get_all_interview_data/", {
                     headers: {
                         "Content-Type": "application/json",
                         Organization: organisation || ''
@@ -513,6 +513,7 @@ function AnalyticsReport() {
                                                     <TableCell sx={tableHeading}>Interview Date</TableCell>
                                                     <TableCell sx={tableHeading}>Interview Status</TableCell>
                                                     <TableCell sx={tableHeading}>View</TableCell>
+                                                    <TableCell sx={tableHeading}>Recording</TableCell>
                                                 </TableRow>
                                             </TableHead>
                                             <TableBody>
@@ -593,7 +594,7 @@ function AnalyticsReport() {
                                                                             padding: '5px',
                                                                             textAlign: 'center'
                                                                         }}>{profile.position}</Typography></TableCell>
-                                                                         <TableCell>
+                                                                <TableCell>
                                                                     <Typography
                                                                         variant="inherit"
                                                                         sx={{
@@ -736,7 +737,37 @@ function AnalyticsReport() {
                                                                     >
                                                                         View
                                                                     </Button>
+
                                                                 </TableCell>
+                                                                <TableCell>    <Button
+                                                                    disabled={profile.status === 'awaited' || profile.status === 'cancelled'}
+                                                                    sx={{
+
+                                                                        textTransform: 'none',
+                                                                        ml: 1,
+                                                                       
+                                                                            // background: '#0284C7',
+                                                                            background:
+                                                                                profile.status === 'awaited' || profile.status === 'cancelled'
+                                                                                    ? '#94A3B8'
+                                                                                    : '#0284C7',
+                                                                            borderRadius: '6px',
+                                                                            color: '#FFFFFF',
+                                                                            fontSize: '12px',
+                                                                            fontWeight: 500,
+                                                                            fontFamily: 'SF Pro Display',
+                                                                            '&:hover': {
+                                                                                background: '#0284C7',
+                                                                            },
+                                                                    }}
+                                                                    onClick={() =>
+                                                                        navigate('/InterviewRecording', {
+                                                                            state: { id: profile.candidateId, jobTitle: profile.position },
+                                                                        })
+                                                                    }
+                                                                >
+                                                                    Play <PlayCircleIcon sx={{ fontSize: '15px' }} />
+                                                                </Button></TableCell>
                                                             </TableRow>
                                                         );
                                                     })}
@@ -823,6 +854,7 @@ function AnalyticsReport() {
                     </>
                 ) : ('')}
             </Grid>
+
         </>
     )
 }

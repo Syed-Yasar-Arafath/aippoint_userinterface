@@ -1,6 +1,6 @@
 
 import React, { ChangeEvent, useEffect, useRef, useState } from 'react';
-import { ChevronLeft, ChevronDown, Paperclip, Sparkles , CheckCircle} from 'lucide-react';
+import { ChevronLeft, ChevronDown, Paperclip, Sparkles, CheckCircle } from 'lucide-react';
 import { Autocomplete, TextField, CircularProgress, Grid, Box, FormControl, OutlinedInput, MenuItem, FormHelperText } from '@mui/material';
 import axios from 'axios';
 import Button from '@mui/material/Button';
@@ -36,8 +36,8 @@ const regularExp = /^(?!.* {4})([a-zA-Z/]+(?: [a-zA-Z/]+){0,3})$/
 
 
 const MAX_FILE_SIZE_MB = 15;
-const ACCEPTED_TYPES = ['application/pdf', 
-                        'application/vnd.openxmlformats-officedocument.wordprocessingml.document']; // .docx
+const ACCEPTED_TYPES = ['application/pdf',
+  'application/vnd.openxmlformats-officedocument.wordprocessingml.document']; // .docx
 type Category = {
   id: number;
   category: string;
@@ -109,6 +109,7 @@ const jobTypeNames = [
 
 const modeOfWorkNames = ['Onsite', 'Remote', 'Hybrid']
 
+
 function getStyles(name: string, personName: readonly string[], theme: Theme) {
   return {
     fontWeight: personName.includes(name)
@@ -161,7 +162,8 @@ const AIjdCreation = () => {
     navigate('/jdccollection', { state: { index } })
   }
   
-   const handleExperienceChange = (
+
+  const handleExperienceChange = (
     event: ChangeEvent<HTMLInputElement | HTMLTextAreaElement>,
   ) => {
     setSelectedExperience(event.target.value)
@@ -176,10 +178,11 @@ const AIjdCreation = () => {
   const [jobDescription, setJobDescription] = useState('');
   const [activeTab, setActiveTab] = useState('jobTitle');
   const [isGenerating, setIsGenerating] = useState(false);
+  const [isAnimated, setIsAnimated] = useState(false);
 
   const handleGenerate = async () => {
     setIsGenerating(true);
-    
+
     // Simulate API call delay
     setTimeout(() => {
       const generatedJD = `Job Title: ${jobTitle || 'Software Engineer'}
@@ -218,12 +221,12 @@ Additional Requirements:
     margin: '5px'
   });
 
-   const lessMoreStyle= {
+  const lessMoreStyle = {
     padding: '4px 10px',
     borderRadius: '25px',
-    border:'none',
+    border: 'none',
     // backgroundColor: '#e3f2fd' ,
-    color:  '#1976d2' ,
+    color: '#1976d2',
     cursor: 'pointer',
     fontSize: '25px',
     fontWeight: '500',
@@ -232,24 +235,24 @@ Additional Requirements:
     alignItems: 'center',
     gap: '8px',
     margin: '0 5px',
-    '&:hover':{
-      backgroundColor:'dodgerblue',
-      color:'#fff',
+    '&:hover': {
+      backgroundColor: 'dodgerblue',
+      color: '#fff',
       border: '1px solid dodgerblue',
 
     }
   };
 
 
-//divya code starts here
-const [openGeneration, setOpenGeneration] = React.useState(false);
+  //divya code starts here
+  const [openGeneration, setOpenGeneration] = React.useState(false);
   const handleCloseGeneration = () => {
     setOpenGeneration(false);
   };
   const handleOpenGeneration = () => {
     setOpenGeneration(true);
   };
- const [jobCategoryInput, setJobCategoryInput] = useState('')
+  const [jobCategoryInput, setJobCategoryInput] = useState('')
   const [jobCategory, setJobCategory] = useState<string[]>([])
   const [noCategoryFound, setNoCategoryFound] = useState(false)
   const [jobCategoryLoading, setJobCategoryLoading] = useState(false)
@@ -295,24 +298,25 @@ const [openGeneration, setOpenGeneration] = React.useState(false);
   const [primarySkillsAi, setPrimarySkillsAi] = useState('')
   const [secondarySkillsAi, setSecondarySkillsAi] = useState<string[]>([])
   const [specificDomainSkillsAi, setSpecificDomainSkillsAi] = useState('')
-  const [jobTypeAi, setJobTypeAi] = useState<string[]>([])
-const [formErrorsAi, setFormErrorsAi] = useState<{ [key: string]: string }>({});
+  // const [jobTypeAi, setJobTypeAi] = useState<string[]>([])
+  const [jobTypeAi, setJobTypeAi]:any = useState('')
+  const [formErrorsAi, setFormErrorsAi] = useState<{ [key: string]: string }>({});
 
 
-const [createdBy, setCreatedBy] = useState('')
- const getUserData = async () => {
+  const [createdBy, setCreatedBy] = useState('')
+  const getUserData = async () => {
     dispatch(loaderOn())
     try {
       const res = await getUserDetails(organisation)
       console.log(res, 'API Response') // Log the entire response
 
- if (res.imageUrl) {
-                    setUserProfileImage(
-                        `${process.env.REACT_APP_SPRINGBOOT_BACKEND_SERVICE}/user/read/downloadFile/${res.imageUrl}/${organisation}`,
-                    );
-                } else {
-                    setUserProfileImage(null);
-                }
+      if (res.imageUrl) {
+        setUserProfileImage(
+          `${process.env.REACT_APP_SPRINGBOOT_BACKEND_SERVICE}/user/read/downloadFile/${res.imageUrl}/${organisation}`,
+        );
+      } else {
+        setUserProfileImage(null);
+      }
 
 
 
@@ -350,11 +354,11 @@ const [createdBy, setCreatedBy] = useState('')
   const [selectedCountryValue, setSelectedCountryValue] = useState<string>('')
   const [selectedStateValue, setSelectedStateValue] = useState<string>('')
   const [selectedCityValue, setSelectedCityValue] = useState<string>('')
-    const [countryIso2, setCountryIso2] = useState('')
+  const [countryIso2, setCountryIso2] = useState('')
   const [stateIso2, setStateIso2] = useState('')
-   const apiKey = 'Z1VrZk93T2RoWmdIQTc0czN0d2YyMnI2WkVvblZYSm14c3B3WWIxVg=='
+  const apiKey = 'Z1VrZk93T2RoWmdIQTc0czN0d2YyMnI2WkVvblZYSm14c3B3WWIxVg=='
 
-    useEffect(() => {
+  useEffect(() => {
     // Fetch countries
     axios
       .get('https://api.countrystatecity.in/v1/countries', {
@@ -433,183 +437,178 @@ const [createdBy, setCreatedBy] = useState('')
     fetchCities(countryIso2, stateIso2)
   }, [countryIso2, stateIso2])
 
-//
-const handleChangeAi = (e: React.ChangeEvent<HTMLInputElement>) => {
-  const { name, value } = e.target;
+  //
+  const handleChangeAi = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const { name, value } = e.target;
 
-  switch (name) {
-    case 'job_title':
-      setJobTitleAi(value);
-      break;
-    case 'job_role':
-      setJobRoleAi(value);
-      break;
-    case 'experience_required':
-      setExperienceRequiredAi(value);
-      break;
-    case 'role_category':
-      setRoleCategoryAi(value);
-      break;
-    case 'mode_of_work':
-      setModeOfWorkAi(value);
-      break;
-    case 'specific_domain_skills':
-      setSpecificDomainSkillsAi(value);
-      break;
-    case 'country':
-      setCountryAi(value);
-      break;
-    case 'state':
-      setStateAi(value);
-      break;
-    case 'city':
-      setCityAi(value);
-      break;
-    default:
-      break;
-  }
-};
-
-
-const validateFormAi = () => {
-  const errors: { [key: string]: string } = {};
-
-  if (!jobTitleAi) errors.job_title = 'Job Title is required';
-  if (!jobRoleAi) errors.job_role = 'Job Role is required';
-  if (!experienceRequiredAi) errors.experience_required = 'Experience is required';
-  if (!roleCategoryAi) errors.role_category = 'Role Category is required';
-  if (jobTypeAi.length === 0) errors.job_type = 'At least one Job Type is required';
-  if (!modeOfWorkAi) errors.mode_of_work = 'Mode of Work is required';
-
-  setFormErrorsAi(errors);
-  return Object.keys(errors).length === 0;
-};
-
-const [loading, setLoading] = useState(false);
-
-const submitFormAi = async () => {
-  setLoading(true); // Show loader
-
-  const MAX_SAFE_LENGTH = 50;
-
-  const primeSkillsStr = Array.isArray(primarySkillsAi)
-    ? primarySkillsAi.join(', ')
-    : '';
-
-  const secSkillsStr = Array.isArray(secondarySkillsAi)
-    ? secondarySkillsAi.join(', ')
-    : '';
-
-  let specificDomainSkillsCombined = Array.isArray(specificDomainSkillsAi)
-    ? specificDomainSkillsAi.join(', ')
-    : '';
-
-  const trimmedPrime = primeSkillsStr.slice(0, MAX_SAFE_LENGTH);
-  const overflowPrime = primeSkillsStr.length > MAX_SAFE_LENGTH ? primeSkillsStr.slice(MAX_SAFE_LENGTH) : '';
-
-  const trimmedSec = secSkillsStr.slice(0, MAX_SAFE_LENGTH);
-  const overflowSec = secSkillsStr.length > MAX_SAFE_LENGTH ? secSkillsStr.slice(MAX_SAFE_LENGTH) : '';
-
-  if (overflowPrime) specificDomainSkillsCombined += (specificDomainSkillsCombined ? ', ' : '') + overflowPrime;
-  if (overflowSec) specificDomainSkillsCombined += (specificDomainSkillsCombined ? ', ' : '') + overflowSec;
-
-  const payload = {
-    job_title: jobTitleAi,
-    job_role: formValues.job_role.value,
-    experience_required: experienceRequiredAi,
-    rolecategory: formValues.job_role.value,
-    job_type: jobTypeAi,
-    no_of_open_positions: formValues.no_of_open_positions.value,
-    // primarySkills: trimmedPrime,
-    primarySkills: primarySkillsAi,
-    secondarySkills: trimmedSec,
-    specificDomainSkills: specificDomainSkillsCombined,
-    modeOfWork: modeOfWorkAi,
-    newLocation: {
-      country: selectedCountryValue,
-      state: selectedStateValue,
-      city: selectedCityValue,
-    },
-    // skills: trimmedPrime,
-    skills: primarySkillsAi,
-    location: formValues.location.value,
-    createdBy: createdBy,
-    job_desc_user: {
-      user_id: userId
+    switch (name) {
+      case 'job_title':
+        setJobTitleAi(value);
+        break;
+      case 'job_role':
+        setJobRoleAi(value);
+        break;
+      case 'experience_required':
+        setExperienceRequiredAi(value);
+        break;
+      case 'role_category':
+        setRoleCategoryAi(value);
+        break;
+      case 'mode_of_work':
+        setModeOfWorkAi(value);
+        break;
+      case 'specific_domain_skills':
+        setSpecificDomainSkillsAi(value);
+        break;
+      case 'country':
+        setCountryAi(value);
+        break;
+      case 'state':
+        setStateAi(value);
+        break;
+      case 'city':
+        setCityAi(value);
+        break;
+      default:
+        break;
     }
   };
 
-  console.log('Final Payload:', payload);
 
-  try {
-    const res = await addJob(payload, organisation);
-    console.log('✅ Job saved:', res.data);
-    dispatch(
+  const validateFormAi = () => {
+    const errors: { [key: string]: string } = {};
+
+    if (!jobTitleAi) errors.job_title = 'Job Title is required';
+    if (!jobRoleAi) errors.job_role = 'Job Role is required';
+    if (!experienceRequiredAi) errors.experience_required = 'Experience is required';
+    if (!roleCategoryAi) errors.role_category = 'Role Category is required';
+    if (jobTypeAi.length === 0) errors.job_type = 'At least one Job Type is required';
+    if (!modeOfWorkAi) errors.mode_of_work = 'Mode of Work is required';
+
+    setFormErrorsAi(errors);
+    return Object.keys(errors).length === 0;
+  };
+
+  const [loading, setLoading] = useState(false);
+
+  const submitFormAi = async () => {
+    setLoading(true); // Show loader
+
+    const MAX_SAFE_LENGTH = 50;
+
+    const primeSkillsStr = Array.isArray(primarySkillsAi)
+      ? primarySkillsAi.join(', ')
+      : '';
+
+    const secSkillsStr = Array.isArray(secondarySkillsAi)
+      ? secondarySkillsAi.join(', ')
+      : '';
+
+    let specificDomainSkillsCombined = Array.isArray(specificDomainSkillsAi)
+      ? specificDomainSkillsAi.join(', ')
+      : '';
+
+    const trimmedPrime = primeSkillsStr.slice(0, MAX_SAFE_LENGTH);
+    const overflowPrime = primeSkillsStr.length > MAX_SAFE_LENGTH ? primeSkillsStr.slice(MAX_SAFE_LENGTH) : '';
+
+    const trimmedSec = secSkillsStr.slice(0, MAX_SAFE_LENGTH);
+    const overflowSec = secSkillsStr.length > MAX_SAFE_LENGTH ? secSkillsStr.slice(MAX_SAFE_LENGTH) : '';
+
+    if (overflowPrime) specificDomainSkillsCombined += (specificDomainSkillsCombined ? ', ' : '') + overflowPrime;
+    if (overflowSec) specificDomainSkillsCombined += (specificDomainSkillsCombined ? ', ' : '') + overflowSec;
+
+    const payload = {
+      job_title: jobTitleAi,
+      job_role: formValues.job_role.value,
+      experience_required: experienceRequiredAi,
+      rolecategory: formValues.job_role.value,
+      job_type: [jobTypeAi],
+      no_of_open_positions: formValues.no_of_open_positions.value,
+      // primarySkills: trimmedPrime,
+      primarySkills: primarySkillsAi,
+      secondarySkills: trimmedSec,
+      specificDomainSkills: specificDomainSkillsCombined,
+      modeOfWork: modeOfWorkAi,
+      newLocation: {
+        country: selectedCountryValue,
+        state: selectedStateValue,
+        city: selectedCityValue,
+      },
+      // skills: trimmedPrime,
+      skills: primarySkillsAi,
+      location: formValues.location.value,
+      createdBy: createdBy,
+      job_desc_user: {
+        user_id: userId
+      }
+    };
+
+    console.log('Final Payload:', payload);
+
+    try {
+      const res = await addJob(payload, organisation);
+      console.log('✅ Job saved:', res.data);
+      dispatch(
         openSnackbar(
           'Job Description Created',
           'green',
         ),
       )
       navigate('/jdcollection')
-  } catch (error) {
-    console.error('❌ Error saving job:', error);
-  } finally {
-    setLoading(false); // Hide loader
-  }
-};
+    } catch (error) {
+      console.error('❌ Error saving job:', error);
+    } finally {
+      setLoading(false); // Hide loader
+    }
+  };
 
 
 
 
-const handleSaveAi = () => {
-  if (validateFormAi()) {
-    submitFormAi();
-  }
-};
+  const handleSaveAi = () => {
+    if (validateFormAi()) {
+      submitFormAi();
+    }
+  };
 
 
-// ✅ Unified handler for job type (multi-select as string array)
-const handleChangeJobTypeAi = (e: SelectChangeEvent<string[]>) => {
-  const {
-    target: { value },
-  } = e;
-  setJobTypeAi(typeof value === 'string' ? value.split(',') : value);
-};
+  // ✅ Unified handler for job type (multi-select as string array)
+  const handleChangeJobTypeAi = (e: SelectChangeEvent<string[]>) => {
+    const {
+      target: { value },
+    } = e;
+    setJobTypeAi(typeof value === 'string' ? value.split(',') : value);
+  };
 
-// ✅ Handler for single select (mode of work)
-const handleChangeModeOfWorkAi = (e: SelectChangeEvent) => {
-  setModeOfWorkAi(e.target.value);
-};
+  // ✅ Handler for single select (mode of work)
+  const handleChangeModeOfWorkAi = (e: SelectChangeEvent) => {
+    setModeOfWorkAi(e.target.value);
+  };
 
-// ✅ Handler for experience dropdown
-const handleChangeExperienceAi = (e: SelectChangeEvent) => {
-  setExperienceRequiredAi(e.target.value);
-};
+  // ✅ Handler for experience dropdown
+  const handleChangeExperienceAi = (e: SelectChangeEvent) => {
+    setExperienceRequiredAi(e.target.value);
+  };
 
-// ✅ Handler for primary skills (string input -> array)
-const handleChangePrimarySkillsAi = (
-  event: React.ChangeEvent<HTMLInputElement>
-) => {
-  const inputValue = event.target.value;
-  // const skillArray = inputValue.split(',').map(skill => skill.trim()).filter(Boolean);
-  setPrimarySkillsAi(inputValue);
-};
+  // ✅ Handler for primary skills (string input -> array)
+  const handleChangePrimarySkillsAi = (
+    event: React.ChangeEvent<HTMLInputElement>
+  ) => {
+    const inputValue = event.target.value;
+    // const skillArray = inputValue.split(',').map(skill => skill.trim()).filter(Boolean);
+    setPrimarySkillsAi(inputValue);
+  };
 
-// ✅ Handler for secondary skills (string input -> array)
-const handleChangeSecondarySkillsAi = (e: React.ChangeEvent<HTMLInputElement>) => {
-  const value = e.target.value;
-  setSecondarySkillsAi(value.split(',').map((item) => item.trim()).filter(Boolean));
-};
+  // ✅ Handler for secondary skills (string input -> array)
+  const handleChangeSecondarySkillsAi = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const value = e.target.value;
+    setSecondarySkillsAi(value.split(',').map((item) => item.trim()).filter(Boolean));
+  };
 
-// ✅ Handler for specific domain skills (simple string)
-const handleChangeSpecificDomainSkillsAi = (e: React.ChangeEvent<HTMLInputElement>) => {
-  setSpecificDomainSkillsAi(e.target.value);
-};
-
-
-
-
-
+  // ✅ Handler for specific domain skills (simple string)
+  const handleChangeSpecificDomainSkillsAi = (e: React.ChangeEvent<HTMLInputElement>) => {
+    setSpecificDomainSkillsAi(e.target.value);
+  };
 
 
 
@@ -617,13 +616,18 @@ const handleChangeSpecificDomainSkillsAi = (e: React.ChangeEvent<HTMLInputElemen
 
 
 
-  
+
+
+
+
+
+
   const [address, setAddress] = useState('')
- const jobTypeTheme = useTheme()
+  const jobTypeTheme = useTheme()
   const modeOfWorkTheme = useTheme()
   const primarySkillTheme = useTheme()
   const secondarySkillTheme = useTheme()
- 
+
   const [primarySkillForm, setPrimarySkillForm] = useState(false)
   const [secondarySkillForm, setSecondarySkillForm] = useState(false)
   const [modeOfWorkForm, setModeOfWorkForm] = useState(false)
@@ -633,15 +637,15 @@ const handleChangeSpecificDomainSkillsAi = (e: React.ChangeEvent<HTMLInputElemen
   //  const [secondarySkillName, setSecondarySkillName] = React.useState<string[]>(
   //   [],
   // )
-   const [secondarySkillName, setSecondarySkillName] = React.useState('')
+  const [secondarySkillName, setSecondarySkillName] = React.useState('')
 
   // const [primarySkillName, setPrimarySkillName] = React.useState<string[]>([]
-    const [primarySkillName, setPrimarySkillName] = React.useState('')
+  const [primarySkillName, setPrimarySkillName] = React.useState('')
 
   // const [specificDomainSkill, setSpecificDomainSkill] = React.useState<
   //   string[]
   // >([])
-    const [specificDomainSkill, setSpecificDomainSkill] = React.useState('')
+  const [specificDomainSkill, setSpecificDomainSkill] = React.useState('')
   const [specificDomainSkillForm, setSpecificDomainSkillForm] = useState(false)
 
 
@@ -663,7 +667,7 @@ const handleChangeSpecificDomainSkillsAi = (e: React.ChangeEvent<HTMLInputElemen
   }
 
 
-   const handleChangeSecondarySkills = (
+  const handleChangeSecondarySkills = (
     event: React.ChangeEvent<HTMLInputElement>,
   ) => {
     const { value } = event.target
@@ -678,7 +682,7 @@ const handleChangeSpecificDomainSkillsAi = (e: React.ChangeEvent<HTMLInputElemen
     setSecondarySkillForm(selectedValues.length === 0)
   }
 
-   const handleChangeSpecificDomainSkills = (
+  const handleChangeSpecificDomainSkills = (
     event: React.ChangeEvent<HTMLInputElement>,
   ) => {
     const { value } = event.target
@@ -775,12 +779,12 @@ const handleChangeSpecificDomainSkillsAi = (e: React.ChangeEvent<HTMLInputElemen
 
   /// dropdown select code
 
-   const [categoryInputValue, setCategoryInputValue] = useState('');
+  const [categoryInputValue, setCategoryInputValue] = useState('');
   const [categoryOptions, setCategoryOptions] = useState<Category[]>([]);
   const [categoryLoading, setCategoryLoading] = useState(false);
   const [categorySelected, setCategorySelected] = useState<Category | null>(null);
 
-   const handleCategoryInputChange = async (event: any, value: string) => {
+  const handleCategoryInputChange = async (event: any, value: string) => {
     setCategoryInputValue(value);
 
     if (value.length >= 3) {
@@ -824,48 +828,48 @@ const handleChangeSpecificDomainSkillsAi = (e: React.ChangeEvent<HTMLInputElemen
     }
   }, [openPreview]);
 
-// hjhj
+  // hjhj
   const { formValues, setFormValues } = useNewJobForm()
 
-const [selectedRole, setSelectedRole] = useState('')
- const [selectedJobType, setSelectedJobType] = useState('')
+  const [selectedRole, setSelectedRole] = useState('')
+  const [selectedJobType, setSelectedJobType] = useState('')
   const [isFormComplete, setIsFormComplete] = useState(false)
-  
-const [showJobTitle, setShowJobTitle]= useState(false)
-const [visibleSections, setVisibleSections] = useState({
-  job_title: false,
-  job_role: false,
-  job_type: false,
-  no_of_open_positions : false,
-  mode_of_work: false,
-  primary_skills: false,
-  secondary_skills: false,
-  experience_required: false,
-  // country: false,
-  // state: false,
-  // city: false,
-  location:false,
-  domain_skills: false,
-  job_description: false,
-});
 
-const toggleSection = (sectionName: keyof typeof visibleSections) => {
-  setVisibleSections(prev => ({
-    ...prev,
-    [sectionName]: !prev[sectionName],
-  }));
-};
-useEffect(() => {
-  const handleDragOver = (e: DragEvent) => {
-    e.preventDefault(); // Enables normal drag cursor instead of 🚫
+  const [showJobTitle, setShowJobTitle] = useState(false)
+  const [visibleSections, setVisibleSections] = useState({
+    job_title: false,
+    job_role: false,
+    job_type: false,
+    no_of_open_positions: false,
+    mode_of_work: false,
+    primary_skills: false,
+    secondary_skills: false,
+    experience_required: false,
+    // country: false,
+    // state: false,
+    // city: false,
+    location: false,
+    domain_skills: false,
+    job_description: false,
+  });
+
+  const toggleSection = (sectionName: keyof typeof visibleSections) => {
+    setVisibleSections(prev => ({
+      ...prev,
+      [sectionName]: !prev[sectionName],
+    }));
   };
+  useEffect(() => {
+    const handleDragOver = (e: DragEvent) => {
+      e.preventDefault(); // Enables normal drag cursor instead of 🚫
+    };
 
-  window.addEventListener('dragover', handleDragOver);
+    window.addEventListener('dragover', handleDragOver);
 
-  return () => {
-    window.removeEventListener('dragover', handleDragOver);
-  };
-}, []);
+    return () => {
+      window.removeEventListener('dragover', handleDragOver);
+    };
+  }, []);
 
   const [openPreviewAijd, setOpenPreviewAijd] = React.useState(false)
 
@@ -898,7 +902,7 @@ useEffect(() => {
   ])
 
 
-   const handleSkillSelect = (role: string, selectedSkill: string) => {
+  const handleSkillSelect = (role: string, selectedSkill: string) => {
     const updatedToneData = toneData.map((category: any) => {
       if (category.name === 'Job_type') {
         category.tone = category.tone.map((skill: any) => {
@@ -915,7 +919,7 @@ useEffect(() => {
   }
 
 
-   const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+  const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const { name, value } = e.target
 
     // If value is already present, remove the error
@@ -964,39 +968,39 @@ useEffect(() => {
           error: !isValidJobRole,
         },
       }))
-    }else
+    } else
 
-  if (name === 'no_of_open_positions') {
-    // Allow only digits
-    const numericValue = value.replace(/[^0-9]/g, '');
+      if (name === 'no_of_open_positions') {
+        // Allow only digits
+        const numericValue = value.replace(/[^0-9]/g, '');
 
-    setFormValues((prev) => ({
-      ...prev,
-      [name]: {
-        ...prev[name],
-        value: numericValue,
-        error: numericValue.trim() === '',
-      },
-    }));
-    return;
+        setFormValues((prev) => ({
+          ...prev,
+          [name]: {
+            ...prev[name],
+            value: numericValue,
+            error: numericValue.trim() === '',
+          },
+        }));
+        return;
+      }
+
+      else {
+        setFormValues((prev) => ({
+          ...prev,
+          [name]: {
+            ...prev[name],
+            value,
+            error: value.trim() === '', // Only show error if field is empty
+          },
+        }))
+      }
   }
-
- else {
-      setFormValues((prev) => ({
-        ...prev,
-        [name]: {
-          ...prev[name],
-          value,
-          error: value.trim() === '', // Only show error if field is empty
-        },
-      }))
-    }
-  }
-    const validateForm = (type: any) => {
+  const validateForm = (type: any) => {
     let invalidSubmit = false
 
     const job_title: any = formValues.job_title.value
-   
+
 
     const formFields = Object.keys(formValues)
     let newFormValues = { ...formValues }
@@ -1040,18 +1044,207 @@ useEffect(() => {
       return false
     }
 
-    
+
 
     dispatch(loaderOff())
     return invalidSubmit
   }
-const [activeJobCount, setActiveJobCount] = useState(0)
-const [draftJobCount, setDraftJobCount] = useState(0)
-const [showButtons, setShowButtons] = useState(false)
- const handleGenerateAijd = async () => {
+  const [activeJobCount, setActiveJobCount] = useState(0)
+  const [draftJobCount, setDraftJobCount] = useState(0)
+  const [showButtons, setShowButtons] = useState(false)
+  //  const handleGenerateAijd = async () => {
+  //     console.log('Executing handleConfirm ai')
+  //     setFormSubmitted(true)
+  // setShowButtons(false)
+  //     if (isSubmitting) {
+  //       console.log('Already submitting, exiting...')
+  //       return
+  //     }
+
+  //     if (activeJobCount >= MAX_ACTIVE_JOBS) {
+  //       dispatch(
+  //         openSnackbar(
+  //           'You have reached maximum limit'+{ maxJobs: MAX_ACTIVE_JOBS },
+  //           'red',
+  //         ),
+  //       )
+  //       return
+  //     }
+
+  //     const selectedJobTypes = toneData?.[0]?.tone?.some(
+  //       (skill) => skill.selected,
+  //     )
+
+  //     const invalidSubmit = validateForm('sign-in')
+
+  //     console.log({
+  //       invalidSubmit,
+  //       job_title: formValues.job_title.value,
+  //       job_role: formValues.job_role.value,
+  //       experience_required: formValues.experience_required.value,
+  //       primarySkillName,
+  //       jobTypeName,
+  //       specificDomainSkill,
+  //     })
+  //     if (selectedCountryValue == '' && selectedCityValue == '') {
+  //       setLocationError(true)
+  //     }
+  //     if (specificDomainSkill.length == 0) {
+  //       setSpecificDomainSkillForm(true)
+  //     }
+  //     if (
+  //       !invalidSubmit &&
+  //       !locationError &&
+  //       formValues.job_title.value &&
+  //       formValues.job_role.value &&
+  //       formValues.experience_required.value &&
+  //       // formValues.location.value &&
+  //       primarySkillName.length !== 0 &&
+  //       secondarySkillName.length !== 0 &&
+  //       modeOfWorkName.length !== 0 &&
+  //       // formValues.skills.value &&
+  //       // formValues.company_name.value &&
+  //       // selectedJobTypes &&
+  //       selectedCountryValue &&
+  //       selectedStateValue &&
+  //       jobTypeName.length !== 0 &&
+  //       specificDomainSkill.length !== 0 &&
+  //       specificDomainSkillForm == false
+  //       // && editorState.getCurrentContent().hasText() &&
+  //       // textValue.trim() !== ''
+  //     ) {
+  //       // setAllFieldsFilled(true)
+  //       // setIsSubmitting(true)
+  //       handleOpenGeneration()
+  //       // dispatch(loaderOn())
+  //       // setIsFormComplete(true)
+
+  //       // const skillsString = primarySkillName.join(', ')
+  //       // const secondarySkillsString = secondarySkillName.join(', ')
+  //       // const specificDomainString = Array.isArray(specificDomainSkill)
+  //       //   ? specificDomainSkill.join(',')
+  //       //   : ''
+
+  //       const modeOfWorkString = modeOfWorkName.join(', ')
+
+  //       const data = {
+  //         job_title: formValues.job_title.value,
+  //         job_role: formValues.job_role.value,
+  //         experience_required: formValues.experience_required.value,
+  //         // location: formValues.location.value,
+  //         language_selected: selectedLanguage,
+  //         rolecategory: formValues.job_role.value,
+  //         // skills: skillsString,
+  //         // primary_skills: skillsString,
+  //         primary_skills: primarySkillName,
+  //         // secondary_skills: secondarySkillsString,
+  //         secondary_skills: secondarySkillName,
+  //         domain_specific: specificDomainSkill,
+  //         mode_of_work: modeOfWorkString,
+  //         job_type: jobTypeName.join(', '),
+  //         jd_category: formValues.job_role.value,
+  //         //salary extra need to be added
+
+
+  //         location: {
+  //           country: selectedCountryValue,
+  //           state: selectedStateValue,
+  //           city: selectedCityValue,
+  //         },
+  //       }
+  //       dispatch(openSnackbar('Please wait until JD being generated..', 'dodgerblue'))
+  //       try {
+  //         const response = await axios.post(
+  //           `${process.env.REACT_APP_DJANGO_PYTHON_MODULE_SERVICE}/generate_job_description/`,
+  //           { jd_info: data },
+  //           { headers: { 'Content-Type': 'application/json' } },
+  //         )
+
+  //         console.log('Generated Job Description:', response.data)
+  //         const jobDescription = response.data
+
+  //         const extractResponse = await axios.post(
+  //           `${process.env.REACT_APP_DJANGO_PYTHON_MODULE_SERVICE}/extract-job-description/`,
+  //           { job_description: jobDescription },
+  //           {
+  //             headers: {
+  //               'Content-Type': 'application/json',
+  //               Organization: organisation, // Passing Organization in headers
+  //             },
+  //           },
+  //         )
+
+  //         console.log('Extracted Job Description:', extractResponse.data)
+  //         const extractedData = extractResponse.data
+  //         console.log(extractedData.location.city)
+  //         console.log(extractedData.location.state)
+  //         console.log(extractedData.location.country)
+
+  //         //
+  //         console.log('Job Title:', extractedData.job_title)
+  //         console.log('Job Role:', extractedData.job_role)
+  //         console.log('Role Category:', extractedData.job_role)
+  //         console.log('Experience Required:', extractedData.experience_required)
+  //         console.log('Country:', extractedData.location?.country)
+  //         console.log('State:', extractedData.location?.state)
+  //         console.log('City:', extractedData.location?.city)
+  //         console.log('Mode of Work:', extractedData.mode_of_work)
+  //         console.log('Primary Skills:', extractedData.primary_skills?.join(', '))
+  //         console.log(
+  //           'Secondary Skills:',
+  //           extractedData.secondary_skills?.join(', '),
+  //         )
+  //         console.log(
+  //           'Specific Domain Skills:',
+  //           extractedData.domain_specific?.join(', '),
+  //         )
+  //         console.log('Job Type:', extractedData.job_type)
+  //         //
+  //         setJobTitleAi(extractedData.job_title || '')
+  //         setJobRoleAi(extractedData.job_role || '')
+  //         setRoleCategoryAi(extractedData.job_role || '')
+  //         setExperienceRequiredAi(extractedData.experience_required || '')
+  //         setCountryAi(extractedData.location?.country || '')
+  //         setStateAi(extractedData.location?.state || '')
+  //         setCityAi(extractedData.location?.city || '')
+  //         setModeOfWorkAi(extractedData.mode_of_work || '')
+  //         setPrimarySkillsAi(extractedData.primary_skills?.join(', ') || '')
+  //         setSecondarySkillsAi(extractedData.secondary_skills?.join(', ') || '')
+  //         setSpecificDomainSkillsAi(
+  //           extractedData.domain_specific?.join(', ') || '',
+  //         )
+  //         setJobTypeAi([extractedData.job_type || ''])
+
+  //         console.log('Ai Title =', jobTitleAi)
+  //         console.log('Ai Role =', jobRoleAi)
+  //         console.log('Ai Role Category =', roleCategoryAi)
+  //         console.log('Ai Experience Required =', experienceRequiredAi)
+  //         console.log('Ai Country =', countryAi)
+  //         console.log('Ai State =', stateAi)
+  //         console.log('Ai City =', cityAi)
+  //         console.log('Ai Mode of Work =', modeOfWorkAi)
+  //         console.log('Ai Primary Skills =', primarySkillsAi)
+  //         console.log('Ai Secondary Skills =', secondarySkillsAi)
+  //         console.log('Ai Specific Domain Skills =', specificDomainSkillsAi)
+  //         console.log('Ai Job Type =', jobTypeAi)
+  //         dispatch(openSnackbar('Jd Generated Successfully', 'green'))
+  // setShowButtons(true)
+  //         handleOpenPreviewAijd()
+  //         // dispatch(loaderOff())
+  //       } catch (error) {
+  //         console.error('API error:', error)
+  //       }
+  //     }
+  //     else{
+  //               dispatch(openSnackbar('Please fill all the fields', 'red'))
+  //     }
+  //   }
+  const handleGenerateAijd = async () => {
+    setIsAnimated(false)
     console.log('Executing handleConfirm ai')
     setFormSubmitted(true)
-setShowButtons(false)
+    setShowButtons(false)
+
     if (isSubmitting) {
       console.log('Already submitting, exiting...')
       return
@@ -1060,7 +1253,7 @@ setShowButtons(false)
     if (activeJobCount >= MAX_ACTIVE_JOBS) {
       dispatch(
         openSnackbar(
-          'You have reached maximum limit'+{ maxJobs: MAX_ACTIVE_JOBS },
+          'You have reached maximum limit' + { maxJobs: MAX_ACTIVE_JOBS },
           'red',
         ),
       )
@@ -1082,79 +1275,81 @@ setShowButtons(false)
       jobTypeName,
       specificDomainSkill,
     })
+
     if (selectedCountryValue == '' && selectedCityValue == '') {
       setLocationError(true)
     }
     if (specificDomainSkill.length == 0) {
       setSpecificDomainSkillForm(true)
     }
+
     if (
       !invalidSubmit &&
       !locationError &&
       formValues.job_title.value &&
       formValues.job_role.value &&
       formValues.experience_required.value &&
-      // formValues.location.value &&
       primarySkillName.length !== 0 &&
       secondarySkillName.length !== 0 &&
       modeOfWorkName.length !== 0 &&
-      // formValues.skills.value &&
-      // formValues.company_name.value &&
-      // selectedJobTypes &&
       selectedCountryValue &&
       selectedStateValue &&
       jobTypeName.length !== 0 &&
       specificDomainSkill.length !== 0 &&
       specificDomainSkillForm == false
-      // && editorState.getCurrentContent().hasText() &&
-      // textValue.trim() !== ''
     ) {
-      // setAllFieldsFilled(true)
-      // setIsSubmitting(true)
       handleOpenGeneration()
-      // dispatch(loaderOn())
-      // setIsFormComplete(true)
-
-      // const skillsString = primarySkillName.join(', ')
-      // const secondarySkillsString = secondarySkillName.join(', ')
-      // const specificDomainString = Array.isArray(specificDomainSkill)
-      //   ? specificDomainSkill.join(',')
-      //   : ''
 
       const modeOfWorkString = modeOfWorkName.join(', ')
 
-      const data = {
+      // Store original user inputs for fallback
+      const originalUserInputs = {
         job_title: formValues.job_title.value,
         job_role: formValues.job_role.value,
         experience_required: formValues.experience_required.value,
-        // location: formValues.location.value,
         language_selected: selectedLanguage,
         rolecategory: formValues.job_role.value,
-        // skills: skillsString,
-        // primary_skills: skillsString,
         primary_skills: primarySkillName,
-        // secondary_skills: secondarySkillsString,
         secondary_skills: secondarySkillName,
         domain_specific: specificDomainSkill,
         mode_of_work: modeOfWorkString,
         job_type: jobTypeName.join(', '),
         jd_category: formValues.job_role.value,
-        //salary extra need to be added
-        
-
         location: {
           country: selectedCountryValue,
           state: selectedStateValue,
           city: selectedCityValue,
         },
       }
+
+      const data = {
+        job_title: formValues.job_title.value,
+        job_role: formValues.job_role.value,
+        experience_required: formValues.experience_required.value,
+        language_selected: selectedLanguage,
+        rolecategory: formValues.job_role.value,
+        primary_skills: primarySkillName,
+        secondary_skills: secondarySkillName,
+        domain_specific: specificDomainSkill,
+        mode_of_work: modeOfWorkString,
+        job_type: jobTypeName.join(', '),
+        jd_category: formValues.job_role.value,
+        location: {
+          country: selectedCountryValue,
+          state: selectedStateValue,
+          city: selectedCityValue,
+        },
+      }
+
       dispatch(openSnackbar('Please wait until JD being generated..', 'dodgerblue'))
+
       try {
         const response = await axios.post(
           `${process.env.REACT_APP_DJANGO_PYTHON_MODULE_SERVICE}/generate_job_description/`,
           { jd_info: data },
           { headers: { 'Content-Type': 'application/json' } },
         )
+       
 
         console.log('Generated Job Description:', response.data)
         const jobDescription = response.data
@@ -1165,79 +1360,148 @@ setShowButtons(false)
           {
             headers: {
               'Content-Type': 'application/json',
-              Organization: organisation, // Passing Organization in headers
+              Organization: organisation,
             },
           },
         )
 
         console.log('Extracted Job Description:', extractResponse.data)
         const extractedData = extractResponse.data
-        console.log(extractedData.location.city)
-        console.log(extractedData.location.state)
-        console.log(extractedData.location.country)
+        if(extractResponse.status===200){
+          setIsAnimated(true)
+        }
 
-        //
-        console.log('Job Title:', extractedData.job_title)
-        console.log('Job Role:', extractedData.job_role)
-        console.log('Role Category:', extractedData.job_role)
-        console.log('Experience Required:', extractedData.experience_required)
-        console.log('Country:', extractedData.location?.country)
-        console.log('State:', extractedData.location?.state)
-        console.log('City:', extractedData.location?.city)
-        console.log('Mode of Work:', extractedData.mode_of_work)
-        console.log('Primary Skills:', extractedData.primary_skills?.join(', '))
-        console.log(
-          'Secondary Skills:',
-          extractedData.secondary_skills?.join(', '),
+        // Helper function to get value with fallback
+        const getValueWithFallback = (aiValue: any, originalValue: any) => {
+          // Check if AI value exists and is not empty
+          if (aiValue !== undefined && aiValue !== null && aiValue !== '') {
+            // For arrays, check if they have elements
+            if (Array.isArray(aiValue) && aiValue.length > 0) {
+              return aiValue
+            }
+            // For strings and numbers
+            if (!Array.isArray(aiValue)) {
+              return aiValue
+            }
+          }
+          // Return original value as fallback
+          return originalValue
+        }
+
+        // Auto-fill with fallback logic
+        setJobTitleAi(
+          getValueWithFallback(extractedData.job_title, originalUserInputs.job_title) || ''
         )
-        console.log(
-          'Specific Domain Skills:',
-          extractedData.domain_specific?.join(', '),
+
+        setJobRoleAi(
+          getValueWithFallback(extractedData.job_role, originalUserInputs.job_role) || ''
         )
-        console.log('Job Type:', extractedData.job_type)
-        //
-        setJobTitleAi(extractedData.job_title || '')
-        setJobRoleAi(extractedData.job_role || '')
-        setRoleCategoryAi(extractedData.job_role || '')
-        setExperienceRequiredAi(extractedData.experience_required || '')
-        setCountryAi(extractedData.location?.country || '')
-        setStateAi(extractedData.location?.state || '')
-        setCityAi(extractedData.location?.city || '')
-        setModeOfWorkAi(extractedData.mode_of_work || '')
-        setPrimarySkillsAi(extractedData.primary_skills?.join(', ') || '')
-        setSecondarySkillsAi(extractedData.secondary_skills?.join(', ') || '')
+
+        setRoleCategoryAi(
+          getValueWithFallback(extractedData.job_role, originalUserInputs.rolecategory) || ''
+        )
+
+        setExperienceRequiredAi(
+          getValueWithFallback(extractedData.experience_required, originalUserInputs.experience_required) || ''
+        )
+
+        // Handle location with fallback
+        setCountryAi(
+          getValueWithFallback(
+            extractedData.location?.country,
+            originalUserInputs.location.country
+          ) || ''
+        )
+
+        setStateAi(
+          getValueWithFallback(
+            extractedData.location?.state,
+            originalUserInputs.location.state
+          ) || ''
+        )
+
+        setCityAi(
+          getValueWithFallback(
+            extractedData.location?.city,
+            originalUserInputs.location.city
+          ) || ''
+        )
+
+        setModeOfWorkAi(
+          getValueWithFallback(extractedData.mode_of_work, originalUserInputs.mode_of_work) || ''
+        )
+
+        // Handle skills arrays - join with comma if it's an array, otherwise use as string
+        const primarySkillsValue = getValueWithFallback(
+          extractedData.primary_skills,
+          originalUserInputs.primary_skills
+        )
+        setPrimarySkillsAi(
+          Array.isArray(primarySkillsValue)
+            ? primarySkillsValue.join(', ')
+            : (primarySkillsValue || '')
+        )
+
+        const secondarySkillsValue = getValueWithFallback(
+          extractedData.secondary_skills,
+          originalUserInputs.secondary_skills
+        )
+        setSecondarySkillsAi(
+          Array.isArray(secondarySkillsValue)
+            ? secondarySkillsValue.join(', ')
+            : (secondarySkillsValue || '')
+        )
+
+        const domainSpecificValue = getValueWithFallback(
+          extractedData.domain_specific,
+          originalUserInputs.domain_specific
+        )
         setSpecificDomainSkillsAi(
-          extractedData.domain_specific?.join(', ') || '',
+          Array.isArray(domainSpecificValue)
+            ? domainSpecificValue.join(', ')
+            : (domainSpecificValue || '')
         )
-        setJobTypeAi([extractedData.job_type || ''])
 
-        console.log('Ai Title =', jobTitleAi)
-        console.log('Ai Role =', jobRoleAi)
-        console.log('Ai Role Category =', roleCategoryAi)
-        console.log('Ai Experience Required =', experienceRequiredAi)
-        console.log('Ai Country =', countryAi)
-        console.log('Ai State =', stateAi)
-        console.log('Ai City =', cityAi)
-        console.log('Ai Mode of Work =', modeOfWorkAi)
-        console.log('Ai Primary Skills =', primarySkillsAi)
-        console.log('Ai Secondary Skills =', secondarySkillsAi)
-        console.log('Ai Specific Domain Skills =', specificDomainSkillsAi)
-        console.log('Ai Job Type =', jobTypeAi)
-        dispatch(openSnackbar('Jd Generated Successfully', 'green'))
-setShowButtons(true)
+        // Handle job type
+        // const jobTypeValue = getValueWithFallback(
+        //   extractedData.job_type,
+        //   originalUserInputs.job_type
+        // )
+        setJobTypeAi(
+         getValueWithFallback (extractedData.job_type,
+          originalUserInputs.job_type)
+        )
+
+        // Log the final values being set
+        console.log('=== FINAL VALUES BEING SET ===')
+        console.log('Job Title:', getValueWithFallback(extractedData.job_title, originalUserInputs.job_title))
+        console.log('Job Role:', getValueWithFallback(extractedData.job_role, originalUserInputs.job_role))
+        console.log('Experience:', getValueWithFallback(extractedData.experience_required, originalUserInputs.experience_required))
+        console.log('Country:', getValueWithFallback(extractedData.location?.country, originalUserInputs.location.country))
+        console.log('State:', getValueWithFallback(extractedData.location?.state, originalUserInputs.location.state))
+        console.log('City:', getValueWithFallback(extractedData.location?.city, originalUserInputs.location.city))
+        console.log('Mode of Work:', getValueWithFallback(extractedData.mode_of_work, originalUserInputs.mode_of_work))
+        console.log('Primary Skills:', primarySkillsValue)
+        console.log('Secondary Skills:', secondarySkillsValue)
+        console.log('Domain Skills:', domainSpecificValue)
+        // console.log('Job Type:', jobTypeValue)
+
+        dispatch(openSnackbar('JD Generated Successfully', 'green'))
+        setShowButtons(true)
         handleOpenPreviewAijd()
-        // dispatch(loaderOff())
+
       } catch (error) {
         console.error('API error:', error)
+        dispatch(openSnackbar('Error generating JD. Please try again.', 'red'))
+        setShowButtons(true)
       }
-    }
-    else{
-              dispatch(openSnackbar('Please fill all the fields', 'red'))
+    } else {
+      dispatch(openSnackbar('Please fill all the fields', 'red'))
     }
   }
 
 
-   const handleDraftAijd = async () => {
+  const handleDraftAijd = async () => {
     const data = {
       job_title: jobTitleAi,
       job_role: jobRoleAi,
@@ -1277,7 +1541,7 @@ setShowButtons(true)
     setIsSubmitting(false)
     setJobType('draft')
   }
-   const handleConfirmsAijd = async () => {
+  const handleConfirmsAijd = async () => {
     console.log('Executing handleConfirm ai')
     setFormSubmitted(true)
 
@@ -1289,7 +1553,7 @@ setShowButtons(true)
     if (activeJobCount >= MAX_ACTIVE_JOBS) {
       dispatch(
         openSnackbar(
-          ('You have reached the maximum limit '+{ maxJobs: MAX_ACTIVE_JOBS }),
+          ('You have reached the maximum limit ' + { maxJobs: MAX_ACTIVE_JOBS }),
           'red',
         ),
       )
@@ -1335,13 +1599,13 @@ setShowButtons(true)
       primarySkillName.length !== 0 &&
       secondarySkillName.length !== 0 &&
       modeOfWorkName.length !== 0 &&
-      
+
       selectedCountryValue &&
       selectedStateValue &&
       jobTypeName.length !== 0 &&
       specificDomainSkill.length !== 0 &&
       specificDomainSkillForm == false
-      
+
     ) {
       setAllFieldsFilled(true)
       setIsSubmitting(true)
@@ -1350,7 +1614,7 @@ setShowButtons(true)
 
       // const skillsString = primarySkillName.join(', ')
       // const secondarySkillsString = secondarySkillName.join(', ')
-      
+
       // const specificDomainString = Array.isArray(specificDomainSkill)
       //   ? specificDomainSkill.join(',')
       //   : ''
@@ -1437,7 +1701,7 @@ setShowButtons(true)
           primarySkills: extractedData.primary_skills?.join(', ') || '',
           secondarySkills: extractedData.secondary_skills?.join(', ') || '',
           specificDomainSkills: extractedData.domain_specific?.join(', ') || '',
-          
+
           job_type: [extractedData.job_type || ''],
           job_desc_user: {
             user_id: userId,
@@ -1483,13 +1747,13 @@ setShowButtons(true)
               `Job Role Created Successfully, Reference No: ${referenceNumber}`,
               'green',
             )),
-         
-          navigateTo(0)
+
+            navigateTo(0)
           dispatch(loaderOff())
         } catch (error) {
           dispatch(loaderOff())
           console.error('Error in adding data:', error)
-         
+
           navigateTo(0)
           dispatch(loaderOff())
         }
@@ -1501,220 +1765,222 @@ setShowButtons(true)
       }
     }
   }
-  
+
   return (
     <div style={{
-      padding:'10px 10px 0px 10px',
+      padding: '10px 10px 0px 10px',
       minHeight: '100vh',
       background: 'linear-gradient(135deg, #e3f2fd 0%, #f0f7ff 100%)',
       fontFamily: '-apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif'
     }}>
 
-        <Header
-                title="Create JD"
-                userProfileImage={userProfileImage}
-                path="/AIJDCreator"
-            />
+      <Header
+        title="Create JD"
+        userProfileImage={userProfileImage}
+        path="/AIJDCreator"
+      />
 
-     
 
-<Grid sx={{display:'flex', justifyContent:'center', alignItems:'center',}}>
-  <Box style={{
-            fontSize: '28px',
-            fontWeight: '700',
-            color: '#1976d2',
-             textAlign:'center',
-            // marginBottom: '15px',
-            background: 'linear-gradient(135deg, #1976d2, #21cbf3)',
-            WebkitBackgroundClip: 'text',
-            WebkitTextFillColor: 'transparent'
-          }}>
-            Hire Smarter with AI-Powered JD Creation
-          </Box>
 
-         
-</Grid>
- <Box style={{
-            fontSize: '16px',
-            color: '#666',
-            // maxWidth: '600px',
-            margin: '0 auto',
-            textAlign:'center',
-            padding:'0px'
-          }}>
-            Just tell me about the role, and I &apos;ll generate a professional, tailored JD for you instantly.
-          
-          </Box>
+      <Grid sx={{ display: 'flex', justifyContent: 'center', alignItems: 'center', }}>
+        <Box style={{
+          fontSize: '28px',
+          fontWeight: '700',
+          color: '#1976d2',
+          textAlign: 'center',
+          // marginBottom: '15px',
+          background: 'linear-gradient(135deg, #1976d2, #21cbf3)',
+          WebkitBackgroundClip: 'text',
+          WebkitTextFillColor: 'transparent'
+        }}>
+          Hire Smarter with AI-Powered JD Creation
+        </Box>
+
+
+      </Grid>
+      <Box style={{
+        fontSize: '16px',
+        color: '#666',
+        // maxWidth: '600px',
+        margin: '0 auto',
+        textAlign: 'center',
+        padding: '0px'
+      }}>
+        Just tell me about the role, and I &apos;ll generate a professional, tailored JD for you instantly.
+
+      </Box>
       {/* Main Content */}
       <div style={{
-        
+
       }}>
-       
+
         {/* Title Section */}
-        <div style={{ marginBottom: '10px' }}>         
+        <div style={{ marginBottom: '10px' }}>
         </div>
 
-      
-      <div style={{
+
+        <div style={{
           display: 'flex',
           justifyContent: 'center',
           marginBottom: '5px',
           flexWrap: 'wrap'
         }}>
-         <button
-  id="btnJobTitle"
-  draggable={true}
-  onDragStart={(e) => {
-    e.dataTransfer.setData('text/plain', 'dragging-job-title');
-    e.dataTransfer.effectAllowed = 'move';
-  }}
-  onDragEnd={() => toggleSection('job_title')}
-  style={tabStyle(activeTab === 'jobTitle')}
->
- 
- 🧾 Job Title
-</button>
+          <button
+            id="btnJobTitle"
+            draggable={true}
+            onDragStart={(e) => {
+              e.dataTransfer.setData('text/plain', 'dragging-job-title');
+              e.dataTransfer.effectAllowed = 'move';
+            }}
+            onDragEnd={() => toggleSection('job_title')}
+            style={tabStyle(activeTab === 'jobTitle')}
+          >
+
+            🧾 Job Title
+          </button>
 
 
-        <button id="btnJobRole"
-  draggable={true}
-  onDragStart={(e) => {
-    e.dataTransfer.setData('text/plain', 'dragging-job-role');
-    e.dataTransfer.effectAllowed = 'move';
-  }}
-  onDragEnd={() => toggleSection('job_role')}
-  style={tabStyle(activeTab === 'job_role')}
->
+          <button id="btnJobRole"
+            draggable={true}
+            onDragStart={(e) => {
+              e.dataTransfer.setData('text/plain', 'dragging-job-role');
+              e.dataTransfer.effectAllowed = 'move';
+            }}
+            onDragEnd={() => toggleSection('job_role')}
+            style={tabStyle(activeTab === 'job_role')}
+          >
 
- 	👤 Job Role
-</button>
+            👤 Job Role
+          </button>
 
-<button id="btnJobType"
-  draggable={true}
-  onDragStart={(e) => {
-    e.dataTransfer.setData('text/plain', 'dragging-job-type');
-    e.dataTransfer.effectAllowed = 'move';
-  }}
-  onDragEnd={() => toggleSection('job_type')}
-  style={tabStyle(activeTab === 'job_type')}
->
- 
-  💼 Job Type
-</button>
+          <button id="btnJobType"
+            draggable={true}
+            onDragStart={(e) => {
+              e.dataTransfer.setData('text/plain', 'dragging-job-type');
+              e.dataTransfer.effectAllowed = 'move';
+            }}
+            onDragEnd={() => toggleSection('job_type')}
+            style={tabStyle(activeTab === 'job_type')}
+          >
 
-<button id="btnNoOfOpenPositions"
-  draggable={true}
-  onDragStart={(e) => {
-    e.dataTransfer.setData('text/plain', 'dragging-mode-of-work');
-    e.dataTransfer.effectAllowed = 'move';
-  }}
-  onDragEnd={() => toggleSection('no_of_open_positions')}
-  style={tabStyle(activeTab === 'no_of_open_positions')}
->
+            💼 Job Type
+          </button>
 
-  📌 Open Positions
-</button>
+          <button id="btnNoOfOpenPositions"
+            draggable={true}
+            onDragStart={(e) => {
+              e.dataTransfer.setData('text/plain', 'dragging-mode-of-work');
+              e.dataTransfer.effectAllowed = 'move';
+            }}
+            onDragEnd={() => toggleSection('no_of_open_positions')}
+            style={tabStyle(activeTab === 'no_of_open_positions')}
+          >
 
-<button id="btnModeOfWork"
-  draggable={true}
-  onDragStart={(e) => {
-    e.dataTransfer.setData('text/plain', 'dragging-mode-of-work');
-    e.dataTransfer.effectAllowed = 'move';
-  }}
-  onDragEnd={() => toggleSection('mode_of_work')}
-  style={tabStyle(activeTab === 'mode_of_work')}
->
+            📌 Open Positions
+          </button>
 
-  🏠 Mode Of Work
-</button>
+          <button id="btnModeOfWork"
+            draggable={true}
+            onDragStart={(e) => {
+              e.dataTransfer.setData('text/plain', 'dragging-mode-of-work');
+              e.dataTransfer.effectAllowed = 'move';
+            }}
+            onDragEnd={() => toggleSection('mode_of_work')}
+            style={tabStyle(activeTab === 'mode_of_work')}
+          >
 
-<button id="btnExperienceRequired"
-  draggable={true}
-  onDragStart={(e) => {
-    e.dataTransfer.setData('text/plain', 'dragging-experience-required');
-    e.dataTransfer.effectAllowed = 'move';
-  }}
-  onDragEnd={() => toggleSection('experience_required')}
-  style={tabStyle(activeTab === 'experience_required')}
->
+            🏠 Mode Of Work
+          </button>
 
-  🎯 Experience Level
-</button>
-  {!showAll ? (
-        <button
-          onClick={() => setShowAll(true)}
-          style={{...lessMoreStyle,
-          }}
-        >
-             <KeyboardDoubleArrowRightIcon sx={{fontSize:'40px'}}/>
-        </button>
-      ):(
-      <>
-       
+          <button id="btnExperienceRequired"
+            draggable={true}
+            onDragStart={(e) => {
+              e.dataTransfer.setData('text/plain', 'dragging-experience-required');
+              e.dataTransfer.effectAllowed = 'move';
+            }}
+            onDragEnd={() => toggleSection('experience_required')}
+            style={tabStyle(activeTab === 'experience_required')}
+          >
 
-          <button id="btnPrimarySkills"
-  draggable={true}
-  onDragStart={(e) => {
-    e.dataTransfer.setData('text/plain', 'dragging-primary-skills');
-    e.dataTransfer.effectAllowed = 'move';
-  }}
-  onDragEnd={() => toggleSection('primary_skills')}
-  style={tabStyle(activeTab === 'primary_skills')}
->
-
-  🛠️ Primary Skills
-</button>
-
-<button id="btnSecondarySkills"
-  draggable={true}
-  onDragStart={(e) => {
-    e.dataTransfer.setData('text/plain', 'dragging-secondary-skills');
-    e.dataTransfer.effectAllowed = 'move';
-  }}
-  onDragEnd={() => toggleSection('secondary_skills')}
-  style={tabStyle(activeTab === 'secondary_skills')}
->
-
- ⚙️ Secondary Skills
-</button>
+            🎯 Experience Level
+          </button>
+          {!showAll ? (
+            <button
+              onClick={() => setShowAll(true)}
+              style={{
+                ...lessMoreStyle,
+              }}
+            >
+              <KeyboardDoubleArrowRightIcon sx={{ fontSize: '40px' }} />
+            </button>
+          ) : (
+            <>
 
 
-<button id="btnLocation"
-  draggable={true}
-  onDragStart={(e) => {
-    e.dataTransfer.setData('text/plain', 'dragging-country');
-    e.dataTransfer.effectAllowed = 'move';
-  }}
-  onDragEnd={() => toggleSection('location')}
-  style={tabStyle(activeTab === 'location')}
->
- 
- 	📍 Location
-</button>
+              <button id="btnPrimarySkills"
+                draggable={true}
+                onDragStart={(e) => {
+                  e.dataTransfer.setData('text/plain', 'dragging-primary-skills');
+                  e.dataTransfer.effectAllowed = 'move';
+                }}
+                onDragEnd={() => toggleSection('primary_skills')}
+                style={tabStyle(activeTab === 'primary_skills')}
+              >
 
-<button id="btnDomainSkills"
-  draggable={true}
-  onDragStart={(e) => {
-    e.dataTransfer.setData('text/plain', 'dragging-domain-skills');
-    e.dataTransfer.effectAllowed = 'move';
-  }}
-  onDragEnd={() => toggleSection('domain_skills')}
-  style={tabStyle(activeTab === 'domain_skills')}
->
+                🛠️ Primary Skills
+              </button>
 
-  🧠 Specific Domain Skills
-</button>
+              <button id="btnSecondarySkills"
+                draggable={true}
+                onDragStart={(e) => {
+                  e.dataTransfer.setData('text/plain', 'dragging-secondary-skills');
+                  e.dataTransfer.effectAllowed = 'move';
+                }}
+                onDragEnd={() => toggleSection('secondary_skills')}
+                style={tabStyle(activeTab === 'secondary_skills')}
+              >
 
-     <button
-          onClick={() => setShowAll(false)}
-          style={{...lessMoreStyle,
-          }}
-        >
-             <KeyboardDoubleArrowLeftIcon sx={{fontSize:'40px'}}/>
-        </button>
-      </>)}
-         
-      </div>
+                ⚙️ Secondary Skills
+              </button>
+
+
+              <button id="btnLocation"
+                draggable={true}
+                onDragStart={(e) => {
+                  e.dataTransfer.setData('text/plain', 'dragging-country');
+                  e.dataTransfer.effectAllowed = 'move';
+                }}
+                onDragEnd={() => toggleSection('location')}
+                style={tabStyle(activeTab === 'location')}
+              >
+
+                📍 Location
+              </button>
+
+              <button id="btnDomainSkills"
+                draggable={true}
+                onDragStart={(e) => {
+                  e.dataTransfer.setData('text/plain', 'dragging-domain-skills');
+                  e.dataTransfer.effectAllowed = 'move';
+                }}
+                onDragEnd={() => toggleSection('domain_skills')}
+                style={tabStyle(activeTab === 'domain_skills')}
+              >
+
+                🧠 Specific Domain Skills
+              </button>
+
+              <button
+                onClick={() => setShowAll(false)}
+                style={{
+                  ...lessMoreStyle,
+                }}
+              >
+                <KeyboardDoubleArrowLeftIcon sx={{ fontSize: '40px' }} />
+              </button>
+            </>)}
+
+        </div>
 
 
 
@@ -1742,27 +2008,28 @@ setShowButtons(true)
           padding: '20px',
           boxShadow: '0 10px 40px rgba(0,0,0,0.1)',
           marginBottom: '5px',
-           minHeight: '100px',
+          minHeight: '100px',
           // minHeight: '400px',
         }}>
-        
 
-         
+
+
           <Grid id="selectedItems" container spacing={2}>
- {/* job tile */}
-      {!visibleSections.job_title && (
-      <Grid id="job_title" item xs={12} sm={6} md={4} lg={3}>
-      <div style={{ display: 'flex', alignItems: 'center' }}>
-      <div style={{ fontFamily: '"Segoe Script", cursive', fontSize: '24px', fontWeight: 'bold', color: '#e65100' }}>
-        	🧾
-      </div>
-      <div style={{ fontSize: '15px', marginLeft: '4px' }}>
-        Job Title<span style={{color:'red'}}> *</span>
+            {/* job tile */}
+            {!visibleSections.job_title && (
+              <Grid id="job_title" item xs={12} sm={6} md={4} lg={3}>
+                <div style={{ display: 'flex', alignItems: 'center' }}>
+                  <div style={{ fontFamily: '"Segoe Script", cursive', fontSize: '24px', fontWeight: 'bold', color: '#e65100' }}>
+                    🧾
+                  </div>
+                  <div style={{ fontSize: '15px', marginLeft: '4px' }}>
+                    Job Title<span style={{ color: 'red' }}> *</span>
 
-      </div>
-      </div>
-        <Grid sx={{display:'flex', alignItems:'center', justifyContent:'space-between',
-           color: '#00000080',
+                  </div>
+                </div>
+                <Grid sx={{
+                  display: 'flex', alignItems: 'center', justifyContent: 'space-between',
+                  color: '#00000080',
                   borderRadius: '5px',
                   border: '0.5px solid #bdbdbd',
                   height: '40px',
@@ -1775,656 +2042,14 @@ setShowButtons(true)
                   lineHeight: '18.23px',
                   letterSpacing: '0%',
                   opacity: 1,
-        }}>
-          <TextField
-              fullWidth
-              variant="filled"
-              autoComplete="off"
-              placeholder="Job Title"
-              sx={{
-                '& .MuiInputBase-input::placeholder': {
-                  fontFamily: 'SF Pro Display',
-                  fontWeight: 300,
-                  fontSize: '14px',
-                  lineHeight: '18.23px',
-                  letterSpacing: '0%',
-                  color: '#00000080',
-                  opacity: 1,
-                },
-              }}
-              InputProps={{
-                disableUnderline: true,
-                style: {
-                  color: '#00000080',
-
-                  borderRadius: '5px',
-                  //   border: '1px solid #0284C7',
-                  // border: '0.5px solid #00000080',
-                  height: '40px',
-                  background: '#FFFFFF',
-                  textAlign: 'center',
-                  padding: '0px 0px 15px 0px',
-
-                  fontFamily: 'SF Pro Display',
-                  fontWeight: 300,
-                  fontSize: '14px',
-                  lineHeight: '18.23px',
-                  letterSpacing: '0%',
-
-                  opacity: 1,
-                },
-              }}
-              inputProps={{
-                style: { textAlign:  'left' },
-              }}
-              required
-              name="job_title"
-              // value={ formValues.job_title.value}
-              value={
-                formValues.job_title.value  || ''
-                // ||
-                // (editAijd === true ? jobTitleAi : '')
-              }
-              onChange={(e: any) => handleChange(e)}
-              // error={formValues.job_title.error}
-              // helperText={
-              //   formValues.job_title.error
-              //     ? formValues.job_title.errorMessage
-              //     : ''
-              // }
-            />
-
-         
-        </Grid>
-      </Grid>
-    
-    )}
-      
-      {/* job role */}
-      {!visibleSections.job_role && (
-      <Grid id="job_role" item xs={12} sm={6} md={4} lg={3}>
-      <div style={{ display: 'flex', alignItems: 'center' }}>
-      <div style={{ fontFamily: '"Segoe Script", cursive', fontSize: '24px', fontWeight: 'bold', color: '#e65100' }}>
-        	👤
-      </div>
-      <div style={{ fontSize: '15px', marginLeft: '4px' }}>
-        Job Role<span style={{color:'red'}}> *</span>
-      </div>
-      </div>
-        <Grid sx={{display:'flex', alignItems:'center', justifyContent:'space-between',
-           color: '#00000080',
-                  borderRadius: '5px',
-                  border: '0.5px solid #bdbdbd',
-                  height: '40px',
-                  background: '#FFFFFF',
-                  textAlign: 'center',
-                  padding: '20px 0px 20px 0px',
-                  fontFamily: 'SF Pro Display',
-                  fontWeight: 300,
-                  fontSize: '14px',
-                  lineHeight: '18.23px',
-                  letterSpacing: '0%',
-                  opacity: 1,
-        }}>
-          <Autocomplete
-              freeSolo
-              options={jobCategory}
-              loading={jobCategoryLoading}
-              // value={formValues.job_role.value || (editAijd ? jobRoleAi : '')}
-              value={formValues.job_role.value ||  ''}
-              inputValue={jobCategoryInput}
-              onInputChange={(e, newInputValue) => {
-                setJobCategoryInput(newInputValue)
-                fetchCategories(newInputValue)
-              }}
-              onChange={(e, newValue) => {
-                const syntheticEvent = {
-                  target: {
-                    name: 'job_role',
-                    value: newValue || '',
-                  },
-                } as React.ChangeEvent<HTMLInputElement>
-
-                handleChange(syntheticEvent)
-              }}
-              sx={{
-                width: '100%',
-                '& .MuiOutlinedInput-root': {
-                  height: '40px',
-                  backgroundColor: '#FFFFFF',
-                  borderRadius: '5px',
-                  padding: '5px 0px 5px 15px',
-                  fontFamily: 'SF Pro Display',
-                  fontWeight: 300,
-                  fontSize: '14px',
-                  lineHeight: '18.23px',
-                  letterSpacing: '0%',
-                  color: '#00000080',
-                  // border: '0.5px solid transparent',
-                  direction: 'ltr',
-                },
-                '& .MuiInputBase-input': {
-                  padding: 0,
-                },
-                '& .MuiInputBase-input::placeholder': {
-                  fontFamily: 'SF Pro Display',
-                  fontWeight: 300,
-                  fontSize: '14px',
-                  lineHeight: '18.23px',
-                  letterSpacing: '0%',
-                  color: '#00000080',
-                  opacity: 1,
-                },
-              }}
-              renderInput={(params) => (
-                <TextField
-                  {...params}
-                  placeholder="Type or search role"
-                  variant="outlined"
-                  fullWidth
-                  // error={formValues.job_role.error}
-                  InputProps={{
-                    ...params.InputProps,
-                    endAdornment: (
-                      <Box
-                        sx={{
-                          display: 'flex',
-                          alignItems: 'center',
-                          minWidth: '30px',
-                        }}
-                      >
-                        {jobCategoryLoading ? (
-                          <CircularProgress color="inherit" size={20} />
-                        ) : null}
-                        {params.InputProps.endAdornment}
-                      </Box>
-                    ),
-                  }}
-                />
-              )}
-            />
-            {noCategoryFound && (
-              <div
-                style={{ color: '#d32f2f', fontSize: '13px', marginTop: '5px' }}
-              >
-                No category found
-              </div>
-            )}
-           
-        </Grid>
-      </Grid>
-    )}
-
-      {/* job type */}
-      {!visibleSections.job_type && (
-      <Grid id="job_type" item xs={12} sm={6} md={4} lg={3}>
-      <div style={{ display: 'flex', alignItems: 'center' }}>
-      <div style={{ fontFamily: '"Segoe Script", cursive', fontSize: '24px', fontWeight: 'bold', color: '#e65100' }}>
-        💼
-      </div>
-      <div style={{ fontSize: '15px', marginLeft: '4px' }}>
-        Job Type<span style={{color:'red'}}> *</span>
-      </div>
-      </div>
-        <Grid sx={{display:'flex', alignItems:'center', justifyContent:'space-between',
-           color: '#00000080',
-                  borderRadius: '5px',
-                  border: '0.5px solid #bdbdbd',
-                  height: '40px',
-                  background: '#FFFFFF',
-                  textAlign: 'center',
-                  padding: '20px 0px 20px 0px',
-                  fontFamily: 'SF Pro Display',
-                  fontWeight: 300,
-                  fontSize: '14px',
-                  lineHeight: '18.23px',
-                  letterSpacing: '0%',
-                  opacity: 1,
-        }}>
-          <FormControl sx={{ width: '100%', height: '45px' }}>
-                  <Select
-                    value={jobTypeName ||  ''}
-                    // value={jobTypeName || ''}
-                    displayEmpty
+                }}>
+                  <TextField
+                    fullWidth
+                    variant="filled"
+                    autoComplete="off"
+                    placeholder="Job Title"
                     sx={{
-                      height: '40px',
-                      width: '100%',
-                      color: jobTypeName ? '#00000080' : '#00000080', //Placeholder color
-                      background: '#FFFFFF',
-                      // border: '1px solid #00000080',
-                      borderRadius: '5px',
-                      padding: '8px 0px 5px 0px',
-                      direction:  'ltr',
-
-                      fontFamily: 'SF Pro Display',
-                      fontWeight: 300,
-                      fontSize: '14px',
-                      lineHeight: '18.23px',
-                      letterSpacing: '0%',
-                      marginTop:'2px',
-                      opacity: 1,
-                      '& .MuiButtonBase-root': {
-                        fontFamily: 'SF Pro Display',
-                        fontWeight: 300,
-                        fontSize: '14px',
-                        lineHeight: '18.23px',
-                        letterSpacing: '0%',
-                        color: '#000000',
-                      },
-                      '& .MuiMenuItem-root': {
-                        fontFamily: 'SF Pro Display',
-                        fontWeight: 300,
-                        fontSize: '14px',
-                        lineHeight: '18.23px',
-                        letterSpacing: '0%',
-                        color: '#000000',
-                      },
-                    }}
-                    onChange={handleChangeJobTypeNames}
-                    input={<OutlinedInput />}
-                    MenuProps={{
-                      PaperProps: {
-                        style: { color: '#000000', background: '#FFFFFF' },
-                      },
-                    }}
-                  >
-                    {/* Placeholder Item */}
-                    <MenuItem value="" disabled>
-                      <span
-                        style={{
-                          display: 'flex',
-                          flexDirection: 'row',
-                          justifyContent: 'space-between',
-
-                          fontFamily: 'SF Pro Display',
-                          fontWeight: 300,
-                          fontSize: '14px',
-                          lineHeight: '18.23px',
-                          letterSpacing: '0%',
-                          color: '#00000080',
-                          opacity: 1,
-                        }}
-                      >
-                        {/* {t('selectJobType')} */}
-                        Select Job Type
-                      </span>
-                    </MenuItem>
-
-                    {/* Actual Options */}
-                    {jobTypeNames.map((name) => (
-                      <MenuItem
-                        key={name}
-                        value={name}
-                        style={getStyles(name, jobTypeName, jobTypeTheme)}
-                      >
-                        {name}
-                      </MenuItem>
-                    ))}
-                  </Select>
-
-                
-                </FormControl>
-         
-        </Grid>
-      </Grid>
-    )}
-
-
-   {!visibleSections.no_of_open_positions && (
-      <Grid id="no_of_open_positions" item xs={12} sm={6} md={4} lg={3}>
-      <div style={{ display: 'flex', alignItems: 'center' }}>
-      <div style={{ fontFamily: '"Segoe Script", cursive', fontSize: '24px', fontWeight: 'bold', color: '#e65100' }}>
-        	📌
-      </div>
-      <div style={{ fontSize: '15px', marginLeft: '4px' }}>
-        Open Positions <span style={{color:'red'}}> *</span>
-
-      </div>
-      </div>
-        <Grid sx={{display:'flex', alignItems:'center', justifyContent:'space-between',
-           color: '#00000080',
-                  borderRadius: '5px',
-                  border: '0.5px solid #bdbdbd',
-                  height: '40px',
-                  background: '#FFFFFF',
-                  textAlign: 'center',
-                  padding: '20px 0px 20px 0px',
-                  fontFamily: 'SF Pro Display',
-                  fontWeight: 300,
-                  fontSize: '14px',
-                  lineHeight: '18.23px',
-                  letterSpacing: '0%',
-                  opacity: 1,
-        }}>
-         <TextField
-      fullWidth
-      variant="filled"
-      autoComplete="off"
-      placeholder="Enter No. Of Open Positions"
-      sx={{
-        '& .MuiInputBase-input::placeholder': {
-          fontFamily: 'SF Pro Display',
-          fontWeight: 300,
-          fontSize: '14px',
-          lineHeight: '18.23px',
-          letterSpacing: '0%',
-          color: '#00000080',
-          opacity: 1,
-        },
-      }}
-      InputProps={{
-        disableUnderline: true,
-        style: {
-          color: '#00000080',
-          borderRadius: '5px',
-          height: '40px',
-          background: '#FFFFFF',
-          textAlign: 'center',
-          padding: '0px 0px 15px 0px',
-          fontFamily: 'SF Pro Display',
-          fontWeight: 300,
-          fontSize: '14px',
-          lineHeight: '18.23px',
-          letterSpacing: '0%',
-          opacity: 1,
-        },
-      }}
-      inputProps={{
-        inputMode: 'numeric',
-        pattern: '[0-9]*',
-        style: { textAlign: 'left' },
-      }}
-      required
-      name="no_of_open_positions"
-      value={formValues.no_of_open_positions.value}
-      onChange={handleChange}
-      error={formValues.no_of_open_positions.error}
-      
-    />
-
-         
-        </Grid>
-      </Grid>
-    
-    )}
-      {/* mode of work */}
-      {!visibleSections.mode_of_work && (
-      <Grid id="mode_of_work" item xs={12} sm={6} md={4} lg={3}>
-      <div style={{ display: 'flex', alignItems: 'center' }}>
-      <div style={{ fontFamily: '"Segoe Script", cursive', fontSize: '24px', fontWeight: 'bold', color: '#e65100' }}>
-        🏠
-      </div>
-      <div style={{ fontSize: '15px', marginLeft: '4px' }}>
-        Mode Of Work<span style={{color:'red'}}> *</span>
-      </div>
-      </div>
-        <Grid sx={{display:'flex', alignItems:'center', justifyContent:'space-between',
-           color: '#00000080',
-                  borderRadius: '5px',
-                  border: '0.5px solid #bdbdbd',
-                  height: '40px',
-                  background: '#FFFFFF',
-                  textAlign: 'center',
-                  padding: '20px 0px 20px 0px',
-                  fontFamily: 'SF Pro Display',
-                  fontWeight: 300,
-                  fontSize: '14px',
-                  lineHeight: '18.23px',
-                  letterSpacing: '0%',
-                  opacity: 1,
-        }}>
-          <FormControl sx={{ width: '100%', height: '40px' }}>
-                  <Select
-                    // value={modeOfWorkName || ''} // Ensure an empty value initially
-                    value={
-                      modeOfWorkName ||  ''
-                    }
-                    displayEmpty
-                    onChange={handleChangeModeOfWork}
-                    input={<OutlinedInput />}
-                    MenuProps={{
-                      PaperProps: {
-                        style: { color: '#000000', background: '#FFFFFF' },
-                      },
-                    }}
-                    style={{
-                      height: '40px',
-                      width: '100%',
-                      color: modeOfWorkName ? '#00000080' : '#00000080', // Darker text when selected
-                      background: '#FFFFFF',
-                      // border: '1px solid #00000080',
-                      borderRadius: '5px',
-                      padding: '5px 0px 5px 0px',
-                      direction:  'ltr',
-                      fontFamily: 'SF Pro Display',
-                      fontWeight: 300,
-                      fontSize: '14px',
-                      lineHeight: '18.23px',
-                      letterSpacing: '0%',
-                      opacity: 1,
-                    }}
-                  >
-                    {/* Placeholder Item (Disabled) */}
-                    <MenuItem value="" disabled>
-                      <span
-                        style={{
-                          display: 'flex',
-                          flexDirection: 'row',
-                          justifyContent: 'space-between',
-                          fontFamily: 'SF Pro Display',
-                          fontWeight: 300,
-                          fontSize: '14px',
-                          lineHeight: '18.23px',
-                          letterSpacing: '0%',
-                          color: '#00000080',
-                          opacity: 1,
-                        }}
-                      >
-                        {/* {t('selectModeOfWork')} */}
-                        Select work mode
-                      </span>
-                    </MenuItem>
-
-                    {/* Actual Options */}
-                    {modeOfWorkNames.map((name) => (
-                      <MenuItem
-                        key={name}
-                        value={name}
-                        style={getStyles(name, modeOfWorkName, modeOfWorkTheme)}
-                      >
-                        {name}
-                      </MenuItem>
-                    ))}
-                  </Select>
-
-                 
-                </FormControl>
-         
-        </Grid>
-      </Grid>
-    )}
-
-      {/* primary skills */}
-      {!visibleSections.primary_skills && (
-      <Grid id="primary_skills" item xs={12} sm={6} md={4} lg={3}>
-      <div style={{ display: 'flex', alignItems: 'center' }}>
-      <div style={{ fontFamily: '"Segoe Script", cursive', fontSize: '24px', fontWeight: 'bold', color: '#e65100' }}>
-        🛠️	
-      </div>
-      <div style={{ fontSize: '15px', marginLeft: '4px' }}>
-        Primary Skills<span style={{color:'red'}}> *</span>
-      </div>
-      </div>
-        <Grid sx={{display:'flex', alignItems:'center', justifyContent:'space-between',
-           color: '#00000080',
-                  borderRadius: '5px',
-                  border: '0.5px solid #bdbdbd',
-                  height: '40px',
-                  background: '#FFFFFF',
-                  textAlign: 'center',
-                  padding: '20px 0px 20px 0px',
-                  fontFamily: 'SF Pro Display',
-                  fontWeight: 300,
-                  fontSize: '14px',
-                  lineHeight: '18.23px',
-                  letterSpacing: '0%',
-                  opacity: 1,
-        }}>
-         
-
-           <TextField
-                  fullWidth
-                  variant="filled"
-                  autoComplete="off"
-                  placeholder="Enter primary skills"
-                  sx={{
-                    '& .MuiInputBase-input::placeholder': {
-                      fontFamily: 'SF Pro Display',
-                      fontWeight: 300,
-                      fontSize: '14px',
-                      lineHeight: '18.23px',
-                      letterSpacing: '0%',
-                      color: '#00000080',
-                      background: '#FFFFFF',
-                      opacity: 1,
-                    },
-                  }}
-                  InputProps={{
-                    disableUnderline: true,
-                    sx: {
-                      color: '#00000080',
-                      borderRadius: '5px',
-                      // border: '0.5px solid #00000080',
-                      height: '40px',
-                      background: '#FFFFFF',
-                      textAlign: 'center',
-                      padding: '0px 0px 15px 0px',
-                      fontFamily: 'SF Pro Display',
-                      fontWeight: 300,
-                      fontSize: '14px',
-                      lineHeight: '18.23px',
-                      letterSpacing: '0%',
-                      opacity: 1,
-                      '&:hover': {
-                        color: '#00000080',
-                        background: '#FFFFFF',
-                      },
-                    },
-                  }}
-                  inputProps={{
-                    sx: {
-                      textAlign: 'left',
-                    },
-                  }}
-                  required
-                  name="primary_skills"
-                  // value={primarySkillName.join(', ')} // Show skills as comma-separated values
-                  // value={
-                  //   primarySkillName.join(', ') || ''
-                  //   // (editAijd === true ? primarySkillsAi : '')
-                  // }
-                  value={primarySkillName}
-                  onChange={handleChangePrimarySkills}
-                  error={primarySkillForm}
-                 
-                />
-          
-        </Grid>
-      </Grid>
-    )}
-         {/* experience required */}
-      {!visibleSections.experience_required && (
-      <Grid id="experinece_required" item xs={12} sm={6} md={4} lg={3}>
-      <div style={{ display: 'flex', alignItems: 'center' }}>
-      <div style={{ fontFamily: '"Segoe Script", cursive', fontSize: '24px', fontWeight: 'bold', color: '#e65100' }}>
-        🎯	
-      </div>
-      <div style={{ fontSize: '15px', marginLeft: '4px' }}>
-        Experience Level<span style={{color:'red'}}> *</span>
-      </div>
-      </div>
-        <Grid sx={{display:'flex', alignItems:'center', justifyContent:'space-between',
-           color: '#00000080',
-                  borderRadius: '5px',
-                  border: '0.5px solid #bdbdbd',
-                  height: '40px',
-                  background: '#FFFFFF',
-                  textAlign: 'center',
-                  padding: '20px 0px 20px 0px',
-                  fontFamily: 'SF Pro Display',
-                  fontWeight: 300,
-                  fontSize: '14px',
-                  lineHeight: '18.23px',
-                  letterSpacing: '0%',
-                  opacity: 1,
-        }}>
-          <FormControl
-                variant="standard"
-                style={{
-                  width: '100%',
-                  border: '0.5px solid rgba(167, 219, 214, 0.72)',
-                  borderRadius: '15px',
-                  marginBottom: formValues.experience_required.error
-                    ? '5px'
-                    : '0px',
-                }}
-              >
-                <Select
-                  disableUnderline
-                  defaultValue={'-'}
-                  displayEmpty
-                  name="experience_required"
-                  required
-                  style={{
-                    height: '40px',
-                    width: '100%',
-                    background: '#FFFFFF',
-                    // border: '0.5px solid #00000080',
-                    color: '#00000080',
-                    borderRadius: '5px',
-                    padding: '5px 0px 5px 15px',
-                    direction: 'ltr',
-                    fontFamily: 'SF Pro Display',
-                    fontWeight: 300,
-                    fontSize: '14px',
-                    lineHeight: '18.23px',
-                    letterSpacing: '0%',
-                    opacity: 1,
-                  }}
-                  MenuProps={{
-                    PaperProps: {
-                      style: {
-                        color: '#000000',
-                        background: '#FFFFFF',
-                        maxHeight: '150px', // Limit the dropdown height
-                        overflowY: 'auto', // Enable scrolling if needed
-                        marginTop: '5px', // Ensure it appears just below the input field
-                      },
-                    },
-                    anchorOrigin: {
-                      vertical: 'bottom',
-                      horizontal: 'left',
-                    },
-                    transformOrigin: {
-                      vertical: 'top',
-                      horizontal: 'left',
-                    },
-                    // getContentAnchorEl: null, // Ensures dropdown opens right below
-                  }}
-                  // value={formValues.experience_required.value}
-                  value={
-                    formValues.experience_required.value || ''
-                    // (editAijd === true ? experienceRequiredAi : '')
-                  }
-                  onChange={(e: any) => handleChange(e)}
-                  error={formValues.experience_required.error}
-                >
-                  <MenuItem value="">
-                    <span
-                      style={{
-                        display: 'flex',
-                        flexDirection: 'row',
-                        justifyContent: 'space-between',
+                      '& .MuiInputBase-input::placeholder': {
                         fontFamily: 'SF Pro Display',
                         fontWeight: 300,
                         fontSize: '14px',
@@ -2432,36 +2057,302 @@ setShowButtons(true)
                         letterSpacing: '0%',
                         color: '#00000080',
                         opacity: 1,
+                      },
+                    }}
+                    InputProps={{
+                      disableUnderline: true,
+                      style: {
+                        color: '#00000080',
+
+                        borderRadius: '5px',
+                        //   border: '1px solid #0284C7',
+                        // border: '0.5px solid #00000080',
+                        height: '40px',
+                        background: '#FFFFFF',
+                        textAlign: 'center',
+                        padding: '0px 0px 15px 0px',
+
+                        fontFamily: 'SF Pro Display',
+                        fontWeight: 300,
+                        fontSize: '14px',
+                        lineHeight: '18.23px',
+                        letterSpacing: '0%',
+
+                        opacity: 1,
+                      },
+                    }}
+                    inputProps={{
+                      style: { textAlign: 'left' },
+                    }}
+                    required
+                    name="job_title"
+                    // value={ formValues.job_title.value}
+                    value={
+                      formValues.job_title.value || ''
+                      // ||
+                      // (editAijd === true ? jobTitleAi : '')
+                    }
+                    onChange={(e: any) => handleChange(e)}
+                  // error={formValues.job_title.error}
+                  // helperText={
+                  //   formValues.job_title.error
+                  //     ? formValues.job_title.errorMessage
+                  //     : ''
+                  // }
+                  />
+
+
+                </Grid>
+              </Grid>
+
+            )}
+
+            {/* job role */}
+            {!visibleSections.job_role && (
+              <Grid id="job_role" item xs={12} sm={6} md={4} lg={3}>
+                <div style={{ display: 'flex', alignItems: 'center' }}>
+                  <div style={{ fontFamily: '"Segoe Script", cursive', fontSize: '24px', fontWeight: 'bold', color: '#e65100' }}>
+                    👤
+                  </div>
+                  <div style={{ fontSize: '15px', marginLeft: '4px' }}>
+                    Job Role<span style={{ color: 'red' }}> *</span>
+                  </div>
+                </div>
+                <Grid sx={{
+                  display: 'flex', alignItems: 'center', justifyContent: 'space-between',
+                  color: '#00000080',
+                  borderRadius: '5px',
+                  border: '0.5px solid #bdbdbd',
+                  height: '40px',
+                  background: '#FFFFFF',
+                  textAlign: 'center',
+                  padding: '20px 0px 20px 0px',
+                  fontFamily: 'SF Pro Display',
+                  fontWeight: 300,
+                  fontSize: '14px',
+                  lineHeight: '18.23px',
+                  letterSpacing: '0%',
+                  opacity: 1,
+                }}>
+                  <Autocomplete
+                    freeSolo
+                    options={jobCategory}
+                    loading={jobCategoryLoading}
+                    // value={formValues.job_role.value || (editAijd ? jobRoleAi : '')}
+                    value={formValues.job_role.value || ''}
+                    inputValue={jobCategoryInput}
+                    onInputChange={(e, newInputValue) => {
+                      setJobCategoryInput(newInputValue)
+                      fetchCategories(newInputValue)
+                    }}
+                    onChange={(e, newValue) => {
+                      const syntheticEvent = {
+                        target: {
+                          name: 'job_role',
+                          value: newValue || '',
+                        },
+                      } as React.ChangeEvent<HTMLInputElement>
+
+                      handleChange(syntheticEvent)
+                    }}
+                    sx={{
+                      width: '100%',
+                      '& .MuiOutlinedInput-root': {
+                        height: '40px',
+                        backgroundColor: '#FFFFFF',
+                        borderRadius: '5px',
+                        padding: '5px 0px 5px 15px',
+                        fontFamily: 'SF Pro Display',
+                        fontWeight: 300,
+                        fontSize: '14px',
+                        lineHeight: '18.23px',
+                        letterSpacing: '0%',
+                        color: '#00000080',
+                        // border: '0.5px solid transparent',
+                        direction: 'ltr',
+                      },
+                      '& .MuiInputBase-input': {
+                        padding: 0,
+                      },
+                      '& .MuiInputBase-input::placeholder': {
+                        fontFamily: 'SF Pro Display',
+                        fontWeight: 300,
+                        fontSize: '14px',
+                        lineHeight: '18.23px',
+                        letterSpacing: '0%',
+                        color: '#00000080',
+                        opacity: 1,
+                      },
+                    }}
+                    renderInput={(params) => (
+                      <TextField
+                        {...params}
+                        placeholder="Type or search role"
+                        variant="outlined"
+                        fullWidth
+                        // error={formValues.job_role.error}
+                        InputProps={{
+                          ...params.InputProps,
+                          endAdornment: (
+                            <Box
+                              sx={{
+                                display: 'flex',
+                                alignItems: 'center',
+                                minWidth: '30px',
+                              }}
+                            >
+                              {jobCategoryLoading ? (
+                                <CircularProgress color="inherit" size={20} />
+                              ) : null}
+                              {params.InputProps.endAdornment}
+                            </Box>
+                          ),
+                        }}
+                      />
+                    )}
+                  />
+                  {noCategoryFound && (
+                    <div
+                      style={{ color: '#d32f2f', fontSize: '13px', marginTop: '5px' }}
+                    >
+                      No category found
+                    </div>
+                  )}
+
+                </Grid>
+              </Grid>
+            )}
+
+            {/* job type */}
+            {!visibleSections.job_type && (
+              <Grid id="job_type" item xs={12} sm={6} md={4} lg={3}>
+                <div style={{ display: 'flex', alignItems: 'center' }}>
+                  <div style={{ fontFamily: '"Segoe Script", cursive', fontSize: '24px', fontWeight: 'bold', color: '#e65100' }}>
+                    💼
+                  </div>
+                  <div style={{ fontSize: '15px', marginLeft: '4px' }}>
+                    Job Type<span style={{ color: 'red' }}> *</span>
+                  </div>
+                </div>
+                <Grid sx={{
+                  display: 'flex', alignItems: 'center', justifyContent: 'space-between',
+                  color: '#00000080',
+                  borderRadius: '5px',
+                  border: '0.5px solid #bdbdbd',
+                  height: '40px',
+                  background: '#FFFFFF',
+                  textAlign: 'center',
+                  padding: '20px 0px 20px 0px',
+                  fontFamily: 'SF Pro Display',
+                  fontWeight: 300,
+                  fontSize: '14px',
+                  lineHeight: '18.23px',
+                  letterSpacing: '0%',
+                  opacity: 1,
+                }}>
+                  <FormControl sx={{ width: '100%', height: '45px' }}>
+                    <Select
+                      value={jobTypeName || ''}
+                      // value={jobTypeName || ''}
+                      displayEmpty
+                      sx={{
+                        height: '40px',
+                        width: '100%',
+                        color: jobTypeName ? '#00000080' : '#00000080', //Placeholder color
+                        background: '#FFFFFF',
+                        // border: '1px solid #00000080',
+                        borderRadius: '5px',
+                        padding: '8px 0px 5px 0px',
+                        direction: 'ltr',
+
+                        fontFamily: 'SF Pro Display',
+                        fontWeight: 300,
+                        fontSize: '14px',
+                        lineHeight: '18.23px',
+                        letterSpacing: '0%',
+                        marginTop: '2px',
+                        opacity: 1,
+                        '& .MuiButtonBase-root': {
+                          fontFamily: 'SF Pro Display',
+                          fontWeight: 300,
+                          fontSize: '14px',
+                          lineHeight: '18.23px',
+                          letterSpacing: '0%',
+                          color: '#000000',
+                        },
+                        '& .MuiMenuItem-root': {
+                          fontFamily: 'SF Pro Display',
+                          fontWeight: 300,
+                          fontSize: '14px',
+                          lineHeight: '18.23px',
+                          letterSpacing: '0%',
+                          color: '#000000',
+                        },
+                      }}
+                      onChange={handleChangeJobTypeNames}
+                      input={<OutlinedInput />}
+                      MenuProps={{
+                        PaperProps: {
+                          style: { color: '#000000', background: '#FFFFFF' },
+                        },
                       }}
                     >
-                      Select experience
-                    </span>
-                  </MenuItem>
-                  {experience.map((exp: any, index: number) => (
-                    <MenuItem key={index} value={exp}>
-                      {exp} years
-                    </MenuItem>
-                  ))}
-                </Select>
-              </FormControl>
-              
-        </Grid>
-      </Grid>
-    )}
+                      {/* Placeholder Item */}
+                      <MenuItem value="" disabled>
+                        <span
+                          style={{
+                            display: 'flex',
+                            flexDirection: 'row',
+                            justifyContent: 'space-between',
 
-      {/* secondary skills */}
-      {!visibleSections.secondary_skills && (
-      <Grid id="secondary_skills" item xs={12} sm={6} md={4} lg={3}>
-      <div style={{ display: 'flex', alignItems: 'center' }}>
-      <div style={{ fontFamily: '"Segoe Script", cursive', fontSize: '24px', fontWeight: 'bold', color: '#e65100' }}>
-        ⚙️	
-      </div>
-      <div style={{ fontSize: '15px', marginLeft: '4px' }}>
-        Secondary Skills<span style={{color:'red'}}> *</span>
-      </div>
-      </div>
-        <Grid sx={{display:'flex', alignItems:'center', justifyContent:'space-between',
-           color: '#00000080',
+                            fontFamily: 'SF Pro Display',
+                            fontWeight: 300,
+                            fontSize: '14px',
+                            lineHeight: '18.23px',
+                            letterSpacing: '0%',
+                            color: '#00000080',
+                            opacity: 1,
+                          }}
+                        >
+                          {/* {t('selectJobType')} */}
+                          Select Job Type
+                        </span>
+                      </MenuItem>
+
+                      {/* Actual Options */}
+                      {jobTypeNames.map((name) => (
+                        <MenuItem
+                          key={name}
+                          value={name}
+                          style={getStyles(name, jobTypeName, jobTypeTheme)}
+                        >
+                          {name}
+                        </MenuItem>
+                      ))}
+                    </Select>
+
+
+                  </FormControl>
+
+                </Grid>
+              </Grid>
+            )}
+
+
+            {!visibleSections.no_of_open_positions && (
+              <Grid id="no_of_open_positions" item xs={12} sm={6} md={4} lg={3}>
+                <div style={{ display: 'flex', alignItems: 'center' }}>
+                  <div style={{ fontFamily: '"Segoe Script", cursive', fontSize: '24px', fontWeight: 'bold', color: '#e65100' }}>
+                    📌
+                  </div>
+                  <div style={{ fontSize: '15px', marginLeft: '4px' }}>
+                    Open Positions <span style={{ color: 'red' }}> *</span>
+
+                  </div>
+                </div>
+                <Grid sx={{
+                  display: 'flex', alignItems: 'center', justifyContent: 'space-between',
+                  color: '#00000080',
                   borderRadius: '5px',
                   border: '0.5px solid #bdbdbd',
                   height: '40px',
@@ -2474,76 +2365,72 @@ setShowButtons(true)
                   lineHeight: '18.23px',
                   letterSpacing: '0%',
                   opacity: 1,
-        }}>
-          <TextField
-                  fullWidth
-                  variant="filled"
-                  autoComplete="off"
-                  placeholder="Enter Secondary Skills"
-                  sx={{
-                    '& .MuiInputBase-input::placeholder': {
-                      fontFamily: 'SF Pro Display',
-                      fontWeight: 300,
-                      fontSize: '14px',
-                      lineHeight: '18.23px',
-                      letterSpacing: '0%',
-                      color: '#00000080',
-                      opacity: 1,
-                    },
-                  }}
-                  InputProps={{
-                    disableUnderline: true,
-                    sx: {
-                      color: '#00000080',
-                      borderRadius: '5px',
-                      // border: '0.5px solid #00000080',
-                      height: '40px',
-                      background: '#FFFFFF',
-                      textAlign: 'center',
-                      padding: '0px 0px 15px 0px',
-                      fontFamily: 'SF Pro Display',
-                      fontWeight: 300,
-                      fontSize: '14px',
-                      lineHeight: '18.23px',
-                      letterSpacing: '0%',
-                      opacity: 1,
-                    },
-                  }}
-                  inputProps={{
-                    sx: {
-                      textAlign:  'left',
-                    },
-                  }}
-                  required
-                  name="secondary_skills"
-                  // value={secondarySkillName.join(', ')} // Show skills as comma-separated values
-                  // value={
-                  //   secondarySkillName.join(', ') || ''
-                  //   // (editAijd === true ? secondarySkillsAi : '')
-                  // }
-                  value={secondarySkillName}
-                  onChange={handleChangeSecondarySkills}
-                  error={secondarySkillForm}
-                 
-                />
-          
-        </Grid>
-      </Grid>
-    )}
-   
-      {/* domain skills */}
-      {!visibleSections.domain_skills && (
-      <Grid id="skills" item xs={12} sm={6} md={4} lg={3}>
-      <div style={{ display: 'flex', alignItems: 'center' }}>
-      <div style={{ fontFamily: '"Segoe Script", cursive', fontSize: '24px', fontWeight: 'bold', color: '#e65100' }}>
-        🧠	
-      </div>
-      <div style={{ fontSize: '15px', marginLeft: '4px' }}>
-        Specific Domain Skills<span style={{color:'red'}}> *</span>
-      </div>
-      </div>
-        <Grid sx={{display:'flex', alignItems:'center', justifyContent:'space-between',
-           color: '#00000080',
+                }}>
+                  <TextField
+                    fullWidth
+                    variant="filled"
+                    autoComplete="off"
+                    placeholder="Enter No. Of Open Positions"
+                    sx={{
+                      '& .MuiInputBase-input::placeholder': {
+                        fontFamily: 'SF Pro Display',
+                        fontWeight: 300,
+                        fontSize: '14px',
+                        lineHeight: '18.23px',
+                        letterSpacing: '0%',
+                        color: '#00000080',
+                        opacity: 1,
+                      },
+                    }}
+                    InputProps={{
+                      disableUnderline: true,
+                      style: {
+                        color: '#00000080',
+                        borderRadius: '5px',
+                        height: '40px',
+                        background: '#FFFFFF',
+                        textAlign: 'center',
+                        padding: '0px 0px 15px 0px',
+                        fontFamily: 'SF Pro Display',
+                        fontWeight: 300,
+                        fontSize: '14px',
+                        lineHeight: '18.23px',
+                        letterSpacing: '0%',
+                        opacity: 1,
+                      },
+                    }}
+                    inputProps={{
+                      inputMode: 'numeric',
+                      pattern: '[0-9]*',
+                      style: { textAlign: 'left' },
+                    }}
+                    required
+                    name="no_of_open_positions"
+                    value={formValues.no_of_open_positions.value}
+                    onChange={handleChange}
+                    error={formValues.no_of_open_positions.error}
+
+                  />
+
+
+                </Grid>
+              </Grid>
+
+            )}
+            {/* mode of work */}
+            {!visibleSections.mode_of_work && (
+              <Grid id="mode_of_work" item xs={12} sm={6} md={4} lg={3}>
+                <div style={{ display: 'flex', alignItems: 'center' }}>
+                  <div style={{ fontFamily: '"Segoe Script", cursive', fontSize: '24px', fontWeight: 'bold', color: '#e65100' }}>
+                    🏠
+                  </div>
+                  <div style={{ fontSize: '15px', marginLeft: '4px' }}>
+                    Mode Of Work<span style={{ color: 'red' }}> *</span>
+                  </div>
+                </div>
+                <Grid sx={{
+                  display: 'flex', alignItems: 'center', justifyContent: 'space-between',
+                  color: '#00000080',
                   borderRadius: '5px',
                   border: '0.5px solid #bdbdbd',
                   height: '40px',
@@ -2556,77 +2443,466 @@ setShowButtons(true)
                   lineHeight: '18.23px',
                   letterSpacing: '0%',
                   opacity: 1,
-        }}>
-                 <TextField
-                  fullWidth
-                  variant="filled"
-                  autoComplete="off"
-                  placeholder="Enter Specific domain skills"
-                  sx={{
-                    '& .MuiInputBase-input::placeholder': {
-                      fontFamily: 'SF Pro Display',
-                      fontWeight: 300,
-                      fontSize: '14px',
-                      lineHeight: '18.23px',
-                      letterSpacing: '0%',
-                      color: '#00000080',
-                      opacity: 1,
-                    },
-                  }}
-                  InputProps={{
-                    disableUnderline: true,
-                    sx: {
-                      color: '#00000080',
-                      borderRadius: '5px',
-                      // border: '0.5px solid #00000080',
-                      height: '40px',
-                      background: '#FFFFFF',
-                      textAlign: 'center',
-                      padding: '0px 0px 15px 0px',
-                      fontFamily: 'SF Pro Display',
-                      fontWeight: 300,
-                      fontSize: '14px',
-                      lineHeight: '18.23px',
-                      letterSpacing: '0%',
-                      opacity: 1,
-                    },
-                  }}
-                  inputProps={{
-                    sx: {
-                      textAlign:  'left',
-                    },
-                  }}
-                  required
-                  name="specific_domain_skills"
-                  // value={secondarySkillName.join(', ')} // Show skills as comma-separated values
-                  // value={
-                  //    specificDomainSkill.join(', ') || ''
-                  //   // (editAijd === true ? secondarySkillsAi : '')
-                  // }
-                   value={specificDomainSkill}
-                  onChange={handleChangeSpecificDomainSkills}
-                  error={specificDomainSkillForm}
-                 
-                />
-        
-        </Grid>
-      </Grid>
-    )}
+                }}>
+                  <FormControl sx={{ width: '100%', height: '40px' }}>
+                    <Select
+                      // value={modeOfWorkName || ''} // Ensure an empty value initially
+                      value={
+                        modeOfWorkName || ''
+                      }
+                      displayEmpty
+                      onChange={handleChangeModeOfWork}
+                      input={<OutlinedInput />}
+                      MenuProps={{
+                        PaperProps: {
+                          style: { color: '#000000', background: '#FFFFFF' },
+                        },
+                      }}
+                      style={{
+                        height: '40px',
+                        width: '100%',
+                        color: modeOfWorkName ? '#00000080' : '#00000080', // Darker text when selected
+                        background: '#FFFFFF',
+                        // border: '1px solid #00000080',
+                        borderRadius: '5px',
+                        padding: '5px 0px 5px 0px',
+                        direction: 'ltr',
+                        fontFamily: 'SF Pro Display',
+                        fontWeight: 300,
+                        fontSize: '14px',
+                        lineHeight: '18.23px',
+                        letterSpacing: '0%',
+                        opacity: 1,
+                      }}
+                    >
+                      {/* Placeholder Item (Disabled) */}
+                      <MenuItem value="" disabled>
+                        <span
+                          style={{
+                            display: 'flex',
+                            flexDirection: 'row',
+                            justifyContent: 'space-between',
+                            fontFamily: 'SF Pro Display',
+                            fontWeight: 300,
+                            fontSize: '14px',
+                            lineHeight: '18.23px',
+                            letterSpacing: '0%',
+                            color: '#00000080',
+                            opacity: 1,
+                          }}
+                        >
+                          {/* {t('selectModeOfWork')} */}
+                          Select work mode
+                        </span>
+                      </MenuItem>
 
-    
-      {/* Job location */}
-       {!visibleSections.location && (<>
-      <Grid id="location" item>
-      <div style={{ display: 'flex', alignItems: 'center' }}>
-      <div style={{ fontFamily: '"Segoe Script", cursive', fontSize: '24px', fontWeight: 'bold', color: '#e65100' }}>
-          📍
-      </div>
-      <div style={{ fontSize: '15px', marginLeft: '4px' }}>
-        Location<span style={{color:'red'}}> *</span>
-      </div>
-      </div>
-       <Grid sx={{display:'flex', alignItems:'center', justifyContent:'space-between',
-           color: '#00000080',
+                      {/* Actual Options */}
+                      {modeOfWorkNames.map((name) => (
+                        <MenuItem
+                          key={name}
+                          value={name}
+                          style={getStyles(name, modeOfWorkName, modeOfWorkTheme)}
+                        >
+                          {name}
+                        </MenuItem>
+                      ))}
+                    </Select>
+
+
+                  </FormControl>
+
+                </Grid>
+              </Grid>
+            )}
+
+            {/* primary skills */}
+            {!visibleSections.primary_skills && (
+              <Grid id="primary_skills" item xs={12} sm={6} md={4} lg={3}>
+                <div style={{ display: 'flex', alignItems: 'center' }}>
+                  <div style={{ fontFamily: '"Segoe Script", cursive', fontSize: '24px', fontWeight: 'bold', color: '#e65100' }}>
+                    🛠️
+                  </div>
+                  <div style={{ fontSize: '15px', marginLeft: '4px' }}>
+                    Primary Skills<span style={{ color: 'red' }}> *</span>
+                  </div>
+                </div>
+                <Grid sx={{
+                  display: 'flex', alignItems: 'center', justifyContent: 'space-between',
+                  color: '#00000080',
+                  borderRadius: '5px',
+                  border: '0.5px solid #bdbdbd',
+                  height: '40px',
+                  background: '#FFFFFF',
+                  textAlign: 'center',
+                  padding: '20px 0px 20px 0px',
+                  fontFamily: 'SF Pro Display',
+                  fontWeight: 300,
+                  fontSize: '14px',
+                  lineHeight: '18.23px',
+                  letterSpacing: '0%',
+                  opacity: 1,
+                }}>
+
+
+                  <TextField
+                    fullWidth
+                    variant="filled"
+                    autoComplete="off"
+                    placeholder="Enter primary skills"
+                    sx={{
+                      '& .MuiInputBase-input::placeholder': {
+                        fontFamily: 'SF Pro Display',
+                        fontWeight: 300,
+                        fontSize: '14px',
+                        lineHeight: '18.23px',
+                        letterSpacing: '0%',
+                        color: '#00000080',
+                        background: '#FFFFFF',
+                        opacity: 1,
+                      },
+                    }}
+                    InputProps={{
+                      disableUnderline: true,
+                      sx: {
+                        color: '#00000080',
+                        borderRadius: '5px',
+                        // border: '0.5px solid #00000080',
+                        height: '40px',
+                        background: '#FFFFFF',
+                        textAlign: 'center',
+                        padding: '0px 0px 15px 0px',
+                        fontFamily: 'SF Pro Display',
+                        fontWeight: 300,
+                        fontSize: '14px',
+                        lineHeight: '18.23px',
+                        letterSpacing: '0%',
+                        opacity: 1,
+                        '&:hover': {
+                          color: '#00000080',
+                          background: '#FFFFFF',
+                        },
+                      },
+                    }}
+                    inputProps={{
+                      sx: {
+                        textAlign: 'left',
+                      },
+                    }}
+                    required
+                    name="primary_skills"
+                    // value={primarySkillName.join(', ')} // Show skills as comma-separated values
+                    // value={
+                    //   primarySkillName.join(', ') || ''
+                    //   // (editAijd === true ? primarySkillsAi : '')
+                    // }
+                    value={primarySkillName}
+                    onChange={handleChangePrimarySkills}
+                    error={primarySkillForm}
+
+                  />
+
+                </Grid>
+              </Grid>
+            )}
+            {/* experience required */}
+            {!visibleSections.experience_required && (
+              <Grid id="experinece_required" item xs={12} sm={6} md={4} lg={3}>
+                <div style={{ display: 'flex', alignItems: 'center' }}>
+                  <div style={{ fontFamily: '"Segoe Script", cursive', fontSize: '24px', fontWeight: 'bold', color: '#e65100' }}>
+                    🎯
+                  </div>
+                  <div style={{ fontSize: '15px', marginLeft: '4px' }}>
+                    Experience Level<span style={{ color: 'red' }}> *</span>
+                  </div>
+                </div>
+                <Grid sx={{
+                  display: 'flex', alignItems: 'center', justifyContent: 'space-between',
+                  color: '#00000080',
+                  borderRadius: '5px',
+                  border: '0.5px solid #bdbdbd',
+                  height: '40px',
+                  background: '#FFFFFF',
+                  textAlign: 'center',
+                  padding: '20px 0px 20px 0px',
+                  fontFamily: 'SF Pro Display',
+                  fontWeight: 300,
+                  fontSize: '14px',
+                  lineHeight: '18.23px',
+                  letterSpacing: '0%',
+                  opacity: 1,
+                }}>
+                  <FormControl
+                    variant="standard"
+                    style={{
+                      width: '100%',
+                      border: '0.5px solid rgba(167, 219, 214, 0.72)',
+                      borderRadius: '15px',
+                      marginBottom: formValues.experience_required.error
+                        ? '5px'
+                        : '0px',
+                    }}
+                  >
+                    <Select
+                      disableUnderline
+                      defaultValue={'-'}
+                      displayEmpty
+                      name="experience_required"
+                      required
+                      style={{
+                        height: '40px',
+                        width: '100%',
+                        background: '#FFFFFF',
+                        // border: '0.5px solid #00000080',
+                        color: '#00000080',
+                        borderRadius: '5px',
+                        padding: '5px 0px 5px 15px',
+                        direction: 'ltr',
+                        fontFamily: 'SF Pro Display',
+                        fontWeight: 300,
+                        fontSize: '14px',
+                        lineHeight: '18.23px',
+                        letterSpacing: '0%',
+                        opacity: 1,
+                      }}
+                      MenuProps={{
+                        PaperProps: {
+                          style: {
+                            color: '#000000',
+                            background: '#FFFFFF',
+                            maxHeight: '150px', // Limit the dropdown height
+                            overflowY: 'auto', // Enable scrolling if needed
+                            marginTop: '5px', // Ensure it appears just below the input field
+                          },
+                        },
+                        anchorOrigin: {
+                          vertical: 'bottom',
+                          horizontal: 'left',
+                        },
+                        transformOrigin: {
+                          vertical: 'top',
+                          horizontal: 'left',
+                        },
+                        // getContentAnchorEl: null, // Ensures dropdown opens right below
+                      }}
+                      // value={formValues.experience_required.value}
+                      value={
+                        formValues.experience_required.value || ''
+                        // (editAijd === true ? experienceRequiredAi : '')
+                      }
+                      onChange={(e: any) => handleChange(e)}
+                      error={formValues.experience_required.error}
+                    >
+                      <MenuItem value="">
+                        <span
+                          style={{
+                            display: 'flex',
+                            flexDirection: 'row',
+                            justifyContent: 'space-between',
+                            fontFamily: 'SF Pro Display',
+                            fontWeight: 300,
+                            fontSize: '14px',
+                            lineHeight: '18.23px',
+                            letterSpacing: '0%',
+                            color: '#00000080',
+                            opacity: 1,
+                          }}
+                        >
+                          Select experience
+                        </span>
+                      </MenuItem>
+                      {experience.map((exp: any, index: number) => (
+                        <MenuItem key={index} value={exp}>
+                          {exp} years
+                        </MenuItem>
+                      ))}
+                    </Select>
+                  </FormControl>
+
+                </Grid>
+              </Grid>
+            )}
+
+            {/* secondary skills */}
+            {!visibleSections.secondary_skills && (
+              <Grid id="secondary_skills" item xs={12} sm={6} md={4} lg={3}>
+                <div style={{ display: 'flex', alignItems: 'center' }}>
+                  <div style={{ fontFamily: '"Segoe Script", cursive', fontSize: '24px', fontWeight: 'bold', color: '#e65100' }}>
+                    ⚙️
+                  </div>
+                  <div style={{ fontSize: '15px', marginLeft: '4px' }}>
+                    Secondary Skills<span style={{ color: 'red' }}> *</span>
+                  </div>
+                </div>
+                <Grid sx={{
+                  display: 'flex', alignItems: 'center', justifyContent: 'space-between',
+                  color: '#00000080',
+                  borderRadius: '5px',
+                  border: '0.5px solid #bdbdbd',
+                  height: '40px',
+                  background: '#FFFFFF',
+                  textAlign: 'center',
+                  padding: '20px 0px 20px 0px',
+                  fontFamily: 'SF Pro Display',
+                  fontWeight: 300,
+                  fontSize: '14px',
+                  lineHeight: '18.23px',
+                  letterSpacing: '0%',
+                  opacity: 1,
+                }}>
+                  <TextField
+                    fullWidth
+                    variant="filled"
+                    autoComplete="off"
+                    placeholder="Enter Secondary Skills"
+                    sx={{
+                      '& .MuiInputBase-input::placeholder': {
+                        fontFamily: 'SF Pro Display',
+                        fontWeight: 300,
+                        fontSize: '14px',
+                        lineHeight: '18.23px',
+                        letterSpacing: '0%',
+                        color: '#00000080',
+                        opacity: 1,
+                      },
+                    }}
+                    InputProps={{
+                      disableUnderline: true,
+                      sx: {
+                        color: '#00000080',
+                        borderRadius: '5px',
+                        // border: '0.5px solid #00000080',
+                        height: '40px',
+                        background: '#FFFFFF',
+                        textAlign: 'center',
+                        padding: '0px 0px 15px 0px',
+                        fontFamily: 'SF Pro Display',
+                        fontWeight: 300,
+                        fontSize: '14px',
+                        lineHeight: '18.23px',
+                        letterSpacing: '0%',
+                        opacity: 1,
+                      },
+                    }}
+                    inputProps={{
+                      sx: {
+                        textAlign: 'left',
+                      },
+                    }}
+                    required
+                    name="secondary_skills"
+                    // value={secondarySkillName.join(', ')} // Show skills as comma-separated values
+                    // value={
+                    //   secondarySkillName.join(', ') || ''
+                    //   // (editAijd === true ? secondarySkillsAi : '')
+                    // }
+                    value={secondarySkillName}
+                    onChange={handleChangeSecondarySkills}
+                    error={secondarySkillForm}
+
+                  />
+
+                </Grid>
+              </Grid>
+            )}
+
+            {/* domain skills */}
+            {!visibleSections.domain_skills && (
+              <Grid id="skills" item xs={12} sm={6} md={4} lg={3}>
+                <div style={{ display: 'flex', alignItems: 'center' }}>
+                  <div style={{ fontFamily: '"Segoe Script", cursive', fontSize: '24px', fontWeight: 'bold', color: '#e65100' }}>
+                    🧠
+                  </div>
+                  <div style={{ fontSize: '15px', marginLeft: '4px' }}>
+                    Specific Domain Skills<span style={{ color: 'red' }}> *</span>
+                  </div>
+                </div>
+                <Grid sx={{
+                  display: 'flex', alignItems: 'center', justifyContent: 'space-between',
+                  color: '#00000080',
+                  borderRadius: '5px',
+                  border: '0.5px solid #bdbdbd',
+                  height: '40px',
+                  background: '#FFFFFF',
+                  textAlign: 'center',
+                  padding: '20px 0px 20px 0px',
+                  fontFamily: 'SF Pro Display',
+                  fontWeight: 300,
+                  fontSize: '14px',
+                  lineHeight: '18.23px',
+                  letterSpacing: '0%',
+                  opacity: 1,
+                }}>
+                  <TextField
+                    fullWidth
+                    variant="filled"
+                    autoComplete="off"
+                    placeholder="Enter Specific domain skills"
+                    sx={{
+                      '& .MuiInputBase-input::placeholder': {
+                        fontFamily: 'SF Pro Display',
+                        fontWeight: 300,
+                        fontSize: '14px',
+                        lineHeight: '18.23px',
+                        letterSpacing: '0%',
+                        color: '#00000080',
+                        opacity: 1,
+                      },
+                    }}
+                    InputProps={{
+                      disableUnderline: true,
+                      sx: {
+                        color: '#00000080',
+                        borderRadius: '5px',
+                        // border: '0.5px solid #00000080',
+                        height: '40px',
+                        background: '#FFFFFF',
+                        textAlign: 'center',
+                        padding: '0px 0px 15px 0px',
+                        fontFamily: 'SF Pro Display',
+                        fontWeight: 300,
+                        fontSize: '14px',
+                        lineHeight: '18.23px',
+                        letterSpacing: '0%',
+                        opacity: 1,
+                      },
+                    }}
+                    inputProps={{
+                      sx: {
+                        textAlign: 'left',
+                      },
+                    }}
+                    required
+                    name="specific_domain_skills"
+                    // value={secondarySkillName.join(', ')} // Show skills as comma-separated values
+                    // value={
+                    //    specificDomainSkill.join(', ') || ''
+                    //   // (editAijd === true ? secondarySkillsAi : '')
+                    // }
+                    value={specificDomainSkill}
+                    onChange={handleChangeSpecificDomainSkills}
+                    error={specificDomainSkillForm}
+
+                  />
+
+                </Grid>
+              </Grid>
+            )}
+
+
+            {/* Job location */}
+            {!visibleSections.location && (<>
+              <Grid id="location" item>
+                <div style={{ display: 'flex', alignItems: 'center' }}>
+                  <div style={{ fontFamily: '"Segoe Script", cursive', fontSize: '24px', fontWeight: 'bold', color: '#e65100' }}>
+                    📍
+                  </div>
+                  <div style={{ fontSize: '15px', marginLeft: '4px' }}>
+                    Location<span style={{ color: 'red' }}> *</span>
+                  </div>
+                </div>
+                <Grid sx={{
+                  display: 'flex', alignItems: 'center', justifyContent: 'space-between',
+                  color: '#00000080',
                   borderRadius: '5px',
                   // border: '0.5px solid #bdbdbd',
                   height: '40px',
@@ -2639,299 +2915,299 @@ setShowButtons(true)
                   lineHeight: '18.23px',
                   letterSpacing: '0%',
                   opacity: 1,
-        }}>
-       <Grid
-                container
-                // spacing={2}
-                // justifyContent="space-between"
-                spacing={1}
-                direction="row"
-                // sx={{ padding: '0 36px' }}
-              >
-       
-        <Grid id="mainCountry" item xs={4}>
-                  <Autocomplete
-                    sx={{
-                      width: '100%',
-                      '& .MuiOutlinedInput-root': {
-                        // height: '40px',
-                        width: '100%',
+                }}>
+                  <Grid
+                    container
+                    // spacing={2}
+                    // justifyContent="space-between"
+                    spacing={1}
+                    direction="row"
+                  // sx={{ padding: '0 36px' }}
+                  >
 
-                        // fontSize: '12px',
-
-                        background: '#FFFFFF',
-                        // border: '0.5px solid #00000080',
-                        color: '#00000080',
-                        borderRadius: '5px',
-                        padding: '0px 0px 0px 15px',
-                        
-
-                        fontFamily: 'SF Pro Display',
-                        fontWeight: 300,
-                        fontSize: '14px',
-                        lineHeight: '18.23px',
-                        letterSpacing: '0%',
-
-                        opacity: 1,
-
-                        height: '44px',
-                        // // borderRadius: '12px',
-                        border: '1px solid #bdbdbd',
-                        '& fieldset': { borderColor: 'transparent' },
-                        '&:hover fieldset': { borderColor: 'transparent' },
-                        '&.Mui-focused fieldset': {
-                          borderColor: 'transparent',
-                        },
-                      },
-                    }}
-                    // value={selectedCountry || null}
-                    value={
-                      selectedCountry || null
-                      // selectedCountry || (editAijd === true ? countryAi : null)
-                    }
-                    options={countries}
-                    getOptionLabel={(option) => option.name}
-                    onChange={(event, newValue) => {
-                      if (newValue) {
-                        setCountryIso2(newValue.iso2)
-                        setSelectedCountry(newValue)
-                        setSelectedCountryValue(newValue.name)
-                        setCountryError(false)
-
-                        // Reset state and city when country changes
-                        setStateIso2('')
-                        setSelectedState('')
-                        setSelectedStateValue('')
-                        // setStateError(false)
-
-                        setSelectedCity('')
-                        setSelectedCityValue('')
-                        // setCityError(false)
-                      } else {
-                        setCountryIso2('')
-                        setSelectedCountry('')
-                        setCountryError(true)
-
-                        // Reset state and city when no country is selected
-                        setStateIso2('')
-                        setSelectedState('')
-                        setSelectedStateValue('')
-                        // setStateError(false)
-
-                        setSelectedCity('')
-                        setSelectedCityValue('')
-                        // setCityError(false)
-                      }
-                    }}
-                    renderInput={(params) => (
-                      <TextField
-                        {...params}
-                        placeholder='Country'
+                    <Grid id="mainCountry" item xs={4}>
+                      <Autocomplete
                         sx={{
-                          '& .MuiInputBase-input::placeholder': {
+                          width: '100%',
+                          '& .MuiOutlinedInput-root': {
+                            // height: '40px',
+                            width: '100%',
+
+                            // fontSize: '12px',
+
+                            background: '#FFFFFF',
+                            // border: '0.5px solid #00000080',
+                            color: '#00000080',
+                            borderRadius: '5px',
+                            padding: '0px 0px 0px 15px',
+
+
                             fontFamily: 'SF Pro Display',
                             fontWeight: 300,
                             fontSize: '14px',
                             lineHeight: '18.23px',
                             letterSpacing: '0%',
-                            color: '#00000080',
+
                             opacity: 1,
+
+                            height: '44px',
+                            // // borderRadius: '12px',
+                            border: '1px solid #bdbdbd',
+                            '& fieldset': { borderColor: 'transparent' },
+                            '&:hover fieldset': { borderColor: 'transparent' },
+                            '&.Mui-focused fieldset': {
+                              borderColor: 'transparent',
+                            },
                           },
                         }}
-                      
-                        helperText={countryError}
-                        // helperText={countryError ? "Please select a country" : ""}
+                        // value={selectedCountry || null}
+                        value={
+                          selectedCountry || null
+                          // selectedCountry || (editAijd === true ? countryAi : null)
+                        }
+                        options={countries}
+                        getOptionLabel={(option) => option.name}
+                        onChange={(event, newValue) => {
+                          if (newValue) {
+                            setCountryIso2(newValue.iso2)
+                            setSelectedCountry(newValue)
+                            setSelectedCountryValue(newValue.name)
+                            setCountryError(false)
+
+                            // Reset state and city when country changes
+                            setStateIso2('')
+                            setSelectedState('')
+                            setSelectedStateValue('')
+                            // setStateError(false)
+
+                            setSelectedCity('')
+                            setSelectedCityValue('')
+                            // setCityError(false)
+                          } else {
+                            setCountryIso2('')
+                            setSelectedCountry('')
+                            setCountryError(true)
+
+                            // Reset state and city when no country is selected
+                            setStateIso2('')
+                            setSelectedState('')
+                            setSelectedStateValue('')
+                            // setStateError(false)
+
+                            setSelectedCity('')
+                            setSelectedCityValue('')
+                            // setCityError(false)
+                          }
+                        }}
+                        renderInput={(params) => (
+                          <TextField
+                            {...params}
+                            placeholder='Country'
+                            sx={{
+                              '& .MuiInputBase-input::placeholder': {
+                                fontFamily: 'SF Pro Display',
+                                fontWeight: 300,
+                                fontSize: '14px',
+                                lineHeight: '18.23px',
+                                letterSpacing: '0%',
+                                color: '#00000080',
+                                opacity: 1,
+                              },
+                            }}
+
+                            helperText={countryError}
+                          // helperText={countryError ? "Please select a country" : ""}
+                          />
+                        )}
                       />
-                    )}
-                  />
-                  {countryError ? (
-                    <p style={{ color: 'red', margin: '0px', padding: '0px' }}>
-                      select country
-                    </p>
-                  ) : (
-                    ''
-                  )}
-                </Grid>
-        
-        <Grid id="mainState" item xs={4}>
-                  <Autocomplete
-                    sx={{
-                      width: '100%',
-                      '& .MuiOutlinedInput-root': {
-                        // height: '40px',
-                        width: '100%',
+                      {countryError ? (
+                        <p style={{ color: 'red', margin: '0px', padding: '0px' }}>
+                          select country
+                        </p>
+                      ) : (
+                        ''
+                      )}
+                    </Grid>
 
-                        // fontSize: '12px',
-
-                        background: '#FFFFFF',
-                        border: '0.5px solid #bdbdbd',
-                        color: '#00000080',
-                        borderRadius: '5px',
-                        padding: '5px 0px 5px 15px',
-
-                        fontFamily: 'SF Pro Display',
-                        fontWeight: 300,
-                        fontSize: '14px',
-                        lineHeight: '18.23px',
-                        letterSpacing: '0%',
-
-                        opacity: 1,
-                        height: '44px',
-                        // borderRadius: '12px',
-                        // border: '1px solid #00000080',
-                        '& fieldset': { borderColor: 'transparent' },
-                        '&:hover fieldset': { borderColor: 'transparent' },
-                        '&.Mui-focused fieldset': {
-                          borderColor: 'transparent',
-                        },
-                      },
-                    }}
-                    options={states}
-                    // value={selectedState || null} // Ensure the selected value updates
-                    value={
-                      selectedState || null
-                    }
-                    getOptionLabel={(option) => option.name}
-                    onChange={(event, newValue) => {
-                      if (newValue && selectedCountry) {
-                        setStateIso2(newValue.iso2)
-                        setSelectedState(newValue)
-                        setSelectedStateValue(newValue.name)
-                        setStateError(false)
-
-                        setSelectedCity('')
-                        setSelectedCityValue('')
-                        setCityError(false)
-                        setLocationError(false)
-                      } else {
-                        setStateIso2('')
-                        setSelectedState('')
-                        setStateError(true)
-
-                        setSelectedCity('')
-                        setSelectedCityValue('')
-                        setCityError(false)
-                        setLocationError(false)
-                      }
-                    }}
-                    renderInput={(params) => (
-                      <TextField
-                        {...params}
-                        placeholder="State"
+                    <Grid id="mainState" item xs={4}>
+                      <Autocomplete
                         sx={{
-                          '& .MuiInputBase-input::placeholder': {
+                          width: '100%',
+                          '& .MuiOutlinedInput-root': {
+                            // height: '40px',
+                            width: '100%',
+
+                            // fontSize: '12px',
+
+                            background: '#FFFFFF',
+                            border: '0.5px solid #bdbdbd',
+                            color: '#00000080',
+                            borderRadius: '5px',
+                            padding: '5px 0px 5px 15px',
+
                             fontFamily: 'SF Pro Display',
                             fontWeight: 300,
                             fontSize: '14px',
                             lineHeight: '18.23px',
                             letterSpacing: '0%',
-                            color: '#00000080',
+
                             opacity: 1,
+                            height: '44px',
+                            // borderRadius: '12px',
+                            // border: '1px solid #00000080',
+                            '& fieldset': { borderColor: 'transparent' },
+                            '&:hover fieldset': { borderColor: 'transparent' },
+                            '&.Mui-focused fieldset': {
+                              borderColor: 'transparent',
+                            },
                           },
                         }}
-                        helperText={stateError}
+                        options={states}
+                        // value={selectedState || null} // Ensure the selected value updates
+                        value={
+                          selectedState || null
+                        }
+                        getOptionLabel={(option) => option.name}
+                        onChange={(event, newValue) => {
+                          if (newValue && selectedCountry) {
+                            setStateIso2(newValue.iso2)
+                            setSelectedState(newValue)
+                            setSelectedStateValue(newValue.name)
+                            setStateError(false)
+
+                            setSelectedCity('')
+                            setSelectedCityValue('')
+                            setCityError(false)
+                            setLocationError(false)
+                          } else {
+                            setStateIso2('')
+                            setSelectedState('')
+                            setStateError(true)
+
+                            setSelectedCity('')
+                            setSelectedCityValue('')
+                            setCityError(false)
+                            setLocationError(false)
+                          }
+                        }}
+                        renderInput={(params) => (
+                          <TextField
+                            {...params}
+                            placeholder="State"
+                            sx={{
+                              '& .MuiInputBase-input::placeholder': {
+                                fontFamily: 'SF Pro Display',
+                                fontWeight: 300,
+                                fontSize: '14px',
+                                lineHeight: '18.23px',
+                                letterSpacing: '0%',
+                                color: '#00000080',
+                                opacity: 1,
+                              },
+                            }}
+                            helperText={stateError}
+                          />
+                        )}
+                        disabled={!selectedCountry} // Disable until a country is selected
                       />
-                    )}
-                    disabled={!selectedCountry} // Disable until a country is selected
-                  />
-                  {stateError ? (
-                    <p style={{ color: 'red', margin: '0px', padding: '0px' }}>
-                      selet state
-                    </p>
-                  ) : (
-                    ''
-                  )}
-                </Grid>
-        
-          <Grid id="mainCity" item xs={3.9}>
-                  <Autocomplete
-                    sx={{
-                      width: '100%',
-                      '& .MuiOutlinedInput-root': {
-                        // height: '40px',
-                        width: '100%',
+                      {stateError ? (
+                        <p style={{ color: 'red', margin: '0px', padding: '0px' }}>
+                          selet state
+                        </p>
+                      ) : (
+                        ''
+                      )}
+                    </Grid>
 
-                        // fontSize: '12px',
-
-                        background: '#FFFFFF',
-                        border: '0.5px solid #bdbdbd',
-                        color: '#00000080',
-                        borderRadius: '5px',
-                        padding: '0px 0px 0px 15px',
-
-                        fontFamily: 'SF Pro Display',
-                        fontWeight: 300,
-                        fontSize: '14px',
-                        lineHeight: '18.23px',
-                        letterSpacing: '0%',
-
-                        opacity: 1,
-
-                        height: '44px',
-                        // // borderRadius: '12px',
-                        // border: '1px solid #00000080',
-                        '& fieldset': { borderColor: 'transparent' },
-                        '&:hover fieldset': { borderColor: 'transparent' },
-                        '&.Mui-focused fieldset': {
-                          borderColor: 'transparent',
-                        },
-                      },
-                    }}
-                    // value={selectedCity || null} // Ensure the selected value updates
-                    value={selectedCity || null
-                      // selectedCity || (editAijd === true ? cityAi : null)
-                    }
-                    options={cities}
-                    getOptionLabel={(option) => option.name}
-                    onChange={(event, newValue) => {
-                      console.log('Selected City:', newValue)
-                      if (newValue) {
-                        setSelectedCity(newValue)
-                        setSelectedCityValue(newValue.name)
-                        setCityError(false)
-                      } else {
-                        setSelectedCity('')
-                        setCityError(true)
-                      }
-                    }}
-                    renderInput={(params) => (
-                      <TextField
-                        {...params}
-                        placeholder="City"
+                    <Grid id="mainCity" item xs={3.9}>
+                      <Autocomplete
                         sx={{
-                          '& .MuiInputBase-input::placeholder': {
+                          width: '100%',
+                          '& .MuiOutlinedInput-root': {
+                            // height: '40px',
+                            width: '100%',
+
+                            // fontSize: '12px',
+
+                            background: '#FFFFFF',
+                            border: '0.5px solid #bdbdbd',
+                            color: '#00000080',
+                            borderRadius: '5px',
+                            padding: '0px 0px 0px 15px',
+
                             fontFamily: 'SF Pro Display',
                             fontWeight: 300,
                             fontSize: '14px',
                             lineHeight: '18.23px',
                             letterSpacing: '0%',
-                            color: '#00000080',
+
                             opacity: 1,
+
+                            height: '44px',
+                            // // borderRadius: '12px',
+                            // border: '1px solid #00000080',
+                            '& fieldset': { borderColor: 'transparent' },
+                            '&:hover fieldset': { borderColor: 'transparent' },
+                            '&.Mui-focused fieldset': {
+                              borderColor: 'transparent',
+                            },
                           },
                         }}
-                        helperText={cityError}
+                        // value={selectedCity || null} // Ensure the selected value updates
+                        value={selectedCity || null
+                          // selectedCity || (editAijd === true ? cityAi : null)
+                        }
+                        options={cities}
+                        getOptionLabel={(option) => option.name}
+                        onChange={(event, newValue) => {
+                          console.log('Selected City:', newValue)
+                          if (newValue) {
+                            setSelectedCity(newValue)
+                            setSelectedCityValue(newValue.name)
+                            setCityError(false)
+                          } else {
+                            setSelectedCity('')
+                            setCityError(true)
+                          }
+                        }}
+                        renderInput={(params) => (
+                          <TextField
+                            {...params}
+                            placeholder="City"
+                            sx={{
+                              '& .MuiInputBase-input::placeholder': {
+                                fontFamily: 'SF Pro Display',
+                                fontWeight: 300,
+                                fontSize: '14px',
+                                lineHeight: '18.23px',
+                                letterSpacing: '0%',
+                                color: '#00000080',
+                                opacity: 1,
+                              },
+                            }}
+                            helperText={cityError}
+                          />
+                        )}
+                        disabled={!selectedState} // Disable until a state is selected
                       />
-                    )}
-                    disabled={!selectedState} // Disable until a state is selected
-                  />
-                  {cityError ? (
-                    <p style={{ color: 'red', margin: '0px', padding: '0px' }}>
-                      select city
-                    </p>
-                  ) : (
-                    ''
-                  )}
+                      {cityError ? (
+                        <p style={{ color: 'red', margin: '0px', padding: '0px' }}>
+                          select city
+                        </p>
+                      ) : (
+                        ''
+                      )}
+                    </Grid>
+                  </Grid>
+
+
                 </Grid>
-      </Grid>
 
-     
-      </Grid>
 
-  
-      </Grid>
-      </>)}
+              </Grid>
+            </>)}
           </Grid>
-     
+
 
         </div>
 
@@ -2943,725 +3219,734 @@ setShowButtons(true)
           gap: '20px'
         }}>
           <div style={{ display: 'flex', gap: '15px' }}>
-           
-      <React.Fragment>
-    
-      <Dialog
-        open={openPreview}
-        // onClose={handleClosePreview}
-         onClose={(event, reason) => {
-            if (reason !== 'backdropClick' && reason !== 'escapeKeyDown') {
-            handleClosePreview();
-            }
-        }}
-        scroll={scrollPreview}
-        aria-labelledby="scroll-dialog-title"
-        aria-describedby="scroll-dialog-description"
-      >
-        <DialogTitle><Grid  sx={{
-      display: 'flex',
-      alignItems: 'center',
-      justifyContent: 'space-between',
-      width: '100%',
-    }}>
-          <Grid id="scroll-dialog-title" 
-        sx={{color: 'rgba(2, 132, 199, 1)',
-           fontFamily: 'SF Pro Display',
-  fontWeight: 700,
-  fontSize: '16px',
-  lineHeight: '100%',
-  letterSpacing: '0%',}}>
-    Review & Customize Your AI-Generated Job Description
 
-          </Grid>
-          <Grid>
-<Button onClick={handleClosePreview}>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<CancelPresentationIcon sx={{color:'red', '&:hover':{backgroundColor:'red', color:'#fff'}}}/></Button>
+            <React.Fragment>
 
-          </Grid>
-          </Grid>
-           </DialogTitle>
-        <DialogContent dividers={scrollPreview === 'paper'}>
-          <DialogContentText
-            id="scroll-dialog-description"
-            ref={descriptionElementRef}
-            tabIndex={-1}
-          >
-      <Grid id="job_title" item xs={12} sm={6} md={4} lg={3}>
-      <div style={{ display: 'flex', alignItems: 'center' }}>
-      <div style={{ fontFamily: '"Segoe Script", cursive', fontSize: '24px', fontWeight: 'bold', color: '#e65100' }}>
-        	🧾
-      </div>
-      <div style={{ fontSize: '15px', marginLeft: '4px' }}>
-        Job Title
-      </div>
-      </div>
-        <Grid sx={{display:'flex', alignItems:'center', justifyContent:'space-between',
-           color: '#00000080',
-                  borderRadius: '5px',
-                  border: '0.5px solid #bdbdbd',
-                  height: '40px',
-                  background: '#FFFFFF',
-                  textAlign: 'center',
-                  padding: '20px 0px 20px 0px',
-                  fontFamily: 'SF Pro Display',
-                  fontWeight: 300,
-                  fontSize: '14px',
-                  lineHeight: '18.23px',
-                  letterSpacing: '0%',
-                  opacity: 1,
-        }}>
-          <TextField
-              fullWidth
-              variant="filled"
-              autoComplete="off"
-              placeholder="Job Title"
-              sx={{
-                '& .MuiInputBase-input::placeholder': {
-                  fontFamily: 'SF Pro Display',
-                  fontWeight: 300,
-                  fontSize: '14px',
-                  lineHeight: '18.23px',
-                  letterSpacing: '0%',
-                  color: '#00000080',
-                  opacity: 1,
-                },
-              }}
-              InputProps={{
-                disableUnderline: true,
-                style: {
-                  color: '#00000080',
-
-                  borderRadius: '5px',
-                  //   border: '1px solid #0284C7',
-                  // border: '0.5px solid #00000080',
-                  height: '40px',
-                  background: '#FFFFFF',
-                  textAlign: 'center',
-                  padding: '0px 0px 15px 0px',
-
-                  fontFamily: 'SF Pro Display',
-                  fontWeight: 300,
-                  fontSize: '14px',
-                  lineHeight: '18.23px',
-                  letterSpacing: '0%',
-
-                  opacity: 1,
-                },
-              }}
-              inputProps={{
-                style: { textAlign:  'left' },
-              }}
-              required
-              name="job_title"
-              // value={ formValues.job_title.value}
-              value={
-                jobTitleAi  || ''
-                // ||
-                // (editAijd === true ? jobTitleAi : '')
-              }
-  onChange={handleChangeAi}
-               error={!!formErrorsAi.job_title}
-  helperText={formErrorsAi.job_title}
-            />
-
-      
-        </Grid>
-      </Grid>
-
- 
-
-   <Grid id="job_role" item xs={12} sm={6} md={4} lg={3}>
-      <div style={{ display: 'flex', alignItems: 'center' }}>
-      <div style={{ fontFamily: '"Segoe Script", cursive', fontSize: '24px', fontWeight: 'bold', color: '#e65100' }}>
-        	👤
-      </div>
-      <div style={{ fontSize: '15px', marginLeft: '4px' }}>
-        Job Role
-      </div>
-      </div>
-        <Grid sx={{display:'flex', alignItems:'center', justifyContent:'space-between',
-           color: '#00000080',
-                  borderRadius: '5px',
-                  border: '0.5px solid #bdbdbd',
-                  height: '40px',
-                  background: '#FFFFFF',
-                  textAlign: 'center',
-                  padding: '20px 0px 20px 0px',
-                  fontFamily: 'SF Pro Display',
-                  fontWeight: 300,
-                  fontSize: '14px',
-                  lineHeight: '18.23px',
-                  letterSpacing: '0%',
-                  opacity: 1,
-        }}>
-          <Autocomplete
-              freeSolo
-              options={jobCategory}
-              loading={jobCategoryLoading}
-              // value={formValues.job_role.value || (editAijd ? jobRoleAi : '')}
-              value={formValues.job_role.value ||  ''}
-              inputValue={jobCategoryInput}
-              onInputChange={(e, newInputValue) => {
-                setJobCategoryInput(newInputValue)
-                fetchCategories(newInputValue)
-              }}
-              onChange={(e, newValue) => {
-                const syntheticEvent = {
-                  target: {
-                    name: 'job_role',
-                    value: newValue || '',
-                  },
-                } as React.ChangeEvent<HTMLInputElement>
-
-                handleChange(syntheticEvent)
-              }}
-              sx={{
-                width: '100%',
-                '& .MuiOutlinedInput-root': {
-                  height: '40px',
-                  backgroundColor: '#FFFFFF',
-                  borderRadius: '5px',
-                  padding: '5px 0px 5px 15px',
-                  fontFamily: 'SF Pro Display',
-                  fontWeight: 300,
-                  fontSize: '14px',
-                  lineHeight: '18.23px',
-                  letterSpacing: '0%',
-                  color: '#00000080',
-                  // border: '0.5px solid transparent',
-                  direction: 'ltr',
-                },
-                '& .MuiInputBase-input': {
-                  padding: 0,
-                },
-                '& .MuiInputBase-input::placeholder': {
-                  fontFamily: 'SF Pro Display',
-                  fontWeight: 300,
-                  fontSize: '14px',
-                  lineHeight: '18.23px',
-                  letterSpacing: '0%',
-                  color: '#00000080',
-                  opacity: 1,
-                },
-              }}
-              renderInput={(params) => (
-                <TextField
-                  {...params}
-                  placeholder="Type or search role"
-                  variant="outlined"
-                  fullWidth
-                  error={formValues.job_role.error}
-                  InputProps={{
-                    ...params.InputProps,
-                    endAdornment: (
-                      <Box
-                        sx={{
-                          display: 'flex',
-                          alignItems: 'center',
-                          minWidth: '30px',
-                        }}
-                      >
-                        {jobCategoryLoading ? (
-                          <CircularProgress color="inherit" size={20} />
-                        ) : null}
-                        {params.InputProps.endAdornment}
-                      </Box>
-                    ),
-                  }}
-                />
-              )}
-            />
-           
-        
-        </Grid>
-      </Grid>
-
-
-
-  <Grid id="job_type" item xs={12} sm={6} md={4} lg={3}>
-      <div style={{ display: 'flex', alignItems: 'center' }}>
-      <div style={{ fontFamily: '"Segoe Script", cursive', fontSize: '24px', fontWeight: 'bold', color: '#e65100' }}>
-        💼
-      </div>
-      <div style={{ fontSize: '15px', marginLeft: '4px' }}>
-        Job Type
-      </div>
-      </div>
-        <Grid sx={{display:'flex', alignItems:'center', justifyContent:'space-between',
-           color: '#00000080',
-                  borderRadius: '5px',
-                  border: '0.5px solid #bdbdbd',
-                  height: '40px',
-                  background: '#FFFFFF',
-                  textAlign: 'center',
-                  padding: '17px 0px 17px 0px',
-                  fontFamily: 'SF Pro Display',
-                  fontWeight: 300,
-                  fontSize: '14px',
-                  lineHeight: '18.23px',
-                  letterSpacing: '0%',
-                  opacity: 1,
-        }}>
-          <FormControl sx={{ width: '100%', height: '45px', paddingTop:'5px' }}>
-                  <Select
-                    // value={jobTypeName || ''}
-                    displayEmpty
+              <Dialog
+                open={openPreview}
+                // onClose={handleClosePreview}
+                onClose={(event, reason) => {
+                  if (reason !== 'backdropClick' && reason !== 'escapeKeyDown') {
+                    handleClosePreview();
+                  }
+                }}
+                scroll={scrollPreview}
+                aria-labelledby="scroll-dialog-title"
+                aria-describedby="scroll-dialog-description"
+              >
+                <DialogTitle><Grid sx={{
+                  display: 'flex',
+                  alignItems: 'center',
+                  justifyContent: 'space-between',
+                  width: '100%',
+                }}>
+                  <Grid id="scroll-dialog-title"
                     sx={{
-                      height: '40px',
-                      width: '100%',
-                      color: jobTypeAi ? '#00000080' : '#00000080', //Placeholder color
-                      background: '#FFFFFF',
-                      // border: '1px solid #00000080',
-                      borderRadius: '5px',
-                      padding: '5px 0px 5px 0px',
-                      direction:  'ltr',
-
+                      color: 'rgba(2, 132, 199, 1)',
                       fontFamily: 'SF Pro Display',
-                      fontWeight: 300,
-                      fontSize: '14px',
-                      lineHeight: '18.23px',
+                      fontWeight: 700,
+                      fontSize: '16px',
+                      lineHeight: '100%',
                       letterSpacing: '0%',
+                    }}>
+                    Review & Customize Your AI-Generated Job Description
 
-                      opacity: 1,
-                      '& .MuiButtonBase-root': {
-                        fontFamily: 'SF Pro Display',
-                        fontWeight: 300,
-                        fontSize: '14px',
-                        lineHeight: '18.23px',
-                        letterSpacing: '0%',
-                        color: '#000000',
-                      },
-                      '& .MuiMenuItem-root': {
-                        fontFamily: 'SF Pro Display',
-                        fontWeight: 300,
-                        fontSize: '14px',
-                        lineHeight: '18.23px',
-                        letterSpacing: '0%',
-                        color: '#000000',
-                      },
-                    }}
-                     value={jobTypeAi}
-    onChange={handleChangeJobTypeAi}
-                    input={<OutlinedInput />}
-                    MenuProps={{
-                      PaperProps: {
-                        style: { color: '#000000', background: '#FFFFFF' },
-                      },
-                    }}
+                  </Grid>
+                  <Grid>
+                    <Button onClick={handleClosePreview}>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<CancelPresentationIcon sx={{ color: 'red', '&:hover': { backgroundColor: 'red', color: '#fff' } }} /></Button>
+
+                  </Grid>
+                </Grid>
+                </DialogTitle>
+                <DialogContent dividers={scrollPreview === 'paper'}>
+                  <DialogContentText
+                    id="scroll-dialog-description"
+                    ref={descriptionElementRef}
+                    tabIndex={-1}
                   >
-                    {/* Placeholder Item */}
-                    <MenuItem value="" disabled>
-                      <span
-                        style={{
-                          display: 'flex',
-                          flexDirection: 'row',
-                          justifyContent: 'space-between',
+                    <Grid id="job_title" item xs={12} sm={6} md={4} lg={3}>
+                      <div style={{ display: 'flex', alignItems: 'center' }}>
+                        <div style={{ fontFamily: '"Segoe Script", cursive', fontSize: '24px', fontWeight: 'bold', color: '#e65100' }}>
+                          🧾
+                        </div>
+                        <div style={{ fontSize: '15px', marginLeft: '4px' }}>
+                          Job Title
+                        </div>
+                      </div>
+                      <Grid sx={{
+                        display: 'flex', alignItems: 'center', justifyContent: 'space-between',
+                        color: '#00000080',
+                        borderRadius: '5px',
+                        border: '0.5px solid #bdbdbd',
+                        height: '40px',
+                        background: '#FFFFFF',
+                        textAlign: 'center',
+                        padding: '20px 0px 20px 0px',
+                        fontFamily: 'SF Pro Display',
+                        fontWeight: 300,
+                        fontSize: '14px',
+                        lineHeight: '18.23px',
+                        letterSpacing: '0%',
+                        opacity: 1,
+                      }}>
+                        <TextField
+                          fullWidth
+                          variant="filled"
+                          autoComplete="off"
+                          placeholder="Job Title"
+                          sx={{
+                            '& .MuiInputBase-input::placeholder': {
+                              fontFamily: 'SF Pro Display',
+                              fontWeight: 300,
+                              fontSize: '14px',
+                              lineHeight: '18.23px',
+                              letterSpacing: '0%',
+                              color: '#00000080',
+                              opacity: 1,
+                            },
+                          }}
+                          InputProps={{
+                            disableUnderline: true,
+                            style: {
+                              color: '#00000080',
 
-                          fontFamily: 'SF Pro Display',
-                          fontWeight: 300,
-                          fontSize: '14px',
-                          lineHeight: '18.23px',
-                          letterSpacing: '0%',
-                          color: '#00000080',
-                          opacity: 1,
-                        }}
-                      >
-                        {/* {t('selectJobType')} */}
-                        Select Job Type
-                      </span>
-                    </MenuItem>
+                              borderRadius: '5px',
+                              //   border: '1px solid #0284C7',
+                              // border: '0.5px solid #00000080',
+                              height: '40px',
+                              background: '#FFFFFF',
+                              textAlign: 'center',
+                              padding: '0px 0px 15px 0px',
 
-                    {/* Actual Options */}
-                    {jobTypeNames.map((name) => (
-                      <MenuItem
-                        key={name}
-                        value={name}
-                        style={getStyles(name, jobTypeName, jobTypeTheme)}
-                      >
-                        {name}
-                      </MenuItem>
-                    ))}
-                  </Select>
+                              fontFamily: 'SF Pro Display',
+                              fontWeight: 300,
+                              fontSize: '14px',
+                              lineHeight: '18.23px',
+                              letterSpacing: '0%',
 
-                  
-                </FormControl>
-       
-        </Grid>
-      </Grid>
+                              opacity: 1,
+                            },
+                          }}
+                          inputProps={{
+                            style: { textAlign: 'left' },
+                          }}
+                          required
+                          name="job_title"
+                          // value={ formValues.job_title.value}
+                          value={
+                            jobTitleAi || ''
+                            // ||
+                            // (editAijd === true ? jobTitleAi : '')
+                          }
+                          onChange={handleChangeAi}
+                          error={!!formErrorsAi.job_title}
+                          helperText={formErrorsAi.job_title}
+                        />
 
 
-     <Grid id="no_of_open_positions" item xs={12} sm={6} md={4} lg={3}>
-      <div style={{ display: 'flex', alignItems: 'center' }}>
-      <div style={{ fontFamily: '"Segoe Script", cursive', fontSize: '24px', fontWeight: 'bold', color: '#e65100' }}>
-        	📌
-      </div>
-      <div style={{ fontSize: '15px', marginLeft: '4px' }}>
-        Open Positions <span style={{color:'red'}}> *</span>
+                      </Grid>
+                    </Grid>
 
-      </div>
-      </div>
-        <Grid sx={{display:'flex', alignItems:'center', justifyContent:'space-between',
-           color: '#00000080',
-                  borderRadius: '5px',
-                  border: '0.5px solid #bdbdbd',
-                  height: '40px',
-                  background: '#FFFFFF',
-                  textAlign: 'center',
-                  padding: '20px 0px 20px 0px',
-                  fontFamily: 'SF Pro Display',
-                  fontWeight: 300,
-                  fontSize: '14px',
-                  lineHeight: '18.23px',
-                  letterSpacing: '0%',
-                  opacity: 1,
-        }}>
-         <TextField
-      fullWidth
-      variant="filled"
-      autoComplete="off"
-      placeholder="Enter No. Of Open Positions"
-      sx={{
-        '& .MuiInputBase-input::placeholder': {
-          fontFamily: 'SF Pro Display',
-          fontWeight: 300,
-          fontSize: '14px',
-          lineHeight: '18.23px',
-          letterSpacing: '0%',
-          color: '#00000080',
-          opacity: 1,
-        },
-      }}
-      InputProps={{
-        disableUnderline: true,
-        style: {
-          color: '#00000080',
-          borderRadius: '5px',
-          height: '40px',
-          background: '#FFFFFF',
-          textAlign: 'center',
-          padding: '0px 0px 15px 0px',
-          fontFamily: 'SF Pro Display',
-          fontWeight: 300,
-          fontSize: '14px',
-          lineHeight: '18.23px',
-          letterSpacing: '0%',
-          opacity: 1,
-        },
-      }}
-      inputProps={{
-        inputMode: 'numeric',
-        pattern: '[0-9]*',
-        style: { textAlign: 'left' },
-      }}
-      required
-      name="no_of_open_positions"
-      value={formValues.no_of_open_positions.value}
-      onChange={handleChange}
-      error={formValues.no_of_open_positions.error}
-      // helperText={
-      //   formValues.no_of_open_positions.error
-      //     ? formValues.no_of_open_positions.errorMessage
-      //     : ''
-      // }
-    />
 
-          {/* <Grid sx={{padding: '15px 0px 15px 0px',}}>
+
+                    <Grid id="job_role" item xs={12} sm={6} md={4} lg={3}>
+                      <div style={{ display: 'flex', alignItems: 'center' }}>
+                        <div style={{ fontFamily: '"Segoe Script", cursive', fontSize: '24px', fontWeight: 'bold', color: '#e65100' }}>
+                          👤
+                        </div>
+                        <div style={{ fontSize: '15px', marginLeft: '4px' }}>
+                          Job Role
+                        </div>
+                      </div>
+                      <Grid sx={{
+                        display: 'flex', alignItems: 'center', justifyContent: 'space-between',
+                        color: '#00000080',
+                        borderRadius: '5px',
+                        border: '0.5px solid #bdbdbd',
+                        height: '40px',
+                        background: '#FFFFFF',
+                        textAlign: 'center',
+                        padding: '20px 0px 20px 0px',
+                        fontFamily: 'SF Pro Display',
+                        fontWeight: 300,
+                        fontSize: '14px',
+                        lineHeight: '18.23px',
+                        letterSpacing: '0%',
+                        opacity: 1,
+                      }}>
+                        <Autocomplete
+                          freeSolo
+                          options={jobCategory}
+                          loading={jobCategoryLoading}
+                          // value={formValues.job_role.value || (editAijd ? jobRoleAi : '')}
+                          value={formValues.job_role.value || ''}
+                          inputValue={jobCategoryInput}
+                          onInputChange={(e, newInputValue) => {
+                            setJobCategoryInput(newInputValue)
+                            fetchCategories(newInputValue)
+                          }}
+                          onChange={(e, newValue) => {
+                            const syntheticEvent = {
+                              target: {
+                                name: 'job_role',
+                                value: newValue || '',
+                              },
+                            } as React.ChangeEvent<HTMLInputElement>
+
+                            handleChange(syntheticEvent)
+                          }}
+                          sx={{
+                            width: '100%',
+                            '& .MuiOutlinedInput-root': {
+                              height: '40px',
+                              backgroundColor: '#FFFFFF',
+                              borderRadius: '5px',
+                              padding: '5px 0px 5px 15px',
+                              fontFamily: 'SF Pro Display',
+                              fontWeight: 300,
+                              fontSize: '14px',
+                              lineHeight: '18.23px',
+                              letterSpacing: '0%',
+                              color: '#00000080',
+                              // border: '0.5px solid transparent',
+                              direction: 'ltr',
+                            },
+                            '& .MuiInputBase-input': {
+                              padding: 0,
+                            },
+                            '& .MuiInputBase-input::placeholder': {
+                              fontFamily: 'SF Pro Display',
+                              fontWeight: 300,
+                              fontSize: '14px',
+                              lineHeight: '18.23px',
+                              letterSpacing: '0%',
+                              color: '#00000080',
+                              opacity: 1,
+                            },
+                          }}
+                          renderInput={(params) => (
+                            <TextField
+                              {...params}
+                              placeholder="Type or search role"
+                              variant="outlined"
+                              fullWidth
+                              error={formValues.job_role.error}
+                              InputProps={{
+                                ...params.InputProps,
+                                endAdornment: (
+                                  <Box
+                                    sx={{
+                                      display: 'flex',
+                                      alignItems: 'center',
+                                      minWidth: '30px',
+                                    }}
+                                  >
+                                    {jobCategoryLoading ? (
+                                      <CircularProgress color="inherit" size={20} />
+                                    ) : null}
+                                    {params.InputProps.endAdornment}
+                                  </Box>
+                                ),
+                              }}
+                            />
+                          )}
+                        />
+
+
+                      </Grid>
+                    </Grid>
+
+
+
+                    <Grid id="job_type" item xs={12} sm={6} md={4} lg={3}>
+                      <div style={{ display: 'flex', alignItems: 'center' }}>
+                        <div style={{ fontFamily: '"Segoe Script", cursive', fontSize: '24px', fontWeight: 'bold', color: '#e65100' }}>
+                          💼
+                        </div>
+                        <div style={{ fontSize: '15px', marginLeft: '4px' }}>
+                          Job Type
+                        </div>
+                      </div>
+                      <Grid sx={{
+                        display: 'flex', alignItems: 'center', justifyContent: 'space-between',
+                        color: '#00000080',
+                        borderRadius: '5px',
+                        border: '0.5px solid #bdbdbd',
+                        height: '40px',
+                        background: '#FFFFFF',
+                        textAlign: 'center',
+                        padding: '17px 0px 17px 0px',
+                        fontFamily: 'SF Pro Display',
+                        fontWeight: 300,
+                        fontSize: '14px',
+                        lineHeight: '18.23px',
+                        letterSpacing: '0%',
+                        opacity: 1,
+                      }}>
+                        <FormControl sx={{ width: '100%', height: '45px', paddingTop: '5px' }}>
+                          <Select
+                            // value={jobTypeName || ''}
+                            displayEmpty
+                            sx={{
+                              height: '40px',
+                              width: '100%',
+                              color: jobTypeAi ? '#00000080' : '#00000080', //Placeholder color
+                              background: '#FFFFFF',
+                              // border: '1px solid #00000080',
+                              borderRadius: '5px',
+                              padding: '5px 0px 5px 0px',
+                              direction: 'ltr',
+
+                              fontFamily: 'SF Pro Display',
+                              fontWeight: 300,
+                              fontSize: '14px',
+                              lineHeight: '18.23px',
+                              letterSpacing: '0%',
+
+                              opacity: 1,
+                              '& .MuiButtonBase-root': {
+                                fontFamily: 'SF Pro Display',
+                                fontWeight: 300,
+                                fontSize: '14px',
+                                lineHeight: '18.23px',
+                                letterSpacing: '0%',
+                                color: '#000000',
+                              },
+                              '& .MuiMenuItem-root': {
+                                fontFamily: 'SF Pro Display',
+                                fontWeight: 300,
+                                fontSize: '14px',
+                                lineHeight: '18.23px',
+                                letterSpacing: '0%',
+                                color: '#000000',
+                              },
+                            }}
+                            value={jobTypeAi}
+                            onChange={handleChangeJobTypeAi}
+                            input={<OutlinedInput />}
+                            MenuProps={{
+                              PaperProps: {
+                                style: { color: '#000000', background: '#FFFFFF' },
+                              },
+                            }}
+                          >
+                            {/* Placeholder Item */}
+                            <MenuItem value="" disabled>
+                              <span
+                                style={{
+                                  display: 'flex',
+                                  flexDirection: 'row',
+                                  justifyContent: 'space-between',
+
+                                  fontFamily: 'SF Pro Display',
+                                  fontWeight: 300,
+                                  fontSize: '14px',
+                                  lineHeight: '18.23px',
+                                  letterSpacing: '0%',
+                                  color: '#00000080',
+                                  opacity: 1,
+                                }}
+                              >
+                                {/* {t('selectJobType')} */}
+                                Select Job Type
+                              </span>
+                            </MenuItem>
+
+                            {/* Actual Options */}
+                            {jobTypeNames.map((name) => (
+                              <MenuItem
+                                key={name}
+                                value={name}
+                                style={getStyles(name, jobTypeName, jobTypeTheme)}
+                              >
+                                {name}
+                              </MenuItem>
+                            ))}
+                          </Select>
+
+
+                        </FormControl>
+
+                      </Grid>
+                    </Grid>
+
+
+                    <Grid id="no_of_open_positions" item xs={12} sm={6} md={4} lg={3}>
+                      <div style={{ display: 'flex', alignItems: 'center' }}>
+                        <div style={{ fontFamily: '"Segoe Script", cursive', fontSize: '24px', fontWeight: 'bold', color: '#e65100' }}>
+                          📌
+                        </div>
+                        <div style={{ fontSize: '15px', marginLeft: '4px' }}>
+                          Open Positions <span style={{ color: 'red' }}> *</span>
+
+                        </div>
+                      </div>
+                      <Grid sx={{
+                        display: 'flex', alignItems: 'center', justifyContent: 'space-between',
+                        color: '#00000080',
+                        borderRadius: '5px',
+                        border: '0.5px solid #bdbdbd',
+                        height: '40px',
+                        background: '#FFFFFF',
+                        textAlign: 'center',
+                        padding: '20px 0px 20px 0px',
+                        fontFamily: 'SF Pro Display',
+                        fontWeight: 300,
+                        fontSize: '14px',
+                        lineHeight: '18.23px',
+                        letterSpacing: '0%',
+                        opacity: 1,
+                      }}>
+                        <TextField
+                          fullWidth
+                          variant="filled"
+                          autoComplete="off"
+                          placeholder="Enter No. Of Open Positions"
+                          sx={{
+                            '& .MuiInputBase-input::placeholder': {
+                              fontFamily: 'SF Pro Display',
+                              fontWeight: 300,
+                              fontSize: '14px',
+                              lineHeight: '18.23px',
+                              letterSpacing: '0%',
+                              color: '#00000080',
+                              opacity: 1,
+                            },
+                          }}
+                          InputProps={{
+                            disableUnderline: true,
+                            style: {
+                              color: '#00000080',
+                              borderRadius: '5px',
+                              height: '40px',
+                              background: '#FFFFFF',
+                              textAlign: 'center',
+                              padding: '0px 0px 15px 0px',
+                              fontFamily: 'SF Pro Display',
+                              fontWeight: 300,
+                              fontSize: '14px',
+                              lineHeight: '18.23px',
+                              letterSpacing: '0%',
+                              opacity: 1,
+                            },
+                          }}
+                          inputProps={{
+                            inputMode: 'numeric',
+                            pattern: '[0-9]*',
+                            style: { textAlign: 'left' },
+                          }}
+                          required
+                          name="no_of_open_positions"
+                          value={formValues.no_of_open_positions.value}
+                          onChange={handleChange}
+                          error={formValues.no_of_open_positions.error}
+                        // helperText={
+                        //   formValues.no_of_open_positions.error
+                        //     ? formValues.no_of_open_positions.errorMessage
+                        //     : ''
+                        // }
+                        />
+
+                        {/* <Grid sx={{padding: '15px 0px 15px 0px',}}>
             <Button sx={{padding:'10px'}}>
               <DeleteOutlineIcon sx={{color:'red', '&:hover':{color:'red', cursor:'pointer'}}}/>
             </Button>
             </Grid> */}
-        </Grid>
-      </Grid>
-  <Grid id="mode_of_work" item xs={12} sm={6} md={4} lg={3}>
-      <div style={{ display: 'flex', alignItems: 'center' }}>
-      <div style={{ fontFamily: '"Segoe Script", cursive', fontSize: '24px', fontWeight: 'bold', color: '#e65100' }}>
-        🏠
-      </div>
-      <div style={{ fontSize: '15px', marginLeft: '4px' }}>
-        Mode Of Work
-      </div>
-      </div>
-        <Grid sx={{display:'flex', alignItems:'center', justifyContent:'space-between',
-           color: '#00000080',
-                  borderRadius: '5px',
-                  border: '0.5px solid #bdbdbd',
-                  height: '40px',
-                  background: '#FFFFFF',
-                  textAlign: 'center',
-                  padding: '20px 0px 20px 0px',
-                  fontFamily: 'SF Pro Display',
-                  fontWeight: 300,
-                  fontSize: '14px',
-                  lineHeight: '18.23px',
-                  letterSpacing: '0%',
-                  opacity: 1,
-        }}>
-          <FormControl sx={{ width: '100%', height: '40px' }}>
-                  <Select
-                    // value={modeOfWorkName || ''} // Ensure an empty value initially
-                   
-                    displayEmpty
-                     value={modeOfWorkAi}
-    onChange={handleChangeModeOfWorkAi}
-                    input={<OutlinedInput />}
-                    MenuProps={{
-                      PaperProps: {
-                        style: { color: '#000000', background: '#FFFFFF' },
-                      },
-                    }}
-                    style={{
-                      height: '40px',
-                      width: '100%',
-                      color: modeOfWorkAi ? '#00000080' : '#00000080', // Darker text when selected
-                      background: '#FFFFFF',
-                      // border: '1px solid #00000080',
-                      borderRadius: '5px',
-                      padding: '5px 0px 5px 0px',
-                      direction:  'ltr',
-                      fontFamily: 'SF Pro Display',
-                      fontWeight: 300,
-                      fontSize: '14px',
-                      lineHeight: '18.23px',
-                      letterSpacing: '0%',
-                      opacity: 1,
-                    }}
-                  >
-                    {/* Placeholder Item (Disabled) */}
-                    <MenuItem value="" disabled>
-                      <span
-                        style={{
-                          display: 'flex',
-                          flexDirection: 'row',
-                          justifyContent: 'space-between',
-                          fontFamily: 'SF Pro Display',
-                          fontWeight: 300,
-                          fontSize: '14px',
-                          lineHeight: '18.23px',
-                          letterSpacing: '0%',
-                          color: '#00000080',
-                          opacity: 1,
-                        }}
-                      >
-                        {/* {t('selectModeOfWork')} */}
-                        Select work mode
-                      </span>
-                    </MenuItem>
+                      </Grid>
+                    </Grid>
+                    <Grid id="mode_of_work" item xs={12} sm={6} md={4} lg={3}>
+                      <div style={{ display: 'flex', alignItems: 'center' }}>
+                        <div style={{ fontFamily: '"Segoe Script", cursive', fontSize: '24px', fontWeight: 'bold', color: '#e65100' }}>
+                          🏠
+                        </div>
+                        <div style={{ fontSize: '15px', marginLeft: '4px' }}>
+                          Mode Of Work
+                        </div>
+                      </div>
+                      <Grid sx={{
+                        display: 'flex', alignItems: 'center', justifyContent: 'space-between',
+                        color: '#00000080',
+                        borderRadius: '5px',
+                        border: '0.5px solid #bdbdbd',
+                        height: '40px',
+                        background: '#FFFFFF',
+                        textAlign: 'center',
+                        padding: '20px 0px 20px 0px',
+                        fontFamily: 'SF Pro Display',
+                        fontWeight: 300,
+                        fontSize: '14px',
+                        lineHeight: '18.23px',
+                        letterSpacing: '0%',
+                        opacity: 1,
+                      }}>
+                        <FormControl sx={{ width: '100%', height: '40px' }}>
+                          <Select
+                            // value={modeOfWorkName || ''} // Ensure an empty value initially
 
-                    {/* Actual Options */}
-                    {modeOfWorkNames.map((name) => (
-                      <MenuItem
-                        key={name}
-                        value={name}
-                        style={getStyles(name, modeOfWorkName, modeOfWorkTheme)}
-                      >
-                        {name}
-                      </MenuItem>
-                    ))}
-                  </Select>
+                            displayEmpty
+                            value={modeOfWorkAi}
+                            onChange={handleChangeModeOfWorkAi}
+                            input={<OutlinedInput />}
+                            MenuProps={{
+                              PaperProps: {
+                                style: { color: '#000000', background: '#FFFFFF' },
+                              },
+                            }}
+                            style={{
+                              height: '40px',
+                              width: '100%',
+                              color: modeOfWorkAi ? '#00000080' : '#00000080', // Darker text when selected
+                              background: '#FFFFFF',
+                              // border: '1px solid #00000080',
+                              borderRadius: '5px',
+                              padding: '5px 0px 5px 0px',
+                              direction: 'ltr',
+                              fontFamily: 'SF Pro Display',
+                              fontWeight: 300,
+                              fontSize: '14px',
+                              lineHeight: '18.23px',
+                              letterSpacing: '0%',
+                              opacity: 1,
+                            }}
+                          >
+                            {/* Placeholder Item (Disabled) */}
+                            <MenuItem value="" disabled>
+                              <span
+                                style={{
+                                  display: 'flex',
+                                  flexDirection: 'row',
+                                  justifyContent: 'space-between',
+                                  fontFamily: 'SF Pro Display',
+                                  fontWeight: 300,
+                                  fontSize: '14px',
+                                  lineHeight: '18.23px',
+                                  letterSpacing: '0%',
+                                  color: '#00000080',
+                                  opacity: 1,
+                                }}
+                              >
+                                {/* {t('selectModeOfWork')} */}
+                                Select work mode
+                              </span>
+                            </MenuItem>
 
-                  {/* {modeOfWorkForm && (
+                            {/* Actual Options */}
+                            {modeOfWorkNames.map((name) => (
+                              <MenuItem
+                                key={name}
+                                value={name}
+                                style={getStyles(name, modeOfWorkName, modeOfWorkTheme)}
+                              >
+                                {name}
+                              </MenuItem>
+                            ))}
+                          </Select>
+
+                          {/* {modeOfWorkForm && (
                     <FormHelperText
                       sx={{ color: '#b71c1c', padding: '5px 0px' }}
                     >
                       Select work mode
                     </FormHelperText>
                   )} */}
-                </FormControl>
-        </Grid>
-      </Grid>
+                        </FormControl>
+                      </Grid>
+                    </Grid>
 
-  <Grid id="primary_skills" item xs={12} sm={6} md={4} lg={3}>
-      <div style={{ display: 'flex', alignItems: 'center' }}>
-      <div style={{ fontFamily: '"Segoe Script", cursive', fontSize: '24px', fontWeight: 'bold', color: '#e65100' }}>
-        🛠️	
-      </div>
-      <div style={{ fontSize: '15px', marginLeft: '4px' }}>
-        Primary Skills
-      </div>
-      </div>
-        <Grid sx={{display:'flex', alignItems:'center', justifyContent:'space-between',
-           color: '#00000080',
-                  borderRadius: '5px',
-                  border: '0.5px solid #bdbdbd',
-                  height: '40px',
-                  background: '#FFFFFF',
-                  textAlign: 'center',
-                  padding: '20px 0px 20px 0px',
-                  fontFamily: 'SF Pro Display',
-                  fontWeight: 300,
-                  fontSize: '14px',
-                  lineHeight: '18.23px',
-                  letterSpacing: '0%',
-                  opacity: 1,
-        }}>
-         
-
-           <TextField
-                  fullWidth
-                  variant="filled"
-                  autoComplete="off"
-                  placeholder="Enter primary skills"
-                  sx={{
-                    '& .MuiInputBase-input::placeholder': {
-                      fontFamily: 'SF Pro Display',
-                      fontWeight: 300,
-                      fontSize: '14px',
-                      lineHeight: '18.23px',
-                      letterSpacing: '0%',
-                      color: '#00000080',
-                      background: '#FFFFFF',
-                      opacity: 1,
-                    },
-                  }}
-                  InputProps={{
-                    disableUnderline: true,
-                    sx: {
-                      color: '#00000080',
-                      borderRadius: '5px',
-                      // border: '0.5px solid #00000080',
-                      height: '40px',
-                      background: '#FFFFFF',
-                      textAlign: 'center',
-                      padding: '0px 0px 15px 0px',
-                      fontFamily: 'SF Pro Display',
-                      fontWeight: 300,
-                      fontSize: '14px',
-                      lineHeight: '18.23px',
-                      letterSpacing: '0%',
-                      opacity: 1,
-                      '&:hover': {
+                    <Grid id="primary_skills" item xs={12} sm={6} md={4} lg={3}>
+                      <div style={{ display: 'flex', alignItems: 'center' }}>
+                        <div style={{ fontFamily: '"Segoe Script", cursive', fontSize: '24px', fontWeight: 'bold', color: '#e65100' }}>
+                          🛠️
+                        </div>
+                        <div style={{ fontSize: '15px', marginLeft: '4px' }}>
+                          Primary Skills
+                        </div>
+                      </div>
+                      <Grid sx={{
+                        display: 'flex', alignItems: 'center', justifyContent: 'space-between',
                         color: '#00000080',
+                        borderRadius: '5px',
+                        border: '0.5px solid #bdbdbd',
+                        height: '40px',
                         background: '#FFFFFF',
-                      },
-                    },
-                  }}
-                  inputProps={{
-                    sx: {
-                      textAlign: 'left',
-                    },
-                  }}
-                  required
-                  name="primary_skills"
-                  // value={primarySkillName.join(', ')} // Show skills as comma-separated values
-                 value={primarySkillsAi}
-  onChange={handleChangePrimarySkillsAi}
-                  // helperText={
-                  //   primarySkillForm ? 'enter atleast oen skill' : ''
-                  // }
-                />
-        
-        </Grid>
-      </Grid>
-
-
-  <Grid id="experinece_required" item xs={12} sm={6} md={4} lg={3}>
-      <div style={{ display: 'flex', alignItems: 'center' }}>
-      <div style={{ fontFamily: '"Segoe Script", cursive', fontSize: '24px', fontWeight: 'bold', color: '#e65100' }}>
-        🎯	
-      </div>
-      <div style={{ fontSize: '15px', marginLeft: '4px' }}>
-        Experience Level
-      </div>
-      </div>
-        <Grid sx={{display:'flex', alignItems:'center', justifyContent:'space-between',
-           color: '#00000080',
-                  borderRadius: '5px',
-                  border: '0.5px solid #bdbdbd',
-                  height: '40px',
-                  background: '#FFFFFF',
-                  textAlign: 'center',
-                  padding: '20px 0px 20px 0px',
-                  fontFamily: 'SF Pro Display',
-                  fontWeight: 300,
-                  fontSize: '14px',
-                  lineHeight: '18.23px',
-                  letterSpacing: '0%',
-                  opacity: 1,
-        }}>
-          <FormControl
-                variant="standard"
-                style={{
-                  width: '100%',
-                  border: '0.5px solid rgba(167, 219, 214, 0.72)',
-                  borderRadius: '15px',
-                  marginBottom: formValues.experience_required.error
-                    ? '5px'
-                    : '0px',
-                }}
-              >
-                <Select
-                  disableUnderline
-                  defaultValue={'-'}
-                  displayEmpty
-                  name="experience_required"
-                  required
-                  style={{
-                    height: '40px',
-                    width: '100%',
-                    background: '#FFFFFF',
-                    // border: '0.5px solid #00000080',
-                    color: '#00000080',
-                    borderRadius: '5px',
-                    padding: '5px 0px 5px 15px',
-                    direction: 'ltr',
-                    fontFamily: 'SF Pro Display',
-                    fontWeight: 300,
-                    fontSize: '14px',
-                    lineHeight: '18.23px',
-                    letterSpacing: '0%',
-                    opacity: 1,
-                  }}
-                  MenuProps={{
-                    PaperProps: {
-                      style: {
-                        color: '#000000',
-                        background: '#FFFFFF',
-                        maxHeight: '150px', // Limit the dropdown height
-                        overflowY: 'auto', // Enable scrolling if needed
-                        marginTop: '5px', // Ensure it appears just below the input field
-                      },
-                    },
-                    anchorOrigin: {
-                      vertical: 'bottom',
-                      horizontal: 'left',
-                    },
-                    transformOrigin: {
-                      vertical: 'top',
-                      horizontal: 'left',
-                    },
-                    // getContentAnchorEl: null, // Ensures dropdown opens right below
-                  }}
-                  // value={formValues.experience_required.value}
-                 value={experienceRequiredAi}
-    onChange={handleChangeExperienceAi}
-                >
-                  <MenuItem value="">
-                    <span
-                      style={{
-                        display: 'flex',
-                        flexDirection: 'row',
-                        justifyContent: 'space-between',
+                        textAlign: 'center',
+                        padding: '20px 0px 20px 0px',
                         fontFamily: 'SF Pro Display',
                         fontWeight: 300,
                         fontSize: '14px',
                         lineHeight: '18.23px',
                         letterSpacing: '0%',
-                        color: '#00000080',
                         opacity: 1,
-                      }}
-                    >
-                      Select experience
-                    </span>
-                  </MenuItem>
-                  {experience.map((exp: any, index: number) => (
-                    <MenuItem key={index} value={exp}>
-                      {exp} years
-                    </MenuItem>
-                  ))}
-                </Select>
-              </FormControl>
-              {/* <div style={{ paddingTop: '5px' }}> */}
-              {/* {formValues.experience_required.error && (
+                      }}>
+
+
+                        <TextField
+                          fullWidth
+                          variant="filled"
+                          autoComplete="off"
+                          placeholder="Enter primary skills"
+                          sx={{
+                            '& .MuiInputBase-input::placeholder': {
+                              fontFamily: 'SF Pro Display',
+                              fontWeight: 300,
+                              fontSize: '14px',
+                              lineHeight: '18.23px',
+                              letterSpacing: '0%',
+                              color: '#00000080',
+                              background: '#FFFFFF',
+                              opacity: 1,
+                            },
+                          }}
+                          InputProps={{
+                            disableUnderline: true,
+                            sx: {
+                              color: '#00000080',
+                              borderRadius: '5px',
+                              // border: '0.5px solid #00000080',
+                              height: '40px',
+                              background: '#FFFFFF',
+                              textAlign: 'center',
+                              padding: '0px 0px 15px 0px',
+                              fontFamily: 'SF Pro Display',
+                              fontWeight: 300,
+                              fontSize: '14px',
+                              lineHeight: '18.23px',
+                              letterSpacing: '0%',
+                              opacity: 1,
+                              '&:hover': {
+                                color: '#00000080',
+                                background: '#FFFFFF',
+                              },
+                            },
+                          }}
+                          inputProps={{
+                            sx: {
+                              textAlign: 'left',
+                            },
+                          }}
+                          required
+                          name="primary_skills"
+                          // value={primarySkillName.join(', ')} // Show skills as comma-separated values
+                          value={primarySkillsAi}
+                          onChange={handleChangePrimarySkillsAi}
+                        // helperText={
+                        //   primarySkillForm ? 'enter atleast oen skill' : ''
+                        // }
+                        />
+
+                      </Grid>
+                    </Grid>
+
+
+                    <Grid id="experinece_required" item xs={12} sm={6} md={4} lg={3}>
+                      <div style={{ display: 'flex', alignItems: 'center' }}>
+                        <div style={{ fontFamily: '"Segoe Script", cursive', fontSize: '24px', fontWeight: 'bold', color: '#e65100' }}>
+                          🎯
+                        </div>
+                        <div style={{ fontSize: '15px', marginLeft: '4px' }}>
+                          Experience Level
+                        </div>
+                      </div>
+                      <Grid sx={{
+                        display: 'flex', alignItems: 'center', justifyContent: 'space-between',
+                        color: '#00000080',
+                        borderRadius: '5px',
+                        border: '0.5px solid #bdbdbd',
+                        height: '40px',
+                        background: '#FFFFFF',
+                        textAlign: 'center',
+                        padding: '20px 0px 20px 0px',
+                        fontFamily: 'SF Pro Display',
+                        fontWeight: 300,
+                        fontSize: '14px',
+                        lineHeight: '18.23px',
+                        letterSpacing: '0%',
+                        opacity: 1,
+                      }}>
+                        <FormControl
+                          variant="standard"
+                          style={{
+                            width: '100%',
+                            border: '0.5px solid rgba(167, 219, 214, 0.72)',
+                            borderRadius: '15px',
+                            marginBottom: formValues.experience_required.error
+                              ? '5px'
+                              : '0px',
+                          }}
+                        >
+                          <Select
+                            disableUnderline
+                            defaultValue={'-'}
+                            displayEmpty
+                            name="experience_required"
+                            required
+                            style={{
+                              height: '40px',
+                              width: '100%',
+                              background: '#FFFFFF',
+                              // border: '0.5px solid #00000080',
+                              color: '#00000080',
+                              borderRadius: '5px',
+                              padding: '5px 0px 5px 15px',
+                              direction: 'ltr',
+                              fontFamily: 'SF Pro Display',
+                              fontWeight: 300,
+                              fontSize: '14px',
+                              lineHeight: '18.23px',
+                              letterSpacing: '0%',
+                              opacity: 1,
+                            }}
+                            MenuProps={{
+                              PaperProps: {
+                                style: {
+                                  color: '#000000',
+                                  background: '#FFFFFF',
+                                  maxHeight: '150px', // Limit the dropdown height
+                                  overflowY: 'auto', // Enable scrolling if needed
+                                  marginTop: '5px', // Ensure it appears just below the input field
+                                },
+                              },
+                              anchorOrigin: {
+                                vertical: 'bottom',
+                                horizontal: 'left',
+                              },
+                              transformOrigin: {
+                                vertical: 'top',
+                                horizontal: 'left',
+                              },
+                              // getContentAnchorEl: null, // Ensures dropdown opens right below
+                            }}
+                            // value={formValues.experience_required.value}
+                            value={experienceRequiredAi}
+                            onChange={handleChangeExperienceAi}
+                          >
+                            <MenuItem value="">
+                              <span
+                                style={{
+                                  display: 'flex',
+                                  flexDirection: 'row',
+                                  justifyContent: 'space-between',
+                                  fontFamily: 'SF Pro Display',
+                                  fontWeight: 300,
+                                  fontSize: '14px',
+                                  lineHeight: '18.23px',
+                                  letterSpacing: '0%',
+                                  color: '#00000080',
+                                  opacity: 1,
+                                }}
+                              >
+                                Select experience
+                              </span>
+                            </MenuItem>
+                            {experience.map((exp: any, index: number) => (
+                              <MenuItem key={index} value={exp}>
+                                {exp} years
+                              </MenuItem>
+                            ))}
+                          </Select>
+                        </FormControl>
+                        {/* <div style={{ paddingTop: '5px' }}> */}
+                        {/* {formValues.experience_required.error && (
                 <span
                   style={{
                     color: '#B32800',
@@ -3673,576 +3958,579 @@ setShowButtons(true)
                   {formValues.experience_required.errorMessage}
                 </span>
               )} */}
-        
-        </Grid>
-      </Grid>
+
+                      </Grid>
+                    </Grid>
 
 
 
 
-  <Grid id="secondary_skills" item xs={12} sm={6} md={4} lg={3}>
-      <div style={{ display: 'flex', alignItems: 'center' }}>
-      <div style={{ fontFamily: '"Segoe Script", cursive', fontSize: '24px', fontWeight: 'bold', color: '#e65100' }}>
-        ⚙️	
-      </div>
-      <div style={{ fontSize: '15px', marginLeft: '4px' }}>
-        Secondary Skills
-      </div>
-      </div>
-        <Grid sx={{display:'flex', alignItems:'center', justifyContent:'space-between',
-           color: '#00000080',
-                  borderRadius: '5px',
-                  border: '0.5px solid #bdbdbd',
-                  height: '40px',
-                  background: '#FFFFFF',
-                  textAlign: 'center',
-                  padding: '20px 0px 20px 0px',
-                  fontFamily: 'SF Pro Display',
-                  fontWeight: 300,
-                  fontSize: '14px',
-                  lineHeight: '18.23px',
-                  letterSpacing: '0%',
-                  opacity: 1,
-        }}>
-          <TextField
-                  fullWidth
-                  variant="filled"
-                  autoComplete="off"
-                  placeholder="Enter Secondary Skills"
-                  sx={{
-                    '& .MuiInputBase-input::placeholder': {
-                      fontFamily: 'SF Pro Display',
-                      fontWeight: 300,
-                      fontSize: '14px',
-                      lineHeight: '18.23px',
-                      letterSpacing: '0%',
-                      color: '#00000080',
-                      opacity: 1,
-                    },
-                  }}
-                  InputProps={{
-                    disableUnderline: true,
-                    sx: {
-                      color: '#00000080',
-                      borderRadius: '5px',
-                      // border: '0.5px solid #00000080',
-                      height: '40px',
-                      background: '#FFFFFF',
-                      textAlign: 'center',
-                      padding: '0px 0px 15px 0px',
-                      fontFamily: 'SF Pro Display',
-                      fontWeight: 300,
-                      fontSize: '14px',
-                      lineHeight: '18.23px',
-                      letterSpacing: '0%',
-                      opacity: 1,
-                    },
-                  }}
-                  inputProps={{
-                    sx: {
-                      textAlign:  'left',
-                    },
-                  }}
-                  required
-                  name="secondary_skills"
-                  // value={secondarySkillName.join(', ')} // Show skills as comma-separated values
-                  value={secondarySkillsAi}
-  onChange={handleChangeSecondarySkillsAi}
-                  // helperText={
-                  //   secondarySkillForm ? 'Enter atleast one skill' : ''
-                  // }
-                />
-       
-        </Grid>
-      </Grid>
-
-
-
- <Grid id="skills" item xs={12} sm={6} md={4} lg={3}>
-      <div style={{ display: 'flex', alignItems: 'center' }}>
-      <div style={{ fontFamily: '"Segoe Script", cursive', fontSize: '24px', fontWeight: 'bold', color: '#e65100' }}>
-        🧠	
-      </div>
-      <div style={{ fontSize: '15px', marginLeft: '4px' }}>
-        Specific Domain Skills
-      </div>
-      </div>
-        <Grid sx={{display:'flex', alignItems:'center', justifyContent:'space-between',
-           color: '#00000080',
-                  borderRadius: '5px',
-                  border: '0.5px solid #bdbdbd',
-                  height: '40px',
-                  background: '#FFFFFF',
-                  textAlign: 'center',
-                  padding: '20px 0px 20px 0px',
-                  fontFamily: 'SF Pro Display',
-                  fontWeight: 300,
-                  fontSize: '14px',
-                  lineHeight: '18.23px',
-                  letterSpacing: '0%',
-                  opacity: 1,
-        }}>
-                 <TextField
-                  fullWidth
-                  variant="filled"
-                  autoComplete="off"
-                  placeholder="Enter Specific domain skills"
-                  sx={{
-                    '& .MuiInputBase-input::placeholder': {
-                      fontFamily: 'SF Pro Display',
-                      fontWeight: 300,
-                      fontSize: '14px',
-                      lineHeight: '18.23px',
-                      letterSpacing: '0%',
-                      color: '#00000080',
-                      opacity: 1,
-                    },
-                  }}
-                  InputProps={{
-                    disableUnderline: true,
-                    sx: {
-                      color: '#00000080',
-                      borderRadius: '5px',
-                      // border: '0.5px solid #00000080',
-                      height: '40px',
-                      background: '#FFFFFF',
-                      textAlign: 'center',
-                      padding: '0px 0px 15px 0px',
-                      fontFamily: 'SF Pro Display',
-                      fontWeight: 300,
-                      fontSize: '14px',
-                      lineHeight: '18.23px',
-                      letterSpacing: '0%',
-                      opacity: 1,
-                    },
-                  }}
-                  inputProps={{
-                    sx: {
-                      textAlign:  'left',
-                    },
-                  }}
-                  required
-                  name="specific_domain_skills"
-                  // value={secondarySkillName.join(', ')} // Show skills as comma-separated values
-                  value={specificDomainSkillsAi}
-  onChange={handleChangeSpecificDomainSkillsAi}
-                  // helperText={
-                  //   secondarySkillForm ? 'Enter atleast one skill' : ''
-                  // }
-                />
-        
-        </Grid>
-      </Grid>
-
-  <Grid id="location" item>
-      <div style={{ display: 'flex', alignItems: 'center' }}>
-      <div style={{ fontFamily: '"Segoe Script", cursive', fontSize: '24px', fontWeight: 'bold', color: '#e65100' }}>
-          📍
-      </div>
-      <div style={{ fontSize: '15px', marginLeft: '4px' }}>
-        Location
-      </div>
-      </div>
-       <Grid sx={{display:'flex', alignItems:'center', justifyContent:'space-between',
-           color: '#00000080',
-                  borderRadius: '5px',
-                  // border: '0.5px solid #bdbdbd',
-                  height: '40px',
-                  background: '#FFFFFF',
-                  textAlign: 'center',
-                  padding: '20px 0px 20px 0px',
-                  fontFamily: 'SF Pro Display',
-                  fontWeight: 300,
-                  fontSize: '14px',
-                  lineHeight: '18.23px',
-                  letterSpacing: '0%',
-                  opacity: 1,
-        }}>
-       <Grid
-                container
-                // spacing={2}
-                // justifyContent="space-between"
-                spacing={1}
-                direction="row"
-                // sx={{ padding: '0 36px' }}
-              >
-       
-        <Grid id="mainCountry" item xs={4}>
-                  <Autocomplete
-                    sx={{
-                      width: '100%',
-                      '& .MuiOutlinedInput-root': {
-                        // height: '40px',
-                        width: '100%',
-
-                        // fontSize: '12px',
-
-                        background: '#FFFFFF',
-                        // border: '0.5px solid #00000080',
+                    <Grid id="secondary_skills" item xs={12} sm={6} md={4} lg={3}>
+                      <div style={{ display: 'flex', alignItems: 'center' }}>
+                        <div style={{ fontFamily: '"Segoe Script", cursive', fontSize: '24px', fontWeight: 'bold', color: '#e65100' }}>
+                          ⚙️
+                        </div>
+                        <div style={{ fontSize: '15px', marginLeft: '4px' }}>
+                          Secondary Skills
+                        </div>
+                      </div>
+                      <Grid sx={{
+                        display: 'flex', alignItems: 'center', justifyContent: 'space-between',
                         color: '#00000080',
                         borderRadius: '5px',
-                        padding: '0px 0px 0px 15px',
-                        
-
-                        fontFamily: 'SF Pro Display',
-                        fontWeight: 300,
-                        fontSize: '14px',
-                        lineHeight: '18.23px',
-                        letterSpacing: '0%',
-
-                        opacity: 1,
-
-                        height: '44px',
-                        // // borderRadius: '12px',
-                        border: '1px solid #bdbdbd',
-                        '& fieldset': { borderColor: 'transparent' },
-                        '&:hover fieldset': { borderColor: 'transparent' },
-                        '&.Mui-focused fieldset': {
-                          borderColor: 'transparent',
-                        },
-                      },
-                    }}
-                    // value={selectedCountry || null}
-                    value={
-                      selectedCountry || null
-                      // selectedCountry || (editAijd === true ? countryAi : null)
-                    }
-                    options={countries}
-                    getOptionLabel={(option) => option.name}
-                    onChange={(event, newValue) => {
-                      if (newValue) {
-                        setCountryIso2(newValue.iso2)
-                        setSelectedCountry(newValue)
-                        setSelectedCountryValue(newValue.name)
-                        setCountryError(false)
-
-                        // Reset state and city when country changes
-                        setStateIso2('')
-                        setSelectedState('')
-                        setSelectedStateValue('')
-                        // setStateError(false)
-
-                        setSelectedCity('')
-                        setSelectedCityValue('')
-                        // setCityError(false)
-                      } else {
-                        setCountryIso2('')
-                        setSelectedCountry('')
-                        setCountryError(true)
-
-                        // Reset state and city when no country is selected
-                        setStateIso2('')
-                        setSelectedState('')
-                        setSelectedStateValue('')
-                        // setStateError(false)
-
-                        setSelectedCity('')
-                        setSelectedCityValue('')
-                        // setCityError(false)
-                      }
-                    }}
-                    renderInput={(params) => (
-                      <TextField
-                        {...params}
-                        placeholder='Country'
-                        sx={{
-                          '& .MuiInputBase-input::placeholder': {
-                            fontFamily: 'SF Pro Display',
-                            fontWeight: 300,
-                            fontSize: '14px',
-                            lineHeight: '18.23px',
-                            letterSpacing: '0%',
-                            color: '#00000080',
-                            opacity: 1,
-                          },
-                        }}
-                       
-                        helperText={countryError}
-                        // helperText={countryError ? "Please select a country" : ""}
-                      />
-                    )}
-                  />
-                  {countryError ? (
-                    <p style={{ color: 'red', margin: '0px', padding: '0px' }}>
-                      select country
-                    </p>
-                  ) : (
-                    ''
-                  )}
-                </Grid>
-        
-        <Grid id="mainState" item xs={4}>
-                  <Autocomplete
-                    sx={{
-                      width: '100%',
-                      '& .MuiOutlinedInput-root': {
-                        // height: '40px',
-                        width: '100%',
-
-                        // fontSize: '12px',
-
-                        background: '#FFFFFF',
                         border: '0.5px solid #bdbdbd',
-                        color: '#00000080',
-                        borderRadius: '5px',
-                        padding: '5px 0px 5px 15px',
-
-                        fontFamily: 'SF Pro Display',
-                        fontWeight: 300,
-                        fontSize: '14px',
-                        lineHeight: '18.23px',
-                        letterSpacing: '0%',
-
-                        opacity: 1,
-                        height: '44px',
-                        // borderRadius: '12px',
-                        // border: '1px solid #00000080',
-                        '& fieldset': { borderColor: 'transparent' },
-                        '&:hover fieldset': { borderColor: 'transparent' },
-                        '&.Mui-focused fieldset': {
-                          borderColor: 'transparent',
-                        },
-                      },
-                    }}
-                    options={states}
-                    // value={selectedState || null} // Ensure the selected value updates
-                    value={
-                      selectedState || null
-                    }
-                    getOptionLabel={(option) => option.name}
-                    onChange={(event, newValue) => {
-                      if (newValue && selectedCountry) {
-                        setStateIso2(newValue.iso2)
-                        setSelectedState(newValue)
-                        setSelectedStateValue(newValue.name)
-                        setStateError(false)
-
-                        setSelectedCity('')
-                        setSelectedCityValue('')
-                        setCityError(false)
-                        setLocationError(false)
-                      } else {
-                        setStateIso2('')
-                        setSelectedState('')
-                        setStateError(true)
-
-                        setSelectedCity('')
-                        setSelectedCityValue('')
-                        setCityError(false)
-                        setLocationError(false)
-                      }
-                    }}
-                    renderInput={(params) => (
-                      <TextField
-                        {...params}
-                        placeholder="State"
-                        sx={{
-                          '& .MuiInputBase-input::placeholder': {
-                            fontFamily: 'SF Pro Display',
-                            fontWeight: 300,
-                            fontSize: '14px',
-                            lineHeight: '18.23px',
-                            letterSpacing: '0%',
-                            color: '#00000080',
-                            opacity: 1,
-                          },
-                        }}
-                        helperText={stateError}
-                      />
-                    )}
-                    disabled={!selectedCountry} // Disable until a country is selected
-                  />
-                  {stateError ? (
-                    <p style={{ color: 'red', margin: '0px', padding: '0px' }}>
-                      select state
-                    </p>
-                  ) : (
-                    ''
-                  )}
-                </Grid>
-        
-          <Grid id="mainCity" item xs={3.9}>
-                  <Autocomplete
-                    sx={{
-                      width: '100%',
-                      '& .MuiOutlinedInput-root': {
-                        // height: '40px',
-                        width: '100%',
-
-                        // fontSize: '12px',
-
+                        height: '40px',
                         background: '#FFFFFF',
-                        border: '0.5px solid #bdbdbd',
-                        color: '#00000080',
-                        borderRadius: '5px',
-                        padding: '0px 0px 0px 15px',
-
+                        textAlign: 'center',
+                        padding: '20px 0px 20px 0px',
                         fontFamily: 'SF Pro Display',
                         fontWeight: 300,
                         fontSize: '14px',
                         lineHeight: '18.23px',
                         letterSpacing: '0%',
-
                         opacity: 1,
+                      }}>
+                        <TextField
+                          fullWidth
+                          variant="filled"
+                          autoComplete="off"
+                          placeholder="Enter Secondary Skills"
+                          sx={{
+                            '& .MuiInputBase-input::placeholder': {
+                              fontFamily: 'SF Pro Display',
+                              fontWeight: 300,
+                              fontSize: '14px',
+                              lineHeight: '18.23px',
+                              letterSpacing: '0%',
+                              color: '#00000080',
+                              opacity: 1,
+                            },
+                          }}
+                          InputProps={{
+                            disableUnderline: true,
+                            sx: {
+                              color: '#00000080',
+                              borderRadius: '5px',
+                              // border: '0.5px solid #00000080',
+                              height: '40px',
+                              background: '#FFFFFF',
+                              textAlign: 'center',
+                              padding: '0px 0px 15px 0px',
+                              fontFamily: 'SF Pro Display',
+                              fontWeight: 300,
+                              fontSize: '14px',
+                              lineHeight: '18.23px',
+                              letterSpacing: '0%',
+                              opacity: 1,
+                            },
+                          }}
+                          inputProps={{
+                            sx: {
+                              textAlign: 'left',
+                            },
+                          }}
+                          required
+                          name="secondary_skills"
+                          // value={secondarySkillName.join(', ')} // Show skills as comma-separated values
+                          value={secondarySkillsAi}
+                          onChange={handleChangeSecondarySkillsAi}
+                        // helperText={
+                        //   secondarySkillForm ? 'Enter atleast one skill' : ''
+                        // }
+                        />
 
-                        height: '44px',
-                        // // borderRadius: '12px',
-                        // border: '1px solid #00000080',
-                        '& fieldset': { borderColor: 'transparent' },
-                        '&:hover fieldset': { borderColor: 'transparent' },
-                        '&.Mui-focused fieldset': {
-                          borderColor: 'transparent',
+                      </Grid>
+                    </Grid>
+
+
+
+                    <Grid id="skills" item xs={12} sm={6} md={4} lg={3}>
+                      <div style={{ display: 'flex', alignItems: 'center' }}>
+                        <div style={{ fontFamily: '"Segoe Script", cursive', fontSize: '24px', fontWeight: 'bold', color: '#e65100' }}>
+                          🧠
+                        </div>
+                        <div style={{ fontSize: '15px', marginLeft: '4px' }}>
+                          Specific Domain Skills
+                        </div>
+                      </div>
+                      <Grid sx={{
+                        display: 'flex', alignItems: 'center', justifyContent: 'space-between',
+                        color: '#00000080',
+                        borderRadius: '5px',
+                        border: '0.5px solid #bdbdbd',
+                        height: '40px',
+                        background: '#FFFFFF',
+                        textAlign: 'center',
+                        padding: '20px 0px 20px 0px',
+                        fontFamily: 'SF Pro Display',
+                        fontWeight: 300,
+                        fontSize: '14px',
+                        lineHeight: '18.23px',
+                        letterSpacing: '0%',
+                        opacity: 1,
+                      }}>
+                        <TextField
+                          fullWidth
+                          variant="filled"
+                          autoComplete="off"
+                          placeholder="Enter Specific domain skills"
+                          sx={{
+                            '& .MuiInputBase-input::placeholder': {
+                              fontFamily: 'SF Pro Display',
+                              fontWeight: 300,
+                              fontSize: '14px',
+                              lineHeight: '18.23px',
+                              letterSpacing: '0%',
+                              color: '#00000080',
+                              opacity: 1,
+                            },
+                          }}
+                          InputProps={{
+                            disableUnderline: true,
+                            sx: {
+                              color: '#00000080',
+                              borderRadius: '5px',
+                              // border: '0.5px solid #00000080',
+                              height: '40px',
+                              background: '#FFFFFF',
+                              textAlign: 'center',
+                              padding: '0px 0px 15px 0px',
+                              fontFamily: 'SF Pro Display',
+                              fontWeight: 300,
+                              fontSize: '14px',
+                              lineHeight: '18.23px',
+                              letterSpacing: '0%',
+                              opacity: 1,
+                            },
+                          }}
+                          inputProps={{
+                            sx: {
+                              textAlign: 'left',
+                            },
+                          }}
+                          required
+                          name="specific_domain_skills"
+                          // value={secondarySkillName.join(', ')} // Show skills as comma-separated values
+                          value={specificDomainSkillsAi}
+                          onChange={handleChangeSpecificDomainSkillsAi}
+                        // helperText={
+                        //   secondarySkillForm ? 'Enter atleast one skill' : ''
+                        // }
+                        />
+
+                      </Grid>
+                    </Grid>
+
+                    <Grid id="location" item>
+                      <div style={{ display: 'flex', alignItems: 'center' }}>
+                        <div style={{ fontFamily: '"Segoe Script", cursive', fontSize: '24px', fontWeight: 'bold', color: '#e65100' }}>
+                          📍
+                        </div>
+                        <div style={{ fontSize: '15px', marginLeft: '4px' }}>
+                          Location
+                        </div>
+                      </div>
+                      <Grid sx={{
+                        display: 'flex', alignItems: 'center', justifyContent: 'space-between',
+                        color: '#00000080',
+                        borderRadius: '5px',
+                        // border: '0.5px solid #bdbdbd',
+                        height: '40px',
+                        background: '#FFFFFF',
+                        textAlign: 'center',
+                        padding: '20px 0px 20px 0px',
+                        fontFamily: 'SF Pro Display',
+                        fontWeight: 300,
+                        fontSize: '14px',
+                        lineHeight: '18.23px',
+                        letterSpacing: '0%',
+                        opacity: 1,
+                      }}>
+                        <Grid
+                          container
+                          // spacing={2}
+                          // justifyContent="space-between"
+                          spacing={1}
+                          direction="row"
+                        // sx={{ padding: '0 36px' }}
+                        >
+
+                          <Grid id="mainCountry" item xs={4}>
+                            <Autocomplete
+                              sx={{
+                                width: '100%',
+                                '& .MuiOutlinedInput-root': {
+                                  // height: '40px',
+                                  width: '100%',
+
+                                  // fontSize: '12px',
+
+                                  background: '#FFFFFF',
+                                  // border: '0.5px solid #00000080',
+                                  color: '#00000080',
+                                  borderRadius: '5px',
+                                  padding: '0px 0px 0px 15px',
+
+
+                                  fontFamily: 'SF Pro Display',
+                                  fontWeight: 300,
+                                  fontSize: '14px',
+                                  lineHeight: '18.23px',
+                                  letterSpacing: '0%',
+
+                                  opacity: 1,
+
+                                  height: '44px',
+                                  // // borderRadius: '12px',
+                                  border: '1px solid #bdbdbd',
+                                  '& fieldset': { borderColor: 'transparent' },
+                                  '&:hover fieldset': { borderColor: 'transparent' },
+                                  '&.Mui-focused fieldset': {
+                                    borderColor: 'transparent',
+                                  },
+                                },
+                              }}
+                              // value={selectedCountry || null}
+                              value={
+                                selectedCountry || null
+                                // selectedCountry || (editAijd === true ? countryAi : null)
+                              }
+                              options={countries}
+                              getOptionLabel={(option) => option.name}
+                              onChange={(event, newValue) => {
+                                if (newValue) {
+                                  setCountryIso2(newValue.iso2)
+                                  setSelectedCountry(newValue)
+                                  setSelectedCountryValue(newValue.name)
+                                  setCountryError(false)
+
+                                  // Reset state and city when country changes
+                                  setStateIso2('')
+                                  setSelectedState('')
+                                  setSelectedStateValue('')
+                                  // setStateError(false)
+
+                                  setSelectedCity('')
+                                  setSelectedCityValue('')
+                                  // setCityError(false)
+                                } else {
+                                  setCountryIso2('')
+                                  setSelectedCountry('')
+                                  setCountryError(true)
+
+                                  // Reset state and city when no country is selected
+                                  setStateIso2('')
+                                  setSelectedState('')
+                                  setSelectedStateValue('')
+                                  // setStateError(false)
+
+                                  setSelectedCity('')
+                                  setSelectedCityValue('')
+                                  // setCityError(false)
+                                }
+                              }}
+                              renderInput={(params) => (
+                                <TextField
+                                  {...params}
+                                  placeholder='Country'
+                                  sx={{
+                                    '& .MuiInputBase-input::placeholder': {
+                                      fontFamily: 'SF Pro Display',
+                                      fontWeight: 300,
+                                      fontSize: '14px',
+                                      lineHeight: '18.23px',
+                                      letterSpacing: '0%',
+                                      color: '#00000080',
+                                      opacity: 1,
+                                    },
+                                  }}
+
+                                  helperText={countryError}
+                                // helperText={countryError ? "Please select a country" : ""}
+                                />
+                              )}
+                            />
+                            {countryError ? (
+                              <p style={{ color: 'red', margin: '0px', padding: '0px' }}>
+                                select country
+                              </p>
+                            ) : (
+                              ''
+                            )}
+                          </Grid>
+
+                          <Grid id="mainState" item xs={4}>
+                            <Autocomplete
+                              sx={{
+                                width: '100%',
+                                '& .MuiOutlinedInput-root': {
+                                  // height: '40px',
+                                  width: '100%',
+
+                                  // fontSize: '12px',
+
+                                  background: '#FFFFFF',
+                                  border: '0.5px solid #bdbdbd',
+                                  color: '#00000080',
+                                  borderRadius: '5px',
+                                  padding: '5px 0px 5px 15px',
+
+                                  fontFamily: 'SF Pro Display',
+                                  fontWeight: 300,
+                                  fontSize: '14px',
+                                  lineHeight: '18.23px',
+                                  letterSpacing: '0%',
+
+                                  opacity: 1,
+                                  height: '44px',
+                                  // borderRadius: '12px',
+                                  // border: '1px solid #00000080',
+                                  '& fieldset': { borderColor: 'transparent' },
+                                  '&:hover fieldset': { borderColor: 'transparent' },
+                                  '&.Mui-focused fieldset': {
+                                    borderColor: 'transparent',
+                                  },
+                                },
+                              }}
+                              options={states}
+                              // value={selectedState || null} // Ensure the selected value updates
+                              value={
+                                selectedState || null
+                              }
+                              getOptionLabel={(option) => option.name}
+                              onChange={(event, newValue) => {
+                                if (newValue && selectedCountry) {
+                                  setStateIso2(newValue.iso2)
+                                  setSelectedState(newValue)
+                                  setSelectedStateValue(newValue.name)
+                                  setStateError(false)
+
+                                  setSelectedCity('')
+                                  setSelectedCityValue('')
+                                  setCityError(false)
+                                  setLocationError(false)
+                                } else {
+                                  setStateIso2('')
+                                  setSelectedState('')
+                                  setStateError(true)
+
+                                  setSelectedCity('')
+                                  setSelectedCityValue('')
+                                  setCityError(false)
+                                  setLocationError(false)
+                                }
+                              }}
+                              renderInput={(params) => (
+                                <TextField
+                                  {...params}
+                                  placeholder="State"
+                                  sx={{
+                                    '& .MuiInputBase-input::placeholder': {
+                                      fontFamily: 'SF Pro Display',
+                                      fontWeight: 300,
+                                      fontSize: '14px',
+                                      lineHeight: '18.23px',
+                                      letterSpacing: '0%',
+                                      color: '#00000080',
+                                      opacity: 1,
+                                    },
+                                  }}
+                                  helperText={stateError}
+                                />
+                              )}
+                              disabled={!selectedCountry} // Disable until a country is selected
+                            />
+                            {stateError ? (
+                              <p style={{ color: 'red', margin: '0px', padding: '0px' }}>
+                                select state
+                              </p>
+                            ) : (
+                              ''
+                            )}
+                          </Grid>
+
+                          <Grid id="mainCity" item xs={3.9}>
+                            <Autocomplete
+                              sx={{
+                                width: '100%',
+                                '& .MuiOutlinedInput-root': {
+                                  // height: '40px',
+                                  width: '100%',
+
+                                  // fontSize: '12px',
+
+                                  background: '#FFFFFF',
+                                  border: '0.5px solid #bdbdbd',
+                                  color: '#00000080',
+                                  borderRadius: '5px',
+                                  padding: '0px 0px 0px 15px',
+
+                                  fontFamily: 'SF Pro Display',
+                                  fontWeight: 300,
+                                  fontSize: '14px',
+                                  lineHeight: '18.23px',
+                                  letterSpacing: '0%',
+
+                                  opacity: 1,
+
+                                  height: '44px',
+                                  // // borderRadius: '12px',
+                                  // border: '1px solid #00000080',
+                                  '& fieldset': { borderColor: 'transparent' },
+                                  '&:hover fieldset': { borderColor: 'transparent' },
+                                  '&.Mui-focused fieldset': {
+                                    borderColor: 'transparent',
+                                  },
+                                },
+                              }}
+                              // value={selectedCity || null} // Ensure the selected value updates
+                              value={selectedCity || null
+                                // selectedCity || (editAijd === true ? cityAi : null)
+                              }
+                              options={cities}
+                              getOptionLabel={(option) => option.name}
+                              onChange={(event, newValue) => {
+                                console.log('Selected City:', newValue)
+                                if (newValue) {
+                                  setSelectedCity(newValue)
+                                  setSelectedCityValue(newValue.name)
+                                  setCityError(false)
+                                } else {
+                                  setSelectedCity('')
+                                  setCityError(true)
+                                }
+                              }}
+                              renderInput={(params) => (
+                                <TextField
+                                  {...params}
+                                  placeholder="City"
+                                  sx={{
+                                    '& .MuiInputBase-input::placeholder': {
+                                      fontFamily: 'SF Pro Display',
+                                      fontWeight: 300,
+                                      fontSize: '14px',
+                                      lineHeight: '18.23px',
+                                      letterSpacing: '0%',
+                                      color: '#00000080',
+                                      opacity: 1,
+                                    },
+                                  }}
+                                  helperText={cityError}
+                                />
+                              )}
+                              disabled={!selectedState} // Disable until a state is selected
+                            />
+                            {cityError ? (
+                              <p style={{ color: 'red', margin: '0px', padding: '0px' }}>
+                                select city
+                              </p>
+                            ) : (
+                              ''
+                            )}
+                          </Grid>
+                        </Grid>
+
+
+
+                      </Grid>
+                    </Grid>
+                  </DialogContentText>
+                </DialogContent>
+                <DialogActions>
+                  <Grid
+                    sx={{
+                      display: 'flex',
+                      alignItems: 'center',
+                      justifyContent: 'center',
+                      width: '100%',
+                      padding: '10px'
+                    }}
+                  >
+                    {/* Left side button */}
+                    <Button
+                      onClick={submitFormAi}
+                      sx={{
+                        fontFamily: 'SF Pro Display',
+                        fontWeight: 500,
+                        fontSize: '14px',
+                        lineHeight: '100%',
+                        letterSpacing: '0%',
+                        color: 'rgba(28, 28, 30, 1)',
+                        boxShadow: '0px 0px 8px 0px rgba(28, 28, 30, 0.08)',
+                        border: '0.5px solid rgba(28, 28, 30, 0.25)',
+                        borderRadius: '50px',
+                        textTransform: 'none',
+                        padding: '9px 20px',
+                        '&:hover': {
+                          background: 'rgba(2, 132, 199, 1)',
+                          color: '#fff',
+                          border: '0.5px solid transparent',
                         },
-                      },
-                    }}
-                    // value={selectedCity || null} // Ensure the selected value updates
-                    value={selectedCity || null
-                      // selectedCity || (editAijd === true ? cityAi : null)
-                    }
-                    options={cities}
-                    getOptionLabel={(option) => option.name}
-                    onChange={(event, newValue) => {
-                      console.log('Selected City:', newValue)
-                      if (newValue) {
-                        setSelectedCity(newValue)
-                        setSelectedCityValue(newValue.name)
-                        setCityError(false)
-                      } else {
-                        setSelectedCity('')
-                        setCityError(true)
-                      }
-                    }}
-                    renderInput={(params) => (
-                      <TextField
-                        {...params}
-                        placeholder="City"
-                        sx={{
-                          '& .MuiInputBase-input::placeholder': {
-                            fontFamily: 'SF Pro Display',
-                            fontWeight: 300,
-                            fontSize: '14px',
-                            lineHeight: '18.23px',
-                            letterSpacing: '0%',
-                            color: '#00000080',
-                            opacity: 1,
-                          },
-                        }}
-                        helperText={cityError}
-                      />
-                    )}
-                    disabled={!selectedState} // Disable until a state is selected
-                  />
-                  {cityError ? (
-                    <p style={{ color: 'red', margin: '0px', padding: '0px' }}>
-                      select city
-                    </p>
-                  ) : (
-                    ''
-                  )}
-                </Grid>
-      </Grid>
+                      }}
+                    >
+                      <AutoAwesomeIcon sx={{ color: '#ffeb3b' }} /> &nbsp;&nbsp; Create Job Description
+                    </Button>
 
+                    {/* Right side button */}
+                  </Grid>
+                </DialogActions>
 
-      
-      </Grid>  
-      </Grid>
-          </DialogContentText>
-        </DialogContent>
-       <DialogActions>
-  <Grid
-    sx={{
-      display: 'flex',
-      alignItems: 'center',
-      justifyContent: 'center',
-      width: '100%',
-      padding:'10px'
-    }}
-  >
-    {/* Left side button */}
-    <Button
-      onClick={submitFormAi}
-      sx={{
-        fontFamily: 'SF Pro Display',
-        fontWeight: 500,
-        fontSize: '14px',
-        lineHeight: '100%',
-        letterSpacing: '0%',
-        color: 'rgba(28, 28, 30, 1)',
-        boxShadow: '0px 0px 8px 0px rgba(28, 28, 30, 0.08)',
-        border: '0.5px solid rgba(28, 28, 30, 0.25)',
-        borderRadius: '50px',
-        textTransform: 'none',
-        padding: '9px 20px',
-        '&:hover': {
-          background: 'rgba(2, 132, 199, 1)',
-          color: '#fff',
-          border: '0.5px solid transparent',
-        },
-      }}
-    >
-      <AutoAwesomeIcon sx={{ color: '#ffeb3b' }} /> &nbsp;&nbsp; Create Job Description
-    </Button>
-
-    {/* Right side button */}
-  </Grid>
-</DialogActions>
-
-      </Dialog>
-      </React.Fragment>
-      {/* preview ends here.. */}
+              </Dialog>
+            </React.Fragment>
+            {/* preview ends here.. */}
 
 
 
 
-      <input
-        ref={fileInputRef}
-        type="file"
-        accept=".pdf,.docx"
-        style={{ display: 'none' }}
-        onChange={handleFileChange}
-      />
+            <input
+              ref={fileInputRef}
+              type="file"
+              accept=".pdf,.docx"
+              style={{ display: 'none' }}
+              onChange={handleFileChange}
+            />
 
-      {uploadedFileName && (
-        <div style={{ display: 'flex', alignItems: 'center', gap: '8px', fontSize: '14px' }}>
-          {uploadSuccess && <CheckCircle size={16} color="green" />}
-          <span>{uploadedFileName} uploaded</span>
-        </div>
-      )}
+            {uploadedFileName && (
+              <div style={{ display: 'flex', alignItems: 'center', gap: '8px', fontSize: '14px' }}>
+                {uploadSuccess && <CheckCircle size={16} color="green" />}
+                <span>{uploadedFileName} uploaded</span>
+              </div>
+            )}
           </div>
         </div>
 
 
-<Grid container sx={{display:'flex', alignItems:'center', justifyContent:'center'}}>
-  <Grid item>
-     <button
-            // onClick={handleGenerate}
-            onClick={handleGenerateAijd}
-            disabled={isGenerating}
-            style={{
-              marginTop:'5px',
-              padding: '8px 20px',
-              background: isGenerating 
-                ? 'linear-gradient(135deg, #ccc, #999)' 
-                : 'linear-gradient(135deg, #2196f3, #21cbf3)',
-              border: 'none',
-              borderRadius: '12px',
-              color: 'white',
-              cursor: isGenerating ? 'not-allowed' : 'pointer',
-              display: 'flex',
-              alignItems: 'center',
-              gap: '10px',
-              fontSize: '16px',
-              fontWeight: '600',
-              boxShadow: '0 4px 15px rgba(33, 150, 243, 0.3)',
-              transition: 'all 0.3s ease'
-            }}
-          >
-            <Sparkles size={20} />
-            {isGenerating ? 'Generating...' : 'Generate with AI'}
-          </button>
-  </Grid>
-</Grid>
-         
+        <Grid container sx={{ display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
+          <Grid item>
+            <button
+              // onClick={handleGenerate}
+              onClick={handleGenerateAijd}
+              disabled={isGenerating}
+              style={{
+                marginTop: '5px',
+                padding: '8px 20px',
+                background: isGenerating
+                  ? 'linear-gradient(135deg, #ccc, #999)'
+                  : 'linear-gradient(135deg, #2196f3, #21cbf3)',
+                border: 'none',
+                borderRadius: '12px',
+                color: 'white',
+                cursor: isGenerating ? 'not-allowed' : 'pointer',
+                display: 'flex',
+                alignItems: 'center',
+                gap: '10px',
+                fontSize: '16px',
+                fontWeight: '600',
+                boxShadow: '0 4px 15px rgba(33, 150, 243, 0.3)',
+                transition: 'all 0.3s ease'
+              }}
+            >
+              <Sparkles size={20} />
+              {isGenerating ? 'Generating...' : 'Generate with AI'}
+            </button>
+          </Grid>
+        </Grid>
+
         {/* Footer */}
         <div style={{
           marginTop: '10px',
@@ -4250,138 +4538,142 @@ setShowButtons(true)
           color: '#999',
           textAlign: 'center'
         }}>
-          © 2025 aipoint.ai • Empowering Recruiters with AI • 
+          © 2025 aipoint.ai • Empowering Recruiters with AI •
           <a href="mailto:support@aipoint.ai" style={{ color: '#2196f3', textDecoration: 'none' }}>
             support@aipoint.ai
           </a>
         </div>
       </div>
 
-          <Backdrop
-        sx={(theme) => ({ color: '#fff',
-          backgroundColor: 'rgba(240, 250, 255, 0.81)', 
-    zIndex: theme.zIndex.drawer + 1 })}
+      <Backdrop
+        sx={(theme) => ({
+          color: '#fff',
+          backgroundColor: 'rgba(240, 250, 255, 0.81)',
+          zIndex: theme.zIndex.drawer + 1
+        })}
         open={openGeneration}
-        // onClick={handleCloseGeneration}
+      // onClick={handleCloseGeneration}
       >
-      <Grid
-  container
-  direction="column"
-  justifyContent="center"
-  alignItems="center"
-  spacing={2}
-  sx={{ minHeight: '100vh', textAlign: 'center' }}
->
-  {/* Image Box */}
-  <Grid item>
-    <Box>
-      <img
-        src="/assets/static/SVG/sparkle.svg"
-        alt="Sparkle"
-        style={{ width: '220px', height: 'auto' }} // Adjust size as needed
-      />
-    </Box>
-  </Grid>
+        <Grid
+          container
+          direction="column"
+          justifyContent="center"
+          alignItems="center"
+          spacing={2}
+          sx={{ minHeight: '100vh', textAlign: 'center' }}
+        >
+          {/* Image Box */}
+          <Grid item>
+            <Box>
+              <img
+                src="/assets/static/SVG/sparkle.svg"
+                alt="Sparkle"
+                style={{ width: '220px', height: 'auto' ,animation:isAnimated?'':'blink 1.2s infinite ease-in-out',}} // Adjust size as needed
+              />
+            </Box>
+          </Grid>
 
-  {/* Text Box */}
-  <Grid item>
-    <Box sx={{ maxWidth: '600px', px: 2 }}>
-      <h1
-        style={{
-          // fontSize: '36px',
-          // fontWeight: 700,
-          marginBottom: '15px',
-          // background: 'linear-gradient(135deg, #1976d2, #21cbf3)',
-          // WebkitBackgroundClip: 'text',
-          // WebkitTextFillColor: 'transparent',
+          {/* Text Box */}
+          <Grid item>
+            <Box sx={{ maxWidth: '600px', px: 2 }}>
+              <h1
+                style={{
+                  // fontSize: '36px',
+                  // fontWeight: 700,
+                  marginBottom: '15px',
+                  // background: 'linear-gradient(135deg, #1976d2, #21cbf3)',
+                  // WebkitBackgroundClip: 'text',
+                  // WebkitTextFillColor: 'transparent',
 
-           fontFamily: 'SF Pro Display',
-  fontWeight: 600,
-  fontSize: '24px',
-  lineHeight: '100%',
-  letterSpacing: '0%',
-  color: 'rgba(2, 132, 199, 1)',
-        }}
-      >
-        Generating Your Smart Job Description…
-      </h1>
-      <p
-        style={{
-           fontFamily: 'SF Pro Display',
-  fontWeight: 500,
-  fontSize: '14px',
-  lineHeight: '100%',
-  letterSpacing: '0%',
-color: 'rgba(28, 28, 30, 1)',
-         }}
-      >
-        We’re analyzing your inputs, refining the language, and structuring the
-        perfect JD tailored to your needs. Hang tight — this will just take a
-        moment!
-      </p>
-    </Box>
-  </Grid>
+                  fontFamily: 'SF Pro Display',
+                  fontWeight: 600,
+                  fontSize: '24px',
+                  lineHeight: '100%',
+                  letterSpacing: '0%',
+                  color: 'rgba(2, 132, 199, 1)',
+                }}
+              >
+                Generating Your Smart Job Description…
+              </h1>
+              <p
+                style={{
+                  fontFamily: 'SF Pro Display',
+                  fontWeight: 500,
+                  fontSize: '14px',
+                  lineHeight: '100%',
+                  letterSpacing: '0%',
+                  color: 'rgba(28, 28, 30, 1)',
+                }}
+              >
+                We’re analyzing your inputs, refining the language, and structuring the
+                perfect JD tailored to your needs. Hang tight — this will just take a
+                moment!
+              </p>
+            </Box>
+          </Grid>
 
-{showButtons && (<>
+          {showButtons && (<>
 
-<Grid container sx={{display:'flex', alignItems:'center',justifyContent:'center',gap:'8px', marginTop:'40px'}}>
+            <Grid container sx={{ display: 'flex', alignItems: 'center', justifyContent: 'center', gap: '8px', marginTop: '40px' }}>
 
-  <Button sx={{ fontFamily: 'SF Pro Display',
-  fontWeight: 500,
-  fontSize: '14px',
-  lineHeight: '100%',
-  letterSpacing: '0%',
-color: 'rgba(28, 28, 30, 1)',
-boxShadow: '0px 0px 8px 0px rgba(28, 28, 30, 0.08)',
-border: '0.5px solid rgba(28, 28, 30, 0.25)',
-borderRadius:'50px',
-textTransform:'none',
- padding:'10px 20px',
- '&:hover':{
-  background:' rgba(2, 132, 199, 1)',
-  color:'#fff',
-  border: '0.5px solid transparent',
+              <Button sx={{
+                fontFamily: 'SF Pro Display',
+                fontWeight: 500,
+                fontSize: '14px',
+                lineHeight: '100%',
+                letterSpacing: '0%',
+                color: 'rgba(28, 28, 30, 1)',
+                boxShadow: '0px 0px 8px 0px rgba(28, 28, 30, 0.08)',
+                border: '0.5px solid rgba(28, 28, 30, 0.25)',
+                borderRadius: '50px',
+                textTransform: 'none',
+                padding: '10px 20px',
+                '&:hover': {
+                  background: ' rgba(2, 132, 199, 1)',
+                  color: '#fff',
+                  border: '0.5px solid transparent',
 
- } 
-}}
- onClick={handleCloseGeneration}
+                }
+              }}
+                onClick={handleCloseGeneration}
 
->
-<KeyboardBackspaceIcon/> &nbsp;&nbsp;Back to canvas
-  </Button>
-  <Button 
-  onClick={handleClickOpenPreview('paper')}
-  sx={{ fontFamily: 'SF Pro Display',
-  fontWeight: 500,
-  fontSize: '14px',
-  lineHeight: '100%',
-  letterSpacing: '0%',
-color: 'rgba(28, 28, 30, 1)',
-boxShadow: '0px 0px 8px 0px rgba(28, 28, 30, 0.08)',
-border: '0.5px solid rgba(28, 28, 30, 0.25)',
-borderRadius:'50px',
-textTransform:'none',
- padding:'9px 20px',
- '&:hover':{
-  background:' rgba(2, 132, 199, 1)',
-  color:'#fff',
-  border: '0.5px solid transparent',
+              >
+                <KeyboardBackspaceIcon /> &nbsp;&nbsp;Back to canvas
+              </Button>
+              <Button
+                onClick={handleClickOpenPreview('paper')}
+                sx={{
+                  fontFamily: 'SF Pro Display',
+                  fontWeight: 500,
+                  fontSize: '14px',
+                  lineHeight: '100%',
+                  letterSpacing: '0%',
+                  color: 'rgba(28, 28, 30, 1)',
+                  boxShadow: '0px 0px 8px 0px rgba(28, 28, 30, 0.08)',
+                  border: '0.5px solid rgba(28, 28, 30, 0.25)',
+                  borderRadius: '50px',
+                  textTransform: 'none',
+                  padding: '9px 20px',
+                  '&:hover': {
+                    background: ' rgba(2, 132, 199, 1)',
+                    color: '#fff',
+                    border: '0.5px solid transparent',
 
- }
-}}>
-<AutoAwesomeIcon sx={{color:'#ffeb3b'}}/> &nbsp; &nbsp; Preview Job Description
-  </Button>
-  </Grid>
-</>)}
-   
-</Grid>
-  
- 
-  
+                  }
+                }}>
+                <AutoAwesomeIcon sx={{ color: '#ffeb3b' }} /> &nbsp; &nbsp; Preview Job Description
+              </Button>
+            </Grid>
+          </>)}
+
+        </Grid>
+
+
+
 
 
       </Backdrop>
-          
+
     </div>
   );
 };

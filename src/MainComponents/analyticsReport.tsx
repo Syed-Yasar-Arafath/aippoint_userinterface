@@ -52,7 +52,7 @@ function AnalyticsReport() {
         const fetchInterviewData = async () => {
             const organisation = localStorage.getItem('organisation');
             try {
-                const response = await axios.get("http://localhost:8000/get_all_interview_data/", {
+                const response = await axios.get(`${process.env.REACT_APP_DJANGO_PYTHON_MODULE_SERVICE}/get_all_interview_data/`, {
                     headers: {
                         "Content-Type": "application/json",
                         Organization: organisation || ''

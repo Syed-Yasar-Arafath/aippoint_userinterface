@@ -428,7 +428,7 @@ const NoScore = () => {
     dispatch(loaderOn())
     try {
       const response = await axios.post(
-        `${process.env.REACT_APP_DJANGO_PYTHON_MODULE_SERVICE}/resume_scoring/`,
+        `http://34.93.77.97:8006/resume_scoring/`,
         { job_id },
         {
           headers: {

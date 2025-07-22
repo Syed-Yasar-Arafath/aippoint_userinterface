@@ -513,6 +513,7 @@ import {
   InputBase,
   MenuItem,
   Select,
+  Tooltip,
   Typography,
 } from '@mui/material'
 import { useNavigate } from 'react-router-dom'
@@ -762,7 +763,7 @@ const JdCollection: React.FC = () => {
   })
 
 
-  const pageSize = 4
+  const pageSize = 3
   const totalPages = Math.ceil(filteredJobs.length / pageSize)
   const startIdx = (currentPage - 1) * pageSize
   const endIdx = startIdx + pageSize
@@ -797,7 +798,8 @@ const JdCollection: React.FC = () => {
         borderColor: '#e0e0e0',
         px: 2,
         py: 1.5,
-        // height: '100px'
+        height: '90px',
+        overflow: 'hidden',
       }}
     >
       <Grid container spacing={2} alignItems="flex-start">
@@ -806,16 +808,18 @@ const JdCollection: React.FC = () => {
         </Grid>
 
         <Grid item xs>
-          <Typography sx={{ fontFamily: 'SF Pro Display', color: '#0284C7', fontWeight: 500, fontSize: '14px', lineHeight: '100%' }}>
+          <Typography variant="inherit"
+            sx={{ fontFamily: 'SF Pro Display', color: '#0284C7', fontWeight: 500, fontSize: '14px', lineHeight: '100%' }}>
             {job.job_title}
           </Typography>
-          <Typography sx={{ fontSize: 10, color: '#666', paddingTop: '9px' }}>
+          <Typography variant="inherit"
+            sx={{ fontSize: 10, color: '#666', paddingTop: '9px' }}>
             Created: <span>{job.created_on}</span>
           </Typography>
-          <Typography sx={{ fontSize: 10, color: '#666', paddingTop: '9px' }}>
+          <Typography variant="inherit" sx={{ fontSize: 10, color: '#666', paddingTop: '9px' }}>
             Job ID: <span>{job.referenceNumber}</span>
           </Typography>
-          <Typography sx={{ fontSize: 10, color: '#666', paddingTop: '9px' }}>
+          <Typography variant="inherit" sx={{ fontSize: 10, color: '#666', paddingTop: '9px' }}>
             Created By: <span>{creator}</span>
           </Typography>
 
@@ -865,26 +869,34 @@ const JdCollection: React.FC = () => {
         <Grid item xs={4}>
           <Grid container spacing={1}>
             <Grid item>
-              <Typography sx={pillStyle}>
+              <Typography variant="inherit" sx={pillStyle}>
                 Experience: {job.experience_required}
               </Typography>
             </Grid>
             <Grid item>
-              <Typography sx={pillStyle}>{job.job_type[0]}</Typography>
+              <Typography variant="inherit" sx={pillStyle}>{job.job_type[0]}</Typography>
             </Grid>
             <Grid item>
-              <Typography sx={pillStyle}>{job.modeOfWork}</Typography>
+              <Typography variant="inherit" sx={pillStyle}>{job.modeOfWork}</Typography>
             </Grid>
             <Grid item>
-              <Typography sx={pillStyle}>
+              <Typography variant="inherit" sx={pillStyle}>
                 Open: {job.no_of_open_positions}
               </Typography>
             </Grid>
             <Grid item>
-              <Typography sx={pillStyle}>Skills: {job.skills}</Typography>
+              {/* <Typography sx={pillStyle}>Skills: {job.skills}</Typography> */}
+              <Tooltip title={job.skills} arrow>
+                <Typography variant="inherit" sx={pillStyle}>
+                  Skills:{' '}
+                  {job.skills.split(',').slice(0, 1).join(', ')}
+                  {job.skills.split(',').length > 2 ? ', ...' : ''}
+                </Typography>
+              </Tooltip>
+
             </Grid>
             <Grid item>
-              <Typography sx={pillStyle}>
+              <Typography variant="inherit" sx={pillStyle}>
                 {job.newLocation.city}, {job.newLocation.country}
               </Typography>
             </Grid>
@@ -894,7 +906,7 @@ const JdCollection: React.FC = () => {
         <Divider orientation="vertical" flexItem sx={{ mx: 2, my: 2, borderColor: '#333', borderWidth: '1.5px' }} />
 
         {/* <Grid item xs={2} sx={{ display: 'flex', flexDirection: 'column', alignItems: 'flex-end', justifyContent: 'center', marginLeft: '180px' }}> */}
-        <Grid item xs={3} sx={{ display: 'flex', flexDirection: 'column', alignItems: 'flex-end', justifyContent: 'center', marginLeft: '15px' }}>
+        <Grid item xs={4} sx={{ display: 'flex', flexDirection: 'column', }}>
           <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', gap: '16px' }}>
             <div style={{ display: 'flex', gap: '12px', flexWrap: 'nowrap' }}>
               <div style={{ border: '1px solid #e5e7eb', borderRadius: '8px', padding: '0px 16px', color: '#6b7280', fontSize: '10px', display: 'flex', alignItems: 'center', height: '40px', justifyContent: 'flex-start', whiteSpace: 'nowrap' }}>
@@ -906,11 +918,11 @@ const JdCollection: React.FC = () => {
                   {/* {job.matchingProfiles} */}
                 </span>
               </div>
-              <div style={{ border: '1px solid #e5e7eb', borderRadius: '8px', padding: '0px 16px', color: '#6b7280', fontSize: '10px', display: 'flex', alignItems: 'center', height: '40px', justifyContent: 'flex-start', whiteSpace: 'nowrap', fontFamily: 'SF Pro Display' }}>
+              <div style={{ gap: '8px', border: '1px solid #e5e7eb', borderRadius: '8px', padding: '0px 16px', color: '#6b7280', fontSize: '10px', display: 'flex', alignItems: 'center', height: '40px', justifyContent: 'flex-start', whiteSpace: 'nowrap', fontFamily: 'SF Pro Display' }}>
                 New Matching Profiles : {matchingResumes[job.jobid]}
-                {/* <button onClick={() => handleViewClick(job.jobid)}
+                <button onClick={() => handleViewClick(job.jobid)}
                 > view
-                </button> */}
+                </button>
                 <span style={{ marginLeft: '4px', color: 'green', fontWeight: 400, fontFamily: 'SF Pro Display', fontSize: '10px' }}>
                   {/* + {job.newProfiles} New */}
                   {/* <button onClick={() => handleClickScore(job.jobid)}>Score</button> */}
@@ -1006,9 +1018,10 @@ const JdCollection: React.FC = () => {
               // )}
               renderValue={(selected) =>
                 selected ? (
-                  <Typography sx={{ color: '#666', fontSize: '12px' }}>{selected}</Typography>
+                  <Typography variant="inherit"
+                    sx={{ color: '#666', fontSize: '12px' }}>{selected}</Typography>
                 ) : (
-                  <Typography sx={{ color: '#aaa', fontSize: '12px' }}>
+                  <Typography variant="inherit" sx={{ color: '#aaa', fontSize: '12px' }}>
                     Select Job Role
                   </Typography>
                 )
@@ -1034,14 +1047,14 @@ const JdCollection: React.FC = () => {
               //   </Typography>
               // )}
               renderValue={(selected) =>
-  selected ? (
-    <Typography sx={{ color: '#000', fontSize: '12px' }}>{selected}</Typography>
-  ) : (
-    <Typography sx={{ color: '#aaa', fontSize: '12px' }}>
-      Select Experience
-    </Typography>
-  )
-}
+                selected ? (
+                  <Typography variant="inherit" sx={{ color: '#000', fontSize: '12px' }}>{selected}</Typography>
+                ) : (
+                  <Typography variant="inherit" sx={{ color: '#aaa', fontSize: '12px' }}>
+                    Select Experience
+                  </Typography>
+                )
+              }
 
             >
               <MenuItem value="" disabled>Select Experience</MenuItem>
@@ -1074,16 +1087,16 @@ const JdCollection: React.FC = () => {
               onChange={(e) => setLocationFilter(e.target.value)}
               displayEmpty
               sx={{ height: '40px', width: '158px', fontSize: '14px', border: '1px solid #ccc', borderRadius: '4px', backgroundColor: '#fff' }}
-             renderValue={(selected) =>
-    selected ? (
-      <Typography sx={{ color: '#000', fontSize: '12px' }}>{selected}</Typography>
-    ) : (
-      <Typography sx={{ color: '#aaa', fontSize: '12px' }}>
-        Select Location
-      </Typography>
-    )
-  }
-           >
+              renderValue={(selected) =>
+                selected ? (
+                  <Typography variant="inherit" sx={{ color: '#000', fontSize: '12px' }}>{selected}</Typography>
+                ) : (
+                  <Typography variant="inherit" sx={{ color: '#aaa', fontSize: '12px' }}>
+                    Select Location
+                  </Typography>
+                )
+              }
+            >
               <MenuItem value="" disabled>Select Location</MenuItem>
               {locations.map((loc) => (
                 <MenuItem key={loc} value={loc}>
@@ -1121,11 +1134,11 @@ const JdCollection: React.FC = () => {
 
         {/* Job Cards */}
         {loading ? (
-          <Typography>Loading jobs...</Typography>
+          <Typography variant="inherit">Loading jobs...</Typography>
         ) : error ? (
-          <Typography color="error">{error}</Typography>
+          <Typography variant="inherit" color="error">{error}</Typography>
         ) : jobs.length === 0 ? (
-          <Typography>No jobs found.</Typography>
+          <Typography variant="inherit">No jobs found.</Typography>
         ) : (
           paginatedJobs.map((job) => <JobCard key={job.jobid} job={job} />)
         )}
@@ -1155,7 +1168,7 @@ const JdCollection: React.FC = () => {
             </Grid>
           ))}
           <Grid item>
-            <Typography sx={{ fontSize: '12px', color: '#666', padding: '8px' }}>...</Typography>
+            <Typography variant="inherit" sx={{ fontSize: '12px', color: '#666', padding: '8px' }}>...</Typography>
           </Grid>
           <Grid item>
             <Button disabled={currentPage === totalPages} onClick={() => setCurrentPage(currentPage + 1)} sx={{ textTransform: 'none', fontSize: '12px' }}>

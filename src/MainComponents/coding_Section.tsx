@@ -303,7 +303,6 @@ function CodingSection() {
       return () => clearInterval(timer)
     } else {
       submitCode()
-
       handleNextQuestion()
       resetTimer()
       handleSubmitClose()
@@ -1203,12 +1202,15 @@ function CodingSection() {
                   fontSize: '14px',
                   fontWeight: 500,
                   textTransform: 'none',
-                  background: submitClicked ? '#0284C7' : '#FFFFFF',
+                  // background: submitClicked ? '#0284C7' : '#FFFFFF',
+                  background:'#0284C7',
                   borderRadius: '8px',
-                  border: submitClicked ? 'none' : '1px solid #000000',
-                  color: submitClicked ? '#FFFFFF' : '#000000',
+                  // border: submitClicked ? 'none' : '1px solid #000000',
+                  // color: submitClicked ? '#FFFFFF' : '#000000',
+                  color:'#FFFFFF',
                   '&:hover': {
-                    background: submitClicked ? '#0284C7' : '#F3F4F6',
+                    // background: submitClicked ? '#0284C7' : '#F3F4F6',
+                    background:'#0284C7'
                   },
                   height: '36px',
                   minWidth: '100px',

@@ -20,12 +20,13 @@ import {
 import {
   LocalizationProvider,
   DatePicker,
+  TimePicker,
 } from '@mui/x-date-pickers'
 import { SearchIcon } from 'lucide-react'
 import { useNavigate } from 'react-router-dom'
 import axios from 'axios'
 import Header from '../CommonComponents/topheader'
-import { Dayjs } from 'dayjs'
+import dayjs, { Dayjs } from 'dayjs'
 import { AdapterDayjs } from '@mui/x-date-pickers/AdapterDayjs'
 import EastIcon from '@mui/icons-material/East';
 import WestIcon from '@mui/icons-material/West';
@@ -52,12 +53,15 @@ const UpcomingInterview: React.FC = () => {
 
   const fetchAllInterviewData = async () => {
     try {
-      const result = await axios.get("https://parseez.ai/parseez-django-service/get_all_interview_data/", {
-        headers: {
-          "Content-Type": "application/json",
-          Organization: organisation || ''
+      const result = await axios.get(
+        `https://parseez.ai/parseez-django-service/get_all_interview_data`,
+        {
+          headers: {
+            "Content-Type": "application/json",
+            Organization: organisation || ''
+          }
         }
-      });
+      );
 
       const allData = Array.isArray(result.data.data)
         ? result.data.data
@@ -77,7 +81,8 @@ const UpcomingInterview: React.FC = () => {
   };
 
   useEffect(() => {
-    getUserId()
+    // getUserId()
+    fetchAllInterviewData()
   }, [])
 
   // useEffect(() => {
@@ -85,9 +90,6 @@ const UpcomingInterview: React.FC = () => {
   //     fetchAllInterviewData();
   //   }
   // }, [userId]);
-  useEffect(() => {
-      fetchAllInterviewData();
-  }, []);
 
   const navigate = useNavigate()
 
@@ -97,8 +99,10 @@ const UpcomingInterview: React.FC = () => {
 
   const handleResetFilters = () => {
     setSelectedJobRole('');
-    setSelectedExperience('');
+    setSelectedInterviewType('');
     setSelectedDate(null);
+    setStartTime(null);
+    setEndTime(null);
     setSearchCandidate('');
     setAwaitedInterviewData(awaitedInterview);
     setPage(0);
@@ -113,31 +117,60 @@ const UpcomingInterview: React.FC = () => {
     setSelectedJobRole(event.target.value);
   };
 
-  const experience = ['1', '2', '3', '4', '5', '6', '7', '8', '9', '10', '11', '12', '13']
+  const interviewType = ['Ai', 'Coding']
 
-  const [selectedExperience, setSelectedExperience] = useState('');
+  const [selectedInterviewType, setSelectedInterviewType] = useState('');
 
-  const handleExperience = (event: SelectChangeEvent) => {
-    console.log('Experience:', event.target.value)
-    setSelectedExperience(event.target.value);
+  const handleInterviewType = (event: SelectChangeEvent) => {
+    console.log('Interview Type:', event.target.value)
+    setSelectedInterviewType(event.target.value);
   };
 
   const [selectedDate, setSelectedDate] = useState<Dayjs | null>(null); //dayjs()
   const formattedDate = selectedDate?.format('DD-MM-YYYY');
   console.log(formattedDate);
 
+  const [startTime, setStartTime] = useState<Dayjs | null>(null);
+  const formattedStartTime = startTime?.format('hh:mm A');
+  console.log('Start Time', formattedStartTime)
+
+  const [endTime, setEndTime] = useState<Dayjs | null>(null);
+  const formattedEndTime = endTime?.format('hh:mm A');
+  console.log('End Time', formattedEndTime)
+
   const filteredData = awaitedInterviewData.filter((item) => {
 
     const matchesJobRole =
       !selectedJobRole || item.resume_data?.job_role?.toLowerCase() === selectedJobRole.toLowerCase();
 
-    const matchesExperience =
-      !selectedExperience || item.resume_data?.experience_in_number?.toString() === selectedExperience;
+    const matchesInterviewType =
+      !selectedInterviewType || item.interview_type.toLowerCase() === selectedInterviewType.toLowerCase();
 
     const matchesInterviewDate =
       !formattedDate || item.uploaded_at?.split(', ')[1] === formattedDate;
 
-    return matchesJobRole && matchesExperience && matchesInterviewDate;
+    // const matchesInterviewDateTime = (() => {
+    //   if (!selectedDate || !startTime || !endTime || !item.uploaded_at) return true;
+
+    //   const [timeStr, dateStr] = item.uploaded_at.split(', '); // "00:00 PM, 00-00-0000"
+    //   const fullDateTimeStr = `${dateStr} ${timeStr}`; // "00-00-0000 00:00 PM"
+
+    //   const itemDateTime = dayjs(fullDateTimeStr, 'DD-MM-YYYY hh:mm A');
+
+    //   const startDateTime = selectedDate
+    //     .hour(startTime.hour())
+    //     .minute(startTime.minute())
+    //     .second(0);
+
+    //   const endDateTime = selectedDate
+    //     .hour(endTime.hour())
+    //     .minute(endTime.minute())
+    //     .second(59);
+
+    //   return itemDateTime.isAfter(startDateTime) && itemDateTime.isBefore(endDateTime);
+    // })();
+
+    return matchesJobRole && matchesInterviewType && matchesInterviewDate;
   });
 
   const [searchCandidate, setSearchCandidate] = useState('');
@@ -150,8 +183,7 @@ const UpcomingInterview: React.FC = () => {
       const filteredData = awaitedInterview.filter((item: any) =>
         (item.resume_data?.name?.toLowerCase() || '').includes(value.toLowerCase()) ||
         (item.resume_data?.email?.toLowerCase() || '').includes(value.toLowerCase()) ||
-        (item.resume_data?.job_role?.toLowerCase() || '').includes(value.toLowerCase()) ||
-        (item.resume_data?.experience_in_number?.toString() || '').includes(value)
+        (item.resume_data?.job_role?.toLowerCase() || '').includes(value.toLowerCase())
       );
       setAwaitedInterviewData(filteredData);
       setPage(0);
@@ -172,6 +204,27 @@ const UpcomingInterview: React.FC = () => {
   };
 
   const theme = useTheme()
+
+  const sharedSlotProps = {
+    textField: {
+      variant: 'standard',
+      placeholder: '',
+      InputProps: {
+        disableUnderline: true,
+        sx: {
+          border: 'none',
+          backgroundColor: 'transparent',
+          color: '#1C1C1E',
+          fontSize: '10px',
+          fontWeight: 500,
+          fontFamily: 'SF Pro Display',
+          '& .MuiInputAdornment-root': {
+            marginLeft: { xl: '-50%', lg: '-50%' },
+          },
+        },
+      },
+    },
+  } as const;
 
   return (
     <>
@@ -271,8 +324,8 @@ const UpcomingInterview: React.FC = () => {
             <Grid item xs={12} sm={6} md={2}>
               <FormControl fullWidth>
                 <Select
-                  value={selectedExperience}
-                  onChange={handleExperience}
+                  value={selectedInterviewType}
+                  onChange={handleInterviewType}
                   displayEmpty
                   renderValue={(selected) =>
                     selected === '' ? (
@@ -281,7 +334,7 @@ const UpcomingInterview: React.FC = () => {
                         fontSize: '10px',
                         fontWeight: 500,
                         fontFamily: 'SF Pro Display',
-                      }}>Select Interview Status</span>
+                      }}>Select Interview Type</span>
                     ) : (
                       selected
                     )
@@ -294,17 +347,17 @@ const UpcomingInterview: React.FC = () => {
                     fontFamily: 'SF Pro Display',
                   }}
                 >
-                  {experience.map((exp, index) => (
+                  {interviewType.map((type, index) => (
                     <MenuItem
                       key={index}
-                      value={exp}
+                      value={type}
                       sx={{ fontFamily: 'SF Pro Display' }}
                       onClick={() => {
                         // setIsSelected(true)
                         setPage(0)
                       }}
                     >
-                      {exp}
+                      {type}
                     </MenuItem>
                   ))}
                 </Select>
@@ -316,38 +369,58 @@ const UpcomingInterview: React.FC = () => {
             </Grid>
 
             <Grid item xs={12} sm={6} md={2}>
-              <Box>
+              <Box sx={{
+                display: 'flex',
+                flexDirection: 'row'
+              }}>
                 <LocalizationProvider dateAdapter={AdapterDayjs}>
                   <DatePicker
                     value={selectedDate}
                     format="DD/MM/YYYY"
-                    // onChange={(newValue) => {
+                    // onChange={(newValue: Dayjs | null) => {
+                    //   setSelectedDate(newValue)
+                    // }}
                     onChange={(newValue: Dayjs | null) => {
                       setSelectedDate(newValue)
-                      // setIsSelected(true)
-                    }
-                    }
+                      setStartTime(null);
+                      setEndTime(null);
+                    }}
                     slotProps={{
+                      ...sharedSlotProps,
                       textField: {
-                        variant: 'standard',
+                        ...sharedSlotProps.textField,
                         placeholder: 'Date Range',
-                        InputProps: {
-                          disableUnderline: true,
-                          sx: {
-                            border: 'none',
-                            backgroundColor: 'transparent',
-                            color: '#1C1C1E',
-                            fontSize: '10px',
-                            fontWeight: 500,
-                            fontFamily: 'SF Pro Display',
-                            '& .MuiInputAdornment-root': {
-                              marginLeft: { xl: '-50%', lg: '-50%' } // adjust icon spacing
-                            }
-                          },
-                        },
-                      } as any,
+                      },
                     }}
                   />
+                  {/* <TimePicker
+                    value={startTime}
+                    // onChange={setStartTime}
+                    onChange={(newValue) => {
+                      setStartTime(newValue);
+                      setEndTime(null);
+                    }}
+                    disabled={!selectedDate}
+                    slotProps={{
+                      ...sharedSlotProps,
+                      textField: {
+                        ...sharedSlotProps.textField,
+                        placeholder: 'Start Time',
+                      },
+                    }}
+                  />
+                  <TimePicker
+                    value={endTime}
+                    onChange={setEndTime}
+                    disabled={!startTime}
+                    slotProps={{
+                      ...sharedSlotProps,
+                      textField: {
+                        ...sharedSlotProps.textField,
+                        placeholder: 'End Time',
+                      },
+                    }}
+                  /> */}
                 </LocalizationProvider>
               </Box>
             </Grid>
@@ -361,7 +434,8 @@ const UpcomingInterview: React.FC = () => {
                 sx={{
                   display: 'flex',
                   flexDirection: 'row',
-                  justifyContent: 'space-between',
+                  // justifyContent: 'space-between',
+                  justifyContent: 'center',
                 }}
               >
                 <Button
@@ -378,7 +452,7 @@ const UpcomingInterview: React.FC = () => {
                 >
                   Reset
                 </Button>
-                <Button
+                {/* <Button
                   sx={{
                     textTransform: 'none',
                     background: '#0284C7',
@@ -394,7 +468,7 @@ const UpcomingInterview: React.FC = () => {
                   onClick={() => navigate('/interviewSchedule')}
                 >
                   Schedule Interview
-                </Button>
+                </Button> */}
               </Box>
             </Grid>
           </Grid>
@@ -418,6 +492,46 @@ const UpcomingInterview: React.FC = () => {
             </Typography>
           </Grid>
 
+          <Grid item xs={12} sm={12} md={12} mt={1}>
+            <Typography
+              variant="inherit"
+              sx={{
+                fontSize: '12px',
+                fontFamily: 'SF Pro Display',
+                fontWeight: 700,
+                color: '#1C1C1E',
+              }}
+            >
+              Note:
+            </Typography>
+            <Typography variant="inherit">
+              <span
+                style={{
+                  width: 10,
+                  height: 10,
+                  borderRadius: '50%',
+                  background: '#34C759',
+                  display: 'inline-block',
+                  marginRight: 6,
+                }}
+              />
+              AI interview
+            </Typography>
+            <Typography variant="inherit">
+              <span
+                style={{
+                  width: 10,
+                  height: 10,
+                  borderRadius: '50%',
+                  background: '#FFCC00',
+                  display: 'inline-block',
+                  marginRight: 6,
+                }}
+              />
+              Coding interview
+            </Typography>
+          </Grid>
+
           <Grid container spacing={0} height="400px">
             {filteredData.slice(
               page * fixedRowsPerPage,
@@ -437,6 +551,7 @@ const UpcomingInterview: React.FC = () => {
                             bgcolor: '#0284C7',
                             fontSize: '14px',
                             fontWeight: 700,
+                            border: profile.interview_type === 'AI' ? '3px solid #34C759' : '3px solid #FFCC00'
                           }}
                         >
                           {!profile.profile_picture &&
@@ -472,8 +587,8 @@ const UpcomingInterview: React.FC = () => {
                             width: 10,
                             height: 10,
                             borderRadius: '50%',
-                            bgcolor: 'orange',
-                            mr: 1,
+                            // bgcolor: 'orange',
+                            // mr: 1,
                           }}
                         />
                         <Typography variant="body2" fontWeight={500}>
@@ -505,7 +620,7 @@ const UpcomingInterview: React.FC = () => {
           </Grid>
 
           <Grid item xs={12} sm={12} md={12} display='flex' justifyContent='center'>
-            <Box display="flex" justifyContent="center" mt={2}>
+            <Box display="flex" justifyContent="center" mt={0}>
               <Box sx={{ flexShrink: 0 }}>
                 <IconButton
                   onClick={handleBackButtonClick}

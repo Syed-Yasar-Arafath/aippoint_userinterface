@@ -107,56 +107,29 @@ function CandidateInterviewAnalytics() {
                 setSummary(report.summary)
 
                 // ✅ PROCTORING
-                const proctoringTemplate = [
-                    { key: "identity_verification", heading: "Identity Verification", icon: <AccountCircleIcon /> },
-                    { key: "multiple_face_result", heading: "Multiple Faces Detection", icon: <FaceRetouchingNaturalIcon /> },
-                    { key: "noise_detection_result", heading: "Background Noise", icon: <GraphicEqIcon /> },
-                    { key: "tab_switching", heading: "Tab Switching Detected", icon: <TabIcon /> },
-                    { key: "eye_movement", heading: "Eye Movement Analysis", icon: <VisibilityIcon /> },
+                const eyeMovementAnalysis = report.analysis_result.sustained_eye_contact || "0%";
+                const eyeMovement = Math.round(parseFloat(eyeMovementAnalysis.replace('%', '')));
+                const eyeMovementReport = eyeMovement > 50 ? "Detected" : "Not Detected";
+
+                const backgroundNoise = report.noise_detection_result?.noise_analysis?.status || "Unknown";
+
+                const proctoringDetails = [
+                    {
+                        key: "noise_detection",
+                        heading: "Background Noise",
+                        icon: <GraphicEqIcon />,
+                        report: backgroundNoise,
+                    },
+                    {
+                        key: "eye_movement",
+                        heading: "Eye Movement Analysis",
+                        icon: <VisibilityIcon />,
+                        report: eyeMovementReport,
+                    },
                 ];
 
-                const proctoring_formatted_data = proctoringTemplate.map(item => {
-                    let text = 'Not Available';
+                setProctoringDetails(proctoringDetails);
 
-                    switch (item.key) {
-                        case "identity_verification":
-                            text = report.identity_verification?.identity === "true" ? "Successfully completed" : "Failed";
-                            break;
-
-                        case "multiple_face_result":
-                            text = report.multiple_face_result?.Multiple_faces_detected_frames > 1 ? "Yes, detected" : "No faces detected";
-                            break;
-
-                        case "noise_detection_result":
-                            text = report.noise_detection_result?.external_voice_analysis?.external_voice_detected === "true" ? "Yes, detected" : "Minimal";
-                            break;
-
-                        case "tab_switching":
-                            text = report.tab_switching?.tab === "true" ? "Yes, detected" : "No major issues";
-                            break;
-
-                        case "eye_movement": {
-                            const percentStr = report.eye_movement?.sustained_eye_contact || "0%";
-                            const percentNum = Math.round(parseFloat(percentStr.replace('%', '')));
-                            text =
-                                percentNum > 50
-                                    ? `Normal, No excessive sideways glances`
-                                    : `Abnormal, excessive sideways glances detected`;
-                            break;
-                        }
-
-
-                        default:
-                            break;
-                    }
-                    return {
-                        icon: item.icon,
-                        heading: item.heading,
-                        text: text
-                    };
-                });
-
-                setProctoringDetails(proctoring_formatted_data);
 
                 // ✅ QUESTION TYPE COUNT
                 // const technicalKeywords = ['technical', 'algorithm', 'plsql', 'java', 'sql', 'api'];
@@ -203,7 +176,7 @@ function CandidateInterviewAnalytics() {
                     `Situational Questions: ${situational}`,
                     `General Questions: ${general}`,
                 ];
-                
+
                 const questionCount = [technical, project, situational, general];
                 const updatedColors = ['#22973F', '#FFCC00', '#0284C7', '#FF3B30'];
 
@@ -816,8 +789,8 @@ function CandidateInterviewAnalytics() {
                                             sx={{
                                                 width: '120px',
                                                 height: '120px',
-                                                background: getColorByRange(interviewData.overall_score * 10),
-                                                border: `10px solid ${reduceColorOpacityByRange(interviewData.overall_score * 10)}`,
+                                                background: getColorByRange(Math.round(interviewData.overall_score * 10)),
+                                                border: `10px solid ${reduceColorOpacityByRange(Math.round(interviewData.overall_score * 10))}`,
                                                 color: '#FFFFFF',
                                                 fontSize: '14px',
                                                 fontWeight: 500,
@@ -828,7 +801,7 @@ function CandidateInterviewAnalytics() {
                                                 justifyContent: 'center',
                                                 alignItems: 'center',
                                             }}
-                                        >{interviewData.overall_score * 10 || '0'}%
+                                        >{Math.round(interviewData.overall_score * 10) || '0'}%
                                             <Typography
                                                 variant="inherit"
                                                 sx={{
@@ -836,7 +809,7 @@ function CandidateInterviewAnalytics() {
                                                     fontSize: '14px',
                                                     fontWeight: 500,
                                                     fontFamily: 'SF Pro Display',
-                                                }}>{ratingScalesByRange(interviewData.overall_score * 10)}</Typography>
+                                                }}>{ratingScalesByRange(Math.round(interviewData.overall_score * 10))}</Typography>
                                         </Typography>
                                     </Box>
                                 </CardContent>
@@ -1085,11 +1058,11 @@ function CandidateInterviewAnalytics() {
                                                     <Typography
                                                         variant="inherit"
                                                         sx={{
-                                                            color: (item.text === 'Yes, detected' || item.text === 'Failed' || item.text === 'Abnormal, excessive sideways glances detected') ? '#FF3B30' : '#22973F',
+                                                            color: (item.report === 'Yes, detected' || item.report === 'Failed' || item.report === 'Abnormal, excessive sideways glances detected') ? '#FF3B30' : '#22973F',
                                                             fontSize: '10px',
                                                             fontWeight: 400,
                                                             fontFamily: 'SF Pro Display',
-                                                        }}>{item.text}</Typography>
+                                                        }}>{item.report}</Typography>
                                                 </Box>
                                             </Box>
                                         ))}

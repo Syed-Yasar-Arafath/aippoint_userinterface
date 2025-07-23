@@ -751,21 +751,10 @@ function CodingSection() {
 
     if (currentQuestionIndex === codingQuestions.length - 1) {
       try {
-        // Stop the recording first
         // await stopRecording()
-
-        // Handle exit process
         await handleExit()
-
-        // Call required functions
-        // generatefeedback()
-
-        // handleProctoring(id)
         handleQuestionAnalysis()
-        // handleSoftSkills()
-        // handleStrengths()
-        // handleTechnicalScore()
-        // SendThankYouMail()
+
         // Navigate after all processes are complete
         navigate('/coding_submit')
       } catch (error) {

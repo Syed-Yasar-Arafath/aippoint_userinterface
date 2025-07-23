@@ -131,120 +131,94 @@ function CandidateCodingAssessment() {
         }
     };
 
- useEffect(() => {
-    const fetchInterviewData = async () => {
-        const organisation = localStorage.getItem('organisation');
-        try {
-            const response = await axios.post("https://parseez.ai/parseez-django-service/get_interview_data/", {
-                object_id: objectId,
-            }, {
-                headers: {
-                    "Content-Type": "application/json",
-                    Organization: organisation || ''
-                }
-            });
+    useEffect(() => {
+        const fetchInterviewData = async () => {
+            const organisation = localStorage.getItem('organisation');
+            try {
+                const response = await axios.post("https://parseez.ai/parseez-django-service/get_interview_data/", {
+                    object_id: objectId,
+                }, {
+                    headers: {
+                        "Content-Type": "application/json",
+                        Organization: organisation || ''
+                    }
+                });
 
-            const report = response.data.data
-            console.log("Interview Data:", report);
+                const report = response.data.data
+                console.log("Interview Data:", report);
 
-            setQuestions(report.questions);
-            setCodeAnalysis(report.code_analysis)
+                setQuestions(report.questions);
+                setCodeAnalysis(report.code_analysis)
 
-            setInterviewData(report)
+                setInterviewData(report)
 
-            // ✅ Default selection logic
-            if (report.questions.length > 0) {
-                const firstTitle = report.questions[0].title;
-                setSelectedTitle(firstTitle);
+                // ✅ Default selection logic
+                if (report.questions.length > 0) {
+                    const firstTitle = report.questions[0].title;
+                    setSelectedTitle(firstTitle);
 
-                // Try to match code_analysis with this question
-                const matched = report.code_analysis.find(
-                    (item: any) =>
-                        item.question.trim().toLowerCase() ===
-                        report.questions[0].problem_statement.trim().toLowerCase()
-                );
+                    // Try to match code_analysis with this question
+                    const matched = report.code_analysis.find(
+                        (item: any) =>
+                            item.question.trim().toLowerCase() ===
+                            report.questions[0].problem_statement.trim().toLowerCase()
+                    );
 
-                if (matched) {
-                    setMatchedAnswer(matched.answer);
-                    setMatchedQuestion(matched.question);
+                    if (matched) {
+                        setMatchedAnswer(matched.answer);
+                        setMatchedQuestion(matched.question);
 
-                    const metrics = matched.analysis?.assessment_metrics;
+                        const metrics = matched.analysis?.assessment_metrics;
 
-                    if (metrics) {
-                        const skillValue = {
-                            Correctness: metrics.correctness_score,
-                            Time_Comple: metrics.time_complexity_score,
-                            Space_Compl: metrics.space_complexity_score,
-                            Error_Report: metrics.error_report_percentage,
-                        };
-                        setMatchedMetrics(skillValue);
+                        if (metrics) {
+                            const skillValue = {
+                                Correctness: metrics.correctness_score,
+                                Time_Comple: metrics.time_complexity_score,
+                                Space_Compl: metrics.space_complexity_score,
+                                Error_Report: metrics.error_report_percentage,
+                            };
+                            setMatchedMetrics(skillValue);
+                        } else {
+                            setMatchedMetrics({});
+                        }
                     } else {
+                        setMatchedAnswer('');
+                        setMatchedQuestion('');
                         setMatchedMetrics({});
                     }
-                } else {
-                    setMatchedAnswer('');
-                    setMatchedQuestion('');
-                    setMatchedMetrics({});
                 }
+
+                // ✅ PROCTORING
+                const eyeMovementAnalysis = report.analysis_result.sustained_eye_contact || "0%";
+                const eyeMovement = Math.round(parseFloat(eyeMovementAnalysis.replace('%', '')));
+                const eyeMovementReport = eyeMovement > 50 ? "Detected" : "Not Detected";
+
+                const backgroundNoise = report.noise_detection_result?.noise_analysis?.status || "Unknown";
+
+                const proctoringDetails = [
+                    {
+                        key: "noise_detection",
+                        heading: "Background Noise",
+                        icon: <GraphicEqIcon />,
+                        report: backgroundNoise,
+                    },
+                    {
+                        key: "eye_movement",
+                        heading: "Eye Movement Analysis",
+                        icon: <VisibilityIcon />,
+                        report: eyeMovementReport,
+                    },
+                ];
+
+                setProctoringDetails(proctoringDetails);
+
+            } catch (error) {
+                console.log('Error', error);
             }
+        };
 
-            // ✅ PROCTORING
-            const proctoringTemplate = [
-                { key: "identity_verification", heading: "Identity Verification", icon: <AccountCircleIcon /> },
-                { key: "multiple_face_result", heading: "Multiple Faces Detection", icon: <FaceRetouchingNaturalIcon /> },
-                { key: "noise_detection_result", heading: "Background Noise", icon: <GraphicEqIcon /> },
-                { key: "tab_switching", heading: "Tab Switching Detected", icon: <TabIcon /> },
-                { key: "eye_movement", heading: "Eye Movement Analysis", icon: <VisibilityIcon /> },
-            ];
-
-            const proctoring_formatted_data = proctoringTemplate.map(item => {
-                let text = 'Not Available';
-
-                switch (item.key) {
-                    case "identity_verification":
-                        text = report.identity_verification?.identity === "true" ? "Successfully completed" : "Failed";
-                        break;
-
-                    case "multiple_face_result":
-                        text = report.multiple_face_result?.Multiple_faces_detected_frames > 1 ? "Yes, detected" : "No faces detected";
-                        break;
-
-                    case "noise_detection_result":
-                        text = report.noise_detection_result?.external_voice_analysis?.external_voice_detected === "true" ? "Yes, detected" : "Minimal";
-                        break;
-
-                    case "tab_switching":
-                        text = report.tab_switching?.tab === "true" ? "Yes, detected" : "No major issues";
-                        break;
-
-                    case "eye_movement": {
-                        const percentStr = report.eye_movement?.sustained_eye_contact || "0%";
-                        const percentNum = Math.round(parseFloat(percentStr.replace('%', '')));
-                        text =
-                            percentNum > 50
-                                ? `Normal, No excessive sideways glances`
-                                : `Abnormal, excessive sideways glances detected`;
-                        break;
-                    }
-
-                    default:
-                        break;
-                }
-                return {
-                    icon: item.icon,
-                    heading: item.heading,
-                    text: text
-                };
-            });
-
-            setProctoringDetails(proctoring_formatted_data);
-        } catch (error) {
-            console.log('Error', error);
-        }
-    };
-
-    fetchInterviewData();
-}, []);
+        fetchInterviewData();
+    }, []);
 
     const downloadPDF = async (objectId: string) => {
         try {
@@ -317,7 +291,7 @@ function CandidateCodingAssessment() {
 
                                                             {/* <Tooltip title={item.title} arrow> */}
                                                             <Typography
-                                                            variant="inherit"
+                                                                variant="inherit"
                                                                 sx={{
                                                                     color: '#1C1C1E',
                                                                     fontSize: '12px',
@@ -359,20 +333,20 @@ function CandidateCodingAssessment() {
                                     </Box>
 
                                     <Box mt={2}>
-                                        <Typography 
-                                        variant="inherit"
-                                        sx={{
-                                            color: '#1C1C1E',
-                                            fontSize: '14px',
-                                            fontWeight: 500,
-                                            fontFamily: 'SF Pro Display',
-                                        }}>
+                                        <Typography
+                                            variant="inherit"
+                                            sx={{
+                                                color: '#1C1C1E',
+                                                fontSize: '14px',
+                                                fontWeight: 500,
+                                                fontFamily: 'SF Pro Display',
+                                            }}>
                                             Objective:
                                         </Typography>
                                         {/* <Tooltip title={codingInterview[selectedInterview].objective} arrow></Tooltip> */}
                                         <Tooltip title={matchedQuestion} arrow>
                                             <Typography
-                                            variant="inherit"
+                                                variant="inherit"
                                                 sx={{
                                                     color: '#1C1C1E',
                                                     fontSize: '12px',
@@ -391,17 +365,17 @@ function CandidateCodingAssessment() {
                                                     : matchedQuestion}
                                             </Typography>
                                         </Tooltip>
-                                        <Typography mt={1} 
-                                        variant="inherit"
-                                        sx={{
-                                            color: '#1C1C1E',
-                                            fontSize: '12px',
-                                            fontWeight: 400,
-                                            fontFamily: 'SF Pro Display',
-                                        }}>Candidate’s Code Submission</Typography>
+                                        <Typography mt={1}
+                                            variant="inherit"
+                                            sx={{
+                                                color: '#1C1C1E',
+                                                fontSize: '12px',
+                                                fontWeight: 400,
+                                                fontFamily: 'SF Pro Display',
+                                            }}>Candidate’s Code Submission</Typography>
                                         <Box border="1px solid #0284C7" borderRadius="12px" p={2} mt={1}>
                                             <Typography
-                                            variant="inherit"
+                                                variant="inherit"
                                                 sx={{
                                                     color: '#999999',
                                                     fontSize: '12px',
@@ -453,15 +427,15 @@ function CandidateCodingAssessment() {
                                             display: 'flex',
                                             justifyContent: 'center',
                                             alignItems: 'center',
-                                            marginTop:'10px'
+                                            marginTop: '10px'
                                         }}>
                                             <Typography
-                                            variant="inherit"
+                                                variant="inherit"
                                                 sx={{
                                                     width: '120px',
                                                     height: '120px',
-                                                    background: getColorByRange(interviewData.coding_overall_score),
-                                                    border: `10px solid ${reduceColorOpacityByRange(interviewData.coding_overall_score)}`,
+                                                    background: getColorByRange(Math.round(interviewData.coding_overall_score)),
+                                                    border: `10px solid ${reduceColorOpacityByRange(Math.round(interviewData.coding_overall_score))}`,
                                                     color: '#FFFFFF',
                                                     fontSize: '14px',
                                                     fontWeight: 500,
@@ -472,15 +446,15 @@ function CandidateCodingAssessment() {
                                                     justifyContent: 'center',
                                                     alignItems: 'center',
                                                 }}
-                                            >{interviewData.coding_overall_score || '0'}%
-                                                <Typography 
-                                                variant="inherit"
-                                                sx={{
-                                                    color: '#FFFFFF',
-                                                    fontSize: '14px',
-                                                    fontWeight: 500,
-                                                    fontFamily: 'SF Pro Display',
-                                                }}>{ratingScalesByRange(interviewData.coding_overall_score)}</Typography>
+                                            >{Math.round(interviewData.coding_overall_score) || '0'}%
+                                                <Typography
+                                                    variant="inherit"
+                                                    sx={{
+                                                        color: '#FFFFFF',
+                                                        fontSize: '14px',
+                                                        fontWeight: 500,
+                                                        fontFamily: 'SF Pro Display',
+                                                    }}>{ratingScalesByRange(Math.round(interviewData.coding_overall_score))}</Typography>
                                             </Typography>
                                         </Box>
                                     </CardContent>
@@ -522,7 +496,7 @@ function CandidateCodingAssessment() {
                                                         <Box display="flex" flexDirection="row" justifyContent="space-between" alignItems="center">
                                                             <Tooltip title={skill} arrow>
                                                                 <Typography
-                                                                variant="inherit"
+                                                                    variant="inherit"
                                                                     sx={{
                                                                         color: '#1C1C1E',
                                                                         fontSize: '12px',
@@ -546,13 +520,13 @@ function CandidateCodingAssessment() {
                                                                 }}
                                                             />
                                                             <Typography
-                                                            variant="inherit"
-                                                             sx={{
-                                                                color: '#1C1C1E',
-                                                                fontSize: '10px',
-                                                                fontWeight: 400,
-                                                                fontFamily: 'SF Pro Display',
-                                                            }}>{value}%</Typography>
+                                                                variant="inherit"
+                                                                sx={{
+                                                                    color: '#1C1C1E',
+                                                                    fontSize: '10px',
+                                                                    fontWeight: 400,
+                                                                    fontFamily: 'SF Pro Display',
+                                                                }}>{value}%</Typography>
                                                         </Box>
                                                     </Box>
                                                 ))}
@@ -590,22 +564,22 @@ function CandidateCodingAssessment() {
                                                         display: 'flex',
                                                         flexDirection: 'column',
                                                     }}>
-                                                        <Typography 
-                                                        variant="inherit"
-                                                        sx={{
-                                                            color: '#1C1C1E',
-                                                            fontSize: '12px',
-                                                            fontWeight: 500,
-                                                            fontFamily: 'SF Pro Display',
-                                                        }}>{item.heading}</Typography>
-                                                        <Typography 
-                                                        variant="inherit"
-                                                        sx={{
-                                                            color: (item.text === 'Yes, detected' || item.text === 'Failed' || item.text === 'Abnormal, excessive sideways glances detected') ? '#FF3B30' : '#22973F',
-                                                            fontSize: '10px',
-                                                            fontWeight: 400,
-                                                            fontFamily: 'SF Pro Display',
-                                                        }}>{item.text}</Typography>
+                                                        <Typography
+                                                            variant="inherit"
+                                                            sx={{
+                                                                color: '#1C1C1E',
+                                                                fontSize: '12px',
+                                                                fontWeight: 500,
+                                                                fontFamily: 'SF Pro Display',
+                                                            }}>{item.heading}</Typography>
+                                                        <Typography
+                                                            variant="inherit"
+                                                            sx={{
+                                                                color: (item.report === 'Yes, detected' || item.report === 'Failed' || item.report === 'Abnormal, excessive sideways glances detected') ? '#FF3B30' : '#22973F',
+                                                                fontSize: '10px',
+                                                                fontWeight: 400,
+                                                                fontFamily: 'SF Pro Display',
+                                                            }}>{item.report}</Typography>
                                                     </div>
                                                 </Box>
                                             ))}

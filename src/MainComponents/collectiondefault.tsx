@@ -14,6 +14,7 @@ import {
   Card,
   CardContent,
   Divider,
+  Tooltip,
 } from '@mui/material';
 import { Search } from 'lucide-react';
 import React, { useEffect, useRef, useState } from 'react';
@@ -48,7 +49,6 @@ interface ResumeData {
   file_data: string | null;
   explanation: any;
   showAllSkills?: boolean;
-  showAllProjects?: boolean; // Added to resolve the TypeScript error
 }
 
 type Profile = {
@@ -106,7 +106,6 @@ const CollectionDefault: React.FC = () => {
         setDispatchLoading(false);
       } catch (error) {
         console.error('Error fetching data:', error);
-        // setError('Failed to fetch user data');
         setDispatchLoading(false);
       }
     };
@@ -192,17 +191,14 @@ const CollectionDefault: React.FC = () => {
         { resume_id: job.resume_ids },
         { headers: { Authorization: `Bearer ${token}`, Organization: organisation } }
       );
-      // Initialize showAllSkills and showAllProjects for each resume
       const updatedResumeData = response.data.map((resume: any) => ({
         ...resume,
         showAllSkills: false,
-        showAllProjects: false, // Added to initialize the property
       }));
       setResumeData(updatedResumeData);
       setOpenModal(true);
     } catch (error) {
       console.error('Error fetching resume data:', error);
-      // setError('Failed to fetch resume data');
     }
   };
 
@@ -250,11 +246,11 @@ const CollectionDefault: React.FC = () => {
       else setError('Unexpected response from server.');
     } catch (error) {
       console.error('Error scoring resumes:', error);
-      // setError('Failed to fetch resume data');
     } finally {
       setScoreLoading(false);
     }
   };
+
   const handleOpenNoteModal = (resumeId: any, existingNote: any = '') => {
     setNote(existingNote);
     setSelectedJob((prev: any) => ({ ...prev, resumeId }));
@@ -338,7 +334,7 @@ const CollectionDefault: React.FC = () => {
           <Grid item><Select displayEmpty value={experience} onChange={(e) => setExperience(e.target.value as string)} IconComponent={CustomExpandMore} sx={{ height: '40px', width: '158px', fontSize: '14px', border: '1px solid #ccc', borderRadius: '4px', backgroundColor: '#fff', '& .MuiSelect-select': { color: '#0284C7' } }} renderValue={(selected) => <Typography sx={{ color: selected ? '#0284C7' : '#000', fontSize: '12px' }}>{selected || 'Select Experience'}</Typography>}><MenuItem value="" sx={{ color: '#000', fontSize: '12px' }}>Select Experience</MenuItem>{experienceOptions.map((option) => <MenuItem key={option} value={option} sx={{ color: '#000', fontSize: '12px', '&:hover': { color: '#0284C7', backgroundColor: '#f1f5f9' }, '&.Mui-selected': { color: '#0284C7', backgroundColor: '#e3f2fd', '&:hover': { backgroundColor: '#f1f5f9' } } }}>{option}</MenuItem>)}</Select></Grid>
           <Grid item><Select displayEmpty value={user} onChange={(e) => setUser(e.target.value as string)} IconComponent={CustomExpandMore} sx={{ height: '40px', width: '158px', fontSize: '14px', border: '1px solid #ccc', borderRadius: '4px', backgroundColor: '#fff', '& .MuiSelect-select': { color: '#0284C7' } }} renderValue={(selected) => <Typography sx={{ color: selected ? '#0284C7' : '#000', fontSize: '12px' }}>{selected || 'Select User'}</Typography>}><MenuItem value="" sx={{ color: '#000', fontSize: '12px' }}>Select User</MenuItem>{userOptions.map((option) => <MenuItem key={option} value={option} sx={{ color: '#000', fontSize: '12px', '&:hover': { color: '#0284C7', backgroundColor: '#f1f5f9' }, '&.Mui-selected': { color: '#0284C7', backgroundColor: '#e3f2fd', '&:hover': { backgroundColor: '#f1f5f9' } } }}>{option}</MenuItem>)}</Select></Grid>
           <Grid item><Select displayEmpty value={status} onChange={(e) => setStatus(e.target.value as string)} IconComponent={CustomExpandMore} sx={{ height: '40px', width: '158px', fontSize: '14px', border: '1px solid #ccc', borderRadius: '4px', backgroundColor: '#fff', '& .MuiSelect-select': { color: '#0284C7' } }} renderValue={(selected) => <Typography sx={{ color: selected ? '#0284C7' : '#000', fontSize: '12px' }}>{selected || 'Select Status'}</Typography>}><MenuItem value="" sx={{ color: '#000', fontSize: '12px' }}>Select Status</MenuItem>{statusOptions.map((option) => <MenuItem key={option} value={option} sx={{ color: '#000', fontSize: '12px', '&:hover': { color: '#0284C7', backgroundColor: '#f1f5f9' }, '&.Mui-selected': { color: '#0284C7', backgroundColor: '#e3f2fd', '&:hover': { backgroundColor: '#f1f5f9' } } }}>{option}</MenuItem>)}</Select></Grid>
-          <Grid item><Select displayEmpty value={select} onChange={(e) => setSelect(e.target.value as string)} IconComponent={CustomExpandMore} sx={{ height: '40px', width: '158px', fontSize: '14px', border: '1px solid #ccc', borderRadius: '4px', backgroundColor: '#fff', '& .MuiSelect-select': { color: '#0284C7' } }} renderValue={(selected) => <Typography sx={{ color: selected ? '#0284C7' : '#000', fontSize: '12px' }}>{selected || 'Select'}</Typography>}><MenuItem value="" sx={{ color: '#000', fontSize: '12px' }}>Select</MenuItem>{selectOptions.map((option) => <MenuItem key={option} value={option} sx={{ color: '#000', fontSize: '12px', '&:hover': { color: '#0284C7', backgroundColor: '#f1f5f9' }, '&.Mui-selected': { color: '#0284C7', backgroundColor: '#e3f2fd', '&:hover': { backgroundColor: '#f1f5f929' } } }}>{option}</MenuItem>)}</Select></Grid>
+          <Grid item><Select displayEmpty value={select} onChange={(e) => setSelect(e.target.value as string)} IconComponent={CustomExpandMore} sx={{ height: '40px', width: '158px', fontSize: '14px', border: '1px solid #ccc', borderRadius: '4px', backgroundColor: '#fff', '& .MuiSelect-select': { color: '#0284C7' } }} renderValue={(selected) => <Typography sx={{ color: selected ? '#0284C7' : '#000', fontSize: '12px' }}>{selected || 'Select'}</Typography>}><MenuItem value="" sx={{ color: '#000', fontSize: '12px' }}>Select</MenuItem>{selectOptions.map((option) => <MenuItem key={option} value={option} sx={{ color: '#000', fontSize: '12px', '&:hover': { color: '#0284C7', backgroundColor: '#f1f5f9' }, '&.Mui-selected': { color: '#0284C7', backgroundColor: '#e3f2fd', '&:hover': { backgroundColor: '#f1f5f9' } } }}>{option}</MenuItem>)}</Select></Grid>
           <Grid item><Button onClick={handleDateClick} sx={{ height: '40px', width: '158px', fontSize: '12px', border: '1px solid #ccc', borderRadius: '4px', backgroundColor: '#fff', color: '#000', justifyContent: 'flex-start', textTransform: 'none', paddingRight: '35px', '& .MuiButton-endIcon': { marginLeft: '20px' } }} endIcon={<EventIcon />}>{selectedDate ? selectedDate.format('DD-MMM-YYYY') : 'Select Date'}</Button><Popover id={id} open={open} anchorEl={anchorEl} onClose={handleDateClose} anchorOrigin={{ vertical: 'bottom', horizontal: 'left' }}><DatePicker value={selectedDate} onChange={(newValue) => { setSelectedDate(newValue); handleDateClose(); }} /></Popover></Grid>
         </Grid>
 
@@ -346,101 +342,58 @@ const CollectionDefault: React.FC = () => {
         {error && <Typography color="error">{error}</Typography>}
 
         <p style={{ fontSize: '0.875rem', color: '#4B5563', margin: '0', fontFamily: 'SF Pro Display' }}>Available Collections: {filteredCollections.length}</p>
-       <div style={{ overflowX: 'auto', borderRadius: '10px' }}>
-  <table style={{ width: '100%', borderCollapse: 'collapse', backgroundColor: '#fff', fontFamily: 'SF Pro Display', fontWeight: '700', border: 'none' }}>
-    <thead>
-      <tr style={{ backgroundColor: '#0284C7', color: 'white', fontFamily: 'SF Pro Display' }}>
-        {['Collection Name', 'Available Profile', 'Profile Added By', 'Last Updated', 'Quick Action'].map((text, i) => (
-          <th
-            key={i}
-            style={{ padding: '10px', textAlign: 'left', border: 'none' }}
-          >
-            {text}
-          </th>
-        ))}
-      </tr>
-    </thead>
-    <tbody>
-      {paginatedCollections.map((collection: any, index: number) => (
-        <tr
-          key={index}
-          onClick={() => setSelectedRow(index)}
-          style={{
-            backgroundColor: selectedRow === index ? '#bfdbfe' : '#fff',
-            fontFamily: 'SF Pro Display',
-            fontWeight: '400',
-            cursor: 'pointer',
-            transition: 'background-color 0.2s',
-          }}
-          onMouseEnter={(e) => selectedRow !== index && (e.currentTarget.style.backgroundColor = '#f1f5f9')}
-          onMouseLeave={(e) => selectedRow !== index && (e.currentTarget.style.backgroundColor = '#fff')}
-        >
-          <td style={{ padding: '10px', fontFamily: 'SF Pro Display', fontWeight: '400' }}>
-            {collection.job_title}
-          </td>
-          <td style={{ padding: '10px', fontFamily: 'SF Pro Display' }}>
-            <span
-              style={{
-                border: '1px solid #ccc',
-                borderRadius: '4px',
-                padding: '4px 8px',
-                display: 'inline-block',
-                fontFamily: 'SF Pro Display',
-                width: '48px',
-                minWidth: '48px',
-                height: '24px',
-                lineHeight: '16px',
-                textAlign: 'center',
-                boxSizing: 'border-box',
-              }}
-            >
-              {collection.profiles}
-            </span>
-          </td>
-          <td style={{ padding: '10px', fontFamily: 'SF Pro Display' }}>
-            <div style={{ display: 'flex', alignItems: 'center', gap: '5px' }}>
-              <Avatar sx={{ width: 30, height: 30, mr: 2, bgcolor: '#0284C7' }}>
-                {collection.addedBy?.charAt(0) || 'N'}
-              </Avatar>
-              <div>{collection.addedBy}</div>
-            </div>
-          </td>
-          <td style={{ padding: '10px', fontFamily: 'SF Pro Display' }}>
-            <span
-              style={{
-                border: '1px solid #ccc',
-                borderRadius: '4px',
-                padding: '2px 6px',
-                display: 'inline-block',
-                fontFamily: 'SF Pro Display',
-              }}
-            >
-              {dayjs(collection.lastUpdated).format('DD-MMM-YYYY')}
-            </span>
-          </td>
-          <td style={{ padding: '10px' }}>
-            <Button
-              variant="outlined"
-              size="small"
-              onClick={() => handleViewProfiles(collection)}
-              sx={{
-                backgroundColor: 'transparent',
-                borderColor: '#0284C7',
-                color: '#0284C7',
-                fontFamily: 'SF Pro Display',
-                textTransform: 'none',
-                fontSize: '12px',
-                '&:hover': { backgroundColor: 'rgba(255, 255, 255, 0.1)', borderColor: 'black', color: 'black' },
-              }}
-            >
-              View Profiles
-            </Button>
-          </td>
-        </tr>
-      ))}
-    </tbody>
-  </table>
-</div>
+        <div style={{ overflowX: 'auto', borderRadius: '10px' }}>
+          <table style={{ width: '100%', borderCollapse: 'collapse', backgroundColor: '#fff', fontFamily: 'SF Pro Display', fontWeight: '700', border: 'none' }}>
+            <thead>
+              <tr style={{ backgroundColor: '#0284C7', color: 'white', fontFamily: 'SF Pro Display' }}>
+                {['Collection Name', 'Available Profile', 'Profile Added By', 'Last Updated', 'Quick Action'].map((text, i) => (
+                  <th key={i} style={{ padding: '10px', textAlign: 'left', border: 'none' }}>{text}</th>
+                ))}
+              </tr>
+            </thead>
+            <tbody>
+              {paginatedCollections.map((collection: any, index: number) => (
+                <tr
+                  key={index}
+                  onClick={() => setSelectedRow(index)}
+                  style={{
+                    backgroundColor: selectedRow === index ? '#bfdbfe' : '#fff',
+                    fontFamily: 'SF Pro Display',
+                    fontWeight: '400',
+                    cursor: 'pointer',
+                    transition: 'background-color 0.2s',
+                  }}
+                  onMouseEnter={(e) => selectedRow !== index && (e.currentTarget.style.backgroundColor = '#f1f5f9')}
+                  onMouseLeave={(e) => selectedRow !== index && (e.currentTarget.style.backgroundColor = '#fff')}
+                >
+                  <td style={{ padding: '10px', fontFamily: 'SF Pro Display', fontWeight: '400' }}>{collection.job_title}</td>
+                  <td style={{ padding: '10px', fontFamily: 'SF Pro Display' }}>
+                    <span style={{ border: '1px solid #ccc', borderRadius: '4px', padding: '4px 8px', display: 'inline-block', fontFamily: 'SF Pro Display', width: '48px', minWidth: '48px', height: '24px', lineHeight: '16px', textAlign: 'center', boxSizing: 'border-box' }}>{collection.profiles}</span>
+                  </td>
+                  <td style={{ padding: '10px', fontFamily: 'SF Pro Display' }}>
+                    <div style={{ display: 'flex', alignItems: 'center', gap: '5px' }}>
+                      <Avatar sx={{ width: 30, height: 30, mr: 2, bgcolor: '#0284C7' }}>{collection.addedBy?.charAt(0) || 'N'}</Avatar>
+                      <div>{collection.addedBy}</div>
+                    </div>
+                  </td>
+                  <td style={{ padding: '10px', fontFamily: 'SF Pro Display' }}>
+                    <span style={{ border: '1px solid #ccc', borderRadius: '4px', padding: '2px 6px', display: 'inline-block', fontFamily: 'SF Pro Display' }}>{dayjs(collection.lastUpdated).format('DD-MMM-YYYY')}</span>
+                  </td>
+                  <td style={{ padding: '10px' }}>
+                    <Button
+                      variant="outlined"
+                      size="small"
+                      onClick={() => handleViewProfiles(collection)}
+                      sx={{ backgroundColor: 'transparent', borderColor: '#0284C7', color: '#0284C7', fontFamily: 'SF Pro Display', textTransform: 'none', fontSize: '12px', '&:hover': { backgroundColor: 'rgba(255, 255, 255, 0.1)', borderColor: 'black', color: 'black' } }}
+                    >
+                      View Profiles
+                    </Button>
+                  </td>
+                </tr>
+              ))}
+            </tbody>
+          </table>
+        </div>
 
         <Grid container justifyContent="center" alignItems="center" spacing={1} sx={{ position: 'fixed', bottom: 20, left: '0', right: '0', zIndex: 10 }}>
           <Grid item><Button disabled={currentPage === 1} onClick={() => setCurrentPage(currentPage - 1)} sx={{ textTransform: 'none', fontSize: '12px', color: '#0284C7' }}>Prev</Button></Grid>
@@ -485,45 +438,15 @@ const CollectionDefault: React.FC = () => {
                           <Typography variant="body2" sx={{ fontSize: 12, color: '#333' }}>
                             <strong>Projects:</strong>
                             {resume.resume_data?.projects?.length > 0 ? (
-                              resume.resume_data.projects.map((project: any, index: number) => (
-                                <div key={index} style={{ marginBottom: 8 }}>
-                                  <Typography variant="body2" sx={{ fontSize: 12, color: '#333', fontWeight: 'bold' }}>
-                                    {project.project_name}
-                                  </Typography>
-                                  <Typography
-                                    variant="body2"
-                                    sx={{ fontSize: 12, color: '#333', whiteSpace: 'pre-wrap' }}
-                                    ref={(el) => {
-                                      if (el) {
-                                        const lineHeight = parseInt(getComputedStyle(el).lineHeight);
-                                        const maxLines = 2;
-                                        const maxHeight = lineHeight * maxLines;
-                                        el.style.maxHeight = resume.showAllProjects ? 'none' : `${maxHeight}px`;
-                                        el.style.overflow = 'hidden';
-                                        el.style.display = '-webkit-box';
-                                        el.style.webkitLineClamp = resume.showAllProjects ? 'none' : '5';
-                                        el.style.webkitBoxOrient = 'vertical';
-                                      }
-                                    }}
-                                  >
-                                    {project.description}
-                                  </Typography>
-                                  {project.description.split('\n').length > 5 && (
-                                    <Button
-                                      sx={{ textTransform: 'none', fontSize: 12, color: '#0284C7', padding: 0, minWidth: 'auto' }}
-                                      onClick={() =>
-                                        setResumeData((prev) =>
-                                          prev.map((r) =>
-                                            r.id === resume.id ? { ...r, showAllProjects: !r.showAllProjects } : r
-                                          )
-                                        )
-                                      }
-                                    >
-                                      {resume.showAllProjects ? 'Show Less' : '...'}
-                                    </Button>
-                                  )}
-                                </div>
-                              ))
+                              <ul style={{ paddingLeft: 16, margin: 0 }}>
+                                {resume.resume_data.projects.map((project: any, index: number) => (
+                                  <Tooltip key={index} title={project.description} placement="top">
+                                    <li style={{ fontSize: 12, color: '#333', marginBottom: 4, cursor: 'pointer' }}>
+                                      {project.project_name}
+                                    </li>
+                                  </Tooltip>
+                                ))}
+                              </ul>
                             ) : (
                               <Typography variant="body2" sx={{ fontSize: 12, color: '#333' }}>
                                 N/A

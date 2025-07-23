@@ -193,7 +193,10 @@ function CandidateCodingAssessment() {
                 const eyeMovement = Math.round(parseFloat(eyeMovementAnalysis.replace('%', '')));
                 const eyeMovementReport = eyeMovement > 50 ? "Detected" : "Not Detected";
 
-                const backgroundNoise = report.noise_detection_result?.noise_analysis?.status || "Unknown";
+                const backgroundNoise = report.noise_detection_result.noise_analysis?.status || "N/A";
+
+                const multipleFace = report.multiple_face_result.Multiple_faces_detected_frames || "N/A"
+                const multipleFaceReport = multipleFace > 0 ? "Detected" : "Not Detected";
 
                 const proctoringDetails = [
                     {
@@ -207,6 +210,12 @@ function CandidateCodingAssessment() {
                         heading: "Eye Movement Analysis",
                         icon: <VisibilityIcon />,
                         report: eyeMovementReport,
+                    },
+                    {
+                        key: "multiple_face",
+                        heading: "Multiple Faces Detection",
+                        icon: <FaceRetouchingNaturalIcon />,
+                        report: multipleFaceReport,
                     },
                 ];
 
@@ -575,7 +584,7 @@ function CandidateCodingAssessment() {
                                                         <Typography
                                                             variant="inherit"
                                                             sx={{
-                                                                color: (item.report === 'Yes, detected' || item.report === 'Failed' || item.report === 'Abnormal, excessive sideways glances detected') ? '#FF3B30' : '#22973F',
+                                                                color: (item.report === 'Yes, detected' || item.report === 'Failed') ? '#FF3B30' : '#22973F',
                                                                 fontSize: '10px',
                                                                 fontWeight: 400,
                                                                 fontFamily: 'SF Pro Display',

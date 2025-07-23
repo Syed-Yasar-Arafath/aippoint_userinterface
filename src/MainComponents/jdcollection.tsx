@@ -920,9 +920,9 @@ const JdCollection: React.FC = () => {
               </div>
               <div style={{ gap: '8px', border: '1px solid #e5e7eb', borderRadius: '8px', padding: '0px 16px', color: '#6b7280', fontSize: '10px', display: 'flex', alignItems: 'center', height: '40px', justifyContent: 'flex-start', whiteSpace: 'nowrap', fontFamily: 'SF Pro Display' }}>
                 New Matching Profiles : {matchingResumes[job.jobid]}
-                <button onClick={() => handleViewClick(job.jobid)}
+                {/* <button onClick={() => handleViewClick(job.jobid)}
                 > view
-                </button>
+                </button> */}
                 <span style={{ marginLeft: '4px', color: 'green', fontWeight: 400, fontFamily: 'SF Pro Display', fontSize: '10px' }}>
                   {/* + {job.newProfiles} New */}
                   {/* <button onClick={() => handleClickScore(job.jobid)}>Score</button> */}

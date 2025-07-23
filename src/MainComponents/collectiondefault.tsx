@@ -404,7 +404,7 @@ const CollectionDefault: React.FC = () => {
         </Grid>
 
         <Modal open={openModal} onClose={handleCloseModal}>
-          <Box sx={{ position: 'absolute', top: '50%', left: '50%', transform: 'translate(-50%, -50%)', width: '95%', maxHeight: '95vh', bgcolor: 'background.paper', boxShadow: 24, p: 2, overflowY: 'auto' }}>
+          <Box sx={{ position: 'absolute', top: '50%', left: '50%', transform: 'translate(-50%, -50%)', width: '90%', maxHeight: '90vh', bgcolor: 'background.paper', boxShadow: 24, p: 2, overflowY: 'auto' }}>
             <Typography variant="h6" sx={{ fontSize: 14, color: '#000', fontWeight: 'bold', mb: 2 }}>
               Available profiles for {selectedJob?.job_title}: {resumeData.length}
             </Typography>

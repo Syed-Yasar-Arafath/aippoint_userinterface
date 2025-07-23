@@ -480,7 +480,7 @@ const CollectionDefault: React.FC = () => {
                                     <li key={idx} style={{ fontSize: 12, color: '#333', marginBottom: 4 }}>{skill}</li>
                                   ))}
                                   {resume.resume_data.skills.length > 5 && (
-                                    <li>
+                                    
                                       <Button
                                         sx={{ textTransform: 'none', fontSize: 12, color: '#0284C7', padding: 0, minWidth: 'auto' }}
                                         onClick={() =>
@@ -491,7 +491,7 @@ const CollectionDefault: React.FC = () => {
                                       >
                                         {resume.showAllSkills ? 'Show Less' : 'More'}
                                       </Button>
-                                    </li>
+                                    
                                   )}
                                   {resume.showAllSkills &&
                                     resume.resume_data.skills.slice(5).map((skill: string, idx: number) => (

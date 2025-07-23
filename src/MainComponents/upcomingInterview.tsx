@@ -54,7 +54,7 @@ const UpcomingInterview: React.FC = () => {
   const fetchAllInterviewData = async () => {
     try {
       const result = await axios.get(
-        `https://parseez.ai/parseez-django-service/get_all_interview_data`,
+        "https://parseez.ai/parseez-django-service/get_all_interview_data",
         {
           headers: {
             "Content-Type": "application/json",

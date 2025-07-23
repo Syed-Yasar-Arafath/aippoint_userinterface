@@ -866,7 +866,7 @@ const JdCollection: React.FC = () => {
             <Grid item xs={4}><Typography sx={pillStyle}>{job.newLocation.city},{job.newLocation.country}</Typography></Grid>
           </Grid>
         </Grid> */}
-        <Grid item xs={4}>
+        <Grid item xs={3.5}>
           <Grid container spacing={1}>
             <Grid item>
               <Typography variant="inherit" sx={pillStyle}>
@@ -930,22 +930,38 @@ const JdCollection: React.FC = () => {
               </div>
             </div>
 
-            <button
-              style={{
-                backgroundColor: '#0284C7',
-                color: 'white',
-                padding: '10px 24px',
-                border: 'none',
-                borderRadius: '8px',
-                fontSize: '10px',
-                fontWeight: 500,
-                cursor: 'pointer',
-                fontFamily: 'SF Pro Display',
-              }}
-              onClick={() => navigate(`/jdprofileview/${job.jobid}`)}
-            >
-              Quick View
-            </button>
+              <div style={{ display: 'flex', justifyContent: 'space-between', flexDirection: 'row' }}>
+              <button
+              style={{ backgroundColor: '#0284C7',
+                  color: 'white',
+                  padding: '10px 24px',
+                  border: 'none',
+                  borderRadius: '8px',
+                  fontSize: '10px',
+                  fontWeight: 500,
+                  cursor: 'pointer',
+                  fontFamily: 'SF Pro Display',}}
+              onClick={() => handleViewClick(job.jobid)}
+              > Score Profile
+              </button>
+              <button
+                style={{
+                  backgroundColor: '#0284C7',
+                  color: 'white',
+                  padding: '10px 24px',
+                  border: 'none',
+                  borderRadius: '8px',
+                  fontSize: '10px',
+                  fontWeight: 500,
+                  cursor: 'pointer',
+                  fontFamily: 'SF Pro Display',marginLeft:'5px'
+                }}
+                onClick={() => navigate(`/jdprofileview/${job.jobid}`)}
+              >
+                Quick View
+              </button>
+            </div>
+ 
           </div>
         </Grid>
 

@@ -41,6 +41,7 @@ import { useDispatch } from 'react-redux'
 import { loaderOff, loaderOn } from '../../redux/actions'
 import { useTranslation } from 'react-i18next';
 import { OutputOutlined } from '@mui/icons-material'
+
 interface MergeVideoRequest {
   video_urls: string[]
   meeting_id: string
@@ -55,7 +56,6 @@ export default function InterviewAttend() {
   const location = useLocation()
   const { authToken, meetingId, objId } = location.state || {}
   const selectedLanguage: any = localStorage.getItem('i18nextLng')
-
   const currentLanguage = selectedLanguage === 'ar' ? 'Arabic' : 'English'
   console.log(currentLanguage)
 
@@ -191,7 +191,6 @@ export default function InterviewAttend() {
       )
 
       if (Array.isArray(response.data)) {
-        // Extract valid URLs, filter non-empty, and deduplicate
         const urls = [
           ...new Set(
             response.data
@@ -201,11 +200,10 @@ export default function InterviewAttend() {
         ]
 
         if (urls.length > 0) {
-          // Call the merge API with the collected video URLs
           const mergeResponse = await axios.post(
-            `${process.env.REACT_APP_DJANGO_PYTHON_MODULE_SERVICE}/merge_videos/`, // Update with actual backend URL
+            `${process.env.REACT_APP_DJANGO_PYTHON_MODULE_SERVICE}/merge_videos/`,
             { video_urls: urls },
-            { responseType: 'blob' }, // To handle binary data
+            { responseType: 'blob' },
           )
 
           if (mergeResponse.status === 200) {
@@ -227,9 +225,8 @@ export default function InterviewAttend() {
       console.error('Error fetching recordings or merging videos:', error)
     }
 
-    return null // Return null if the process fails
+    return null
   }
-
 
   const handleProctoring = async (objectId?: string): Promise<File | null> => {
     try {
@@ -512,40 +509,11 @@ export default function InterviewAttend() {
     }
   }
 
-  // const generateQuestions = async () => {
-  //   try {
-  //     const params = new URLSearchParams()
-  //     params.append('object_id', objId)
-  //     const response = await axios.post(
-  //       `${process.env.REACT_APP_DJANGO_PYTHON_MODULE_SERVICE}/get_interview_data/`,
-  //       params,
-  //       {
-  //         headers: {
-  //           'Content-Type': 'application/x-www-form-urlencoded',
-  //           organization: organisation,
-  //         },
-  //       },
-  //     )
-  //     const responseData = response.data.data.questions
-  //     const candidatename = response.data.data.resume_data.name
-  //     setQuestions(responseData)
-  //     setCandidateName(candidatename)
-  //     const concatenatedQuestions: string[] = []
-  //     if (Array.isArray(responseData)) {
-  //       responseData.forEach((questionObj) => {
-  //         concatenatedQuestions.push(questionObj.question)
-  //       })
-  //       setQuestionGenerated(concatenatedQuestions)
-  //     }
-  //   } catch (error) {
-  //     console.error('Error fetching questions:', error)
-  //   }
-  // }
   const generateQuestions = async () => {
     try {
       const response = await axios.post(
         `${process.env.REACT_APP_DJANGO_PYTHON_MODULE_SERVICE}/get_interview_data/`,
-        { object_id: objId }, // Send JSON
+        { object_id: objId },
         {
           headers: {
             'Content-Type': 'application/json',
@@ -562,10 +530,11 @@ export default function InterviewAttend() {
     } catch (error: any) {
       console.error('Error fetching questions:', error);
       if (error.response) {
-        console.log('Error response:', error.response.data); // Log the server error message
+        console.log('Error response:', error.response.data);
       }
     }
   };
+
   useEffect(() => {
     generateQuestions()
   }, [objId])
@@ -574,40 +543,6 @@ export default function InterviewAttend() {
     setShowPopup(true)
   }, [])
 
-  // useEffect(() => {
-  //   if (liveParticipant > 0 && !isReadingQuestion) {
-  //     const SpeechRecognition =
-  //       (window as any).SpeechRecognition ||
-  //       (window as any).webkitSpeechRecognition
-  //     if (!SpeechRecognition) {
-  //       console.error('Speech Recognition not supported')
-  //       return
-  //     }
-  //     const mic = new SpeechRecognition()
-  //     mic.continuous = true
-  //     mic.interimResults = true
-  //     mic.lang = 'en-US'
-  //     mic.onresult = (event: any) => {
-  //       let interim = ''
-  //       let final = ''
-  //       for (let i = 0; i < event.results.length; i++) {
-  //         const result = event.results[i]
-  //         const transcriptPart = result[0].transcript
-  //         if (result.isFinal) {
-  //           final += transcriptPart + ' '
-  //         } else {
-  //           interim += transcriptPart
-  //         }
-  //       }
-  //       // if (!isReadingQuestion) {
-  //       setTranscript(final)
-  //       setInterimTranscript(interim)
-  //       // }
-  //     }
-  //     mic.start()
-  //     return () => mic.stop()
-  //   }
-  // }, [liveParticipant, currentQuestionIndex, isReadingQuestion])
   useEffect(() => {
     if (liveParticipant > 0 && !isReadingQuestion) {
       const SpeechRecognition =
@@ -646,6 +581,7 @@ export default function InterviewAttend() {
       return () => mic.stop();
     }
   }, [liveParticipant, currentQuestionIndex, isReadingQuestion, selectedLanguage]);
+
   const checkSessionStatus = async () => {
     try {
       const response = await axios.get(
@@ -712,11 +648,8 @@ export default function InterviewAttend() {
       }
       if (currentQuestionIndex < questionGenerated.length - 1) {
         if (recordingId) {
-          console.log('Stopping recording:', recordingId);
-          await stopRecording();
-          await new Promise((resolve) => setTimeout(resolve, 1000));
-          console.log('Downloading recording');
-          await handleDownloadRecording();
+          console.log('Stopping and saving recording:', recordingId);
+          await handleRecordingSubmit();
           setRecordingId(null);
         }
         setCode('');
@@ -746,33 +679,32 @@ export default function InterviewAttend() {
       console.error('Error sending thank-you email:', error)
     }
   }
-  
+
   const handleInterviewStatus = async (objectId: string, organisation: any) => {
-  try {
-    const response = await axios.post(
-      `${process.env.REACT_APP_DJANGO_PYTHON_MODULE_SERVICE}/interview_status/`,
-      {
-        object_id: objectId,
-        interview_status: "completed",
-      },
-      {
-        headers: {
-          'Content-Type': 'application/json',
-          Organization: organisation,
+    try {
+      const response = await axios.post(
+        `${process.env.REACT_APP_DJANGO_PYTHON_MODULE_SERVICE}/interview_status/`,
+        {
+          object_id: objectId,
+          interview_status: "completed",
         },
-      }
-    );
-    console.log(response.data.message);
-  } catch (error) {
-    console.error('Failed to update status:', error);
-  }
-};
+        {
+          headers: {
+            'Content-Type': 'application/json',
+            Organization: organisation,
+          },
+        }
+      );
+      console.log(response.data.message);
+    } catch (error) {
+      console.error('Failed to update status:', error);
+    }
+  };
 
   const handleSubmit = async () => {
     try {
       dispatch(loaderOn());
       if (liveParticipant >= 0 && recordingId) {
-        // Ensure the last answer is saved
         const codeInput = code.trim();
         const voiceInput = transcript + interimTranscript;
         const finalAnswer = codeInput !== '' ? codeInput : voiceInput;
@@ -783,11 +715,8 @@ export default function InterviewAttend() {
           finalAnswer || 'No answer provided',
         );
 
-        console.log('Stopping recording in handleSubmit');
-        await stopRecording();
-        await new Promise((resolve) => setTimeout(resolve, 1500));
-        console.log('Downloading recording in handleSubmit');
-        await handleDownloadRecording();
+        console.log('Stopping and saving recording in handleSubmit');
+        await handleRecordingSubmit();
         setQuestionsSubmitted(true);
 
         await Promise.all([
@@ -808,16 +737,11 @@ export default function InterviewAttend() {
     } catch (error) {
       console.error('Error in handleSubmit:', error);
       setOpenDialog(true);
-      // setTimeout(() => {
-
-      //   navigate('/');
-      // }, 1000);
     } finally {
       dispatch(loaderOff());
       setLoading(false)
     }
   };
- 
 
   const updateanswer = async (
     reference_number: any,
@@ -843,7 +767,7 @@ export default function InterviewAttend() {
         new Promise<never>((_, reject) =>
           setTimeout(() => reject(new Error('API timeout')), 5000)
         ),
-      ]) as AxiosResponse<any>; // 👈 Cast the response type here
+      ]) as AxiosResponse<any>;
 
       console.log('update_answer response:', response.data);
       setTranscript('');
@@ -855,7 +779,6 @@ export default function InterviewAttend() {
       throw error;
     }
   };
-
 
   const sendOrg = async (dbName: any) => {
     try {
@@ -963,14 +886,11 @@ export default function InterviewAttend() {
       console.log('Soft skills response:', response.data)
       return response.data
     } catch (error) {
-      console.error('Error extracting soft skills:', {
-        // message: error.message,
-        // response: error.response?.data,
-        // status: error.response?.status,
-      })
-      throw error // Rethrow to allow Promise.all to catch it
+      console.error('Error extracting soft skills:', error)
+      throw error
     }
   }
+
   const handleStrengths = async () => {
     try {
       await axios.post(
@@ -1013,9 +933,8 @@ export default function InterviewAttend() {
 
   const handleExit = async () => {
     if (recordingId) {
-      await stopRecording()
-      await new Promise((resolve) => setTimeout(resolve, 1000))
-      await handleDownloadRecording()
+      await handleRecordingSubmit()
+      setRecordingId(null)
     }
     setOpenDialog(true)
     try {
@@ -1050,7 +969,6 @@ export default function InterviewAttend() {
     const finalAnswer = codeInput !== '' ? codeInput : voiceInput;
     console.log('handleClick - finalAnswer:', finalAnswer, 'codeInput:', codeInput, 'voiceInput:', voiceInput);
 
-    // Always call updateanswer, even if no answer is provided
     await updateanswer(
       objId,
       questionGenerated[currentQuestionIndex],
@@ -1065,7 +983,6 @@ export default function InterviewAttend() {
   };
 
   const startRecording = async () => {
-    // Feathers (https://feathersjs.com/) recommends adding a delay to ensure the recording starts properly
     try {
       const recordingData = {
         meeting_id: meetingId,
@@ -1081,17 +998,22 @@ export default function InterviewAttend() {
           },
         },
       )
-      await new Promise((resolve) => setTimeout(resolve, 1000)) // Add delay
-      setRecordingId(response.data.data.id)
+
+      const newRecordingId = response.data.data.id
+      setRecordingId(newRecordingId)
+      console.log('Started recording with ID:', newRecordingId)
     } catch (error) {
       console.error('Error starting recording:', error)
     }
   }
 
   const stopRecording = async () => {
-    if (!recordingId) return
     try {
-      await axios.put(
+      if (!recordingId) {
+        console.log('No active recording to stop')
+        return
+      }
+      const response = await axios.put(
         `https://api.dyte.io/v2/recordings/${recordingId}`,
         { action: 'stop' },
         {
@@ -1101,14 +1023,17 @@ export default function InterviewAttend() {
           },
         },
       )
-      console.log(`Stopped recording with ID: ${recordingId}`)
+      console.log('Recording stopped:', recordingId)
     } catch (error) {
       console.error('Error stopping recording:', error)
     }
   }
 
   const handleDownloadRecording = async () => {
-    if (!recordingId) return
+    if (!recordingId) {
+      console.log('No recording ID available for download')
+      return
+    }
     try {
       const response = await axios.get(
         `https://api.dyte.io/v2/recordings/${recordingId}`,
@@ -1134,12 +1059,27 @@ export default function InterviewAttend() {
         recordingEntity,
       )
       console.log(
-        `Recording written to backend: question_${currentQuestionIndex + 1
-        }.mp4`,
+        `Recording written to backend: question_${currentQuestionIndex + 1}.mp4`,
       )
       setUserProfileImage(url)
     } catch (error) {
       console.error('Error downloading recording:', error)
+    }
+  }
+
+  const handleRecordingSubmit = async () => {
+    try {
+      if (recordingId) {
+        console.log('Stopping recording:', recordingId)
+        await stopRecording()
+        console.log('Recording stopped, waiting for download...')
+        await new Promise((resolve) => setTimeout(resolve, 3000))
+        await handleDownloadRecording()
+        console.log('Recording downloaded and saved for question:', currentQuestionIndex + 1)
+      }
+      setRecordingId(null)
+    } catch (error) {
+      console.error('Error in handleRecordingSubmit:', error)
     }
   }
 
@@ -1159,7 +1099,7 @@ export default function InterviewAttend() {
       } catch (error) {
         setLoading(false)
         console.error('Failed to initialize Dyte meeting:', error)
-      }finally{
+      } finally {
         dispatch(loaderOff())
         setLoading(false)
       }
@@ -1442,10 +1382,6 @@ export default function InterviewAttend() {
                     }}
                   >
                     {questionGenerated[currentQuestionIndex]}
-                    {/* {convertNumberToArabic(
-                      parseInt(questionGenerated[currentQuestionIndex]),
-                      selectedLanguage,
-                    )} */}
                   </Typography>
                 )}
               </div>
@@ -1704,7 +1640,6 @@ export default function InterviewAttend() {
                       color: '#E8F1FF',
                       textTransform: 'none',
                     }}
-                  //{t('exitButton')}
                   >
                     {t('confirmBtn')}
                   </Button>

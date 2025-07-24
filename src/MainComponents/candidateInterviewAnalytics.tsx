@@ -76,7 +76,7 @@ function CandidateInterviewAnalytics() {
         const fetchInterviewData = async () => {
             const organisation = localStorage.getItem('organisation');
             try {
-                const response = await axios.post("https://parseez.ai/parseez-django-service/get_interview_data/", {
+                const response = await axios.post( `${process.env.REACT_APP_DJANGO_PYTHON_MODULE_SERVICE}/get_interview_data/`, {
                     object_id: objectId,
                 }, {
                     headers: {
@@ -84,18 +84,6 @@ function CandidateInterviewAnalytics() {
                         Organization: organisation || ''
                     }
                 });
-                // const response = await axios.post(
-                //     "https://parseez.ai/parseez-django-service/get_interview_data/",
-                //     new URLSearchParams({
-                //         object_id: objectId,
-                //     }),
-                //     {
-                //         headers: {
-                //             "Content-Type": "application/x-www-form-urlencoded",
-                //             Organization: organisation || ''
-                //         }
-                //     }
-                // );
 
                 const report = response.data.data
                 console.log("Interview Data:", report);
@@ -107,14 +95,16 @@ function CandidateInterviewAnalytics() {
                 setSummary(report.summary)
 
                 // ✅ PROCTORING
-                const eyeMovementAnalysis = report.analysis_result.sustained_eye_contact || "0%";
-                const eyeMovement = Math.round(parseFloat(eyeMovementAnalysis.replace('%', '')));
-                const eyeMovementReport = eyeMovement > 50 ? "Detected" : "Not Detected";
+                const backgroundNoise = report.noise_detection_result?.noise_analysis.status || "N/A";
 
-                const backgroundNoise = report.noise_detection_result.noise_analysis.status || "N/A";
+                const eyeMovementAnalysis = report.analysis_result?.sustained_eye_contact;
+                const eyeMovement = eyeMovementAnalysis ? Math.round(parseFloat(eyeMovementAnalysis.replace('%', ''))) : null;
+                // const eyeMovementReport = eyeMovement > 50 ? "Detected" : "Not Detected";
+                const eyeMovementReport = eyeMovement === undefined || eyeMovement === null ? "N/A" : eyeMovement > 50 ? "Detected" : "Not Detected";
 
-                const multipleFace = report.multiple_face_result.Multiple_faces_detected_frames || "N/A"
-                const multipleFaceReport = multipleFace > 0 ? "Detected" : "Not Detected";
+                const multipleFace = report.multiple_face_result?.Multiple_faces_detected_frames
+                // const multipleFaceReport = multipleFace > 0 ? "Detected" : "Not Detected";
+                const multipleFaceReport = multipleFace === undefined || multipleFace === null ? "N/A" : multipleFace > 0 ? "Detected" : "Not Detected";
 
                 const proctoringDetails = [
                     {
@@ -373,7 +363,7 @@ function CandidateInterviewAnalytics() {
         };
 
         try {
-            const response = await fetch('https://parseez.ai/parseez-django-service/get_resume/', {
+            const response = await fetch( `${process.env.REACT_APP_DJANGO_PYTHON_MODULE_SERVICE}/get_resume/`, {
                 method: 'POST',
                 headers: {
                     'Content-Type': 'application/json',
@@ -407,7 +397,7 @@ function CandidateInterviewAnalytics() {
         try {
             const organisation = localStorage.getItem('organisation');
 
-            const response = await fetch(`https://parseez.ai/parseez-django-service/export-ai-pdf/${objectId}/`, {
+            const response = await fetch( `${process.env.REACT_APP_DJANGO_PYTHON_MODULE_SERVICE}/export-ai-pdf/${objectId}/`, {
                 method: 'GET',
                 headers: {
                     Organization: organisation || '',

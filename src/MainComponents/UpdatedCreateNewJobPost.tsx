@@ -739,7 +739,7 @@ const handleChangeSpecificDomainSkillsAi = (e: React.ChangeEvent<HTMLInputElemen
     formData.append('file', file);
 
     try {
-      await axios.post('http://localhost:8080/api/upload', formData, {
+      await axios.post('https://parseez.ai/parseez-spring-service/api/upload', formData, {
         headers: {
           'Content-Type': 'multipart/form-data',
         },

@@ -53,6 +53,7 @@ import JdProfile from './MainComponents/jdprofileview';
 import ForgotPassword from './MainComponents/Forgotpassword';
 import InterviewScheduleCoding from './MainComponents/interviewScheduleCoding';
 import InterviewRecording from './MainComponents/interview/interview_recording';
+import Support from './MainComponents/support';
 // import ConfirmJoinInterview from './MainComponents/ConfirmJoinIntreview';
 // import QuestionFormat from './MainComponents/question_format';
 
@@ -192,6 +193,10 @@ const AppContent: React.FC = () => {
                <Route
                 path='/interviewrecording'
                 element={<InterviewRecording />}
+              />
+                <Route
+                path='/support'
+                element={<Support />}
               />
             </>
           ) : (

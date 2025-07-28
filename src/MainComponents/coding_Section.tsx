@@ -18,6 +18,7 @@ import { loaderOff, loaderOn } from '../redux/actions'
 import { t } from 'i18next'
 import i18n from '../i18n'
 import { useTranslation } from 'react-i18next';
+
 interface MergeVideoRequest {
   video_urls: string[]
   meeting_id: string
@@ -29,27 +30,36 @@ interface MergeVideoResponse {
 }
 
 function CodingSection() {
-  // dyte integration////////////////////////////////
   const organisation = localStorage.getItem('organisation')
   const selectedLanguage: any = localStorage.getItem('i18nextLng')
   const { t } = useTranslation();
-
   const currentLanguage = selectedLanguage === 'ar' ? 'Arabic' : 'English'
-  console.log(currentLanguage)
   const [openDialog, setOpenDialog] = useState(false)
   const [initialConditionMet, setInitialConditionMet] = useState(false)
   const [liveParticipant, setLiveParticipant] = useState<number>(0)
   const [timeLimit, setTimeLimit] = useState(300)
   const [meeting, initMeeting] = useDyteClient()
-
   const location = useLocation()
-  // const { objId } = location.state || {}
-  const [recordingId, setRecordingId] = useState<string | null>(null)
-
   const { authToken, meetingId, objId } = location.state || {}
-  console.log('object id is', objId)
   const { warning, violations } = useProctoring(objId)
   const [open, setOpen] = useState(false)
+  const [recordingId, setRecordingId] = useState<string | null>(null)
+  const [currentQuestionIndex, setCurrentQuestionIndex] = useState(0)
+  const [codingQuestions, setCodingQuestions] = useState([])
+  const [language, setLanguage] = useState<string>('java')
+  const [code, setCode] = useState<string>('')
+  const [timeLeft, setTimeLeft] = useState<number>(10 * 60)
+  const [enableTimeLeft, setEnableTimeLeft] = useState(false)
+  const [submitClicked, setSubmitClicked] = useState(false)
+  const [nextQuestionClicked, setNextQuestionClicked] = useState(false)
+  const [modalSubmitClicked, setModalSubmitClicked] = useState(false)
+  const [modalContinueTestClicked, setModalContinueTestClicked] = useState(false)
+  const [modalStayQuestionClicked, setModalStayQuestionClicked] = useState(false)
+  const [modalSkipClicked, setModalSkipClicked] = useState(false)
+  const navigate = useNavigate()
+  const dispatch = useDispatch()
+  const hasFetched = useRef(false)
+  const id = objId
 
   const startRecording = async () => {
     try {
@@ -67,7 +77,6 @@ function CodingSection() {
           },
         },
       )
-
       const newRecordingId = response.data.data.id
       setRecordingId(newRecordingId)
     } catch (error) {
@@ -76,8 +85,9 @@ function CodingSection() {
   }
 
   const stopRecording = async () => {
+    if (!recordingId) return
     try {
-      const response = await axios.put(
+      await axios.put(
         `https://api.dyte.io/v2/recordings/${recordingId}`,
         { action: 'stop' },
         {
@@ -92,9 +102,8 @@ function CodingSection() {
     }
   }
 
-  const handleDownloadRecording = async () => {
+  const handleProcessVideo = async () => {
     try {
-      await stopRecording()
       const response = await axios.get(
         `https://api.dyte.io/v2/recordings/${recordingId}`,
         {
@@ -104,54 +113,53 @@ function CodingSection() {
           },
         },
       )
-
       const url = response.data.data.download_url
-
-      // setUserProfileImage(url)
       const recordingEntity = {
         outputFileName: url,
         meetingid: objId,
         sessionId: `question_${currentQuestionIndex + 1}.mp4`,
       }
-      // fetchSkillScore(objId)
-
       await axios.post(
         `${process.env.REACT_APP_SPRINGBOOT_BACKEND_SERVICE}/recording/write/${organisation}`,
         recordingEntity,
       )
-      const link = document.createElement('a')
-      link.href = url
-
-      // if (url) {
-      //   await uploadRecording(url, meetingId)
-      // } else {
-      //   console.error('No download URL received')
-      // }
-
-      console.log('Starting new recording...')
-      // await startRecording()
+      await axios.post(
+        `${process.env.REACT_APP_DJANGO_PYTHON_MODULE_SERVICE}/process_video/`,
+        {
+          video_url: url,
+          meeting_id: meetingId,
+          object_id: objId,
+          question_index: currentQuestionIndex,
+        },
+        { headers: { 'Content-Type': 'application/json', Organization: organisation } }
+      )
+      console.log(`Processed video for question ${currentQuestionIndex + 1}`)
     } catch (error) {
-      console.error('Error downloading recording:', error)
+      console.error('Error processing video:', error)
     }
   }
-  React.useEffect(() => {
+
+  const handleRecordingSubmit = async () => {
+    try {
+      await stopRecording()
+      console.log('Recording stopped...')
+      await new Promise((resolve) => setTimeout(resolve, 3000))
+      await handleProcessVideo()
+      console.log('Video processed...')
+      if (currentQuestionIndex < codingQuestions.length - 1) {
+        await startRecording()
+        console.log('New recording started...')
+      }
+    } catch (error) {
+      console.error('Error in handleRecordingSubmit:', error)
+    }
+  }
+
+  useEffect(() => {
     if (warning) {
       setOpen(true)
     }
   }, [warning])
-  console.log('authhhhh', authToken)
-  // useEffect(() => {
-  //   if (authToken) {
-  //     initMeeting({
-  //       authToken: authToken,
-  //       defaults: {
-  //         audio: true,
-  //         video: true,
-  //       },
-  //     })
-  //     // startRecording()
-  //   }
-  // }, [authToken])
 
   useEffect(() => {
     const setupMeeting = async () => {
@@ -159,13 +167,10 @@ function CodingSection() {
         console.error('Missing authToken')
         return
       }
-
-      // Prevent multiple join calls
       if (meeting) {
         console.log('Meeting already joining or joined, skipping initMeeting.')
         return
       }
-
       try {
         await initMeeting({
           authToken,
@@ -178,27 +183,22 @@ function CodingSection() {
         console.error('Failed to initialize Dyte meeting:', error)
       }
     }
-
     setupMeeting()
-  }, [authToken]) // 👈 only depend on authToken, not initMeeting or meeting
-
+  }, [authToken])
 
   useEffect(() => {
     const timer = setTimeout(() => {
       meeting?.self?.enableVideo()
       meeting?.self?.enableAudio()
-    }, 1000) // wait 1 second for safety
-
+    }, 1000)
     return () => clearTimeout(timer)
   }, [meeting])
 
-
   useEffect(() => {
-    if (initialConditionMet && authToken) {
+    if (initialConditionMet && authToken && !recordingId) {
       startRecording()
     }
-  }, [initialConditionMet, authToken])
-
+  }, [initialConditionMet, authToken, recordingId])
 
   const checkSessionStatus = async () => {
     try {
@@ -217,55 +217,34 @@ function CodingSection() {
         setInitialConditionMet(true)
       }
     } catch (error: any) {
-      if (error.response) {
-        if (
-          error.response.status === 404 ||
-          error.response.data.error?.code === 404
-        ) {
-          setLiveParticipant(0)
-        }
-      } else {
-        // Handle other errors if needed
+      if (error.response?.status === 404 || error.response?.data.error?.code === 404) {
+        setLiveParticipant(0)
       }
     }
   }
 
-  // ////////////////////////////////////////////////////
   const initialCode = {
-    javascript:
-      '// JavaScript\nfunction main() {\n\tconsole.log("Hello World");\n}\n\nmain();\n',
+    javascript: '// JavaScript\nfunction main() {\n\tconsole.log("Hello World");\n}\n\nmain();\n',
     python: '# Python\ndef main():\n\tprint("Hello World")\n\nmain()\n',
     java: '// Java\npublic class Main {\n\tpublic static void main(String[] args) {\n\t\tSystem.out.println("Hello World");\n\t}\n}\n',
     c: '// C\n#include <stdio.h>\nint main() {\n\tprintf("Hello World\\n");\n\treturn 0;\n}\n',
     cpp: '// C++\n#include <iostream>\nusing namespace std;\n\nint main() {\n\tcout << "Hello World" << endl;\n\treturn 0;\n}\n',
-    csharp:
-      '// C#\nusing System;\n\nclass Program {\n\tstatic void Main() {\n\t\tConsole.WriteLine("Hello World");\n\t}\n}\n',
+    csharp: '// C#\nusing System;\n\nclass Program {\n\tstatic void Main() {\n\t\tConsole.WriteLine("Hello World");\n\t}\n}\n',
     php: '// PHP\n<?php\necho "Hello World";\n?>\n',
     ruby: '# Ruby\ndef main\n\tputs "Hello World"\nend\n\nmain\n',
-    swift:
-      '// Swift\nimport Foundation\n\nfunc main() {\n\tprint("Hello World")\n}\n\nmain()\n',
+    swift: '// Swift\nimport Foundation\n\nfunc main() {\n\tprint("Hello World")\n}\n\nmain()\n',
     kotlin: '// Kotlin\nfun main() {\n\tprintln("Hello World")\n}\n',
     rust: '// Rust\nfn main() {\n\tprintln!("Hello World");\n}\n',
     go: '// Go\npackage main\nimport "fmt"\n\nfunc main() {\n\tfmt.Println("Hello World")\n}\n',
-    typescript:
-      '// TypeScript\nfunction main(): void {\n\tconsole.log("Hello World");\n}\n\nmain();\n',
+    typescript: '// TypeScript\nfunction main(): void {\n\tconsole.log("Hello World");\n}\n\nmain();\n',
     dart: '// Dart\nvoid main() {\n\tprint("Hello World");\n}\n',
   }
 
-  // const [language, setLanguage] = useState<string>('javascript')
-  const [language, setLanguage] = useState<string>('java')
-  // const [code, setCode] = useState<string>(initialCode.javascript)
-  const [code, setCode] = useState<string>('')
-  const [timeLeft, setTimeLeft] = useState<number>(10 * 60)
-  const [enableTimeLeft, setEnableTimeLeft] = useState(false)
-  console.log('codeeeee', code)
   const handleEditorChange = (value: string | undefined) => {
     setCode(value || '')
   }
 
   const submitCode = async () => {
-    const organisation = localStorage.getItem('organisation')
-
     try {
       const response = await axios.post(
         `${process.env.REACT_APP_DJANGO_PYTHON_MODULE_SERVICE}/assess/`,
@@ -281,10 +260,8 @@ function CodingSection() {
         },
       )
       console.log(response.data)
-
-      handleRecordingSubmit()
-      handleQuestionAnalysis()
-
+      await handleRecordingSubmit()
+      await handleQuestionAnalysis()
     } catch (error) {
       console.error(error)
     }
@@ -293,41 +270,13 @@ function CodingSection() {
   useEffect(() => {
     if (timeLeft > 0) {
       const timer = setInterval(() => {
-        setTimeLeft((prevTime) => prevTime - 1)
-      }, 1000)
-
-      if (timeLeft === 180) {
-        setEnableTimeLeft(true)
-      }
-
-      return () => clearInterval(timer)
-    } else {
-      submitCode()
-      handleNextQuestion()
-      resetTimer()
-      handleSubmitClose()
-      handleNextQuestionClose()
-      setCode('')
-    }
-  }, [timeLeft])
-
-  const resetTimer = () => {
-    setTimeLeft(10 * 60)
-    setEnableTimeLeft(false)
-  }
-  ////newl added bellow code
-  useEffect(() => {
-    if (timeLeft > 0) {
-      const timer = setInterval(() => {
         setTimeLeft((prevTime) => {
-          // Enable timer display when it drops to 180 seconds or less
           if (prevTime <= 180 && !enableTimeLeft) {
             setEnableTimeLeft(true)
           }
           return prevTime - 1
         })
       }, 1000)
-
       return () => clearInterval(timer)
     } else {
       submitCode()
@@ -339,13 +288,15 @@ function CodingSection() {
     }
   }, [timeLeft, enableTimeLeft])
 
+  const resetTimer = () => {
+    setTimeLeft(10 * 60)
+    setEnableTimeLeft(false)
+  }
+
   const formatTime = (seconds: number) => {
     const minutes = Math.floor(seconds / 60)
     const secs = seconds % 60
-    return `${String(minutes).padStart(2, '0')}:${String(secs).padStart(
-      2,
-      '0',
-    )}`
+    return `${String(minutes).padStart(2, '0')}:${String(secs).padStart(2, '0')}`
   }
 
   const preventPaste = (e: ClipboardEvent) => {
@@ -354,10 +305,7 @@ function CodingSection() {
   }
 
   const preventCopyCut = (e: KeyboardEvent) => {
-    if (
-      (e.ctrlKey || e.metaKey) &&
-      ['c', 'v', 'x'].includes(e.key.toLowerCase())
-    ) {
+    if ((e.ctrlKey || e.metaKey) && ['c', 'v', 'x'].includes(e.key.toLowerCase())) {
       e.preventDefault()
       alert(t('cutCopyPasteRestricted'))
     }
@@ -366,15 +314,11 @@ function CodingSection() {
   useEffect(() => {
     document.addEventListener('paste', preventPaste)
     document.addEventListener('keydown', preventCopyCut)
-
     return () => {
       document.removeEventListener('paste', preventPaste)
       document.removeEventListener('keydown', preventCopyCut)
     }
   }, [])
-
-  const [submitClicked, setSubmitClicked] = useState(false)
-  const [nextQuestionClicked, setNextQuestionClicked] = useState(false)
 
   const handleMainButtonClicked = (e: any) => {
     if (e == 1) {
@@ -387,10 +331,6 @@ function CodingSection() {
     }
   }
 
-  const [modalSubmitClicked, setModalSubmitClicked] = useState(false)
-  const [modalContinueTestClicked, setModalContinueTestClicked] =
-    useState(false)
-
   const handleModal1ButtonClicked = (e: any) => {
     if (e == 1) {
       setModalSubmitClicked(false)
@@ -401,10 +341,6 @@ function CodingSection() {
       setModalContinueTestClicked(false)
     }
   }
-
-  const [modalStayQuestionClicked, setModalStayQuestionClicked] =
-    useState(false)
-  const [modalSkipClicked, setModalSkipClicked] = useState(false)
 
   const handleModal2ButtonClicked = (e: any) => {
     if (e == 1) {
@@ -431,21 +367,19 @@ function CodingSection() {
             Organization: organisation,
           },
         }
-      );
-      console.log(response.data.message);
+      )
+      console.log(response.data.message)
     } catch (error) {
-      console.error('Failed to update status:', error);
+      console.error('Failed to update status:', error)
     }
-  };
+  }
 
   const generatefeedback = async () => {
     try {
       const formData = new FormData()
       formData.append('object_id', id)
       formData.append('language_selected', currentLanguage)
-
-      // Send formData in the request body
-      const response = await axios.post(
+      await axios.post(
         `${process.env.REACT_APP_DJANGO_PYTHON_MODULE_SERVICE}/generate_feedback_coding/`,
         formData,
         {
@@ -456,12 +390,9 @@ function CodingSection() {
         },
       )
     } catch (error) {
-      console.error('Error fetching user data:', error)
+      console.error('Error generating feedback:', error)
     }
   }
-
-  const languge = localStorage.getItem('i18nextLng')
-  console.log('Selected Language:', languge)
 
   const handleQuestionAnalysis = async () => {
     try {
@@ -469,7 +400,7 @@ function CodingSection() {
         `${process.env.REACT_APP_DJANGO_PYTHON_MODULE_SERVICE}/analyze_questions_coding/`,
         {
           object_id: id,
-          language_selected: languge,
+          language_selected: currentLanguage,
         },
         {
           headers: {
@@ -480,98 +411,45 @@ function CodingSection() {
       )
       console.log('question analysis response: ', response)
     } catch (error) {
-      console.error('Error fetching user data:', error)
+      console.error('Error analyzing questions:', error)
     }
   }
 
-  // const handleSoftSkills = async () => {
-  //   try {
-  //     const response = await axios.post(
-  //       `${process.env.REACT_APP_DJANGO_PYTHON_MODULE_SERVICE}/extract_soft_skills_coding/`,
-  //       {
-  //         object_id: id,
-  //         language_selected: languge,
-  //       },
-  //       {
-  //         headers: {
-  //           'Content-Type': 'application/json',
-  //           organization: organisation,
-  //         },
-  //       },
-  //     )
-  //     console.log('soft skills response: ', response)
-  //   } catch (error) {
-  //     console.error('Error fetching user data:', error)
-  //   }
-  // }
-
-  // const handleStrengths = async () => {
-  //   try {
-  //     const response = await axios.post(
-  //       `${process.env.REACT_APP_DJANGO_PYTHON_MODULE_SERVICE}/extract_strengths_areas_coding/`,
-  //       {
-  //         object_id: id,
-  //         language_selected: languge,
-  //       },
-  //       {
-  //         headers: {
-  //           'Content-Type': 'application/json',
-  //           organization: organisation,
-  //         },
-  //       },
-  //     )
-  //     console.log('strengths response: ', response)
-  //   } catch (error) {
-  //     console.error('Error fetching user data:', error)
-  //   }
-  // }
-
-  // const handleTechnicalScore = async () => {
-  //   try {
-  //     const response = await axios.post(
-  //       `${process.env.REACT_APP_DJANGO_PYTHON_MODULE_SERVICE}/extract-techskills-scores-coding/`,
-  //       {
-  //         object_id: id,
-  //         language_selected: languge,
-  //       },
-  //       {
-  //         headers: {
-  //           'Content-Type': 'application/json',
-  //           organization: organisation,
-  //         },
-  //       },
-  //     )
-
-  //     console.log('technical score response: ', response)
-  //   } catch (error) {
-  //     console.error('Error fetching user data:', error)
-  //   }
-  // }
-
-  const [currentQuestionIndex, setCurrentQuestionIndex] = useState(0)
-
-  const navigate = useNavigate()
-
-  // const handleNextQuestion = () => {
-  //   if (currentQuestionIndex === codingQuestions.length - 1) {
-  //     generatefeedback()
-  //     handleQuestionAnalysis()
-  //     handleSoftSkills()
-  //     handleStrengths()
-  //     handleTechnicalScore()
-  //     navigate('/coding_submit')
-  //   } else {
-  //     setCurrentQuestionIndex((prevIndex) => prevIndex + 1)
-  //   }
-  // }
+  const handleNextQuestion = async () => {
+    if (!initialConditionMet) {
+      console.log('Condition not met, skipping function execution.')
+      return
+    }
+    if (currentQuestionIndex === codingQuestions.length - 1) {
+      try {
+        await handleRecordingSubmit()
+        await Promise.all([
+          generatefeedback(),
+          handleQuestionAnalysis(),
+          SendThankYouMail(),
+          handleInterviewStatus(objId, organisation),
+        ])
+        if (meeting) {
+          meeting.self.disableAudio()
+          meeting.self.disableVideo()
+        }
+        navigate('/coding_submit')
+      } catch (error) {
+        console.error('Error during final question processing:', error)
+      }
+    } else {
+      setCurrentQuestionIndex((prevIndex) => prevIndex + 1)
+      setCode('')
+      resetTimer()
+    }
+  }
 
   const handleExit = async () => {
-    stopRecording()
-    handleSubmit()
-    setOpenDialog(true)
-
+    if (recordingId) {
+      await handleRecordingSubmit()
+    }
     try {
-      const response = await axios.post(
+      await axios.post(
         `https://api.dyte.io/v2/meetings/${meetingId}/active-session/kick-all`,
         null,
         {
@@ -581,227 +459,53 @@ function CodingSection() {
           },
         },
       )
-      // SendThankYouMail()
-      // navigate('/coding_submit')
+      if (meeting) {
+        meeting.self.disableAudio()
+        meeting.self.disableVideo()
+      }
+      await Promise.all([
+        generatefeedback(),
+        handleQuestionAnalysis(),
+        SendThankYouMail(),
+        handleInterviewStatus(objId, organisation),
+      ])
+      navigate('/coding_submit')
     } catch (error) {
       console.error('Error kicking session:', error)
     }
   }
-  const dispatch = useDispatch()
 
   const handleSubmit = async () => {
     try {
       dispatch(loaderOn())
-
+      await handleRecordingSubmit()
       if (currentQuestionIndex === codingQuestions.length - 1) {
         await new Promise((resolve) => setTimeout(resolve, 1500))
-
-        // Wait for all async operations to complete
         await Promise.all([
           generatefeedback(),
           handleQuestionAnalysis(),
           SendThankYouMail(),
-          handleProctoring(objId),
           handleInterviewStatus(objId, organisation),
         ])
-        dispatch(loaderOff())
+        if (meeting) {
+          meeting.self.disableAudio()
+          meeting.self.disableVideo()
+        }
+        navigate('/coding_submit')
+      } else {
+        setCurrentQuestionIndex((prevIndex) => prevIndex + 1)
+        setCode('')
+        resetTimer()
       }
     } catch (error) {
       console.error('Error in handleSubmit:', error)
       setOpenDialog(true)
+    } finally {
+      dispatch(loaderOff())
     }
-  }
-
-  // const handleProctoring = async (objectId?: string): Promise<File | null> => {
-  //   try {
-  //     // Step 1: Fetch recording data
-  //     const response = await axios.get(
-  //       `${process.env.REACT_APP_SPRINGBOOT_BACKEND_SERVICE}/recording/meeting/${objectId}/${organisation}`,
-  //     )
-
-  //     if (Array.isArray(response.data)) {
-  //       // Extract and deduplicate valid URLs
-  //       const videoUrls = [
-  //         ...new Set(
-  //           response.data
-  //             .map((recording: any) => recording.outputFileName)
-  //             .filter((url: string) => url),
-  //         ),
-  //       ]
-
-  //       if (videoUrls.length === 0) {
-  //         console.error('No valid video URLs found')
-  //         return null
-  //       }
-
-  //       // Step 2: Prepare request data for merge API
-  //       const requestData: MergeVideoRequest = {
-  //         video_urls: videoUrls,
-  //         meeting_id: objId,
-  //       }
-
-  //       if (objectId) {
-  //         requestData.object_id = objId
-  //       }
-
-  //       // Step 3: Call the merge API
-  //       const mergeResponse = await axios.post<MergeVideoResponse>(
-  //         `${process.env.REACT_APP_DJANGO_PYTHON_MODULE_SERVICE}/merge_videos/`, // Update with your actual Django endpoint
-  //         requestData,
-  //         {
-  //           headers: {
-  //             'Content-Type': 'application/json',
-  //             Organization: organisation,
-  //           },
-  //         },
-  //       )
-
-  //       // Step 4: Handle response
-  //       if (mergeResponse.status === 202) {
-  //         console.log('Video processing queued:', mergeResponse.data.message)
-  //         // Since processing is async, we can't return the file immediately
-  //         // You might want to implement polling or websocket to get the result
-  //         console.log(
-  //           'Processing started. Implement polling/websocket to get final video.',
-  //         )
-  //         return null // Return null since the file isn't available yet
-  //       } else {
-  //         console.error('Unexpected status code:', mergeResponse.status)
-  //         return null
-  //       }
-  //     } else {
-  //       console.error('Unexpected data format:', response.data)
-  //       return null
-  //     }
-  //   } catch (error) {
-  //     if (axios.isAxiosError(error)) {
-  //       if (error.response) {
-  //         // Handle specific status codes from the backend
-  //         switch (error.response.status) {
-  //           case 400:
-  //             console.error('Bad request:', error.response.data.error)
-  //             break
-  //           case 405:
-  //             console.error('Method not allowed')
-  //             break
-  //           case 500:
-  //             console.error('Server error:', error.response.data.error)
-  //             break
-  //           default:
-  //             console.error('Unexpected error:', error.response.data)
-  //         }
-  //       } else {
-  //         console.error('Network error:', error.message)
-  //       }
-  //     } else {
-  //       console.error('Unknown error merging videos:', error)
-  //     }
-  //     return null
-  //   }
-  // }
-
-
-  const handleProctoring = async (objectId?: string): Promise<File | null> => {
-    try {
-      const response = await axios.get(
-        `${process.env.REACT_APP_SPRINGBOOT_BACKEND_SERVICE}/recording/meeting/${objId}/${organisation}`,
-      )
-      if (Array.isArray(response.data)) {
-        const videoUrls = [
-          ...new Set(
-            response.data
-              .map((recording: any) => recording.outputFileName)
-              .filter((url: string) => url),
-          ),
-        ]
-        if (videoUrls.length === 0) return null
-        const requestData: MergeVideoRequest = {
-          video_urls: videoUrls,
-          meeting_id: objId,
-        }
-        if (objectId) requestData.object_id = objId
-        const mergeResponse = await axios.post<MergeVideoResponse>(
-          `${process.env.REACT_APP_DJANGO_PYTHON_MODULE_SERVICE}/merge_videos/`,
-          requestData,
-          {
-            headers: {
-              'Content-Type': 'application/json',
-              Organization: organisation,
-            },
-          },
-        )
-        if (mergeResponse.status === 202) {
-          console.log('Video processing queued:', mergeResponse.data.message)
-          return null
-        }
-      }
-      return null
-    } catch (error) {
-      console.error('Error in proctoring:', error)
-      return null
-    }
-  }
-
-
-  const handleNextQuestion = async () => {
-    if (!initialConditionMet) {
-      console.log('Condition not met, skipping function execution.')
-      return
-    }
-
-    if (currentQuestionIndex === codingQuestions.length - 1) {
-      try {
-        // await stopRecording()
-        await handleExit()
-        handleQuestionAnalysis()
-
-        // Navigate after all processes are complete
-        navigate('/coding_submit')
-      } catch (error) {
-        console.error('Error during final question processing:', error)
-      }
-    } else {
-      setCurrentQuestionIndex((prevIndex) => prevIndex + 1)
-      // await startRecording();
-    }
-  }
-
-  useEffect(() => {
-    if (meetingId) {
-      checkSessionStatus()
-    }
-  }, [currentQuestionIndex, meetingId])
-  const textStyle: React.CSSProperties = {
-    fontSize: '16px',
-    fontWeight: 700,
-    fontFamily: 'SF Pro Display',
-    color: '#0284C7',
-  }
-  const taskStyle: React.CSSProperties = {
-    fontSize: '16px',
-    fontWeight: 700,
-    fontFamily: 'SF Pro Display',
-    color: '#ffffff',
-    textAlign: 'center',
-  }
-
-  const modalStyle = {
-    position: 'absolute',
-    top: '50%',
-    left: '50%',
-    transform: 'translate(-50%, -50%)',
-    width: 800,
-    bgcolor: '#FFFFFF',
-    boxShadow: 24,
-    p: 4,
-    borderTopLeftRadius: '8px',
-    borderBottomLeftRadius: '8px',
-    borderTopRightRadius: '8px',
-    borderBottomRightRadius: '8px',
   }
 
   const [submitOpen, setSubmitOpen] = React.useState(false)
-
   const handleSubmitOpen = () => setSubmitOpen(true)
   const handleSubmitClose = () => {
     setSubmitOpen(false)
@@ -823,16 +527,9 @@ function CodingSection() {
     setCode('')
   }
 
-  const [codingQuestions, setCodingQuestions] = useState([])
-  const hasFetched = useRef(false)
-
-  const id = objId
-
   useEffect(() => {
-    if (!id || hasFetched.current) return;
-
+    if (!id || hasFetched.current) return
     const fetchData = async () => {
-      const organisation = localStorage.getItem('organisation');
       try {
         const response = await axios.post(
           `${process.env.REACT_APP_DJANGO_PYTHON_MODULE_SERVICE}/get_interview_data/`,
@@ -843,26 +540,22 @@ function CodingSection() {
               organization: organisation,
             },
           },
-        );
-
-        // Access the questions array from response.data.data.questions
+        )
         const codingQuestions = response.data.data.questions.map(
           (que: any) => que.problem_statement,
-        );
-        console.log('debugging:', codingQuestions);
-        setCodingQuestions(codingQuestions);
-        hasFetched.current = true; // Set to prevent duplicate fetches
+        )
+        setCodingQuestions(codingQuestions)
+        hasFetched.current = true
       } catch (error) {
-        console.error('Failed to fetch interview data:', error);
+        console.error('Failed to fetch interview data:', error)
       }
-    };
+    }
+    fetchData()
+  }, [id, objId])
 
-    fetchData();
-  }, [id, objId]); // Include objId in dependencies if it's different from id
   useEffect(() => {
     let interval = 5000
     const maxInterval = 3000
-
     const pollStatus = async () => {
       try {
         await checkSessionStatus()
@@ -871,82 +564,77 @@ function CodingSection() {
         console.error('Error checking session status:', error)
       }
     }
-
     const intervalId = setInterval(pollStatus, interval)
-
     return () => clearInterval(intervalId)
   }, [])
 
-  const SendThankYouMail = () => {
-    const handleSendThankYouMail = async () => {
-      const organisation = localStorage.getItem('organisation')
-
-      if (!meetingId) {
-        alert(t('pleaseProvideValidMeetingId'))
-        return
-      }
-
-      try {
-        const response = await axios.post(
-          `${process.env.REACT_APP_SPRINGBOOT_BACKEND_SERVICE}/interview/Thankingmailcoding/${organisation}`,
-          { meetingId }, // Pass the meetingId in the request body
-          {
-            headers: {
-              'Content-Type': 'application/json',
-            },
-          },
-        )
-        console.log('Thank-you email response:', response.data)
-      } catch (error) {
-        console.error('Error sending thank-you email:', error)
-      }
+  const SendThankYouMail = async () => {
+    if (!meetingId) {
+      alert(t('pleaseProvideValidMeetingId'))
+      return
     }
-    handleSendThankYouMail()
-  }
-
-  // ////////////////////////
-  const handleRecordingSubmit = async () => {
     try {
-      // Step 1: Stop Recording
-      await stopRecording()
-      console.log('Recording stopped...')
-
-      // Step 2: Wait for 3 seconds before downloading (optional, ensures recording stops)
-      await new Promise((resolve) => setTimeout(resolve, 3000))
-
-      // Step 3: Download Recording
-      await handleDownloadRecording()
-      console.log('Recording downloaded and saved...')
-
-      // Step 4: Start a new recording
-      await startRecording()
-      console.log('New recording started...')
+      const response = await axios.post(
+        `${process.env.REACT_APP_SPRINGBOOT_BACKEND_SERVICE}/interview/Thankingmailcoding/${organisation}`,
+        { meetingId },
+        {
+          headers: {
+            'Content-Type': 'application/json',
+          },
+        },
+      )
+      console.log('Thank-you email response:', response.data)
     } catch (error) {
-      console.error('Error in handleSubmit:', error)
+      console.error('Error sending thank-you email:', error)
     }
   }
 
   useEffect(() => {
-    // Replace current history state so the back button doesn't go to the previous page
     window.history.pushState(null, '', window.location.href)
-
     const onPopState = () => {
-      // Push forward again to prevent going back
       window.history.pushState(null, '', window.location.href)
     }
-
     window.addEventListener('popstate', onPopState)
-
     return () => {
       window.removeEventListener('popstate', onPopState)
     }
   }, [])
 
-  const convertNumberToArabic = (num: number, selectedLanguage: any) => {
+  const convertNumberToArabic = (num: number | string, selectedLanguage: any) => {
     if (selectedLanguage === 'ar') {
       return num.toLocaleString('ar-EG')
     }
     return num
+  }
+
+  const textStyle: React.CSSProperties = {
+    fontSize: '16px',
+    fontWeight: 700,
+    fontFamily: 'SF Pro Display',
+    color: '#0284C7',
+  }
+
+  const taskStyle: React.CSSProperties = {
+    fontSize: '16px',
+    fontWeight: 700,
+    fontFamily: 'SF Pro Display',
+    color: '#ffffff',
+    textAlign: 'center',
+  }
+
+  const modalStyle = {
+    position: 'absolute',
+    top: '50%',
+    left: '50%',
+    transform: 'translate(-50%, -50%)',
+    width: 800,
+    bgcolor: '#FFFFFF',
+    boxShadow: 24,
+    p: 4,
+    borderTopLeftRadius: '8px',
+    borderBottomLeftRadius: '8px',
+    borderTopRightRadius: '8px',
+    borderBottomRightRadius: '8px',
   }
 
   return (
@@ -971,20 +659,16 @@ function CodingSection() {
           }}
         >
           <DyteUiProvider meeting={meeting}>
-            {/* 1. Dyte Video */}
             <DyteGrid
               meeting={meeting}
               style={{
                 flex: '0 0 auto',
                 borderRadius: '10px',
-
                 maxHeight: '300px',
                 minWidth: '200px',
                 width: '100%',
               }}
             />
-
-            {/* 2. Questions and Timer */}
             <Box
               sx={{
                 background: '#263D4A',
@@ -993,9 +677,9 @@ function CodingSection() {
                 width: '100%',
                 borderRadius: '8px',
                 padding: '11px 6px',
-                maxHeight: { xs: '150px', sm: '200px', md: '250px' }, // Example for responsive heights
-                overflowY: 'auto', // Enable vertical scrolling
-                wordBreak: 'break-word', // Ensure long text wraps
+                maxHeight: { xs: '150px', sm: '200px', md: '250px' },
+                overflowY: 'auto',
+                wordBreak: 'break-word',
               }}
             >
               {initialConditionMet && (
@@ -1022,9 +706,8 @@ function CodingSection() {
                         display: 'inline-block',
                       }}
                     >
-                      {/* {formatTime(timeLeft)} */}
                       {convertNumberToArabic(
-                        parseInt(formatTime(timeLeft)),
+                        formatTime(timeLeft),
                         selectedLanguage,
                       )}
                     </span>
@@ -1041,7 +724,6 @@ function CodingSection() {
                       fontWeight: 400,
                     }}
                   >
-                    {/* {codingQuestions[currentQuestionIndex]} */}
                     {convertNumberToArabic(
                       codingQuestions[currentQuestionIndex],
                       selectedLanguage,
@@ -1054,8 +736,6 @@ function CodingSection() {
                 )}
               </Box>
             </Box>
-
-            {/* 4. Buttons */}
             {initialConditionMet && (
               <Box
                 sx={{
@@ -1127,14 +807,10 @@ function CodingSection() {
                 </Button>
               </Box>
             )}
-            {/* </Box> */}
           </DyteUiProvider>
         </Grid>
-
-        {/* editor grid  */}
         {initialConditionMet && (
           <Grid item lg={8} sx={{}}>
-            {/* Instruction */}
             <Typography
               variant="h6"
               sx={{
@@ -1145,8 +821,6 @@ function CodingSection() {
             >
               {t('pleaseWriteTheCodeInBelowEditor')}
             </Typography>
-
-            {/* Editor box */}
             <Box
               sx={{
                 border: '2px solid #0284C7',
@@ -1172,8 +846,6 @@ function CodingSection() {
                 }}
               />
             </Box>
-
-            {/* Submit button below */}
             <Box
               sx={{
                 display: 'flex',
@@ -1191,15 +863,11 @@ function CodingSection() {
                   fontSize: '14px',
                   fontWeight: 500,
                   textTransform: 'none',
-                  // background: submitClicked ? '#0284C7' : '#FFFFFF',
-                  background:'#0284C7',
+                  background: '#0284C7',
                   borderRadius: '8px',
-                  // border: submitClicked ? 'none' : '1px solid #000000',
-                  // color: submitClicked ? '#FFFFFF' : '#000000',
-                  color:'#FFFFFF',
+                  color: '#FFFFFF',
                   '&:hover': {
-                    // background: submitClicked ? '#0284C7' : '#F3F4F6',
-                    background:'#0284C7'
+                    background: '#0284C7',
                   },
                   height: '36px',
                   minWidth: '100px',
@@ -1215,9 +883,8 @@ function CodingSection() {
             <span style={{ color: '#FF3131' }}>
               You have only{' '}
               <span style={{ minWidth: '35px', display: 'inline-block' }}>
-                {/* {formatTime(timeLeft)} */}
                 {convertNumberToArabic(
-                  parseInt(formatTime(timeLeft)),
+                  formatTime(timeLeft),
                   selectedLanguage,
                 )}
               </span>{' '}
@@ -1253,12 +920,11 @@ function CodingSection() {
           >
             {t('youHave')}{' '}
             <span style={{ minWidth: '40px', display: 'inline-block' }}>
-              {/* {formatTime(timeLeft)} */}
               {initialConditionMet
                 ? convertNumberToArabic(
-                  parseInt(formatTime(timeLeft)),
-                  selectedLanguage,
-                )
+                    formatTime(timeLeft),
+                    selectedLanguage,
+                  )
                 : '00:00'}
             </span>{' '}
             {t('codeSubmitAlertMessage')}
@@ -1296,7 +962,7 @@ function CodingSection() {
                 handleModal1ButtonClicked(2)
                 submitCode()
                 resetTimer()
-                handleNextQuestion()
+                handleSubmit()
                 handleSubmitClose()
               }}
               sx={{
@@ -1400,6 +1066,20 @@ function CodingSection() {
           </div>
         </Box>
       </Modal>
+      <Snackbar
+        open={open}
+        autoHideDuration={5000}
+        onClose={() => setOpen(false)}
+        anchorOrigin={{ vertical: 'top', horizontal: 'center' }}
+      >
+        <Alert
+          onClose={() => setOpen(false)}
+          severity="warning"
+          sx={{ width: '100%' }}
+        >
+          {warning}
+        </Alert>
+      </Snackbar>
     </div>
   )
 }

@@ -189,16 +189,16 @@ function CandidateCodingAssessment() {
                 }
 
                 // ✅ PROCTORING
-                const backgroundNoise = report.noise_detection_result?.noise_analysis.status || "N/A";
+                const backgroundNoise = report.noise_detection_result?.noise_analysis.status || "Not Detected"; //"N/A"
 
                 const eyeMovementAnalysis = report.analysis_result?.sustained_eye_contact;
                 const eyeMovement = eyeMovementAnalysis ? Math.round(parseFloat(eyeMovementAnalysis.replace('%', ''))) : null;
                 // const eyeMovementReport = eyeMovement > 50 ? "Detected" : "Not Detected";
-                const eyeMovementReport = eyeMovement === undefined || eyeMovement === null ? "N/A" : eyeMovement > 50 ? "Detected" : "Not Detected";
+                const eyeMovementReport = eyeMovement === undefined || eyeMovement === null ? "Detected" : eyeMovement > 50 ? "Detected" : "Not Detected"; //"N/A"
 
                 const multipleFace = report.multiple_face_result?.Multiple_faces_detected_frames
                 // const multipleFaceReport = multipleFace > 0 ? "Detected" : "Not Detected";
-                const multipleFaceReport = multipleFace === undefined || multipleFace === null ? "N/A" : multipleFace > 0 ? "Detected" : "Not Detected";
+                const multipleFaceReport = multipleFace === undefined || multipleFace === null ? "Not Detected" : multipleFace > 0 ? "Detected" : "Not Detected"; //"N/A"
 
                 const proctoringDetails = [
                     {
@@ -586,7 +586,7 @@ function CandidateCodingAssessment() {
                                                         <Typography
                                                             variant="inherit"
                                                             sx={{
-                                                                color: (item.report === 'Yes, detected' || item.report === 'Failed') ? '#FF3B30' : '#22973F',
+                                                                color: (item.report === 'Detected' || item.report === 'Failed') ? '#FF3B30' : '#22973F',
                                                                 fontSize: '10px',
                                                                 fontWeight: 400,
                                                                 fontFamily: 'SF Pro Display',

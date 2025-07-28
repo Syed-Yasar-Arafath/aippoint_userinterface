@@ -49,6 +49,7 @@ interface ResumeData {
   file_data: string | null;
   explanation: any;
   showAllSkills?: boolean;
+  score:any;
 }
 
 type Profile = {
@@ -403,132 +404,139 @@ const CollectionDefault: React.FC = () => {
           <Grid item><Button variant="contained" sx={{ textTransform: 'none', fontSize: '12px', ml: 2, backgroundColor: '#0284C7', '&:hover': { backgroundColor: '#0284C7' } }} onClick={() => navigate('/interviewSchedule')}>Schedule Interview</Button></Grid>
         </Grid>
 
-        <Modal open={openModal} onClose={handleCloseModal}>
-          <Box sx={{ position: 'absolute', top: '50%', left: '50%', transform: 'translate(-50%, -50%)', width: '90%', maxHeight: '90vh', bgcolor: 'background.paper', boxShadow: 24, p: 2, overflowY: 'auto' }}>
-            <Typography variant="h6" sx={{ fontSize: 14, color: '#000', fontWeight: 'bold', mb: 2 }}>
-              Available profiles for {selectedJob?.job_title}: {resumeData.length}
-            </Typography>
-            <Grid container spacing={1}>
-              {resumeData.map((resume) => (
-                <Grid item xs={12} key={resume.id}>
-                  <Card sx={{ display: 'flex', p: 2, border: '1px solid #ddd', borderRadius: 4 }}>
-                    <Avatar sx={{ width: 50, height: 50, mr: 2, bgcolor: '#0284C7' }}>
-                      {resume.resume_data?.name?.charAt(0) || 'N'}
-                    </Avatar>
-                    <CardContent sx={{ flexGrow: 1, p: 0 }}>
-                      <Grid container spacing={1}>
-                        <Grid item xs={3}>
-                          <Typography variant="body2" sx={{ fontSize: 12, color: '#333' }}>
-                            <strong>Current Position:</strong> {resume.resume_data?.work?.[0]?.designation_at_company || 'N/A'}
-                          </Typography>
-                          <Typography variant="body2" sx={{ fontSize: 12, color: '#333' }}>
-                            <strong>Experience:</strong> {resume.resume_data?.experience_in_number ? `${resume.resume_data.experience_in_number} year(s)` : 'N/A'}
-                          </Typography>
-                          <Typography variant="body2" sx={{ fontSize: 12, color: '#333' }}>
-                            <strong>Education:</strong> {`${resume.resume_data?.education?.Degree || ''} - ${resume.resume_data?.education?.institution || ''} (${resume.resume_data?.education?.year_of_graduation || ''})` || 'N/A'}
-                          </Typography>
-                          <Typography variant="body2" sx={{ fontSize: 12, color: '#333' }}>
-                            <strong>Contact:</strong> {resume.resume_data?.phone || resume.resume_data?.email || 'N/A'}
-                          </Typography>
-                          <Typography variant="body2" sx={{ fontSize: 12, color: '#333' }}>
-                            <strong>Prev Interview:</strong> N/A
-                          </Typography>
-                        </Grid>
-                        <Grid item xs={4}>
-                          <Typography variant="body2" sx={{ fontSize: 12, color: '#333' }}>
-                            <strong>Projects:</strong>
-                            {resume.resume_data?.projects?.length > 0 ? (
-                              <ul style={{ paddingLeft: 16, margin: 0 }}>
-                                {resume.resume_data.projects.map((project: any, index: number) => (
-                                  <Tooltip key={index} title={project.description} placement="top">
-                                    <li style={{ fontSize: 12, color: '#333', marginBottom: 4, cursor: 'pointer' }}>
-                                      {project.project_name}
-                                    </li>
-                                  </Tooltip>
-                                ))}
-                              </ul>
-                            ) : (
-                              <Typography variant="body2" sx={{ fontSize: 12, color: '#333' }}>
-                                N/A
-                              </Typography>
-                            )}
-                          </Typography>
-                          <Box sx={{ mt: 1 }}>
-                            <Button
-                              variant="outlined"
-                              sx={{ mr: 1, color: '#000', borderColor: '#ccc', textTransform: 'none', fontSize: 12, '&:hover': { borderColor: '#0284C7', color: '#0284C7' } }}
-                              onClick={() => handleViewResume(resume.file_data)}
-                            >
-                              View CV/Resume
-                            </Button>
-                            <Button
-                              variant="outlined"
-                              sx={{ color: '#000', borderColor: '#ccc', textTransform: 'none', fontSize: 12, '&:hover': { borderColor: '#0284C7', color: '#0284C7' } }}
-                              onClick={() => handleOpenNoteModal(resume.id, resume.resume_data?.notes || '')}
-                            >
-                              {resume.resume_data?.notes ? 'Edit Note' : 'Note'}
-                            </Button>
-                          </Box>
-                        </Grid>
-                        <Grid item xs={2}>
-                          <Typography variant="body2" sx={{ fontSize: 12, color: '#333' }}>
-                            <strong>Key Skills:</strong>
-                            <ul style={{ paddingLeft: 16, margin: 0 }}>
-                              {resume.resume_data?.skills?.length > 0 ? (
-                                <>
-                                  {resume.resume_data.skills.slice(0, 5).map((skill: string, idx: number) => (
-                                    <li key={idx} style={{ fontSize: 12, color: '#333', marginBottom: 4 }}>{skill}</li>
-                                  ))}
-                                  {resume.resume_data.skills.length > 5 && (
-                                    
-                                      <Button
-                                        sx={{ textTransform: 'none', fontSize: 12, color: '#0284C7', padding: 0, minWidth: 'auto' }}
-                                        onClick={() =>
-                                          setResumeData((prev) =>
-                                            prev.map((r) => (r.id === resume.id ? { ...r, showAllSkills: !r.showAllSkills } : r))
-                                          )
-                                        }
-                                      >
-                                        {resume.showAllSkills ? 'Show Less' : 'More'}
-                                      </Button>
-                                    
-                                  )}
-                                  {resume.showAllSkills &&
-                                    resume.resume_data.skills.slice(5).map((skill: string, idx: number) => (
-                                      <li key={idx + 5} style={{ fontSize: 12, color: '#333', marginBottom: 4 }}>{skill}</li>
-                                    ))}
-                                </>
-                              ) : (
-                                <li style={{ fontSize: 12, color: '#333' }}>N/A</li>
-                              )}
-                            </ul>
-                          </Typography>
-                        </Grid>
-                        <Grid item xs={3}>
-                          <Typography variant="body2" sx={{ fontSize: 12, color: '#333' }}>
-                            <strong>Uploaded By:</strong> {resume.resume_data?.created_by || createdBy}
-                          </Typography>
-                          <Typography variant="body2" sx={{ fontSize: 12, color: '#333' }}>
-                            <strong>Upcoming Interview:</strong> Not Scheduled
-                          </Typography>
-                          <Button
-                            variant="contained"
-                            color="primary"
-                            sx={{ mt: 1, textTransform: 'none', fontSize: 12, backgroundColor: '#0284C7', '&:hover': { backgroundColor: '#0267B1' } }}
-                            onClick={() => navigate('/interviewSchedule')}
-                          >
-                            Schedule Interview
-                          </Button>
-                        </Grid>
-                      </Grid>
-                    </CardContent>
-                  </Card>
+   <Modal open={openModal} onClose={handleCloseModal}>
+  <Box sx={{ position: 'absolute', top: '50%', left: '50%', transform: 'translate(-50%, -50%)', width: '90%', maxHeight: '90vh', bgcolor: 'background.paper', boxShadow: 24, p: 2, overflowY: 'auto' }}>
+    <Typography variant="h6" sx={{ fontSize: 14, color: '#000', fontWeight: 'bold', mb: 2 }}>
+      Available profiles for {selectedJob?.job_title}: {resumeData.length}
+    </Typography>
+    <Grid container spacing={1}>
+      {resumeData.map((resume) => (
+        <Grid item xs={12} key={resume.id}>
+          <Card sx={{ display: 'flex', p: 2, border: '1px solid #ddd', borderRadius: 4 }}>
+            <Avatar sx={{ width: 50, height: 50, mr: 2, bgcolor: '#0284C7' }}>
+              {resume.resume_data?.name?.charAt(0) || 'N'}
+            </Avatar>
+            <CardContent sx={{ flexGrow: 1, p: 0 }}>
+              <Grid container spacing={1}>
+                <Grid item xs={3}>
+                  <Typography variant="body2" sx={{ fontSize: 12, color: '#333' }}>
+                    <strong>Name:</strong> {resume.resume_data?.name || 'N/A'}
+                  </Typography>
+                  <Typography variant="body2" sx={{ fontSize: 12, color: '#333' }}>
+                    <strong>Email:</strong> {resume.resume_data?.email || 'N/A'}
+                  </Typography>
+                  <Typography variant="body2" sx={{ fontSize: 12, color: '#333' }}>
+                    <strong>Current Position:</strong> {resume.resume_data?.work?.[0]?.designation_at_company || 'N/A'}
+                  </Typography>
+                  <Typography variant="body2" sx={{ fontSize: 12, color: '#333' }}>
+                    <strong>Experience:</strong> {resume.resume_data?.experience_in_number ? `${resume.resume_data.experience_in_number} year(s)` : 'N/A'}
+                  </Typography>
+                  <Typography variant="body2" sx={{ fontSize: 12, color: '#333' }}>
+                    <strong>Education:</strong> {`${resume.resume_data?.education?.Degree || ''} - ${resume.resume_data?.education?.institution || ''} (${resume.resume_data?.education?.year_of_graduation || ''})` || 'N/A'}
+                  </Typography>
+                  <Typography variant="body2" sx={{ fontSize: 12, color: '#333' }}>
+                    <strong>Contact:</strong> {resume.resume_data?.phone || resume.resume_data?.email || 'N/A'}
+                  </Typography>
+                  <Typography variant="body2" sx={{ fontSize: 12, color: '#333' }}>
+                    <strong>Prev Interview:</strong> N/A
+                  </Typography>
                 </Grid>
-              ))}
-            </Grid>
-          </Box>
-        </Modal>
-
+                <Grid item xs={4}>
+                  {/* <Typography variant="body2" sx={{ fontSize: 12, color: '#333' }}>
+                    <strong>Score:</strong> {resume.score !== undefined ? resume.score : '0'}
+                  </Typography> */}
+                  <Typography variant="body2" sx={{ fontSize: 12, color: '#333', mt: 1 }}>
+                    <strong>Projects:</strong>
+                    {resume.resume_data?.projects?.length > 0 ? (
+                      <ul style={{ paddingLeft: 16, margin: 0 }}>
+                        {resume.resume_data.projects.map((project: any, index: number) => (
+                          <Tooltip key={index} title={project.description} placement="top">
+                            <li style={{ fontSize: 12, color: '#333', marginBottom: 4, cursor: 'pointer' }}>
+                              {project.project_name}
+                            </li>
+                          </Tooltip>
+                        ))}
+                      </ul>
+                    ) : (
+                      <Typography variant="body2" sx={{ fontSize: 12, color: '#333' }}>
+                        N/A
+                      </Typography>
+                    )}
+                  </Typography>
+                  <Box sx={{ mt: 1 }}>
+                    <Button
+                      variant="outlined"
+                      sx={{ mr: 1, color: '#000', borderColor: '#ccc', textTransform: 'none', fontSize: 12, '&:hover': { borderColor: '#0284C7', color: '#0284C7' } }}
+                      onClick={() => handleViewResume(resume.file_data)}
+                    >
+                      View CV/Resume
+                    </Button>
+                    <Button
+                      variant="outlined"
+                      sx={{ color: '#000', borderColor: '#ccc', textTransform: 'none', fontSize: 12, '&:hover': { borderColor: '#0284C7', color: '#0284C7' } }}
+                      onClick={() => handleOpenNoteModal(resume.id, resume.resume_data?.notes || '')}
+                    >
+                      {resume.resume_data?.notes ? 'Edit Note' : 'Note'}
+                    </Button>
+                  </Box>
+                </Grid>
+                <Grid item xs={2}>
+                  <Typography variant="body2" sx={{ fontSize: 12, color: '#333' }}>
+                    <strong>Key Skills:</strong>
+                    <ul style={{ paddingLeft: 16, margin: 0 }}>
+                      {resume.resume_data?.skills?.length > 0 ? (
+                        <>
+                          {resume.resume_data.skills.slice(0, 5).map((skill: string, idx: number) => (
+                            <li key={idx} style={{ fontSize: 12, color: '#333', marginBottom: 4 }}>{skill}</li>
+                          ))}
+                          {resume.resume_data.skills.length > 5 && (
+                            <Button
+                              sx={{ textTransform: 'none', fontSize: 12, color: '#0284C7', padding: 0, minWidth: 'auto' }}
+                              onClick={() =>
+                                setResumeData((prev) =>
+                                  prev.map((r) => (r.id === resume.id ? { ...r, showAllSkills: !r.showAllSkills } : r))
+                                )
+                              }
+                            >
+                              {resume.showAllSkills ? 'Show Less' : 'More'}
+                            </Button>
+                          )}
+                          {resume.showAllSkills &&
+                            resume.resume_data.skills.slice(5).map((skill: string, idx: number) => (
+                              <li key={idx + 5} style={{ fontSize: 12, color: '#333', marginBottom: 4 }}>{skill}</li>
+                            ))}
+                        </>
+                      ) : (
+                        <li style={{ fontSize: 12, color: '#333' }}>N/A</li>
+                      )}
+                    </ul>
+                  </Typography>
+                </Grid>
+                <Grid item xs={3}>
+                  <Typography variant="body2" sx={{ fontSize: 12, color: '#333' }}>
+                    <strong>Uploaded By:</strong> {resume.resume_data?.created_by || createdBy}
+                  </Typography>
+                  <Typography variant="body2" sx={{ fontSize: 12, color: '#333' }}>
+                    <strong>Upcoming Interview:</strong> Not Scheduled
+                  </Typography>
+                  <Button
+                    variant="contained"
+                    color="primary"
+                    sx={{ mt: 1, textTransform: 'none', fontSize: 12, backgroundColor: '#0284C7', '&:hover': { backgroundColor: '#0267B1' } }}
+                    onClick={() => navigate('/interviewSchedule')}
+                  >
+                    Schedule Interview
+                  </Button>
+                </Grid>
+              </Grid>
+            </CardContent>
+          </Card>
+        </Grid>
+      ))}
+    </Grid>
+  </Box>
+</Modal>
+ 
         <Modal open={openNoteModal} onClose={handleCloseNoteModal}>
           <Box sx={{ position: 'absolute', top: '50%', left: '50%', transform: 'translate(-50%, -50%)', width: 400, bgcolor: 'background.paper', boxShadow: 24, p: 4, borderRadius: 8 }}>
             <Typography variant="h6" sx={{ mb: 2, fontSize: 16, fontWeight: 'bold' }}>

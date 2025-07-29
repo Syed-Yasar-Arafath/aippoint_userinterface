@@ -199,62 +199,150 @@ export default function InterviewAttend() {
   };
  
   const handleProcessVideo = async () => {
-    try {
+
+  const maxRetries = 10; // Maximum number of retries
+
+  const retryInterval = 3000; // Wait 3 seconds between retries
+ 
+  try {
+
+    let attempts = 0;
+
+    let downloadUrl = null;
+ 
+    // Polling loop to check for download_url
+
+    while (attempts < maxRetries) {
+
       const response = await axios.get(
+
         `https://api.dyte.io/v2/recordings/${recordingId}`,
+
         {
+
           auth: {
+
             username: '955e223b-76a8-4c24-a9c6-ecbfea717290',
+
             password: '26425221301ce90b9244',
+
           },
+
         }
+
       );
  
-      const url = response.data.data.download_url;
+      downloadUrl = response.data.data.download_url;
  
-      const recordingEntity = {
-        outputFileName: url,
-        meetingid: objId,
-        sessionId: `question_${currentQuestionIndex + 1}.mp4`,
-      };
+      if (downloadUrl) {
+
+        console.log(`Download URL available: ${downloadUrl}`);
+
+        break; // Exit the loop if download_url is available
+
+      }
  
-      await axios.post(
-        `${process.env.REACT_APP_SPRINGBOOT_BACKEND_SERVICE}/recording/write/${organisation}`,
-        recordingEntity,
-      );
- 
-      await axios.post(
-        `${process.env.REACT_APP_DJANGO_PYTHON_MODULE_SERVICE}/process_video/`,
-        {
-          video_url: url,
-          meeting_id: meetingId,
-          object_id: objId,
-          question_index: currentQuestionIndex,
-        },
-        { headers: { 'Content-Type': 'application/json', Organization: organisation } }
-      );
- 
-      console.log(`Processed video for question ${currentQuestionIndex + 1}`);
-    } catch (error) {
-      console.error('Error processing video:', error);
+      console.log(`Download URL not available yet, retrying (${attempts + 1}/${maxRetries})...`);
+
+      attempts++;
+
+      await new Promise((resolve) => setTimeout(resolve, retryInterval)); // Wait before retrying
+
     }
-  };
+ 
+    if (!downloadUrl) {
+
+      console.error('No download URL available after maximum retries');
+
+      return;
+
+    }
+ 
+    // Proceed with processing the video
+
+    const recordingEntity = {
+
+      outputFileName: downloadUrl,
+
+      meetingid: objId,
+
+      sessionId: `question_${currentQuestionIndex + 1}.mp4`,
+
+    };
+ 
+    await axios.post(
+
+      `${process.env.REACT_APP_SPRINGBOOT_BACKEND_SERVICE}/recording/write/${organisation}`,
+
+      recordingEntity
+
+    );
+ 
+    await axios.post(
+
+      `${process.env.REACT_APP_DJANGO_PYTHON_MODULE_SERVICE}/process_video/`,
+
+      {
+
+        video_url: downloadUrl,
+
+        meeting_id: meetingId,
+
+        object_id: objId,
+
+        question_index: currentQuestionIndex,
+
+      },
+
+      {
+
+        headers: { 'Content-Type': 'application/json', Organization: organisation },
+
+      }
+
+    );
+ 
+    console.log(`Processed video for question ${currentQuestionIndex + 1}`);
+
+  } catch (error) {
+
+    console.error('Error processing video:', error);
+
+  }
+
+};
+ 
  
   const handleRecordingSubmit = async () => {
-    try {
-      await stopRecording();
-      console.log('Recording stopped...');
-      await new Promise((resolve) => setTimeout(resolve, 3000));
-      await handleProcessVideo();
-      console.log('Video processed...');
-      if (currentQuestionIndex < questionGenerated.length - 1) {
-        await startRecording();
-        console.log('New recording started...');
-      }
-    } catch (error) {
-      console.error('Error in handleRecordingSubmit:', error);
+
+  try {
+
+    await stopRecording();
+
+    console.log('Recording stopped...');
+
+    await new Promise((resolve) => setTimeout(resolve, 3000)); // Existing delay
+
+    await handleProcessVideo(); // Updated function with polling
+
+    console.log('Video processed...');
+
+    if (currentQuestionIndex < questionGenerated.length - 1) {
+
+      await startRecording();
+
+      console.log('New recording started...');
+
     }
-  };
+
+  } catch (error) {
+
+    console.error('Error in handleRecordingSubmit:', error);
+
+  }
+
+};
+ 
  
   const checkSessionStatus = async () => {
     try {

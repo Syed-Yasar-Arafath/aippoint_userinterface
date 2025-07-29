@@ -75,7 +75,8 @@ function AnalyticsReport() {
                         status: item.interview_status || 'N/A',
                         date: item.interview_time || 'N/A',
                         experience: item.resume_data.experience_in_number || 'N/A',
-                        score: item.coding_overall_score ?? item.overall_score ?? 'N/A'
+                        score: item.coding_overall_score ?? item.overall_score ?? 'N/A',
+                        proctoring: item.proctoring_details,
                     }));
 
                 setInterviewData(formattedData);
@@ -87,6 +88,26 @@ function AnalyticsReport() {
 
         fetchInterviewData();
     }, []);
+
+
+    const handleProctoringReport = async (objectId: any) => {
+        try {
+            const response = await axios.post(
+                `${process.env.REACT_APP_DJANGO_PYTHON_MODULE_SERVICE}/proctoring_report/${objectId}/`, {},
+                {
+                    headers: {
+                        "Content-Type": "application/json",
+                        "Organization": organisation,
+                    },
+                }
+            );
+
+            console.log("✅ Success:", response.data.summary);
+
+        } catch (error) {
+            console.error('Something went wrong', error);
+        }
+    };
 
     // Fetch user profile image
     useEffect(() => {
@@ -721,17 +742,35 @@ function AnalyticsReport() {
                                                                                 background: '#0284C7',
                                                                             },
                                                                         }}
-                                                                        // onClick={() =>
-                                                                        //     profile.type === 'AI'
-                                                                        //         ? navigate('/candidate_interview_analytics', { state: { id: profile.candidateId } })
-                                                                        //         : navigate('/candidate_coding_assessment', { state: { id: profile.candidateId } })
-                                                                        // }
                                                                         disabled={profile.status === 'awaited' || profile.status === 'cancelled'}
+                                                                        // onClick={() => {
+                                                                        //     if (profile.status !== 'awaited' || profile.status !== 'cancelled') {
+                                                                        //         profile.type === 'AI'
+                                                                        //             ? navigate('/candidate_interview_analytics', { state: { id: profile.candidateId } })
+                                                                        //             : navigate('/candidate_coding_assessment', { state: { id: profile.candidateId } });
+                                                                        //     }
+                                                                        // }}
                                                                         onClick={() => {
-                                                                            if (profile.status !== 'awaited' || profile.status !== 'cancelled') {
-                                                                                profile.type === 'AI'
-                                                                                    ? navigate('/candidate_interview_analytics', { state: { id: profile.candidateId } })
-                                                                                    : navigate('/candidate_coding_assessment', { state: { id: profile.candidateId } });
+                                                                            if (profile.status !== 'awaited' && profile.status !== 'cancelled') {
+                                                                                if (profile.type === 'AI') {
+                                                                                    if (!profile.proctoring) {
+                                                                                        handleProctoringReport(profile.candidateId);
+                                                                                    }
+                                                                                    setTimeout(() => {
+                                                                                        navigate('/candidate_interview_analytics', {
+                                                                                            state: { id: profile.candidateId },
+                                                                                        });
+                                                                                    }, 1000);
+                                                                                } else {
+                                                                                    if (!profile.proctoring) {
+                                                                                        handleProctoringReport(profile.candidateId);
+                                                                                    }
+                                                                                    setTimeout(() => {
+                                                                                        navigate('/candidate_coding_assessment', {
+                                                                                            state: { id: profile.candidateId },
+                                                                                        });
+                                                                                    }, 1000);
+                                                                                }
                                                                             }
                                                                         }}
                                                                     >
@@ -742,23 +781,21 @@ function AnalyticsReport() {
                                                                 <TableCell>    <Button
                                                                     disabled={profile.status === 'awaited' || profile.status === 'cancelled'}
                                                                     sx={{
-
                                                                         textTransform: 'none',
                                                                         ml: 1,
-                                                                       
-                                                                            // background: '#0284C7',
-                                                                            background:
-                                                                                profile.status === 'awaited' || profile.status === 'cancelled'
-                                                                                    ? '#94A3B8'
-                                                                                    : '#0284C7',
-                                                                            borderRadius: '6px',
-                                                                            color: '#FFFFFF',
-                                                                            fontSize: '12px',
-                                                                            fontWeight: 500,
-                                                                            fontFamily: 'SF Pro Display',
-                                                                            '&:hover': {
-                                                                                background: '#0284C7',
-                                                                            },
+                                                                        // background: '#0284C7',
+                                                                        background:
+                                                                            profile.status === 'awaited' || profile.status === 'cancelled'
+                                                                                ? '#94A3B8'
+                                                                                : '#0284C7',
+                                                                        borderRadius: '6px',
+                                                                        color: '#FFFFFF',
+                                                                        fontSize: '12px',
+                                                                        fontWeight: 500,
+                                                                        fontFamily: 'SF Pro Display',
+                                                                        '&:hover': {
+                                                                            background: '#0284C7',
+                                                                        },
                                                                     }}
                                                                     onClick={() =>
                                                                         navigate('/InterviewRecording', {

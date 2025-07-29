@@ -49,7 +49,34 @@ interface ResumeData {
   file_data: string | null;
   explanation: any;
   showAllSkills?: boolean;
-  score:any;
+  // score:any;
+}
+interface ResumeScore {
+  resume_id: string;
+  job_id: string | number;
+  score: number;
+  resume_score_explanation: {
+    experience: string;
+    primary_skills: string;
+    secondary_skills: string;
+    role: string;
+    projects: string;
+    certifications: string;
+    domain_specific: string;
+  };
+  resume_data: {
+    name: string;
+    email: string;
+    job_role: string;
+    experiance_in_number: number;
+    Resume_Category: string;
+  };
+  jd_data: {
+    job_title: string;
+    job_role: string;
+    experience_required: string;
+    rolecategory: string;
+  };
 }
 
 type Profile = {
@@ -93,7 +120,7 @@ const CollectionDefault: React.FC = () => {
   const [select, setSelect] = useState('');
   const [selectedDate, setSelectedDate] = useState<dayjs.Dayjs | null>(null);
   const [searchQuery, setSearchQuery] = useState('');
-
+const [scoreData, setScoreData] = useState<{ [key: string]: ResumeScore }>({});
   useEffect(() => {
     const getUserData = async () => {
       setDispatchLoading(true);
@@ -184,7 +211,7 @@ const CollectionDefault: React.FC = () => {
   const navigate = useNavigate();
   const dispatch = useDispatch();
 
-  const handleViewProfiles = async (job: any) => {
+   const handleViewProfiles = async (job: any) => {
     setSelectedJob(job);
     try {
       const response = await axios.post(
@@ -197,15 +224,40 @@ const CollectionDefault: React.FC = () => {
         showAllSkills: false,
       }));
       setResumeData(updatedResumeData);
+
+      // Fetch scores for each resume
+      const scorePromises = updatedResumeData.map(async (resume: ResumeData) => {
+        try {
+          const scoreResponse = await axios.post(
+            `${process.env.REACT_APP_DJANGO_PYTHON_MODULE_SERVICE}/fetch_resume_score/`,
+            { resume_id: resume.id, job_id: job.jobid },
+            { headers: { Authorization: `Bearer ${token}`, Organization: organisation, 'Content-Type': 'application/json' } }
+          );
+          if (scoreResponse.status === 200 && scoreResponse.data.data) {
+            return { [resume.id]: scoreResponse.data.data };
+          }
+          return { [resume.id]: null };
+        } catch (error) {
+          console.error(`Error fetching score for resume ${resume.id}:`, error);
+          return { [resume.id]: null };
+        }
+      });
+
+      const scores = await Promise.all(scorePromises);
+      const scoreMap = scores.reduce((acc, curr) => ({ ...acc, ...curr }), {});
+      setScoreData(scoreMap);
       setOpenModal(true);
     } catch (error) {
       console.error('Error fetching resume data:', error);
+      dispatch(openSnackbar('Failed to fetch resume data', 'red'));
     }
   };
+
 
   const handleCloseModal = () => {
     setOpenModal(false);
     setResumeData([]);
+    setScoreData({});
   };
 
   const handleViewResume = (fileData: string | null) => {
@@ -442,9 +494,9 @@ const CollectionDefault: React.FC = () => {
                   </Typography>
                 </Grid>
                 <Grid item xs={4}>
-                  {/* <Typography variant="body2" sx={{ fontSize: 12, color: '#333' }}>
-                    <strong>Score:</strong> {resume.score !== undefined ? resume.score : '0'}
-                  </Typography> */}
+                   <Typography variant="body2" sx={{ fontSize: 12, color: '#333' }}>
+                            <strong>Score:</strong> {scoreData[resume.id]?.score !== undefined ? scoreData[resume.id].score : 'N/A'}
+                          </Typography>
                   <Typography variant="body2" sx={{ fontSize: 12, color: '#333', mt: 1 }}>
                     <strong>Projects:</strong>
                     {resume.resume_data?.projects?.length > 0 ? (

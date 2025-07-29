@@ -42,7 +42,7 @@ const UpcomingInterview: React.FC = () => {
 
   const getUserId = async () => {
     try {
-      const res = await axios.get(`http://localhost:8082/user/getuserid/${organisation}/${email}`)
+      const res = await axios.get(`https://parseez.ai/parseez-spring-service/user/getuserid/${organisation}/${email}`)
 
       setUserId(res.data.user_id)
 

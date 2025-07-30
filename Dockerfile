@@ -10,6 +10,9 @@ COPY package*.json ./
 # Install dependencies with peer dependency resolution
 RUN npm install --legacy-peer-deps
 
+# Upgrade testing library to ensure 'screen' is available
+RUN npm install @testing-library/react@latest --save-dev
+
 # Copy the rest of the application
 COPY . .
 

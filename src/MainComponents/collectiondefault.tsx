@@ -162,7 +162,7 @@ const [scoreData, setScoreData] = useState<{ [key: string]: ResumeScore }>({});
             const response = await axios.post(
               `${process.env.REACT_APP_DJANGO_PYTHON_MODULE_SERVICE}/get_resume/`,
               { resume_id: [resumeId] },
-              { headers: { Authorization: `Bearer ${token}`, Organization: organisation } }
+              { headers: { Organization: organisation } }
             );
             const resume = response.data[0];
             const resumeExp = resume?.resume_data?.experience_in_number || 0;
@@ -217,7 +217,7 @@ const [scoreData, setScoreData] = useState<{ [key: string]: ResumeScore }>({});
       const response = await axios.post(
         `${process.env.REACT_APP_DJANGO_PYTHON_MODULE_SERVICE}/get_resume/`,
         { resume_id: job.resume_ids },
-        { headers: { Authorization: `Bearer ${token}`, Organization: organisation } }
+        { headers: {Organization: organisation } }
       );
       const updatedResumeData = response.data.map((resume: any) => ({
         ...resume,
@@ -231,7 +231,7 @@ const [scoreData, setScoreData] = useState<{ [key: string]: ResumeScore }>({});
           const scoreResponse = await axios.post(
             `${process.env.REACT_APP_DJANGO_PYTHON_MODULE_SERVICE}/fetch_resume_score/`,
             { resume_id: resume.id, job_id: job.jobid },
-            { headers: { Authorization: `Bearer ${token}`, Organization: organisation, 'Content-Type': 'application/json' } }
+            { headers: { Organization: organisation, 'Content-Type': 'application/json' } }
           );
           if (scoreResponse.status === 200 && scoreResponse.data.data) {
             return { [resume.id]: scoreResponse.data.data };
@@ -286,7 +286,7 @@ const [scoreData, setScoreData] = useState<{ [key: string]: ResumeScore }>({});
       const response = await axios.post(
         `${process.env.REACT_APP_DJANGO_PYTHON_MODULE_SERVICE}/get_jd_score/`,
         { jd_id: selectedJob.jobid },
-        { headers: { Authorization: `Bearer ${token}`, Organization: organisation, 'Content-Type': 'application/json' } }
+        { headers: {Organization: organisation, 'Content-Type': 'application/json' } }
       );
       if (response.status === 200 && Array.isArray(response.data)) {
         setResumeData((prevResumeData) =>
@@ -329,7 +329,7 @@ const [scoreData, setScoreData] = useState<{ [key: string]: ResumeScore }>({});
       const response = await axios.post(
         `${process.env.REACT_APP_DJANGO_PYTHON_MODULE_SERVICE}/save_notes/`,
         { object_id: selectedJob.resumeId, notes: note },
-        { headers: { Authorization: `Bearer ${token}`, Organization: organisation, 'Content-Type': 'application/json' } }
+        { headers: {Organization: organisation, 'Content-Type': 'application/json' } }
       );
       if (response.status === 200) {
         dispatch(openSnackbar('Notes saved successfully!', 'green'));

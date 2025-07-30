@@ -20,7 +20,7 @@ import {
 import { useTranslation } from 'react-i18next';
 import { loaderOff, loaderOn, openSnackbar } from '../redux/actions';
 import { putResume } from '../services/JobService';
-import { getAllResume, getResumeById, getResumeScore } from '../services/ResumeService';
+import { getAllResume, getResumeById } from '../services/ResumeService';
 import { getUserDetails } from '../services/UserService';
 import Header from '../CommonComponents/topheader';
 import axios from 'axios';
@@ -78,16 +78,6 @@ interface Profile {
   score: any;
 }
 
-type Row = {
-  resume_data: any;
-  id: string | number;
-  name: string;
-  email: string;
-  phone: string;
-  file_data: any;
-  file_name: any;
-}
-
 const JdProfile = () => {
   const [selectedCandidates, setSelectedCandidates] = useState<any[]>([]);
   const [selectAll, setSelectAll] = useState(false);
@@ -113,7 +103,6 @@ const JdProfile = () => {
   const [inputLocValue, setInputLocValue] = useState<string>('');
   const { t } = useTranslation();
   const { jobId } = useParams();
-  const job_id = jobId;
   const token = localStorage.getItem('token');
   const [currentPage, setCurrentPage] = useState(1);
   const [resumesPerPage] = useState(5);
@@ -121,88 +110,7 @@ const JdProfile = () => {
   const [error, setError] = useState<string | null>(null);
   const [noFilterProfiles, setNoFilterProfiles] = useState<any[]>([]);
   const [scoredResumes, setScoredResumes] = useState<{ [key: string]: number }>({});
-  const [rows, setRows] = useState<Row[]>([]);
   const dispatch = useDispatch();
-  const classes = useStyles();
-
-  const handleSkillChange = async () => {
-    if (!jobId) {
-      console.error('Job ID is undefined');
-      dispatch(openSnackbar(t('noJobIdProvided'), 'red'));
-      return;
-    }
-
-    const jsonDataa = { jd_id: parseInt(jobId, 10) };
-
-    try {
-      const res = await getResumeScore(jsonDataa);
-      setRows(res);
-      const resumes = res.map((resume: any) => ({
-        id: resume.resume._id,
-        name: resume.resume_data.name,
-        email: resume.resume_data.email,
-        phone: resume.resume_data.phone,
-        location: resume.resume_data.location,
-        job_role: resume.resume_data.job_role,
-        experiance_in_number: resume.resume_data.experiance_in_number,
-        score: resume.score || 'N/A',
-        url: resume.resume_data.resume.url,
-      }));
-
-      if (res) {
-        const validProfiles = res.filter((profile: any) => Number(profile.score) > 0);
-        const sortedProfiles = validProfiles.sort((a: any, b: any) => Number(b.score) - Number(a.score));
-        
-        // Deduplicate profiles by id
-        const seenIds = new Set();
-        const uniqueProfiles = sortedProfiles.filter((profile: any) => {
-          const id = profile.id || profile.resume_data?.id;
-          if (seenIds.has(id)) return false;
-          seenIds.add(id);
-          return true;
-        });
-
-        setProfile(uniqueProfiles);
-        setProfileLength(uniqueProfiles.length);
-      }
-    } catch (err) {
-      console.error('Request error:', err);
-      dispatch(openSnackbar(t('failedToFetchScoredResumes'), 'red'));
-    } finally {
-      dispatch(loaderOff());
-    }
-  };
-
-  const fetchscore = async () => {
-    if (!job_id) return;
-    dispatch(loaderOn());
-    try {
-      const response = await axios.post(
-        `${process.env.REACT_APP_DJANGO_PYTHON_MODULE_SERVICE}/resume_scoring/`,
-        { job_id },
-        {
-          headers: {
-            Organization: organisation,
-            'Content-Type': 'application/json',
-          },
-        },
-      );
-      if (response) {
-        dispatch(openSnackbar(t('scoringCompleted'), 'green'));
-      } else {
-        dispatch(openSnackbar(t('scoringFailed'), 'red'));
-      }
-      handleSkillChange();
-      dispatch(loaderOff());
-    } catch (err) {
-      console.error(`Error fetching resumes for job ${job_id}:`, err);
-      dispatch(loaderOff());
-    }
-  };
-
-  const handleClickScore = () => {
-    fetchscore();
-  };
 
   const fetchScoredResumes = async () => {
     if (!jobId) {
@@ -220,7 +128,7 @@ const JdProfile = () => {
     const jobIdNum = parseInt(jobId, 10);
     console.log('Fetching scored resumes for jobId:', jobIdNum);
     setLoading(true);
-    setError(null);
+    setError(null); // Clear any previous error
     dispatch(loaderOn());
 
     try {
@@ -230,12 +138,13 @@ const JdProfile = () => {
         {
           headers: {
             Organization: organisation,
-            Authorization: `Bearer ${token}`,
+           
           },
         }
       );
 
       console.log('API Response:', response.data);
+      // Check if response contains scored_resumes and handle empty array case
       if (response.status === 200 && Array.isArray(response.data.scored_resumes)) {
         const formattedProfiles = response.data.scored_resumes.map((resume: any) => ({
           id: resume.resume_id,
@@ -252,22 +161,12 @@ const JdProfile = () => {
           },
           score: resume.score,
         }));
-
-        // Deduplicate profiles by id
-        const seenIds = new Set();
-        const uniqueProfiles = formattedProfiles.filter((profile: any) => {
-          const id = profile.id || profile.resume_data?.id;
-          if (seenIds.has(id)) return false;
-          seenIds.add(id);
-          return true;
-        });
-
         setScoredResumes({ [jobId]: response.data.scored_resumes_count || 0 });
-        setProfile(uniqueProfiles);
-        setNoFilterProfiles(uniqueProfiles);
-        setProfileLength(uniqueProfiles.length);
-        if (uniqueProfiles.length === 0) {
-          setError(t('noResumesFound'));
+        setProfile(formattedProfiles);
+        setNoFilterProfiles(formattedProfiles);
+        setProfileLength(formattedProfiles.length);
+        if (formattedProfiles.length === 0) {
+          setError(t('noResumesFound')); // Set error only if no resumes are found
         }
       } else {
         setError(t('invalidResponseFormat'));
@@ -331,20 +230,10 @@ const JdProfile = () => {
       const resumeResponse = await getResumeById(requestData);
       if (resumeResponse && Array.isArray(resumeResponse)) {
         const resumeData = resumeResponse.map((resume: any) => resume.resume_data || resume);
-        
-        // Deduplicate resumes by id
-        const seenIds = new Set();
-        const uniqueResumes = resumeData.filter((resume: any) => {
-          const id = resume.id || resume.resume_data?.id;
-          if (seenIds.has(id)) return false;
-          seenIds.add(id);
-          return true;
-        });
-
-        console.log('Fetched Resume Data:', uniqueResumes);
-        setProfile(uniqueResumes);
-        setNoFilterProfiles(uniqueResumes);
-        setProfileLength(uniqueResumes.length);
+        console.log('Fetched Resume Data:', resumeData);
+        setProfile(resumeData);
+        setNoFilterProfiles(resumeData);
+        setProfileLength(resumeData.length);
       } else {
         console.error('Invalid response format from getResumeById');
         setError('Invalid response format from server.');
@@ -431,6 +320,8 @@ const JdProfile = () => {
       }),
     ),
   ];
+
+  const classes = useStyles();
 
   const getAllCollection = async () => {
     try {
@@ -1174,7 +1065,7 @@ const JdProfile = () => {
               </button>
             </div>
           )}
-          {loading && (
+{loading && (
             <div
               style={{
                 padding: '40px',
@@ -1276,7 +1167,8 @@ const JdProfile = () => {
                         margin: '0 0 2px 0',
                         fontSize: '14px',
                         fontWeight: '600',
-color: '#000000',                        whiteSpace: 'nowrap',
+                        color: '#1f2937',
+                        whiteSpace: 'nowrap',
                         overflow: 'hidden',
                         textOverflow: 'ellipsis',
                       }}
@@ -1287,7 +1179,8 @@ color: '#000000',                        whiteSpace: 'nowrap',
                       style={{
                         margin: '0 0 2px 0',
                         fontSize: '11px',
-color: '#000000',                        whiteSpace: 'nowrap',
+                        color: '#6b7280',
+                        whiteSpace: 'nowrap',
                         overflow: 'hidden',
                         textOverflow: 'ellipsis',
                       }}
@@ -1298,7 +1191,8 @@ color: '#000000',                        whiteSpace: 'nowrap',
                       style={{
                         margin: '0 0 2px 0',
                         fontSize: '11px',
-color: '#000000',                        whiteSpace: 'nowrap',
+                        color: '#6b7280',
+                        whiteSpace: 'nowrap',
                         overflow: 'hidden',
                         textOverflow: 'ellipsis',
                       }}
@@ -1309,7 +1203,8 @@ color: '#000000',                        whiteSpace: 'nowrap',
                       style={{
                         margin: '0',
                         fontSize: '11px',
-color: '#000000',                        whiteSpace: 'nowrap',
+                        color: '#6b7280',
+                        whiteSpace: 'nowrap',
                         overflow: 'hidden',
                         textOverflow: 'ellipsis',
                       }}
@@ -1322,7 +1217,8 @@ color: '#000000',                        whiteSpace: 'nowrap',
                         flexDirection: 'column',
                         gap: '1px',
                         fontSize: '10px',
-color: '#000000',                        marginBottom: '4px',
+                        color: '#6b7280',
+                        marginBottom: '4px',
                       }}
                     >
                       <div style={{ display: 'flex', gap: '8px' }}>
@@ -1379,7 +1275,8 @@ color: '#000000',                        marginBottom: '4px',
                         margin: '0 0 4px 0',
                         fontSize: '10px',
                         fontWeight: '600',
-color: '#000000',                      }}
+                        color: '#374151',
+                      }}
                     >
                       {t('keySkill')}
                     </h4>
@@ -1399,7 +1296,8 @@ color: '#000000',                      }}
                             key={idx}
                             style={{
                               fontSize: '9px',
-color: '#000000',                              display: 'flex',
+                              color: '#6b7280',
+                              display: 'flex',
                               alignItems: 'center',
                               whiteSpace: 'nowrap',
                               overflow: 'hidden',
@@ -1429,7 +1327,8 @@ color: '#000000',                              display: 'flex',
                         margin: '0 0 4px 0',
                         fontSize: '10px',
                         fontWeight: '600',
-color: '#000000',                      }}
+                        color: '#374151',
+                      }}
                     >
                       Previous Interview
                     </h4>
@@ -1437,7 +1336,8 @@ color: '#000000',                      }}
                       style={{
                         margin: 0,
                         fontSize: '9px',
-color: '#000000',                        whiteSpace: 'nowrap',
+                        color: '#6b7280',
+                        whiteSpace: 'nowrap',
                         overflow: 'hidden',
                         textOverflow: 'ellipsis',
                       }}
@@ -1449,8 +1349,7 @@ color: '#000000',                        whiteSpace: 'nowrap',
               </div>
             ))
           )}
-        </div>
-        <div
+        </div>        <div
           style={{
             display: 'flex',
             justifyContent: 'space-between',
@@ -1550,23 +1449,6 @@ color: '#000000',                        whiteSpace: 'nowrap',
                 ? `${t('addCollectionBtn')} (${selectedCandidates.length})`
                 : t('addCollectionBtn')}
             </button>
-            <Button
-              style={{
-                padding: '6px 14px',
-                backgroundColor: selectedCandidates.length > 0 ? '#0284C7' : '#9CA3AF',
-                color: 'white',
-                border: 'none',
-                borderRadius: '6px',
-                fontSize: '12px',
-                fontWeight: '500',
-                cursor: selectedCandidates.length > 0 ? 'pointer' : 'not-allowed',
-                marginLeft: '10px',
-                whiteSpace: 'nowrap',
-              }}
-              onClick={handleClickScore}
-            >
-              Score
-            </Button>
           </div>
         </div>
       </div>

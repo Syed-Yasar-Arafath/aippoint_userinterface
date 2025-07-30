@@ -401,7 +401,7 @@ const JdCollection: React.FC = () => {
               </div>
             </div>
             <div style={{ display: 'flex', justifyContent: 'space-between', flexDirection: 'row' }}>
-              {/* <button
+              <button
                 style={{
                   backgroundColor: '#0284C7',
                   color: 'white',
@@ -416,7 +416,7 @@ const JdCollection: React.FC = () => {
                 onClick={() => handleViewClick(job.jobid)}
               >
                 Score Profile
-              </button> */}
+              </button>
               <button
                 style={{
                   backgroundColor: '#0284C7',

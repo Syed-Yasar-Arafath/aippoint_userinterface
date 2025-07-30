@@ -1,38 +1,33 @@
-# Stage 1: Build React app using Node
+# Stage 1: Build environment (based on node:18-alpine)
 FROM node:18-alpine AS builder
-
+ 
 # Set working directory
 WORKDIR /app
-
-# Copy dependency definitions
+ 
+# Copy package.json and package-lock.json (if present)
 COPY package*.json ./
-
-# Install dependencies with peer dependency resolution
+ 
+# Install dependencies
 RUN npm install --legacy-peer-deps
-
-# Upgrade testing library to ensure 'screen' is available
-RUN npm install @testing-library/react@latest --save-dev
-
-# Copy the rest of the application
+ 
+# Copy the rest of the application code
 COPY . .
-
-# Set environment options to prevent memory issues
+ 
+# Build the React application for production
 ENV NODE_OPTIONS=--max-old-space-size=4096
-
-# Build the app
 RUN npm run build
-
-# Stage 2: Serve app using Nginx
+ 
+# Stage 2: Production image (based on nginx:alpine)
 FROM nginx:alpine
-
-# Copy built files from builder stage
+ 
+# Copy static assets from the builder stage
 COPY --from=builder /app/build /usr/share/nginx/html
-
-# Copy custom nginx config (make sure nginx.conf exists in project root)
-COPY nginx.conf /etc/nginx/conf.d/default.conf
-
-# Expose port 80
+ 
+# Expose port 80 for web traffic
 EXPOSE 80
-
-# Start Nginx
+ 
+# Configure default server block to serve the React app
+COPY nginx.conf /etc/nginx/conf.d/default.conf
+ 
+# Start the Nginx server
 CMD ["nginx", "-g", "daemon off;"]

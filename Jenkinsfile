@@ -6,7 +6,7 @@ pipeline {
         REGISTRY = "iosysdev"
         TAG = "latest"
         DOCKER_USERNAME = "iosysdev"
-        DOCKER_PASSWORD = "Dev45#iosys89$"
+        DOCKER_PASSWORD = "Dev45#iosys89\$"
     }
 
     stages {

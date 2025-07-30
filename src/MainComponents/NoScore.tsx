@@ -445,7 +445,7 @@ const NoScore = () => {
       }
       handleSkillChange() // Assuming handleSkillChange is defined and does something
       dispatch(loaderOff())
-      navigate('/jdccollection')
+      navigate('/jdcollection')
       // counts[job.jobid] = response.data.matching_resume_count || 0
     } catch (err) {
       console.error(`Error fetching resumes for job ${job_id}:`, err)

@@ -3,10 +3,10 @@ pipeline {
 
     environment {
         IMAGE_NAME = "aippoint-ui"
-        REGISTRY = "iosysdev"   
+        REGISTRY = "iosysdev"
         TAG = "latest"
-        DOCKER_USERNAME = "iosysdev"   
-        DOCKER_PASSWORD = "Dev45#iosys89\$"  
+        DOCKER_USERNAME = "iosysdev"
+        DOCKER_PASSWORD = "Dev45#iosys89$"
     }
 
     stages {
@@ -22,6 +22,18 @@ pipeline {
                     echo "$DOCKER_PASSWORD" | docker login -u "$DOCKER_USERNAME" --password-stdin
                     docker push $REGISTRY/$IMAGE_NAME:$TAG
                 """
+            }
+        }
+
+        stage('Authenticate with GCP') {
+            steps {
+                withCredentials([file(credentialsId: 'gcp-key', variable: 'GOOGLE_CREDENTIALS')]) {
+                    sh '''
+                        gcloud auth activate-service-account --key-file=$GOOGLE_CREDENTIALS
+                        gcloud config set project deployments-449806
+                        gcloud container clusters get-credentials kubernetes-cluster --region=us-central1
+                    '''
+                }
             }
         }
 

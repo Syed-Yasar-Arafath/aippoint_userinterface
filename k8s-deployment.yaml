@@ -1,0 +1,19 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: aippoint-ui
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: aippoint-ui
+  template:
+    metadata:
+      labels:
+        app: aippoint-ui
+    spec:
+      containers:
+        - name: aippoint-ui
+          image: iosysdev/aippoint-ui:latest
+          ports:
+            - containerPort: 80

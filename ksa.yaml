@@ -1,0 +1,7 @@
+apiVersion: v1
+kind: ServiceAccount
+metadata:
+  name: aippoint-ui-ksa
+  namespace: default
+  annotations:
+    iam.gke.io/gcp-service-account: jenkins-deployer@deployments-449806.iam.gserviceaccount.com

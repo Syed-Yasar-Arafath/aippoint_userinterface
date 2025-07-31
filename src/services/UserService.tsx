@@ -1,17 +1,15 @@
 import internalApi from '../utilities/internalApi'
 
-
-
+// const organisation = localStorage.getItem('organisation')
 export async function signIn(data: any, organisation: any) {
   try {
-    const api = await internalApi; // Resolve the promise to get axios instance
-    const endpoint = `/admin/signin-user/${organisation}`;
-    const fullUrl = `${api.defaults.baseURL}${endpoint}`; // Construct full URL
-    console.log('Requesting URL:', fullUrl); // Logs e.g., https://api.example.com/v1/admin/signin-user/my-org
-    const response = await api.post(endpoint, data);
-    return response.data;
+    const response = await internalApi.post(
+      `/admin/signin-user/${organisation}`,
+      data,
+    )
+    return response.data
   } catch (error) {
-    return error;
+    return error
   }
 }
 export async function setPassword(data: any) {
@@ -221,9 +219,9 @@ export async function getUserDetails(organisation: any) {
   }
 }
 
-export async function getUserDetailsWithouttoken(email: any, organisation: any) {
+export async function getUserDetailsWithouttoken(email:any,organisation: any) {
   try {
-    const response = await internalApi.get(`/user/readwithouttoken/${organisation}`, {
+    const response = await internalApi.get(`/user/readwithouttoken/${organisation}`,{
       params: { email }
     })
     return response.data

@@ -46,14 +46,13 @@
 //     }
 // }
 
-
 pipeline {
     agent any
 
     environment {
         IMAGE_NAME = "aippoint-ui"
         GCR_REGISTRY = "gcr.io/deployments-449806"
-        TAG = "${env.BUILD_NUMBER}" // Dynamic tagging
+        IMAGE_TAG = "${new Date().format('yyyyMMddHHmmss')}" 
         GCP_PROJECT = "deployments-449806"
         CLUSTER_NAME = "kubernetes-cluster"
         CLUSTER_REGION = "us-central1"
@@ -76,8 +75,8 @@ pipeline {
         stage('Build Docker Image') {
             steps {
                 script {
-                    echo "Building Docker image: ${GCR_REGISTRY}/${IMAGE_NAME}:${TAG}"
-                    sh "docker build -t ${GCR_REGISTRY}/${IMAGE_NAME}:${TAG} ."
+                    echo "Building Docker image: ${GCR_REGISTRY}/${IMAGE_NAME}:${IMAGE_TAG}"
+                    sh "docker build -t ${GCR_REGISTRY}/${IMAGE_NAME}:${IMAGE_TAG} ."
                 }
             }
         }
@@ -100,8 +99,8 @@ pipeline {
         stage('Push to GCR') {
             steps {
                 script {
-                    echo "Pushing to GCR: ${GCR_REGISTRY}/${IMAGE_NAME}:${TAG}"
-                    sh "docker push ${GCR_REGISTRY}/${IMAGE_NAME}:${TAG}"
+                    echo "Pushing to GCR: ${GCR_REGISTRY}/${IMAGE_NAME}:${IMAGE_TAG}"
+                    sh "docker push ${GCR_REGISTRY}/${IMAGE_NAME}:${IMAGE_TAG}"
                 }
             }
         }
@@ -109,9 +108,9 @@ pipeline {
         stage('Deploy to Kubernetes') {
             steps {
                 script {
-                    echo "Updating k8s-deployment.yaml with tag: ${TAG}"
+                    echo "Updating k8s-deployment.yaml with tag: ${IMAGE_TAG}"
                     sh """
-                        sed -i 's|image: gcr.io/deployments-449806/aippoint-ui:.*|image: gcr.io/deployments-449806/aippoint-ui:${TAG}|' k8s-deployment.yaml
+                        sed -i 's|image: gcr.io/deployments-449806/aippoint-ui:.*|image: gcr.io/deployments-449806/aippoint-ui:${IMAGE_TAG}|' k8s-deployment.yaml
                     """
                     echo "Authenticating with Kubernetes cluster: ${CLUSTER_NAME}"
                     sh """
@@ -128,11 +127,11 @@ pipeline {
         always {
             script {
                 echo "Cleaning up Docker images to free space"
-                sh "docker rmi ${GCR_REGISTRY}/${IMAGE_NAME}:${TAG} || true"
+                sh "docker rmi ${GCR_REGISTRY}/${IMAGE_NAME}:${IMAGE_TAG} || true"
             }
         }
         success {
-            echo "Pipeline completed successfully! Image pushed to ${GCR_REGISTRY}/${IMAGE_NAME}:${TAG} and deployed to Kubernetes."
+            echo "Pipeline completed successfully! Image pushed to ${GCR_REGISTRY}/${IMAGE_NAME}:${IMAGE_TAG} and deployed to Kubernetes."
         }
         failure {
             echo "Pipeline failed. Check the logs for errors."

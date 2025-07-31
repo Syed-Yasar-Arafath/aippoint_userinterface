@@ -53,13 +53,26 @@ pipeline {
     environment {
         IMAGE_NAME = "aippoint-ui"
         GCR_REGISTRY = "gcr.io/deployments-449806"
-        TAG = "${env.BUILD_NUMBER}" // Use build number for unique tagging
+        TAG = "${env.BUILD_NUMBER}" // Dynamic tagging
         GCP_PROJECT = "deployments-449806"
         CLUSTER_NAME = "kubernetes-cluster"
         CLUSTER_REGION = "us-central1"
     }
 
     stages {
+        stage('Verify Environment') {
+            steps {
+                script {
+                    echo "Verifying gcloud and Docker setup"
+                    sh '''
+                        gcloud --version
+                        docker --version
+                        gcloud config get-value project || echo "No project set"
+                    '''
+                }
+            }
+        }
+
         stage('Build Docker Image') {
             steps {
                 script {

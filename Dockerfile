@@ -56,20 +56,8 @@ RUN npm install --legacy-peer-deps
 
 # Copy rest of the app
 COPY . .
-
-# Fetch secret and create .env.production
-ENV GCP_PROJECT_ID=deployments-449806
-ENV SECRET_NAME=api-endpoint-url
-
-RUN python3 -c "\
-import os; \
-from google.cloud import secretmanager; \
-client = secretmanager.SecretManagerServiceClient(); \
-name = f'projects/{os.environ.get(\"GCP_PROJECT_ID\")}/secrets/{os.environ.get(\"SECRET_NAME\")}/versions/latest'; \
-response = client.access_secret_version(request={'name': name}); \
-secret = response.payload.data.decode(\"utf-8\"); \
-with open('.env.production', 'w') as f: f.write(f'REACT_APP_SPRINGBOOT_BACKEND_SERVICE={secret}\n')"
-
+COPY .env.production .env.production
+ 
 # Optional: Remove test files
 RUN find src -type f -name "*.test.tsx" -delete || true
 RUN find src -type f -name "*.spec.tsx" -delete || true

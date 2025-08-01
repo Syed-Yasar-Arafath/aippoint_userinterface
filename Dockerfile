@@ -56,7 +56,6 @@ RUN npm install --legacy-peer-deps
 
 # Copy rest of the app
 COPY . .
-COPY .env.production .env.production
  
 # Optional: Remove test files
 RUN find src -type f -name "*.test.tsx" -delete || true

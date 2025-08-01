@@ -45,7 +45,7 @@ FROM node:18-alpine AS builder
 RUN apk add --no-cache python3 py3-pip
 
 # Install Google Cloud Secret Manager client
-RUN pip3 install google-cloud-secret-manager
+RUN pip3 install --break-system-packages google-cloud-secret-manager
 
 # Set working directory
 WORKDIR /app

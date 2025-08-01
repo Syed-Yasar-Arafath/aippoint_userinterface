@@ -285,7 +285,7 @@ pipeline {
     }
 
     stages {
-        stage('Verify Environment') {
+        stage('Verify Environments') {
             steps {
                 script {
                     echo "Verifying gcloud and Docker setup"

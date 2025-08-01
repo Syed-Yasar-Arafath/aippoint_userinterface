@@ -1,275 +1,3 @@
-// pipeline {
-//     agent any
-
-//     environment {
-//         IMAGE_NAME = "aippoint-ui"
-//         REGISTRY = "iosysdev"
-//         TAG = "latest"
-//         DOCKER_USERNAME = "iosysdev"
-//         DOCKER_PASSWORD = "Dev45#iosys89\$"
-//     }
-
-//     stages {
-//         stage('Build Docker Image') {
-//             steps {
-//                 sh "docker build -t $REGISTRY/$IMAGE_NAME:$TAG ."
-//             }
-//         }
-
-//         stage('Push Docker Image') {
-//             steps {
-//                 sh """
-//                     echo "$DOCKER_PASSWORD" | docker login -u "$DOCKER_USERNAME" --password-stdin
-//                     docker push $REGISTRY/$IMAGE_NAME:$TAG
-//                 """
-//             }
-//         }
-
-//         stage('Authenticate with GCP') {
-//             steps {
-//                 withCredentials([file(credentialsId: 'gcp-key', variable: 'GOOGLE_CREDENTIALS')]) {
-//                     sh '''
-//                         gcloud auth activate-service-account --key-file=$GOOGLE_CREDENTIALS
-//                         gcloud config set project deployments-449806
-//                         gcloud container clusters get-credentials kubernetes-cluster --region=us-central1
-//                     '''
-//                 }
-//             }
-//         }
-
-//         stage('Deploy to Kubernetes') {
-//             steps {
-//                 sh "kubectl apply --validate=false -f k8s-deployment.yaml"
-//                 sh "kubectl apply --validate=false -f k8s-service.yaml"
-//             }
-//         }
-//     }
-// }
-//2nd one
-// pipeline {
-//     agent any
-
-//     environment {
-//         IMAGE_NAME = "aippoint-ui"
-//         GCR_REGISTRY = "gcr.io/deployments-449806"
-//         IMAGE_TAG = "${new Date().format('yyyyMMddHHmmss')}" 
-//         GCP_PROJECT = "deployments-449806"
-//         CLUSTER_NAME = "kubernetes-cluster"
-//         CLUSTER_REGION = "us-central1"
-//     }
-
-//     stages {
-//         stage('Verify Environment') {
-//             steps {
-//                 script {
-//                     echo "Verifying gcloud and Docker setup"
-//                     sh '''
-//                         gcloud --version
-//                         docker --version
-//                         gcloud config get-value project || echo "No project set"
-//                     '''
-//                 }
-//             }
-//         }
-
-        
-
-//         stage('Build Docker Image') {
-//             steps {
-//                 script {
-//                     echo "Building Docker image: ${GCR_REGISTRY}/${IMAGE_NAME}:${IMAGE_TAG}"
-//                     sh "docker build -t ${GCR_REGISTRY}/${IMAGE_NAME}:${IMAGE_TAG} ."
-//                 }
-//             }
-//         }
-
-//         stage('Authenticate with GCP') {
-//             steps {
-//                 withCredentials([file(credentialsId: 'gcp-key', variable: 'GOOGLE_CREDENTIALS')]) {
-//                     script {
-//                         echo "Authenticating with GCP"
-//                         sh '''
-//                             gcloud auth activate-service-account --key-file=$GOOGLE_CREDENTIALS
-//                             gcloud config set project $GCP_PROJECT
-//                             gcloud auth configure-docker gcr.io --quiet
-//                         '''
-//                     }
-//                 }
-//             }
-//         }
-
-//         stage('Push to GCR') {
-//             steps {
-//                 script {
-//                     echo "Pushing to GCR: ${GCR_REGISTRY}/${IMAGE_NAME}:${IMAGE_TAG}"
-//                     sh "docker push ${GCR_REGISTRY}/${IMAGE_NAME}:${IMAGE_TAG}"
-//                 }
-//             }
-//         }
-
-//         stage('Deploy to Kubernetes') {
-//             steps {
-//                 script {
-//                     echo "Updating k8s-deployment.yaml with tag: ${IMAGE_TAG}"
-//                     sh """
-//                         sed -i 's|image: gcr.io/deployments-449806/aippoint-ui:.*|image: gcr.io/deployments-449806/aippoint-ui:${IMAGE_TAG}|' k8s-deployment.yaml
-//                     """
-//                     echo "Authenticating with Kubernetes cluster: ${CLUSTER_NAME}"
-//                     sh """
-//                         gcloud container clusters get-credentials ${CLUSTER_NAME} --region=${CLUSTER_REGION} --project=${GCP_PROJECT}
-//                         kubectl apply --validate=false -f k8s-deployment.yaml
-//                         kubectl apply --validate=false -f k8s-service.yaml
-//                     """
-//                 }
-//             }
-//         }
-//     }
-
-//     post {
-//         always {
-//             script {
-//                 echo "Cleaning up Docker images to free space"
-//                 sh "docker rmi ${GCR_REGISTRY}/${IMAGE_NAME}:${IMAGE_TAG} || true"
-//             }
-//         }
-//         success {
-//             echo "Pipeline completed successfully! Image pushed to ${GCR_REGISTRY}/${IMAGE_NAME}:${IMAGE_TAG} and deployed to Kubernetes."
-//         }
-//         failure {
-//             echo "Pipeline failed. Check the logs for errors."
-//         }
-//     }
-// }
-
-
-
-
-//  pipeline {
-//     agent any
-
-//     environment {
-//         IMAGE_NAME = "aippoint-ui"
-//         GCR_REGISTRY = "gcr.io/deployments-449806"
-//         IMAGE_TAG = "${new Date().format('yyyyMMddHHmmss')}" 
-//         GCP_PROJECT = "deployments-449806"
-//         CLUSTER_NAME = "kubernetes-cluster"
-//         CLUSTER_REGION = "us-central1"
-//         SECRET_NAME = "api-endpoint-url"
-//     }
-
-//     stages {
-//         stage('Verify Environment') {
-//             steps {
-//                 script {
-//                     echo "Verifying gcloud and Docker setup"
-//                     sh '''
-//                         gcloud --version
-//                         docker --version
-//                         gcloud config get-value project || echo "No project set"
-//                     '''
-//                 }
-//             }
-//         }
-
-//         stage('Inject Secrets into .env.production') {
-//             steps {
-//                 withCredentials([file(credentialsId: 'gcp-key', variable: 'GOOGLE_CREDENTIALS')]) {
-//                     sh '''
-//                         echo "Fetching secret from Secret Manager..."
-//                         gcloud auth activate-service-account --key-file=$GOOGLE_CREDENTIALS
-//                         gcloud config set project $GCP_PROJECT
-
-//                         SECRET_VALUE=$(gcloud secrets versions access latest --secret=api-endpoint-url) || exit 1
-//                         echo "REACT_APP_SPRINGBOOT_BACKEND_SERVICE=$SECRET_VALUE" > .env.production
-//                         cat .env.production
-//                     '''
-//                 }
-//             }
-//         }
-
-//         // stage('Build Docker Image') {
-//         //     steps {
-//         //         script {
-//         //             echo "Building Docker image: ${GCR_REGISTRY}/${IMAGE_NAME}:${IMAGE_TAG}"
-//         //             sh "docker build -t ${GCR_REGISTRY}/${IMAGE_NAME}:${IMAGE_TAG} ."
-                    
-//         //         }
-//         //     }
-//         // }
-
-//         stage('Build Docker Image') {
-//     steps {
-//         script {
-//             echo "Building Docker image: ${GCR_REGISTRY}/${GCP_PROJECT}/${IMAGE_NAME}:${IMAGE_TAG}"
-//             sh """
-//                 docker build -t ${GCR_REGISTRY}/${GCP_PROJECT}/${IMAGE_NAME}:${IMAGE_TAG} .
-//             """
-//         }
-//     }
-// }
-
-
-
-//         stage('Authenticate with GCP') {
-//             steps {
-//                 withCredentials([file(credentialsId: 'gcp-key', variable: 'GOOGLE_CREDENTIALS')]) {
-//                     script {
-//                         echo "Authenticating with GCP"
-//                         sh '''
-//                             gcloud auth activate-service-account --key-file=$GOOGLE_CREDENTIALS
-//                             gcloud config set project $GCP_PROJECT
-//                             gcloud auth configure-docker gcr.io --quiet
-//                         '''
-//                     }
-//                 }
-//             }
-//         }
-
-//         stage('Push to GCR') {
-//             steps {
-//                 script {
-//                     echo "Pushing to GCR: ${GCR_REGISTRY}/${IMAGE_NAME}:${IMAGE_TAG}"
-//                     sh "docker push ${GCR_REGISTRY}/${IMAGE_NAME}:${IMAGE_TAG}"
-//                 }
-//             }
-//         }
-
-//         stage('Deploy to Kubernetes') {
-//             steps {
-//                 script {
-//                     echo "Updating k8s-deployment.yaml with tag: ${IMAGE_TAG}"
-//                     sh """
-//                         sed -i 's|image: gcr.io/deployments-449806/aippoint-ui:.*|image: gcr.io/deployments-449806/aippoint-ui:${IMAGE_TAG}|' k8s-deployment.yaml
-//                     """
-//                     echo "Authenticating with Kubernetes cluster: ${CLUSTER_NAME}"
-//                     sh """
-//                         gcloud container clusters get-credentials ${CLUSTER_NAME} --region=${CLUSTER_REGION} --project=${GCP_PROJECT}
-//                         kubectl apply --validate=false -f k8s-deployment.yaml
-//                         kubectl apply --validate=false -f k8s-service.yaml
-//                     """
-//                 }
-//             }
-//         }
-//     }
-
-//     post {
-//         always {
-//             script {
-//                 echo "Cleaning up Docker images to free space"
-//                 sh """
-//                     docker rmi ${GCR_REGISTRY}/${IMAGE_NAME}:${IMAGE_TAG} || true
-//                     docker system prune -f || true
-//                 """
-//             }
-//         }
-//         success {
-//             echo "✅ Pipeline completed successfully! Image pushed to ${GCR_REGISTRY}/${IMAGE_NAME}:${IMAGE_TAG} and deployed to Kubernetes."
-//         }
-//         failure {
-//             echo "❌ Pipeline failed. Check the logs for errors."
-//         }
-//     }
-// }
 pipeline {
     agent any
 
@@ -280,35 +8,36 @@ pipeline {
         IMAGE_TAG = "${new Date().format('yyyyMMddHHmmss')}" 
         CLUSTER_NAME = "kubernetes-cluster"
         CLUSTER_REGION = "us-central1"
-        SECRET_NAME = "api-endpoint-url"
+        SECRET_NAME = "ENV_PROD"
         FULL_IMAGE_NAME = "gcr.io/${GCP_PROJECT}/${IMAGE_NAME}:${IMAGE_TAG}"
     }
 
     stages {
         stage('Verify Environments') {
             steps {
-                script {
-                    echo "Verifying gcloud and Docker setup"
-                    sh '''
-                        gcloud --version
-                        docker --version
-                        gcloud config get-value project || echo "No project set"
-                    '''
-                }
+                echo "🔍 [DEBUG] Verifying environment setup: gcloud, docker, and GCP project"
+                sh '''
+                    echo "---- gcloud version ----"
+                    gcloud --version
+
+                    echo "---- docker version ----"
+                    docker --version
+
+                    echo "---- checking gcloud project ----"
+                    gcloud config get-value project || echo "No project set"
+                '''
             }
         }
 
-        stage('Inject Secrets into .env.production') {
+        stage('Authenticate with GCP') {
             steps {
                 withCredentials([file(credentialsId: 'gcp-key', variable: 'GOOGLE_CREDENTIALS')]) {
+                    echo "🔐 [DEBUG] Authenticating with GCP using service account"
                     sh '''
-                        echo "Fetching secret from Secret Manager..."
                         gcloud auth activate-service-account --key-file=$GOOGLE_CREDENTIALS
                         gcloud config set project $GCP_PROJECT
-
-                        SECRET_VALUE=$(gcloud secrets versions access latest --secret=api-endpoint-url) || exit 1
-                        echo "REACT_APP_SPRINGBOOT_BACKEND_SERVICE=$SECRET_VALUE" > .env.production
-                        cat .env.production
+                        gcloud auth configure-docker gcr.io --quiet
+                        echo "✅ GCP authentication and Docker config successful"
                     '''
                 }
             }
@@ -316,70 +45,86 @@ pipeline {
 
         stage('Build Docker Image') {
             steps {
-                script {
-                    echo "Building Docker image: ${FULL_IMAGE_NAME}"
-                    sh "docker build -t ${FULL_IMAGE_NAME} ."
-                }
-            }
-        }
-
-        stage('Authenticate with GCP') {
-            steps {
-                withCredentials([file(credentialsId: 'gcp-key', variable: 'GOOGLE_CREDENTIALS')]) {
-                    script {
-                        echo "Authenticating with GCP"
-                        sh '''
-                            gcloud auth activate-service-account --key-file=$GOOGLE_CREDENTIALS
-                            gcloud config set project $GCP_PROJECT
-                            gcloud auth configure-docker gcr.io --quiet
-                        '''
-                    }
-                }
+                echo "🐳 [DEBUG] Building Docker image: ${FULL_IMAGE_NAME}"
+                sh '''
+                    echo "Running docker build..."
+                    docker build -t ${FULL_IMAGE_NAME} .
+                    echo "✅ Docker image built successfully"
+                '''
             }
         }
 
         stage('Push to GCR') {
             steps {
-                script {
-                    echo "Pushing to GCR: ${FULL_IMAGE_NAME}"
-                    sh "docker push ${FULL_IMAGE_NAME}"
+                echo "📤 [DEBUG] Pushing Docker image to GCR: ${FULL_IMAGE_NAME}"
+                sh '''
+                    echo "Pushing image to GCR..."
+                    docker push ${FULL_IMAGE_NAME}
+                    echo "✅ Docker image pushed to GCR"
+                '''
+            }
+        }
+
+        stage('Fetch Secret and Create Kubernetes Secret') {
+            steps {
+                withCredentials([file(credentialsId: 'gcp-key', variable: 'GOOGLE_CREDENTIALS')]) {
+                    echo "🔐 [DEBUG] Fetching secret from Secret Manager and creating Kubernetes secret"
+                    sh '''
+                        gcloud auth activate-service-account --key-file=$GOOGLE_CREDENTIALS
+                        gcloud config set project $GCP_PROJECT
+
+                        echo "Fetching ENV_PROD secret from GCP Secret Manager..."
+                        gcloud secrets versions access latest --secret=${SECRET_NAME} > .env.production
+
+                        echo "Creating Kubernetes secret 'prod-env' from .env.production..."
+                        kubectl create secret generic prod-env \
+                          --from-env-file=.env.production \
+                          --dry-run=client -o yaml | kubectl apply -f -
+
+                        echo "✅ Kubernetes secret created/updated"
+                    '''
                 }
             }
         }
 
         stage('Deploy to Kubernetes') {
             steps {
-                script {
-                    echo "Updating k8s-deployment.yaml with tag: ${IMAGE_TAG}"
-                    sh """
-                        sed -i 's|image: gcr.io/${GCP_PROJECT}/${IMAGE_NAME}:.*|image: ${FULL_IMAGE_NAME}|' k8s-deployment.yaml
-                    """
-                    echo "Authenticating with Kubernetes cluster: ${CLUSTER_NAME}"
-                    sh """
-                        gcloud container clusters get-credentials ${CLUSTER_NAME} --region=${CLUSTER_REGION} --project=${GCP_PROJECT}
-                        kubectl apply --validate=false -f k8s-deployment.yaml
-                        kubectl apply --validate=false -f k8s-service.yaml
-                    """
-                }
+                echo "🚀 [DEBUG] Deploying to Kubernetes cluster"
+                sh '''
+                    echo "Updating image tag in k8s-deployment.yaml to ${FULL_IMAGE_NAME}..."
+                    sed -i 's|image: gcr.io/${GCP_PROJECT}/${IMAGE_NAME}:.*|image: ${FULL_IMAGE_NAME}|' k8s-deployment.yaml
+
+                    echo "Getting credentials for Kubernetes cluster: ${CLUSTER_NAME}..."
+                    gcloud container clusters get-credentials ${CLUSTER_NAME} --region=${CLUSTER_REGION} --project=${GCP_PROJECT}
+
+                    echo "Applying Kubernetes deployment..."
+                    kubectl apply --validate=false -f k8s-deployment.yaml
+
+                    echo "Applying Kubernetes service..."
+                    kubectl apply --validate=false -f k8s-service.yaml
+
+                    echo "✅ Kubernetes deployment completed"
+                '''
             }
         }
     }
 
     post {
         always {
-            script {
-                echo "Cleaning up Docker images to free space"
-                sh """
-                    docker rmi ${FULL_IMAGE_NAME} || true
-                    docker system prune -f || true
-                """
-            }
+            echo "🧹 [DEBUG] Cleaning up local Docker images"
+            sh '''
+                echo "Removing local Docker image..."
+                docker rmi ${FULL_IMAGE_NAME} || true
+
+                echo "Pruning unused Docker resources..."
+                docker system prune -f || true
+            '''
         }
         success {
-            echo "✅ Pipeline completed successfully! Image pushed to ${FULL_IMAGE_NAME} and deployed to Kubernetes."
+            echo "✅ [SUCCESS] Pipeline completed successfully! Image pushed to ${FULL_IMAGE_NAME} and deployed to Kubernetes."
         }
         failure {
-            echo "❌ Pipeline failed. Check the logs for errors."
+            echo "❌ [FAILURE] Pipeline failed. Please check the logs above for debugging info."
         }
     }
 }

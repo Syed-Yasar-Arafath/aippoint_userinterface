@@ -200,16 +200,14 @@
         stage('Build Docker Image') {
     steps {
         script {
-            echo "Building Docker image: ${GCR_REGISTRY}/${IMAGE_NAME}:${IMAGE_TAG}"
+            echo "Building Docker image: ${GCR_REGISTRY}/${GCP_PROJECT}/${IMAGE_NAME}:${IMAGE_TAG}"
             sh """
-                docker build \
-                    --build-arg GCP_PROJECT_ID=${GCP_PROJECT_ID} \
-                    --build-arg SECRET_NAME=${SECRET_NAME} \
-                    -t ${GCR_REGISTRY}/${IMAGE_NAME}:${IMAGE_TAG} .
+                docker build -t ${GCR_REGISTRY}/${GCP_PROJECT}/${IMAGE_NAME}:${IMAGE_TAG} .
             """
         }
     }
 }
+
 
 
         stage('Authenticate with GCP') {

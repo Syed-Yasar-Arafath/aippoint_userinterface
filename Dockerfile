@@ -7,7 +7,7 @@ WORKDIR /app
 # Copy package files
 COPY package*.json ./
 
-# Install dependencies - using npm install with force to handle conflicts
+# Install ALL dependencies (including dev dependencies needed for build)
 RUN npm install --legacy-peer-deps --force
 
 # Stage 2: Builder
@@ -32,8 +32,15 @@ ENV NODE_OPTIONS="--max-old-space-size=2048"
 ENV GENERATE_SOURCEMAP=false
 ENV CI=true
 
+# Verify dependencies are installed
+RUN npm list --depth=0
+
+# Copy build script and make it executable
+COPY build.sh /app/build.sh
+RUN chmod +x /app/build.sh
+
 # Build React app with optimized settings
-RUN npm run build
+RUN /app/build.sh
 
 # Stage 3: Production image
 FROM nginx:alpine

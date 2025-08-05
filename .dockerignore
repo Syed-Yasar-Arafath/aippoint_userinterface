@@ -37,6 +37,8 @@ Jenkinsfile*
 # Docker
 Dockerfile*
 .dockerignore
+# Keep build script
+!build.sh
 
 # Logs
 logs

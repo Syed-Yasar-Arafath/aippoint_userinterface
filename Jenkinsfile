@@ -79,44 +79,7 @@ pipeline {
             }
         }
 
-        stage('Select Image for Production') {
-            steps {
-                script {
-                    withCredentials([file(credentialsId: 'gcp-key', variable: 'GOOGLE_CREDENTIALS')]) {
-                        echo "📋 [DEBUG] Fetching available images for production deployment"
-                        
-                        sh '''
-                            gcloud auth activate-service-account --key-file=$GOOGLE_CREDENTIALS
-                            gcloud config set project $GCP_PROJECT
-                        '''
-                        
-                        def availableImages = sh(
-                            script: "gcloud container images list-tags gcr.io/${GCP_PROJECT}/${IMAGE_NAME} --format=value(tags)",
-                            returnStdout: true
-                        ).trim().split('\n')
-                        
-                        echo "📋 Available images for production deployment:"
-                        availableImages.eachWithIndex { image, index ->
-                            echo "${index + 1}. gcr.io/${GCP_PROJECT}/${IMAGE_NAME}:${image}"
-                        }
-                        
-                        def selectedImage = input(
-                            message: 'Select image for production deployment:',
-                            parameters: [
-                                choice(
-                                    name: 'SELECTED_IMAGE',
-                                    choices: availableImages,
-                                    description: 'Choose the image tag to deploy'
-                                )
-                            ]
-                        )
-                        
-                        env.SELECTED_IMAGE = selectedImage
-                        echo "Selected image: gcr.io/${GCP_PROJECT}/${IMAGE_NAME}:${selectedImage}"
-                    }
-                }
-            }
-        }
+
 
 
         stage('Fetch Secret and Create Kubernetes Secret') {
@@ -152,17 +115,17 @@ pipeline {
             steps {
                 echo "🚀 [DEBUG] Deploying to Testing cluster (Automatic)"
                 sh '''
-                    echo "Updating image tag in backend-deployment.yaml to ${FULL_IMAGE_NAME}..."
-                    sed -i "s|image: gcr.io/${GCP_PROJECT}/${IMAGE_NAME}:.*|image: ${FULL_IMAGE_NAME}|" backend-deployment.yaml
+                    echo "Updating image tag in k8s-deployment.yaml to ${FULL_IMAGE_NAME}..."
+                    sed -i "s|image: gcr.io/${GCP_PROJECT}/${IMAGE_NAME}:.*|image: ${FULL_IMAGE_NAME}|" k8s-deployment.yaml
 
                     echo "Getting credentials for Testing Kubernetes cluster: ${CLUSTER_NAME}..."
                     gcloud container clusters get-credentials ${CLUSTER_NAME} --region=${CLUSTER_REGION} --project=${GCP_PROJECT}
 
                     echo "Applying Kubernetes deployment to Testing..."
-                    kubectl apply --validate=false -f backend-deployment.yaml
+                    kubectl apply --validate=false -f k8s-deployment.yaml
 
                     echo "Applying Kubernetes service to Testing..."
-                    kubectl apply --validate=false -f backend-service.yaml
+                    kubectl apply --validate=false -f k8s-service.yaml
 
                     echo "✅ Testing deployment completed"
                 '''
@@ -188,12 +151,13 @@ pipeline {
                             '''
                         }
                         
+                        // Use a safer approach to execute the gcloud command
                         def result = sh(
-                            script: 'gcloud container images list-tags gcr.io/deployments-449806/aippoint-ui --format="value(tags)"',
+                            script: 'gcloud container images list-tags gcr.io/deployments-449806/aippoint-ui --format="value(tags)" || echo ""',
                             returnStdout: true
                         ).trim()
                         
-                        if (result) {
+                        if (result && result != '') {
                             def tags = result.split('\n').collect { it.trim() }.findAll { it && it != '' }
                             availableImages = tags.collect { "gcr.io/deployments-449806/aippoint-ui:${it}" }
                         }
@@ -242,17 +206,17 @@ pipeline {
                     def productionImage = env.PRODUCTION_IMAGE_TAG ?: params.PRODUCTION_IMAGE_TAG
                     echo "Production image: ${productionImage}"
                     sh """
-                        echo "Updating image tag in backend-deployment.yaml to ${productionImage}..."
-                        sed -i "s|image: gcr.io/${GCP_PROJECT}/${IMAGE_NAME}:.*|image: ${productionImage}|" backend-deployment.yaml
+                        echo "Updating image tag in k8s-deployment.yaml to ${productionImage}..."
+                        sed -i "s|image: gcr.io/${GCP_PROJECT}/${IMAGE_NAME}:.*|image: ${productionImage}|" k8s-deployment.yaml
 
                         echo "Getting credentials for Production Kubernetes cluster: ${PRODUCTION_CLUSTER}..."
                         gcloud container clusters get-credentials ${PRODUCTION_CLUSTER} --region=${CLUSTER_REGION} --project=${GCP_PROJECT}
 
                         echo "Applying Kubernetes deployment to Production..."
-                        kubectl apply --validate=false -f backend-deployment.yaml
+                        kubectl apply --validate=false -f k8s-deployment.yaml
 
                         echo "Applying Kubernetes service to Production..."
-                        kubectl apply --validate=false -f backend-service.yaml
+                        kubectl apply --validate=false -f k8s-service.yaml
 
                         echo "✅ Production deployment completed"
                     """

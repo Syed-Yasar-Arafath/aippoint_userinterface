@@ -72,11 +72,16 @@ pipeline {
                     echo "Regenerating package-lock.json to ensure consistency..."
                     npm install --package-lock-only --legacy-peer-deps || true
                     
-                    echo "Running docker build..."
+                    echo "Checking Node.js and npm versions..."
+                    node --version
+                    npm --version
+                    
+                    echo "Running docker build with verbose output..."
                     docker build \
                         --no-cache \
                         --progress=plain \
-                        -t ${FULL_IMAGE_NAME} .
+                        --build-arg NODE_ENV=production \
+                        -t ${FULL_IMAGE_NAME} . 2>&1
                     echo "✅ Docker image built successfully"
                 '''
             }

@@ -1,5 +1,10 @@
 pipeline {
     agent any
+    
+    options {
+        timeout(time: 30, unit: 'MINUTES')
+        timestamps()
+    }
 
     parameters {
         choice(
@@ -61,8 +66,22 @@ pipeline {
             steps {
                 echo "🐳 [DEBUG] Building Docker image: ${FULL_IMAGE_NAME}"
                 sh '''
-                    echo "Running docker build..."
-                    docker build -t ${FULL_IMAGE_NAME} .
+                    echo "Cleaning up Docker system before build..."
+                    docker system prune -f || true
+                    
+                    echo "Running docker build with optimizations..."
+                    DOCKER_BUILDKIT=1 docker build \
+                        --no-cache \
+                        --progress=plain \
+                        --build-arg BUILDKIT_INLINE_CACHE=1 \
+                        -t ${FULL_IMAGE_NAME} . || {
+                        echo "❌ Docker build failed, trying with increased timeout..."
+                        timeout 1800 DOCKER_BUILDKIT=1 docker build \
+                            --no-cache \
+                            --progress=plain \
+                            --build-arg BUILDKIT_INLINE_CACHE=1 \
+                            -t ${FULL_IMAGE_NAME} .
+                    }
                     echo "✅ Docker image built successfully"
                 '''
             }

@@ -69,19 +69,14 @@ pipeline {
                     echo "Cleaning up Docker system before build..."
                     docker system prune -f || true
                     
-                    echo "Running docker build with optimizations..."
-                    DOCKER_BUILDKIT=1 docker build \
+                    echo "Regenerating package-lock.json to ensure consistency..."
+                    npm install --package-lock-only --legacy-peer-deps || true
+                    
+                    echo "Running docker build..."
+                    docker build \
                         --no-cache \
                         --progress=plain \
-                        --build-arg BUILDKIT_INLINE_CACHE=1 \
-                        -t ${FULL_IMAGE_NAME} . || {
-                        echo "❌ Docker build failed, trying with increased timeout..."
-                        timeout 1800 DOCKER_BUILDKIT=1 docker build \
-                            --no-cache \
-                            --progress=plain \
-                            --build-arg BUILDKIT_INLINE_CACHE=1 \
-                            -t ${FULL_IMAGE_NAME} .
-                    }
+                        -t ${FULL_IMAGE_NAME} .
                     echo "✅ Docker image built successfully"
                 '''
             }

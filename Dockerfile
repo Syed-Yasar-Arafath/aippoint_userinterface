@@ -7,9 +7,8 @@ WORKDIR /app
 # Copy package files
 COPY package*.json ./
 
-# Install dependencies with cache mount
-RUN --mount=type=cache,target=/root/.npm \
-    npm ci --only=production --legacy-peer-deps
+# Install dependencies - using npm install with force to handle conflicts
+RUN npm install --legacy-peer-deps --force
 
 # Stage 2: Builder
 FROM node:18-alpine AS builder

@@ -26,8 +26,7 @@ pipeline {
         FULL_IMAGE_NAME = "gcr.io/${GCP_PROJECT}/${IMAGE_NAME}:${IMAGE_TAG}"
     }
 
-   
-
+    stages {
         stage('Verify Environments') {
             steps {
                 echo "🔍 [DEBUG] Verifying environment setup: gcloud, docker, and GCP project"

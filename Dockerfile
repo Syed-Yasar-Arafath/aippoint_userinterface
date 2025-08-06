@@ -35,12 +35,8 @@ ENV CI=true
 # Verify dependencies are installed
 RUN npm list --depth=0
 
-# Copy build script and make it executable
-COPY build.sh /app/build.sh
-RUN chmod +x /app/build.sh
-
 # Build React app with optimized settings
-RUN /app/build.sh
+RUN npm run build || (echo "Build failed, trying with more memory..." && NODE_OPTIONS="--max-old-space-size=4096" npm run build)
 
 # Stage 3: Production image
 FROM nginx:alpine

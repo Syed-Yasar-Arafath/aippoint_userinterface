@@ -1,10 +1,5 @@
 pipeline {
     agent any
-    
-    options {
-        timeout(time: 30, unit: 'MINUTES')
-        timestamps()
-    }
 
     parameters {
         choice(
@@ -66,28 +61,8 @@ pipeline {
             steps {
                 echo "🐳 [DEBUG] Building Docker image: ${FULL_IMAGE_NAME}"
                 sh '''
-                    echo "Cleaning up Docker system before build..."
-                    docker system prune -f || true
-                    
-                    echo "Checking Node.js installation..."
-                    node --version
-                    npm --version
-                    
-                    echo "Regenerating package-lock.json to ensure consistency..."
-                    npm install --package-lock-only --legacy-peer-deps --force || true
-                    
-                    echo "Installing dependencies locally to verify build..."
-                    npm install --legacy-peer-deps --force
-                    
-                    echo "Testing build locally..."
-                    npm run build || echo "Local build failed, but continuing with Docker build..."
-                    
-                    echo "Running docker build with verbose output..."
-                    docker build \
-                        --no-cache \
-                        --progress=plain \
-                        --build-arg NODE_ENV=production \
-                        -t ${FULL_IMAGE_NAME} . 2>&1
+                    echo "Running docker build..."
+                    docker build -t ${FULL_IMAGE_NAME} .
                     echo "✅ Docker image built successfully"
                 '''
             }

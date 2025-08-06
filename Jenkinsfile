@@ -69,12 +69,18 @@ pipeline {
                     echo "Cleaning up Docker system before build..."
                     docker system prune -f || true
                     
-                    echo "Regenerating package-lock.json to ensure consistency..."
-                    npm install --package-lock-only --legacy-peer-deps || true
-                    
-                    echo "Checking Node.js and npm versions..."
+                    echo "Checking Node.js installation..."
                     node --version
                     npm --version
+                    
+                    echo "Regenerating package-lock.json to ensure consistency..."
+                    npm install --package-lock-only --legacy-peer-deps --force || true
+                    
+                    echo "Installing dependencies locally to verify build..."
+                    npm install --legacy-peer-deps --force
+                    
+                    echo "Testing build locally..."
+                    npm run build || echo "Local build failed, but continuing with Docker build..."
                     
                     echo "Running docker build with verbose output..."
                     docker build \

@@ -218,6 +218,7 @@ const JdCollection: React.FC = () => {
             Authorization: `Bearer ${token}`,
           },
         });
+        
         setCreator(response.data.email);
         if (Array.isArray(response.data.job_description)) {
           setJobs(response.data.job_description);
@@ -378,7 +379,7 @@ const JdCollection: React.FC = () => {
                 }}
               >
                 <span style={{ fontFamily: 'SF Pro Display', fontSize: '10px' }}>
-                  Matching Profiles: {scoredResumes[job.jobid] || 0}
+                 New Matching Profiles: {matchingResumes[job.jobid] || 0}
                 </span>
               </div>
               <div
@@ -397,7 +398,8 @@ const JdCollection: React.FC = () => {
                   fontFamily: 'SF Pro Display',
                 }}
               >
-                New Matching Profiles: {matchingResumes[job.jobid] || 0}
+                
+                 Matching Profiles: {scoredResumes[job.jobid] || 0}
               </div>
             </div>
             <div style={{ display: 'flex', justifyContent: 'space-between', flexDirection: 'row' }}>

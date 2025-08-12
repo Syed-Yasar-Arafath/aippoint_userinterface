@@ -461,7 +461,7 @@ function ConfirmJoinInterview() {
   const handleInterviewTime = async (objectId: any) => {
     try {
       const response = await axios.post(
-        `https://parseez.ai/parseez-django-service/interview_time/${objectId}/`,
+        `${process.env.REACT_APP_DJANGO_PYTHON_MODULE_SERVICE}/interview_time/${objectId}/`,
         {},
         {
           headers: {

@@ -442,7 +442,7 @@ function CodingAssessmentScreen() {
   //   const fetchCollections = async () => {
   //     try {
   //       const response = await axios.get(
-  //         'https://aippoint.ai/aippoint-spring-service/collection/read',
+  //         `${process.env.REACT_APP_SPRINGBOOT_BACKEND_SERVICE}/collection/read`,
   //       )
   //       console.log('this is userid', response.data)
   //       const filteredCollections = response.data.filter(
@@ -492,7 +492,7 @@ function CodingAssessmentScreen() {
   // useEffect(() => {
   //   const fetchJobs = async () => {
   //     try {
-  //       const response = await axios.get('https://aippoint.ai/aippoint-spring-service/job/read')
+  //       const response = await axios.get(`${process.env.REACT_APP_SPRINGBOOT_BACKEND_SERVICE}/job/read`)
   //       console.log('this is res', response.data)
   //       const filteredJobs = response.data.filter(
   //         (job: any) => job.type === 'active' && job.deleteStatus !== 'deleted',
@@ -646,7 +646,7 @@ function CodingAssessmentScreen() {
   // useEffect(() => {
   //   const fetchFiles = async () => {
   //     try {
-  //       const response = await axios.get('https://aippoint.ai/aippoint-spring-service/files/list')
+  //       const response = await axios.get(`${process.env.REACT_APP_SPRINGBOOT_BACKEND_SERVICE}/files/list`)
   //       setFiles(response.data)
   //       console.log('Files', response.data)
   //     } catch (error) {

@@ -133,7 +133,7 @@ const JdProfile = () => {
 
     try {
       const response = await axios.post(
-        `https://parseez.ai/parseez-django-service/count_scored_resumes_for_jd/`,
+        `${process.env.REACT_APP_DJANGO_PYTHON_MODULE_SERVICE}/count_scored_resumes_for_jd/`,
         { job_id: jobIdNum },
         {
           headers: {
@@ -254,7 +254,7 @@ const JdProfile = () => {
     const fetchJobs = async () => {
       setLoading(true);
       try {
-        const response = await axios.get(`https://parseez.ai/parseez-spring-service/user/read/${organisation}`, {
+        const response = await axios.get(`${process.env.REACT_APP_SPRINGBOOT_BACKEND_SERVICE}/user/read/${organisation}`, {
           headers: {
             Authorization: `Bearer ${token}`,
           },

@@ -481,7 +481,7 @@ function InterviewScheduleCoding() {
     // useEffect(() => {
     //   const fetchFiles = async () => {
     //     try {
-    //       const response = await axios.get('https://aippoint.ai/aippoint-spring-service/files/list')
+    //       const response = await axios.get(`${process.env.REACT_APP_SPRINGBOOT_BACKEND_SERVICE}/files/list`)
     //       setFiles(response.data)
     //       console.log('Files', response.data)
     //     } catch (error) {

@@ -443,7 +443,7 @@ const RecruitmentDashboard: React.FC = () => {
     const fetchJobs = async () => {
       setLoading(true)
       try {
-        const response = await axios.get(`https://parseez.ai/parseez-spring-service/user/read/${organisation}`, {
+        const response = await axios.get(`${process.env.REACT_APP_SPRINGBOOT_BACKEND_SERVICE}/user/read/${organisation}`, {
           headers: {
             Authorization: `Bearer ${token}`,
           },
@@ -941,7 +941,7 @@ const RecruitmentDashboard: React.FC = () => {
   // const[userId,setUserId]=useState(0)
   const getUserData = async (userId: any) => {
     try {
-      const res = await axios.get(`https://parseez.ai/parseez-spring-service/user/jdcount/${organisation}/${userId}`)
+      const res = await axios.get(`${process.env.REACT_APP_SPRINGBOOT_BACKEND_SERVICE}/user/jdcount/${organisation}/${userId}`)
       if (res.status === 200) {
         setTotaljdcount(res.data.totalJDs)
 
@@ -954,7 +954,7 @@ const RecruitmentDashboard: React.FC = () => {
     console.log(user_id)
     try {
     
-      const res = await axios.post('https://parseez.ai/parseez-django-service/count_resumes_by_user/',{ created_by: String(user_id) },
+      const res = await axios.post(`${process.env.REACT_APP_DJANGO_PYTHON_MODULE_SERVICE}/count_resumes_by_user/`,{ created_by: String(user_id) },
        {
         headers: {
           Organization: organisation,
@@ -972,7 +972,7 @@ const RecruitmentDashboard: React.FC = () => {
   }
    const getTotalaiinterviewAndCoding = async (user_id:any) => {
     try {
-      const res = await axios.post('https://parseez.ai/parseez-django-service/get_interview_count_by_user/',{
+      const res = await axios.post(`${process.env.REACT_APP_DJANGO_PYTHON_MODULE_SERVICE}/get_interview_count_by_user/`,{
         created_by:String(user_id)
       },
        {
@@ -994,7 +994,7 @@ const RecruitmentDashboard: React.FC = () => {
   const email = localStorage.getItem('email')
   const getUserId = async () => {
     try {
-      const res = await axios.get(`https://parseez.ai/parseez-spring-service/user/getuserid/${organisation}/${email}`)
+      const res = await axios.get(`${process.env.REACT_APP_SPRINGBOOT_BACKEND_SERVICE}/user/getuserid/${organisation}/${email}`)
       if (res.status === 200) {
         console.log(res.data.user_id)
         const temp = res.data.user_id
@@ -1035,7 +1035,7 @@ const RecruitmentDashboard: React.FC = () => {
   }
   const getAiinterviewCount = async (userId: any) => {
     try {
-      const res = await axios.get(`https://parseez.ai/parseez-spring-service/user/jdcount/${organisation}/${userId}`)
+      const res = await axios.get(`${process.env.REACT_APP_SPRINGBOOT_BACKEND_SERVICE}/user/jdcount/${organisation}/${userId}`)
       if (res.status === 200) {
         setTotalaiinterviewcompletedcount(res.data.totalJDs)
       }
@@ -1045,7 +1045,7 @@ const RecruitmentDashboard: React.FC = () => {
   }
   const getCodingassessmentCount = async (userId: any) => {
     try {
-      const res = await axios.get(`https://parseez.ai/parseez-spring-service/user/jdcount/${organisation}/${userId}`)
+      const res = await axios.get(`${process.env.REACT_APP_SPRINGBOOT_BACKEND_SERVICE}/user/jdcount/${organisation}/${userId}`)
       if (res.status === 200) {
         setTotalcodingassessmentcompletedcount(res.data.totalJDs)
       }

@@ -775,7 +775,9 @@ Additional Requirements:
     formData.append("file", file);
 
     try {
-      await axios.post("https://parseez.ai/parseez-spring-service/api/upload", formData, {
+      await axios.post(
+        `${process.env.REACT_APP_SPRINGBOOT_BACKEND_SERVICE}/api/upload`,
+         formData, {
         headers: {
           "Content-Type": "multipart/form-data",
         },
@@ -807,7 +809,7 @@ Additional Requirements:
       setCategoryLoading(true);
       try {
         const response = await axios.get<Category[]>(
-          `https://parseez.ai/parseez-spring-service/category/iosys/search?keyword=${value}`
+          `${process.env.REACT_APP_SPRINGBOOT_BACKEND_SERVICE}/category/iosys/search?keyword=${value}`
         );
         setCategoryOptions(response.data);
       } catch (err) {

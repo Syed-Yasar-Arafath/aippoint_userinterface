@@ -92,7 +92,7 @@ const CandidateLogIn = () => {
       
       try {
         // Make API call to fetch interviews
-        const response = await fetch('https://parseez.ai/parseez-spring-service/interview/wipro', {
+        const response = await fetch(`${process.env.REACT_APP_SPRINGBOOT_BACKEND_SERVICE}/interview/wipro`, {
           method: 'GET',
           headers: {
             'Content-Type': 'application/json',
@@ -131,7 +131,7 @@ const CandidateLogIn = () => {
 
         // Update isTokenGenerated to true
         const updateResponse = await fetch(
-          `https://parseez.ai/parseez-spring-service/interview/wipro/${matchingInterview.interviewId}`,
+          `${process.env.REACT_APP_SPRINGBOOT_BACKEND_SERVICE}/interview/wipro/${matchingInterview.interviewId}`,
           {
             method: 'PUT',
             headers: {

@@ -108,7 +108,7 @@
 //   const fetchCandidateDetails = async () => {
 //     try {
 //       const res = await axios.post(
-//         'https://parseez.ai/parseez-django-service/get_interview_data/',
+//         `${process.env.REACT_APP_DJANGO_PYTHON_MODULE_SERVICE}/get_interview_data/`,
 //         { object_id: id },
 //         {
 //           headers: {
@@ -250,7 +250,7 @@ const InterviewDetails: React.FC = () => {
     const fetchCandidateDetails = async () => {
       try {
         const res = await axios.post(
-          'https://parseez.ai/parseez-django-service/get_interview_data/',
+          `${process.env.REACT_APP_DJANGO_PYTHON_MODULE_SERVICE}/get_interview_data/`,
           { object_id: id },
           {
             headers: {

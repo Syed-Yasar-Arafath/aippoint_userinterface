@@ -213,7 +213,7 @@ const JdCollection: React.FC = () => {
     const fetchJobs = async () => {
       setLoading(true);
       try {
-        const response = await axios.get(`https://parseez.ai/parseez-spring-service/user/read/${organisation}`, {
+        const response = await axios.get(`${process.env.REACT_APP_SPRINGBOOT_BACKEND_SERVICE}/user/read/${organisation}`, {
           headers: {
             Authorization: `Bearer ${token}`,
           },

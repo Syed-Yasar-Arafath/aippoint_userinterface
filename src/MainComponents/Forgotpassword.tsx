@@ -139,7 +139,7 @@ const ForgotPassword: React.FC = () => {
             const formData = new FormData()
             formData.append('email', email)
             const res = await axios.post(
-                `https://parseez.ai/parseez-spring-service/user/sendemail/${organisation}`,
+                `${process.env.REACT_APP_SPRINGBOOT_BACKEND_SERVICE}/user/sendemail/${organisation}`,
                 formData
             );
             if (res.status === 200) {
@@ -210,7 +210,7 @@ const ForgotPassword: React.FC = () => {
         formData.append('confirmpassword', confirmpassword);
         formData.append('email', email);
         try {
-            const res = await axios.post(`https://parseez.ai/parseez-spring-service/user/changePassword/${organisation}`, formData)
+            const res = await axios.post(`${process.env.REACT_APP_SPRINGBOOT_BACKEND_SERVICE}/user/changePassword/${organisation}`, formData)
             if (res.status === 201) {
                 dispatch(openSnackbar('password changed successfully', 'green'))
                 navigate('/')

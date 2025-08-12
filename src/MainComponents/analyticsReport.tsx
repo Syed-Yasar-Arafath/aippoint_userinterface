@@ -815,7 +815,7 @@ function AnalyticsReport() {
                             ) : (
                                 <img src="assets/static/images/Profiling-bro 1.png" alt='Image'
                                     height='auto'
-                                    width='40%'
+                                    width='45%'
                                 />
                             )}
                         </Grid>

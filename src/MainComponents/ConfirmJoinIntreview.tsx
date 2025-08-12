@@ -446,7 +446,10 @@ function ConfirmJoinInterview() {
 
   useEffect(() => {
     ConfirmJoinInterview()
+    // Automatically show modal when component mounts
+    setShowModal(true)
   }, [])
+  
   const [showModal, setShowModal] = useState(false)
 
   const handleModal = () => {
@@ -476,6 +479,8 @@ function ConfirmJoinInterview() {
 
   return (
     <div style={{ background: '#FFFFFF', overflowY: 'hidden' }}>
+      {/* Main content is commented out - only modal will be displayed */}
+      {/* 
       <Grid
         container
         direction="column"
@@ -499,7 +504,7 @@ function ConfirmJoinInterview() {
             padding: '20px',
             border: '1px solid #000000',
             borderRadius: '8px',
-            boxSizing: 'border-box', // Ensures padding and borders are included in the element's total width and height
+            boxSizing: 'border-box',
           }}
         >
           <Grid container spacing={2}>
@@ -512,7 +517,6 @@ function ConfirmJoinInterview() {
                   textAlign: 'left',
                 }}
               >
-                {/* Email */}
                 {t('email')}
               </Typography>
             </Grid>
@@ -522,12 +526,10 @@ function ConfirmJoinInterview() {
                 variant="body1"
                 style={{
                   fontSize: '1rem',
-                  //   textAlign: 'left',
                   paddingRight: '20px',
-
-                  wordWrap: 'break-word', // Break long words to avoid overflow
-                  overflow: 'hidden', // Hide any overflowed text
-                  textOverflow: 'ellipsis', // Show ellipsis (...) for overflowed text
+                  wordWrap: 'break-word',
+                  overflow: 'hidden',
+                  textOverflow: 'ellipsis',
                 }}
               >
                 : &nbsp;{email}
@@ -540,12 +542,10 @@ function ConfirmJoinInterview() {
               <Typography
                 variant="body1"
                 style={{
-                  //   fontSize: '1rem',
                   fontWeight: 'bold',
                   textAlign: 'left',
                 }}
               >
-                {/* Job Profile */}
                 {t('jobProfile')}
               </Typography>
             </Grid>
@@ -556,7 +556,7 @@ function ConfirmJoinInterview() {
                 style={{
                   fontSize: '1rem',
                   textAlign: 'left',
-                  wordWrap: 'break-word', // Ensure Job Profile does not overflow
+                  wordWrap: 'break-word',
                   overflow: 'hidden',
                   textOverflow: 'ellipsis',
                 }}
@@ -577,12 +577,13 @@ function ConfirmJoinInterview() {
                 background: '#0284C7',
               },
             }}
-            onClick={handleModal}
+            
           >
             Join Interview
           </Button>
         </Grid>
       </Grid>
+      */}
 
       {/* modallllllllll */}
       <Modal open={showModal} onClose={() => setShowModal(false)}>
@@ -864,7 +865,7 @@ function ConfirmJoinInterview() {
                 style={{
                   display: 'flex',
                   alignItems: 'center',
-                  paddingTop: '5px',
+                  paddingTop: '20px',
                 }}
               >
                 <Checkbox

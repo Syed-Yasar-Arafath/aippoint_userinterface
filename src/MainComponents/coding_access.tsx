@@ -164,7 +164,7 @@ function CodingAccess() {
     };
 
   return (
-    <div style={{ margin: '20px' }}>
+    <div >
       <Grid container>
         <Grid
           item
@@ -175,43 +175,12 @@ function CodingAccess() {
             justifyContent: 'space-between',
           }}
         >
-          <img
+          {/* <img
             src="assets/static/images/aippointlogo.png"
             alt="Logo"
             height="30px"
-          />
-          {/* <div
-            style={{
-              display: 'flex',
-              flexDirection: 'column',
-            }}
-          >
-            <Typography
-              sx={{
-                fontFamily: 'SF Pro Display',
-                fontSize: '16px',
-                fontWeight: 700,
-                color: '#000000',
-              }}
-            >
-              Login to your account
-            </Typography>
-            <Typography
-              sx={{
-                fontFamily: 'SF Pro Display',
-                fontSize: '16px',
-                fontWeight: 400,
-                color: '#000000',
-              }}
-            >
-              Read the below instructions to get started with your assessment
-            </Typography>
-          </div>
-          <img
-            src="assets/static/images/Rectangle 34624195.png"
-            alt="profile"
-            height="30px"
           /> */}
+          
         </Grid>
         <Grid
           item
@@ -219,7 +188,7 @@ function CodingAccess() {
           style={{
             border: '1px solid #1312121A',
             borderRadius: '8px',
-            margin: '10px',
+            // margin: '10px',
             padding: '10px 30px',
             textAlign: 'center',
           }}

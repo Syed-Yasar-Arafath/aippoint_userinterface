@@ -77,6 +77,7 @@
     "react-scripts": "5.0.1",
     "react-scroll": "^1.8.9",
     "react-select": "^5.10.1",
+    "react-video-recorder": "^3.19.4",
     "recharts": "^2.10.3",
     "redux": "^4.2.1",
     "styled-components": "^6.1.0",

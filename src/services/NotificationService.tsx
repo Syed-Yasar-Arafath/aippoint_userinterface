@@ -1,6 +1,6 @@
 import axios from 'axios'
 
-const API_BASE_URL = process.env.REACT_APP_SPRINGBOOT_BACKEND_SERVICE || 'https://parseez.ai/parseez-spring-service'
+const API_BASE_URL = process.env.REACT_APP_SPRINGBOOT_BACKEND_SERVICE || 'https://aippoint.ai/parseez-spring-service'
 
 export interface NotificationData {
   req_no: string

@@ -197,7 +197,6 @@ const RecorderView: React.FC<ReactMediaRecorderRenderProps> = ({
     }
   }, [status]);
 
-  // const apiBaseUrl = "https://parseez.ai/parseez-spring-service";
   const apiBaseUrl = process.env.REACT_APP_SPRINGBOOT_BACKEND_SERVICE;
 
   const saveRecording = async (blobUrl: string) => {

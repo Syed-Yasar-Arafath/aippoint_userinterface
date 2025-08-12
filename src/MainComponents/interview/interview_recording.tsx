@@ -1,4 +1,4 @@
-import React, { useState, useRef, useEffect } from 'react'
+import React, { useState, useRef, useEffect } from 'react';
 import {
   Box,
   Button,
@@ -6,70 +6,93 @@ import {
   Typography,
   useTheme,
   Tooltip,
-} from '@mui/material'
-import axios from 'axios'
-import { useLocation } from 'react-router-dom'
-import { useTranslation } from 'react-i18next'
-import ArrowBackIosIcon from '@mui/icons-material/ArrowBackIos'
-import ArrowForwardIosIcon from '@mui/icons-material/ArrowForwardIos'
-
+  CircularProgress,
+} from '@mui/material';
+import axios from 'axios';
+import { useLocation } from 'react-router-dom';
+import { useTranslation } from 'react-i18next';
+import ArrowBackIosIcon from '@mui/icons-material/ArrowBackIos';
+import ArrowForwardIosIcon from '@mui/icons-material/ArrowForwardIos';
+ 
 interface Question {
-  question: string
-  problem_statement?: string
+  question: string;
+  problem_statement?: string;
 }
-
+ 
+interface Recording {
+  sessionId: string;
+  videoUrl: string;
+}
+ 
 export default function InterviewRecording() {
-  const { t } = useTranslation()
-  const location = useLocation()
-  const { id } = location.state || {}
-  const [videoUrls, setVideoUrls] = useState<string[]>([])
-  const [selectedVideoUrl, setSelectedVideoUrl] = useState<string | null>(null)
-  const [selectedVideoIndex, setSelectedVideoIndex] = useState<number>(-1)
-  const [questions, setQuestions] = useState<Question[]>([])
-  const [error, setError] = useState<string | null>(null)
-  const mainVideoRef = useRef<HTMLVideoElement | null>(null)
-  const smallVideoRefs = useRef<(HTMLVideoElement | null)[]>([])
-  const videoContainerRef = useRef<HTMLDivElement | null>(null)
-  const theme = useTheme()
-  const organisation = localStorage.getItem('organisation')
-
+  const { t } = useTranslation();
+  const location = useLocation();
+  const { id } = location.state || {};
+  const [videoUrls, setVideoUrls] = useState<Recording[]>([]);
+  const [selectedVideoUrl, setSelectedVideoUrl] = useState<string | null>(null);
+  const [selectedVideoIndex, setSelectedVideoIndex] = useState<number>(-1);
+  const [questions, setQuestions] = useState<Question[]>([]);
+  const [error, setError] = useState<string | null>(null);
+  const [isLoading, setIsLoading] = useState<boolean>(false);
+  const mainVideoRef = useRef<HTMLVideoElement | null>(null);
+  const smallVideoRefs = useRef<(HTMLVideoElement | null)[]>([]);
+  const videoContainerRef = useRef<HTMLDivElement | null>(null);
+  const theme = useTheme();
+  const organisation = localStorage.getItem('organisation');
+ 
   const fetchRecordings = async (objectId: string) => {
+    setIsLoading(true);
     try {
+      // Fetch recordings metadata
       const response = await axios.get(
         `${process.env.REACT_APP_SPRINGBOOT_BACKEND_SERVICE}/recording/meeting/${objectId}/${organisation}`,
-      )
+        {
+          headers: {
+            'Content-Type': 'application/json',
+          },
+        }
+      );
+ 
       if (Array.isArray(response.data)) {
-        const sessionMap = new Map<string, string>()
-        response.data.forEach((recording: any) => {
-          if (recording.sessionId && recording.outputFileName) {
-            sessionMap.set(recording.sessionId, recording.outputFileName)
+        const recordings: Recording[] = [];
+ 
+        for (const recording of response.data) {
+          if (recording.outputFileName) {
+            // Use the outputFileName directly as the video URL
+            recordings.push({
+              sessionId: recording.sessionId || `recording_${recording.id}`,
+              videoUrl: recording.outputFileName,
+            });
           }
-        })
-        const uniqueUrls = Array.from(sessionMap.entries())
-          .sort((a, b) => {
-            const aNum = parseInt(a[0].replace('question_', '').replace('.mp4', '')) || 0
-            const bNum = parseInt(b[0].replace('question_', '').replace('.mp4', '')) || 0
-            return aNum - bNum
-          })
-          .map(([, url]) => url)
-        setVideoUrls(uniqueUrls)
-        if (uniqueUrls.length > 0) {
-          setSelectedVideoUrl(uniqueUrls[0])
-          setSelectedVideoIndex(0)
+        }
+ 
+        // Sort recordings by id since sessionId is null
+        const sortedRecordings = recordings.sort((a, b) => {
+          const aId = parseInt(a.sessionId.split('_')[1]) || 0;
+          const bId = parseInt(b.sessionId.split('_')[1]) || 0;
+          return aId - bId;
+        });
+ 
+        setVideoUrls(sortedRecordings);
+        if (sortedRecordings.length > 0) {
+          setSelectedVideoUrl(sortedRecordings[0].videoUrl);
+          setSelectedVideoIndex(0);
         } else {
-          setError(t('noRecordingsAvailable', 'No recordings available for this interview'))
+          setError(t('noRecordingsAvailable', 'No recordings available for this interview'));
         }
       } else {
-        console.error('Unexpected data format:', response.data)
-        setError(t('invalidDataFormat', 'Invalid data format received'))
+        console.error('Unexpected data format:', response.data);
+        setError(t('invalidDataFormat', 'Invalid data format received'));
       }
     } catch (error) {
-      console.error('Error fetching recordings:', error)
-      setError(t('errorFetchingRecordings', 'Failed to fetch recordings'))
+      console.error('Error fetching recordings:', error);
+      setError(t('errorFetchingRecordings', 'Failed to fetch recordings'));
+    } finally {
+      setIsLoading(false);
     }
-  }
-
-  const generateQuestionss = async (objectId: string) => {
+  };
+ 
+  const generateQuestions = async (objectId: string) => {
     try {
       const response = await axios.post(
         `${process.env.REACT_APP_DJANGO_PYTHON_MODULE_SERVICE}/get_interview_data/`,
@@ -79,75 +102,89 @@ export default function InterviewRecording() {
             'Content-Type': 'application/json',
             organization: organisation,
           },
-        },
-      )
-      const responseData = response.data.data.questions
+        }
+      );
+      const responseData = response.data.data.questions;
       if (Array.isArray(responseData)) {
-        setQuestions(responseData)
+        setQuestions(responseData);
+        // Initialize smallVideoRefs based on number of questions
+        smallVideoRefs.current = Array(responseData.length).fill(null);
       } else {
-        console.error('Invalid response format: questions array not found')
-        setQuestions([])
+        console.error('Invalid response format: questions array not found');
+        setQuestions([]);
       }
     } catch (error: any) {
-      console.error('Error fetching questions:', error)
+      console.error('Error fetching questions:', error);
       if (error.response) {
-        console.log('Error response:', error.response.data)
+        console.log('Error response:', error.response.data);
       }
+      setError(t('errorFetchingQuestions', 'Failed to fetch questions'));
     }
-  }
-
+  };
+ 
   useEffect(() => {
     if (id) {
-      fetchRecordings(id)
-      generateQuestionss(id)
+      fetchRecordings(id);
+      generateQuestions(id);
     } else {
-      setError(t('noIdProvided', 'No interview ID provided'))
+      setError(t('noIdProvided', 'No interview ID provided'));
     }
-  }, [id])
-
+  }, [id, t]);
+ 
+  useEffect(() => {
+    // Cleanup object URLs to prevent memory leaks, only for blob URLs
+    return () => {
+      videoUrls.forEach((recording) => {
+        if (recording.videoUrl.startsWith('blob:')) {
+          URL.revokeObjectURL(recording.videoUrl);
+        }
+      });
+    };
+  }, [videoUrls]);
+ 
   const handleVideoSelect = (index: number) => {
-    if (videoUrls[index]) {
-      setSelectedVideoUrl(videoUrls[index])
-      setSelectedVideoIndex(index)
+    if (videoUrls[index]?.videoUrl) {
+      setSelectedVideoUrl(videoUrls[index].videoUrl);
+      setSelectedVideoIndex(index);
       if (mainVideoRef.current) {
-        mainVideoRef.current.load()
-        mainVideoRef.current.play()
+        mainVideoRef.current.load();
+        mainVideoRef.current.play();
       }
       smallVideoRefs.current.forEach((video, i) => {
-        if (i !== index && video) video.pause()
-      })
+        if (i !== index && video) video.pause();
+      });
       if (videoContainerRef.current && smallVideoRefs.current[index]) {
         smallVideoRefs.current[index]?.scrollIntoView({
           behavior: 'smooth',
           inline: 'center',
-        })
+        });
       }
     }
-  }
-
+  };
+ 
   const handleNextVideo = () => {
     if (selectedVideoIndex < videoUrls.length - 1) {
-      handleVideoSelect(selectedVideoIndex + 1)
+      handleVideoSelect(selectedVideoIndex + 1);
     }
-  }
-
+  };
+ 
   const handlePreviousVideo = () => {
     if (selectedVideoIndex > 0) {
-      handleVideoSelect(selectedVideoIndex - 1)
+      handleVideoSelect(selectedVideoIndex - 1);
     }
-  }
-
+  };
+ 
   const handleDownload = () => {
     if (selectedVideoUrl) {
-      const link = document.createElement('a')
-      link.href = selectedVideoUrl
-      link.download = `interview-video-${selectedVideoIndex + 1}.mp4`
-      document.body.appendChild(link)
-      link.click()
-      document.body.removeChild(link)
+      const link = document.createElement('a');
+      link.href = selectedVideoUrl;
+      link.download = `interview-video-${selectedVideoIndex + 1}.mp4`;
+      document.body.appendChild(link);
+      link.click();
+      document.body.removeChild(link);
     }
-  }
-
+  };
+ 
   return (
     <Box sx={{ padding: '15px', bgcolor: '#F7F7F7', overflowY: 'auto' }}>
       <Typography
@@ -162,7 +199,11 @@ export default function InterviewRecording() {
       >
         {t('interviewRecordings', 'Interview Recordings')}
       </Typography>
-      {error ? (
+      {isLoading ? (
+        <Box sx={{ display: 'flex', justifyContent: 'center', alignItems: 'center', height: '60vh' }}>
+          <CircularProgress size={60} sx={{ color: '#0284C7' }} />
+        </Box>
+      ) : error ? (
         <Typography
           variant="h6"
           sx={{
@@ -236,8 +277,8 @@ export default function InterviewRecording() {
                 }}
                 onPlay={() => {
                   smallVideoRefs.current.forEach((video) => {
-                    if (video) video.pause()
-                  })
+                    if (video) video.pause();
+                  });
                 }}
               >
                 <source src={selectedVideoUrl} type="video/mp4" />
@@ -329,43 +370,43 @@ export default function InterviewRecording() {
               },
             }}
           >
-            {questions.map((q, index) => (
-              <Tooltip
-                key={index}
-                title={q.question ?? q.problem_statement ?? t('noQuestionAvailable', 'No question available')}
-                placement="top"
-                arrow
-                sx={{
-                  '& .MuiTooltip-tooltip': {
-                    fontFamily: 'SF Pro Display',
-                    fontSize: { xs: '12px', sm: '13px' },
-                    maxWidth: '300px',
-                    backgroundColor: '#1C1C1E',
-                    padding: '8px',
-                    borderRadius: '4px',
-                  },
-                  '& .MuiTooltip-arrow': {
-                    color: '#1C1C1E',
-                  },
-                }}
-              >
-                <Box
+            {questions.map((q, index) =>
+              videoUrls[index]?.videoUrl ? (
+                <Tooltip
+                  key={index}
+                  title={q.question ?? q.problem_statement ?? t('noQuestionAvailable', 'No question available')}
+                  placement="top"
+                  arrow
                   sx={{
-                    position: 'relative',
-                    width: { xs: '160px', sm: '200px' },
-                    minWidth: { xs: '160px', sm: '200px' },
-                    maxWidth: { xs: '160px', sm: '200px' },
-                    height: '120px',
-                    borderRadius: '8px',
-                    overflow: 'hidden',
-                    border: selectedVideoIndex === index ? '2px solid #0284C7' : '1px solid #e0e0e0',
-                    cursor: 'pointer',
-                    flexShrink: 0,
-                    bgcolor: '#000',
+                    '& .MuiTooltip-tooltip': {
+                      fontFamily: 'SF Pro Display',
+                      fontSize: { xs: '12px', sm: '13px' },
+                      maxWidth: '300px',
+                      backgroundColor: '#1C1C1E',
+                      padding: '8px',
+                      borderRadius: '4px',
+                    },
+                    '& .MuiTooltip-arrow': {
+                      color: '#1C1C1E',
+                    },
                   }}
-                  onClick={() => handleVideoSelect(index)}
                 >
-                  {videoUrls[index] ? (
+                  <Box
+                    sx={{
+                      position: 'relative',
+                      width: { xs: '160px', sm: '200px' },
+                      minWidth: { xs: '160px', sm: '200px' },
+                      maxWidth: { xs: '160px', sm: '200px' },
+                      height: '120px',
+                      borderRadius: '8px',
+                      overflow: 'hidden',
+                      border: selectedVideoIndex === index ? '2px solid #0284C7' : '1px solid #e0e0e0',
+                      cursor: 'pointer',
+                      flexShrink: 0,
+                      bgcolor: '#000',
+                    }}
+                    onClick={() => handleVideoSelect(index)}
+                  >
                     <video
                       ref={(el) => (smallVideoRefs.current[index] = el)}
                       style={{
@@ -374,73 +415,52 @@ export default function InterviewRecording() {
                         objectFit: 'cover',
                       }}
                       onPlay={() => {
-                        if (mainVideoRef.current) mainVideoRef.current.pause()
+                        if (mainVideoRef.current) mainVideoRef.current.pause();
                         smallVideoRefs.current.forEach((video, i) => {
-                          if (i !== index && video) video.pause()
-                        })
+                          if (i !== index && video) video.pause();
+                        });
                       }}
                     >
-                      <source src={videoUrls[index]} type="video/mp4" />
+                      <source src={videoUrls[index].videoUrl} type="video/mp4" />
                       {t('browserDoesNotSupportVideotag', 'Your browser does not support the video tag')}
                     </video>
-                  ) : (
                     <Box
                       sx={{
+                        position: 'absolute',
+                        bottom: 0,
+                        left: 0,
                         width: '100%',
-                        height: '100%',
-                        backgroundColor: '#ccc',
-                        display: 'flex',
-                        alignItems: 'center',
-                        justifyContent: 'center',
+                        bgcolor: 'rgba(0, 0, 0, 0.6)',
+                        color: '#fff',
+                        px: 1,
+                        py: 0.5,
                       }}
                     >
                       <Typography
                         variant="body2"
                         sx={{
-                          color: '#666',
-                          px: 2,
-                          fontFamily: 'SF Pro Display',
+                          fontWeight: 500,
                           fontSize: { xs: '12px', sm: '13px' },
+                          overflow: 'hidden',
+                          textOverflow: 'ellipsis',
+                          display: '-webkit-box',
+                          WebkitLineClamp: 2,
+                          WebkitBoxOrient: 'vertical',
+                          fontFamily: 'SF Pro Display',
                         }}
                       >
-                        {t('noVideoAvailable', 'No video available')}
+                        {q.question ?? q.problem_statement ?? t('noQuestionAvailable', 'No question available')}
                       </Typography>
                     </Box>
-                  )}
-                  <Box
-                    sx={{
-                      position: 'absolute',
-                      bottom: 0,
-                      left: 0,
-                      width: '100%',
-                      bgcolor: 'rgba(0, 0, 0, 0.6)',
-                      color: '#fff',
-                      px: 1,
-                      py: 0.5,
-                    }}
-                  >
-                    <Typography
-                      variant="body2"
-                      sx={{
-                        fontWeight: 500,
-                        fontSize: { xs: '12px', sm: '13px' },
-                        overflow: 'hidden',
-                        textOverflow: 'ellipsis',
-                        display: '-webkit-box',
-                        WebkitLineClamp: 2,
-                        WebkitBoxOrient: 'vertical',
-                        fontFamily: 'SF Pro Display',
-                      }}
-                    >
-                      {q.question ?? q.problem_statement ?? t('noQuestionAvailable', 'No question available')}
-                    </Typography>
                   </Box>
-                </Box>
-              </Tooltip>
-            ))}
+                </Tooltip>
+              ) : null
+            )}
           </Box>
         </>
       )}
     </Box>
-  )
+  );
 }
+ 
+ 

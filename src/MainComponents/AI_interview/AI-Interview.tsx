@@ -1,548 +1,668 @@
-import React, { useEffect, useRef, useState } from 'react';
-import { Editor } from '@monaco-editor/react';
-import { DyteMeeting, DyteUiProvider, DyteGrid } from '@dytesdk/react-ui-kit';
-import { useDyteClient } from '@dytesdk/react-web-core';
+import React, { useRef, useEffect, useState } from "react";
 import { useLocation, useNavigate } from 'react-router-dom';
-import { useDispatch } from 'react-redux';
-import { useTranslation } from 'react-i18next';
-import axios from 'axios';
-import {
-  Box,
-  Button,
-  Dialog,
-  DialogActions,
-  DialogContent,
-  DialogContentText,
-  DialogTitle,
-  Grid,
-  IconButton,
-  Snackbar,
-  Alert,
-  Typography,
-} from '@mui/material';
-import MicIcon from '@mui/icons-material/Mic';
+import { Box, Button, Dialog, DialogTitle, DialogContent, DialogActions, CircularProgress, Snackbar, Alert, LinearProgress, Typography, IconButton } from '@mui/material';
+import { CheckCircle } from '@mui/icons-material';
 import VideocamIcon from '@mui/icons-material/Videocam';
 import VolumeUpIcon from '@mui/icons-material/VolumeUp';
 import CodeIcon from '@mui/icons-material/Code';
 import AttachFileIcon from '@mui/icons-material/AttachFile';
-import CircularProgress from '@mui/material/CircularProgress';
-import useProctoring from '../useProctoring';
-import { loaderOn, loaderOff } from '../../redux/actions';
- 
-interface MergeVideoRequest {
-  video_urls: string[];
-  meeting_id: string;
-  object_id?: string;
+import MicIcon from '@mui/icons-material/Mic';
+import { ReactMediaRecorder, ReactMediaRecorderRenderProps } from "react-media-recorder";
+import { Editor } from '@monaco-editor/react';
+import axios from 'axios';
+import { t } from "i18next";
+
+interface SpeechRecognition extends EventTarget {
+  continuous: boolean;
+  interimResults: boolean;
+  lang: string;
+  onresult: (event: SpeechRecognitionEvent) => void;
+  onerror: (event: SpeechRecognitionErrorEvent) => void;
+  onend: () => void;
+  start: () => void;
+  stop: () => void;
 }
- 
-interface MergeVideoResponse {
-  message: string;
+
+interface SpeechRecognitionEvent {
+  resultIndex: number;
+  results: SpeechRecognitionResultList;
 }
- 
-export default function InterviewAttend() {
-  const location = useLocation();
-  const { authToken, meetingId, objId } = location.state || {};
-  const { t } = useTranslation();
+
+interface SpeechRecognitionErrorEvent { error: string; }
+
+interface SpeechRecognitionResultList { [index: number]: SpeechRecognitionResult; length: number; }
+
+interface SpeechRecognitionResult { isFinal: boolean;[index: number]: SpeechRecognitionAlternative; }
+
+interface SpeechRecognitionAlternative { transcript: string; }
+
+declare global {
+  interface Window { SpeechRecognition: new () => SpeechRecognition; webkitSpeechRecognition: new () => SpeechRecognition; }
+}
+
+// Professional Loading Component
+const ProfessionalLoader: React.FC<{ message: string; progress?: number }> = ({ message, progress }) => (
+  <div style={{
+    position: 'fixed',
+    top: 0,
+    left: 0,
+    width: '100%',
+    height: '100%',
+    backgroundColor: 'rgba(0, 0, 0, 0.85)',
+    display: 'flex',
+    flexDirection: 'column',
+    justifyContent: 'center',
+    alignItems: 'center',
+    zIndex: 9999,
+    backdropFilter: 'blur(8px)'
+  }}>
+    <div style={{
+      backgroundColor: 'rgba(255, 255, 255, 0.95)',
+      padding: '2rem 3rem',
+      borderRadius: '16px',
+      boxShadow: '0 20px 40px rgba(0, 0, 0, 0.3)',
+      textAlign: 'center',
+      minWidth: '300px',
+      border: '1px solid rgba(255, 255, 255, 0.2)'
+    }}>
+      <CircularProgress
+        size={60}
+        thickness={4}
+        style={{
+          color: '#1976d2',
+          marginBottom: '1.5rem',
+          filter: 'drop-shadow(0 4px 8px rgba(25, 118, 210, 0.3))'
+        }}
+      />
+      <Typography
+        variant="h6"
+        style={{
+          marginBottom: '1rem',
+          color: '#333',
+          fontWeight: '600',
+          letterSpacing: '0.5px'
+        }}
+      >
+        {message}
+      </Typography>
+      {progress !== undefined && (
+        <Box sx={{ width: '100%', mt: 2 }}>
+          <LinearProgress
+            variant="determinate"
+            value={progress}
+            style={{
+              height: '6px',
+              borderRadius: '3px',
+              backgroundColor: '#e0e0e0'
+            }}
+          />
+          <Typography variant="body2" color="textSecondary" style={{ marginTop: '0.5rem' }}>
+            {Math.round(progress)}% Complete
+          </Typography>
+        </Box>
+      )}
+    </div>
+  </div>
+);
+
+const RecorderView: React.FC<ReactMediaRecorderRenderProps> = ({
+  status, startRecording, stopRecording, previewStream, mediaBlobUrl,
+}) => {
+  const videoRef = useRef<HTMLVideoElement | null>(null);
+  const editorRef = useRef<HTMLDivElement | null>(null);
+  const lipSyncVideoRef = useRef<HTMLVideoElement | null>(null);
   const navigate = useNavigate();
-  const dispatch = useDispatch();
-  const { warning } = useProctoring(objId);
-  const selectedLanguage = localStorage.getItem('i18nextLng') || 'en';
+  const location = useLocation();
   const organisation = localStorage.getItem('organisation') || '';
- 
-  // State Management
-  const [meeting, initMeeting] = useDyteClient();
-  const [loading, setLoading] = useState(true);
-  const [questions, setQuestions] = useState<any[]>([]);
-  const [questionGenerated, setQuestionGenerated] = useState<string[]>([]);
-  const [currentQuestionIndex, setCurrentQuestionIndex] = useState(0);
-  const [timeLeft, setTimeLeft] = useState(300);
-  const [hasTriggeredNext, setHasTriggeredNext] = useState(false);
-  const [recordingId, setRecordingId] = useState<string | null>(null);
-  const [liveParticipant, setLiveParticipant] = useState<number>(0);
-  const [initialConditionMet, setInitialConditionMet] = useState(false);
-  const [showPopup, setShowPopup] = useState(true);
+  const selectedLanguage = localStorage.getItem('i18nextLng') || 'en';
+  const { meetingId, objId } = location.state || {};
+
+  const [questions, setQuestions] = useState<{ question: string; answer?: string }[]>([]);
+  const [currentQuestion, setCurrentQuestion] = useState(0);
   const [showEditor, setShowEditor] = useState(false);
   const [code, setCode] = useState('');
   const [transcript, setTranscript] = useState('');
   const [interimTranscript, setInterimTranscript] = useState('');
-  const [openWarning, setOpenWarning] = useState(false);
-  const [openConfirmDialog, setOpenConfirmDialog] = useState(false);
-  const [confirmAction, setConfirmAction] = useState<'next' | 'submit' | null>(null);
-  const [candidateName, setCandidateName] = useState('');
-  const [readQuestions, setReadQuestions] = useState(new Set<number>());
-  const [isReadingQuestion, setIsReadingQuestion] = useState(false);
-  const [voices, setVoices] = useState<SpeechSynthesisVoice[]>([]);
- 
-  // Refs
+  const [isUploading, setIsUploading] = useState(false);
+  const [openNextDialog, setOpenNextDialog] = useState(false);
+  const [openSubmitDialog, setOpenSubmitDialog] = useState(false);
+  const [isSubmitting, setIsSubmitting] = useState(false);
+  const [lastBlobUrl, setLastBlobUrl] = useState<string | null>(null);
+  const [uploadStatus, setUploadStatus] = useState<boolean[]>([]);
+  const [errorMessage, setErrorMessage] = useState<string | null>(null);
+  const [isProcessingQuestion, setIsProcessingQuestion] = useState(false);
+  const [hasSpokenQuestion, setHasSpokenQuestion] = useState<boolean[]>([]);
+  const [loadingMessage, setLoadingMessage] = useState('');
+  const [uploadProgress, setUploadProgress] = useState(0);
+  const [submissionProgress, setSubmissionProgress] = useState(0);
+  const [isVideoReady, setIsVideoReady] = useState(false);
+  const [voicesLoaded, setVoicesLoaded] = useState(false);
   const fileInputRef = useRef<HTMLInputElement | null>(null);
-  const audioRef = useRef<HTMLAudioElement | null>(null);
-  const editorRef = useRef<HTMLDivElement | null>(null);
-  const videoRef = useRef<HTMLVideoElement | null>(null);
-  let speechInstance: SpeechSynthesisUtterance | null = null;
- 
-  // Utility Functions
-  const formatTime = (seconds: number) => {
-    const m = Math.floor(seconds / 60).toString().padStart(2, '0');
-    const s = (seconds % 60).toString().padStart(2, '0');
-    return `${m}:${s}`;
-  };
- 
-  const convertNumberToArabic = (num: number) => {
-    return selectedLanguage === 'ar' ? num.toLocaleString('ar-EG') : num.toString();
-  };
- 
-  const sanitizeText = (text: string): string => {
-    return text.replace(/[`"'“”]/g, '');
-  };
- 
-  // Speech Synthesis
-  const loadVoices = () => {
-    const availableVoices = window.speechSynthesis.getVoices();
-    setVoices(availableVoices);
-  };
- 
-  const speak = (text: string) => {
-    const speech = new SpeechSynthesisUtterance(text);
-    const femaleVoice =
-      voices.find((voice) => voice.name.toLowerCase().includes('female')) ||
-      voices.find((voice) => voice.name.toLowerCase().includes('woman')) ||
-      voices[0];
-    speech.voice = femaleVoice;
-    speech.onstart = () => {
-      setIsReadingQuestion(true);
-      if (videoRef.current) videoRef.current.play();
-    };
-    speech.onend = () => {
-      setIsReadingQuestion(false);
-      if (videoRef.current) videoRef.current.pause();
-    };
-    window.speechSynthesis.speak(speech);
-  };
- 
-  const readQuestion = (index: number) => {
-    if (liveParticipant > 0 && !readQuestions.has(index) && questionGenerated[index]) {
-      if (speechInstance) {
-        window.speechSynthesis.cancel();
-        speechInstance = null;
-      }
-      const sanitizedQuestion = sanitizeText(questionGenerated[index]);
-      speechInstance = new SpeechSynthesisUtterance(sanitizedQuestion);
-      speak(sanitizedQuestion);
-      setReadQuestions((prev) => new Set([...prev, index]));
-    }
-  };
- 
-  // API Calls
-  const generateQuestions = async () => {
-    try {
-      const response = await axios.post(
-        `${process.env.REACT_APP_DJANGO_PYTHON_MODULE_SERVICE}/get_interview_data/`,
-        { object_id: objId },
-        { headers: { 'Content-Type': 'application/json', organization: organisation } }
-      );
-      const responseData = response.data.data.questions;
-      const candidateName = response.data.data.resume_data.name;
-      setQuestions(responseData);
-      setCandidateName(candidateName);
-      setQuestionGenerated(responseData.map((q: any) => q.question));
-    } catch (error) {
-      console.error('Error fetching questions:', error);
-    }
-  };
- 
-  const updateAnswer = async (questionText: string, answer: string) => {
-    try {
-      const data = {
-        object_id: objId,
-        question_text: questionText,
-        answer: answer || 'No answer provided',
+  const recognitionRef = useRef<SpeechRecognition | null>(null);
+
+  // Initialize Speech Recognition
+  useEffect(() => {
+    const SpeechRecognition = window.SpeechRecognition || window.webkitSpeechRecognition;
+    if (SpeechRecognition) {
+      const recognition = new SpeechRecognition();
+      recognition.continuous = true;
+      recognition.interimResults = true;
+      recognition.lang = selectedLanguage;
+
+      recognition.onresult = (event: SpeechRecognitionEvent) => {
+        let interim = '';
+        let final = '';
+        for (let i = event.resultIndex; i < event.results.length; i++) {
+          const text = event.results[i][0].transcript;
+          if (event.results[i].isFinal) {
+            final += text + ' ';
+          } else {
+            interim = text;
+          }
+        }
+        setTranscript(prev => prev + final);
+        setInterimTranscript(interim);
       };
+
+      recognition.onerror = (event: SpeechRecognitionErrorEvent) => {
+        console.error('Speech recognition error:', event.error);
+        setErrorMessage(`Speech recognition error: ${event.error}`);
+      };
+
+      recognition.onend = () => {
+        if (status === 'recording' && !isProcessingQuestion) {
+          try {
+            recognition.start();
+          } catch (error) {
+            console.error('Failed to restart speech recognition:', error);
+          }
+        }
+      };
+
+      recognitionRef.current = recognition;
+      return () => recognition.stop();
+    } else {
+      setErrorMessage('Speech recognition is not supported in this browser. Please use Chrome or Edge.');
+    }
+  }, [selectedLanguage, status, isProcessingQuestion]);
+
+  // Ensure voices are loaded before using speech synthesis
+  useEffect(() => {
+    const loadVoices = () => {
+      if (window.speechSynthesis.getVoices().length > 0) {
+        setVoicesLoaded(true);
+      } else {
+        window.speechSynthesis.onvoiceschanged = () => {
+          setVoicesLoaded(true);
+          window.speechSynthesis.onvoiceschanged = null; // Clean up
+        };
+      }
+    };
+    loadVoices();
+  }, []);
+
+  // Request microphone and camera permission
+  useEffect(() => {
+    const initializeMedia = async () => {
+      try {
+        setLoadingMessage('Initializing camera and microphone...');
+        const stream = await navigator.mediaDevices.getUserMedia({ audio: true, video: true });
+        console.log('Media stream initialized:', stream);
+        if (videoRef.current) {
+          videoRef.current.srcObject = stream;
+          videoRef.current.play().then(() => {
+            console.log('Webcam video playing');
+            setIsVideoReady(true);
+          }).catch(error => {
+            console.error('Failed to play video stream:', error);
+            setErrorMessage('Failed to play webcam video. Please ensure camera permissions are granted.');
+          });
+        }
+        setLoadingMessage('');
+      } catch (error: any) {
+        console.error('Failed to access media devices:', error.message || error);
+        setErrorMessage('Failed to access microphone or camera. Please ensure permissions are granted and try again.');
+        setLoadingMessage('');
+      }
+    };
+    initializeMedia();
+    return () => {
+      if (videoRef.current?.srcObject) {
+        const stream = videoRef.current.srcObject as MediaStream;
+        stream.getTracks().forEach(track => track.stop());
+        videoRef.current.srcObject = null;
+        setIsVideoReady(false);
+      }
+    };
+  }, []);
+
+  // Update video stream from ReactMediaRecorder
+  useEffect(() => {
+    if (videoRef.current && previewStream && !isVideoReady) {
+      console.log('Assigning previewStream to videoRef:', previewStream);
+      videoRef.current.srcObject = previewStream;
+      videoRef.current.play().then(() => {
+        console.log('Preview stream playing');
+        setIsVideoReady(true);
+      }).catch(error => {
+        console.error('Failed to play previewStream:', error);
+        setErrorMessage('Failed to display webcam video. Please ensure camera permissions are granted.');
+      });
+    }
+  }, [previewStream, isVideoReady]);
+
+  // Timeout for video initialization
+  useEffect(() => {
+    if (!isVideoReady) {
+      const timeout = setTimeout(() => {
+        if (!isVideoReady) {
+          setErrorMessage('Webcam video failed to initialize. Please check your camera and permissions.');
+        }
+      }, 10000); // 10 seconds timeout
+      return () => clearTimeout(timeout);
+    }
+  }, [isVideoReady]);
+
+  // Log environment variables for debugging
+  useEffect(() => {
+    if (isVideoReady) {
+      console.log('Environment variables:', {
+        django: process.env.REACT_APP_DJANGO_PYTHON_MODULE_SERVICE,
+        springboot: process.env.REACT_APP_SPRINGBOOT_BACKEND_SERVICE,
+        fileBaseUrl: process.env.REACT_APP_SPRINGBOOT_FILE_BASE_URL,
+        organisation,
+        selectedLanguage,
+      });
+    }
+  }, [organisation, selectedLanguage, isVideoReady]);
+
+  // Fetch questions only after video is ready
+  useEffect(() => {
+    if (!isVideoReady) return;
+
+    const fetchQuestions = async () => {
+      try {
+        setLoadingMessage('Loading interview questions...');
+        const response = await axios.post(
+          `${process.env.REACT_APP_DJANGO_PYTHON_MODULE_SERVICE}/get_interview_data/`,
+          { object_id: objId },
+          { headers: { 'Content-Type': 'application/json', organization: organisation, Organization: organisation } }
+        );
+        setQuestions(response.data.data.questions);
+        setUploadStatus(new Array(response.data.data.questions.length).fill(false));
+        setHasSpokenQuestion(new Array(response.data.data.questions.length).fill(false));
+        setLoadingMessage('');
+      } catch (error: any) {
+        console.error('Error fetching questions:', error.message || error);
+        setErrorMessage('Failed to fetch questions. Please try again.');
+        setLoadingMessage('');
+      }
+    };
+    fetchQuestions();
+  }, [objId, organisation, isVideoReady]);
+
+  // Start/stop speech recognition with recording status
+  useEffect(() => {
+    if (recognitionRef.current && status === 'recording' && !isProcessingQuestion && isVideoReady) {
+      try {
+        recognitionRef.current.start();
+        console.log('Speech recognition started.');
+      } catch (error) {
+        console.error('Failed to start speech recognition:', error);
+        setErrorMessage('Failed to start speech recognition. Please check your microphone.');
+      }
+    } else if (recognitionRef.current) {
+      recognitionRef.current.stop();
+      console.log('Speech recognition stopped.');
+    }
+  }, [status, isProcessingQuestion, isVideoReady]);
+
+  // Text-to-speech for reading questions only after video is ready and voices are loaded
+  useEffect(() => {
+    if (
+      !isVideoReady ||
+      !voicesLoaded ||
+      questions.length === 0 ||
+      !questions[currentQuestion]?.question ||
+      hasSpokenQuestion[currentQuestion] ||
+      isUploading ||
+      isSubmitting ||
+      isProcessingQuestion ||
+      !lipSyncVideoRef.current
+    ) return;
+
+    const videoElement = lipSyncVideoRef.current;
+    const utterance = new SpeechSynthesisUtterance(questions[currentQuestion].question);
+    utterance.lang = selectedLanguage;
+
+    // Select a female voice
+    const voices = window.speechSynthesis.getVoices();
+    const femaleVoice = voices.find(voice =>
+      voice.name.toLowerCase().includes('female') ||
+      voice.name.toLowerCase().includes('woman') ||
+      voice.name.includes('Samantha') ||
+      voice.name.includes('Victoria') ||
+      voice.name.includes('Zira') ||
+      voice.name.includes('Tessa') ||
+      voice.name.includes('Google US English')
+    );
+    if (femaleVoice) {
+      utterance.voice = femaleVoice;
+      console.log(`Using female voice: ${femaleVoice.name}`);
+    } else {
+      console.warn('No female voice found, using default voice.');
+    }
+
+    utterance.onstart = () => {
+      if (videoElement) {
+        videoElement.play().catch(error => {
+          console.error('Failed to play lip-sync video:', error);
+          setErrorMessage('Failed to play video avatar.');
+        });
+      }
+    };
+
+    utterance.onend = () => {
+      setHasSpokenQuestion(prev => {
+        const updated = [...prev];
+        updated[currentQuestion] = true;
+        return updated;
+      });
+
+      if (videoElement) {
+        videoElement.pause();
+        videoElement.currentTime = 0;
+      }
+
+      if (status !== 'recording') {
+        startRecording();
+        console.log(`Recording started for question ${currentQuestion + 1}.`);
+      }
+    };
+
+    utterance.onerror = (event) => {
+      console.error('Speech synthesis error:', event);
+      setErrorMessage('Failed to read question aloud.');
+      setHasSpokenQuestion(prev => {
+        const updated = [...prev];
+        updated[currentQuestion] = true;
+        return updated;
+      });
+    };
+
+    // Delay to ensure video and speech sync
+    setTimeout(() => {
+      window.speechSynthesis.speak(utterance);
+    }, 500);
+
+    return () => {
+      window.speechSynthesis.cancel();
+      if (videoElement) {
+        videoElement.pause();
+        videoElement.currentTime = 0;
+      }
+    };
+  }, [currentQuestion, questions, selectedLanguage, startRecording, status, isUploading, isSubmitting, isProcessingQuestion, hasSpokenQuestion, isVideoReady, voicesLoaded]);
+
+  const updateAnswer = async (
+    questionText: string,
+    answer: string,
+    index: number,
+    blobUrl?: string | null,
+    forceUpload = false
+  ) => {
+    try {
+      setIsUploading(true);
+      setLoadingMessage(`Processing Question ${index + 1}...`);
+      setUploadProgress(0);
+      let uploadedVideoUrl: string | null = null;
+
+      if (blobUrl && (!uploadStatus[index] || forceUpload)) {
+        setLoadingMessage(`Uploading video for Question ${index + 1}...`);
+        setUploadProgress(25);
+        const response = await fetch(blobUrl);
+        const blob = await response.blob();
+
+        if (blob.size > 0) {
+          const file = new File([blob], `interview-q${index + 1}.mp4`, { type: 'video/mp4' });
+          const formData = new FormData();
+          formData.append('videoFile', file);
+          formData.append('meetingId', objId);
+          formData.append('transcript', answer);
+
+          const uploadResponse = await axios.post(
+            `${process.env.REACT_APP_SPRINGBOOT_BACKEND_SERVICE}/recording/write/${organisation}`,
+            formData,
+            {
+              headers: { 'Content-Type': 'multipart/form-data' },
+              onUploadProgress: (progressEvent) => {
+                if (progressEvent.total) {
+                  const progress = Math.round((progressEvent.loaded * 50) / progressEvent.total);
+                  setUploadProgress(25 + progress);
+                }
+              }
+            }
+          );
+
+          // Use the outputFileName from the backend response
+          uploadedVideoUrl = uploadResponse.data.outputFileName;
+          setUploadProgress(75);
+
+          // Verify video availability with retries
+          if (uploadedVideoUrl) {
+            let retries = 5;
+            let delay = 2000;
+            while (retries > 0) {
+              try {
+                const verifyResponse = await axios.get(uploadedVideoUrl, {
+                  responseType: 'blob',
+                  headers: { Accept: 'video/mp4' },
+                });
+                if (verifyResponse.status === 200 && verifyResponse.data.type === 'video/mp4') {
+                  break;
+                }
+              } catch (urlError: any) {
+                console.error(`Attempt ${6 - retries} failed for Question ${index + 1}: ${urlError.message}`);
+                retries--;
+                if (retries === 0) {
+                  uploadedVideoUrl = null;
+                  setErrorMessage(`Failed to verify video for Question ${index + 1} after multiple attempts.`);
+                  break;
+                }
+                await new Promise(resolve => setTimeout(resolve, delay));
+                delay *= 2;
+              }
+            }
+          } else {
+            setErrorMessage(`No video URL returned from backend for Question ${index + 1}.`);
+          }
+
+          setUploadStatus((prev) => {
+            const updated = [...prev];
+            updated[index] = true;
+            return updated;
+          });
+        }
+      }
+
+      setLoadingMessage(`Updating answer for Question ${index + 1}...`);
+      setUploadProgress(85);
       await axios.post(
         `${process.env.REACT_APP_DJANGO_PYTHON_MODULE_SERVICE}/update_answer/`,
-        data,
-        { headers: { organization: organisation } }
+        {
+          object_id: objId,
+          question_text: questionText,
+          answer: answer || 'No answer provided',
+        },
+        { headers: { 'Content-Type': 'application/json', organization: organisation, Organization: organisation } }
       );
+
+      if (uploadedVideoUrl) {
+        setUploadProgress(95);
+        await axios.post(
+          `${process.env.REACT_APP_DJANGO_PYTHON_MODULE_SERVICE}/process_video/`,
+          {
+            video_url: uploadedVideoUrl,
+            meeting_id: meetingId,
+            object_id: objId,
+            question_index: index,
+          },
+          { headers: { 'Content-Type': 'application/json', organization: organisation, Organization: organisation } }
+        );
+      }
+
+      setUploadProgress(100);
       setTranscript('');
       setInterimTranscript('');
-    } catch (error) {
-      console.error('Error updating answer:', error);
-      throw error;
-    }
-  };
- 
-  const startRecording = async () => {
-    try {
-      const response = await axios.post(
-        'https://api.dyte.io/v2/recordings',
-        { meeting_id: meetingId, allow_multiple_recordings: true },
-        { auth: { username: '955e223b-76a8-4c24-a9c6-ecbfea717290', password: '26425221301ce90b9244' } }
-      );
-      setRecordingId(response.data.data.id);
-      console.log(`Started recording for question ${currentQuestionIndex + 1}: ${response.data.data.id}`);
-    } catch (error) {
-      console.error('Error starting recording:', error);
-    }
-  };
- 
-  const stopRecording = async () => {
-    if (!recordingId) return;
-    try {
-      await axios.put(
-        `https://api.dyte.io/v2/recordings/${recordingId}`,
-        { action: 'stop' },
-        { auth: { username: '955e223b-76a8-4c24-a9c6-ecbfea717290', password: '26425221301ce90b9244' } }
-      );
-      console.log(`Stopped recording: ${recordingId}`);
-    } catch (error) {
-      console.error('Error stopping recording:', error);
-    }
-  };
- 
-  const handleProcessVideo = async () => {
-
-  const maxRetries = 10; // Maximum number of retries
-
-  const retryInterval = 3000; // Wait 3 seconds between retries
- 
-  try {
-
-    let attempts = 0;
-
-    let downloadUrl = null;
- 
-    // Polling loop to check for download_url
-
-    while (attempts < maxRetries) {
-
-      const response = await axios.get(
-
-        `https://api.dyte.io/v2/recordings/${recordingId}`,
-
-        {
-
-          auth: {
-
-            username: '955e223b-76a8-4c24-a9c6-ecbfea717290',
-
-            password: '26425221301ce90b9244',
-
-          },
-
-        }
-
-      );
- 
-      downloadUrl = response.data.data.download_url;
- 
-      if (downloadUrl) {
-
-        console.log(`Download URL available: ${downloadUrl}`);
-
-        break; // Exit the loop if download_url is available
-
-      }
- 
-      console.log(`Download URL not available yet, retrying (${attempts + 1}/${maxRetries})...`);
-
-      attempts++;
-
-      await new Promise((resolve) => setTimeout(resolve, retryInterval)); // Wait before retrying
-
-    }
- 
-    if (!downloadUrl) {
-
-      console.error('No download URL available after maximum retries');
-
-      return;
-
-    }
- 
-    // Proceed with processing the video
-
-    const recordingEntity = {
-
-      outputFileName: downloadUrl,
-
-      meetingid: objId,
-
-      sessionId: `question_${currentQuestionIndex + 1}.mp4`,
-
-    };
- 
-    await axios.post(
-
-      `${process.env.REACT_APP_SPRINGBOOT_BACKEND_SERVICE}/recording/write/${organisation}`,
-
-      recordingEntity
-
-    );
- 
-    await axios.post(
-
-      `${process.env.REACT_APP_DJANGO_PYTHON_MODULE_SERVICE}/process_video/`,
-
-      {
-
-        video_url: downloadUrl,
-
-        meeting_id: meetingId,
-
-        object_id: objId,
-
-        question_index: currentQuestionIndex,
-
-      },
-
-      {
-
-        headers: { 'Content-Type': 'application/json', Organization: organisation },
-
-      }
-
-    );
- 
-    console.log(`Processed video for question ${currentQuestionIndex + 1}`);
-
-  } catch (error) {
-
-    console.error('Error processing video:', error);
-
-  }
-
-};
- 
- 
-  const handleRecordingSubmit = async () => {
-
-  try {
-
-    await stopRecording();
-
-    console.log('Recording stopped...');
-
-    await new Promise((resolve) => setTimeout(resolve, 3000)); // Existing delay
-
-    await handleProcessVideo(); // Updated function with polling
-
-    console.log('Video processed...');
-
-    if (currentQuestionIndex < questionGenerated.length - 1) {
-
-      await startRecording();
-
-      console.log('New recording started...');
-
-    }
-
-  } catch (error) {
-
-    console.error('Error in handleRecordingSubmit:', error);
-
-  }
-
-};
- 
- 
-  const checkSessionStatus = async () => {
-    try {
-      const response = await axios.get(
-        `https://api.dyte.io/v2/meetings/${meetingId}/active-session`,
-        { auth: { username: '955e223b-76a8-4c24-a9c6-ecbfea717290', password: '26425221301ce90b9244' } }
-      );
-      const participant = response.data.data.live_participants;
-      setLiveParticipant(participant);
-      if (participant > 0) {
-        setInitialConditionMet(true);
-      }
+      setLastBlobUrl(null);
     } catch (error: any) {
-      if (error.response?.status === 404 || error.response?.data.error?.code === 404) {
-        setLiveParticipant(0);
+      console.error(`Error processing Question ${index + 1}:`, error.message || error);
+      setErrorMessage(`Failed to process Question ${index + 1}. Please try again.`);
+    } finally {
+      setIsUploading(false);
+      setLoadingMessage('');
+      setUploadProgress(0);
+    }
+  };
+
+  const handleNextQuestion = () => {
+    stopRecording();
+    setLastBlobUrl(mediaBlobUrl ?? null);
+    setOpenNextDialog(true);
+  };
+
+  const handleDialogYes = async () => {
+    setOpenNextDialog(false);
+    if (questions[currentQuestion]?.question) {
+      setIsProcessingQuestion(true);
+      await updateAnswer(questions[currentQuestion].question, transcript, currentQuestion, lastBlobUrl ?? mediaBlobUrl);
+      setCurrentQuestion((prev) => prev + 1);
+      setIsProcessingQuestion(false);
+    } else {
+      setErrorMessage('No question available to process.');
+    }
+  };
+
+  const handleSubmitInterview = async () => {
+    setIsSubmitting(true);
+    setLoadingMessage('Submitting your interview...');
+    setSubmissionProgress(0);
+    stopRecording();
+
+    // Process current question if it exists
+    if (questions[currentQuestion]?.question) {
+      await updateAnswer(questions[currentQuestion].question, transcript, currentQuestion, mediaBlobUrl ?? null);
+    }
+
+    // Process any unanswered questions
+    for (let i = 0; i < questions.length; i++) {
+      if (!uploadStatus[i]) {
+        const emptyBlob = new Blob([], { type: 'video/mp4' });
+        const fileUrl = URL.createObjectURL(emptyBlob);
+        await updateAnswer(questions[i].question, '', i, fileUrl, true);
       }
     }
-  };
- 
-  const sendThankYouMail = async () => {
+
+    setLoadingMessage('Processing interview results...');
     try {
-      await axios.post(
-        `${process.env.REACT_APP_SPRINGBOOT_BACKEND_SERVICE}/interview/Thankingmail/${organisation}`,
-        { meetingId },
-        { headers: { 'Content-Type': 'application/json' } }
-      );
-    } catch (error) {
-      console.error('Error sending thank-you email:', error);
-    }
-  };
- 
-  const handleInterviewStatus = async () => {
-    try {
-      await axios.post(
-        `${process.env.REACT_APP_DJANGO_PYTHON_MODULE_SERVICE}/interview_status/`,
-        { object_id: objId, interview_status: 'completed' },
-        { headers: { 'Content-Type': 'application/json', organization: organisation } }
-      );
-    } catch (error) {
-      console.error('Failed to update status:', error);
-    }
-  };
- 
-  const generateFeedback = async () => {
-    try {
-      const formData = new FormData();
-      formData.append('object_id', objId);
-      formData.append('language_selected', selectedLanguage);
-      await axios.post(
-        `${process.env.REACT_APP_DJANGO_PYTHON_MODULE_SERVICE}/generate_feedback/`,
-        formData,
-        { headers: { 'Content-Type': 'multipart/form-data', organization: organisation } }
-      );
-    } catch (error) {
-      console.error('Error generating feedback:', error);
-    }
-  };
- 
-  const handleQuestionAnalysis = async () => {
-    try {
-      await axios.post(
-        `${process.env.REACT_APP_DJANGO_PYTHON_MODULE_SERVICE}/analyze_questions/`,
-        { object_id: objId, language_selected: selectedLanguage },
-        { headers: { 'Content-Type': 'application/json', organization: organisation } }
-      );
-    } catch (error) {
-      console.error('Error analyzing questions:', error);
-    }
-  };
- 
-  const handleBatchInterviewAnalysis = async () => {
-    try {
-      await axios.post(
-        `${process.env.REACT_APP_DJANGO_PYTHON_MODULE_SERVICE}/batch_process_interview_analysis/`,
-        { object_id: objId, language_selected: selectedLanguage },
-        { headers: { 'Content-Type': 'application/json', organization: organisation } }
-      );
-    } catch (error) {
-      console.error('Error in batch interview analysis:', error);
-    }
-  };
- 
-  const handleSoftSkills = async () => {
-    try {
-      await axios.post(
-        `${process.env.REACT_APP_DJANGO_PYTHON_MODULE_SERVICE}/extract_soft_skills/`,
-        { object_id: objId, language_selected: selectedLanguage },
-        { headers: { 'Content-Type': 'application/json', organization: organisation } }
-      );
-    } catch (error) {
-      console.error('Error extracting soft skills:', error);
-    }
-  };
- 
-  const handleStrengths = async () => {
-    try {
-      await axios.post(
-        `${process.env.REACT_APP_DJANGO_PYTHON_MODULE_SERVICE}/extract_strengths_areas/`,
-        { object_id: objId, language_selected: selectedLanguage },
-        { headers: { 'Content-Type': 'application/json', organization: organisation } }
-      );
-    } catch (error) {
-      console.error('Error extracting strengths:', error);
-    }
-  };
- 
-  const handleTechnicalScore = async () => {
-    try {
-      await axios.post(
-        `${process.env.REACT_APP_DJANGO_PYTHON_MODULE_SERVICE}/extract-techskills-scores/`,
-        { object_id: objId, language_selected: selectedLanguage },
-        { headers: { 'Content-Type': 'application/json', organization: organisation } }
-      );
-    } catch (error) {
-      console.error('Error extracting technical scores:', error);
-    }
-  };
- 
- 
- 
-  // Event Handlers
-  const handleNextQuestion = async () => {
-    setConfirmAction('next');
-    setOpenConfirmDialog(true);
-  };
- 
-  const handleSubmit = async () => {
-    setConfirmAction('submit');
-    setOpenConfirmDialog(true);
-  };
- 
-  const handleConfirmAction = async () => {
-    setOpenConfirmDialog(false);
-    dispatch(loaderOn());
-    try {
-      const finalAnswer = code.trim() || transcript + interimTranscript || 'No answer provided';
-      await updateAnswer(questionGenerated[currentQuestionIndex], finalAnswer);
-      await handleRecordingSubmit();
- 
-      if (confirmAction === 'submit' || currentQuestionIndex === questionGenerated.length - 1) {
-        // Disable audio and video
-        if (meeting) {
-          meeting.self.disableAudio();
-          meeting.self.disableVideo();
+      const apiEndpoints = [
+        {
+          url: `${process.env.REACT_APP_SPRINGBOOT_BACKEND_SERVICE}/interview/Thankingmail/${organisation}`,
+          data: { meetingId },
+          headers: { 'Content-Type': 'application/json' },
+          name: 'Thanking Email'
+        },
+        {
+          url: `${process.env.REACT_APP_DJANGO_PYTHON_MODULE_SERVICE}/interview_status/`,
+          data: { object_id: objId, interview_status: 'completed' },
+          headers: { 'Content-Type': 'application/json', organization: organisation, Organization: organisation },
+          name: 'Interview Status'
+        },
+        {
+          url: `${process.env.REACT_APP_DJANGO_PYTHON_MODULE_SERVICE}/generate_feedback/`,
+          data: { object_id: objId, language_selected: selectedLanguage },
+          headers: { 'Content-Type': 'multipart/form-data', organization: organisation, Organization: organisation },
+          name: 'Generate Feedback'
+        },
+        {
+          url: `${process.env.REACT_APP_DJANGO_PYTHON_MODULE_SERVICE}/analyze_questions/`,
+          data: { object_id: objId, language_selected: selectedLanguage },
+          headers: { 'Content-Type': 'application/json', organization: organisation, Organization: organisation },
+          name: 'Analyze Questions'
+        },
+        {
+          url: `${process.env.REACT_APP_DJANGO_PYTHON_MODULE_SERVICE}/batch_process_interview_analysis/`,
+          data: { object_id: objId, language_selected: selectedLanguage },
+          headers: { 'Content-Type': 'application/json', organization: organisation, Organization: organisation },
+          name: 'Batch Process Analysis'
+        },
+        {
+          url: `${process.env.REACT_APP_DJANGO_PYTHON_MODULE_SERVICE}/extract_soft_skills/`,
+          data: { object_id: objId, language_selected: selectedLanguage },
+          headers: { 'Content-Type': 'application/json', organization: organisation, Organization: organisation },
+          name: 'Extract Soft Skills'
+        },
+        {
+          url: `${process.env.REACT_APP_DJANGO_PYTHON_MODULE_SERVICE}/extract_strengths_areas/`,
+          data: { object_id: objId, language_selected: selectedLanguage },
+          headers: { 'Content-Type': 'application/json', organization: organisation, Organization: organisation },
+          name: 'Extract Strengths Areas'
+        },
+        {
+          url: `${process.env.REACT_APP_DJANGO_PYTHON_MODULE_SERVICE}/extract-techskills-scores/`,
+          data: { object_id: objId, language_selected: selectedLanguage },
+          headers: { 'Content-Type': 'application/json', organization: organisation, Organization: organisation },
+          name: 'Extract Tech Skills Scores'
+        },
+      ];
+
+      const totalApis = apiEndpoints.length;
+      let completedApis = 0;
+      const failedApis: string[] = [];
+
+      const apiPromises = apiEndpoints.map(async (api, index) => {
+        try {
+          setLoadingMessage(`Processing ${api.name} (${index + 1} of ${totalApis})...`);
+          const response = await axios.post(api.url, api.data, { headers: api.headers });
+          console.log(`API ${api.name} completed with status: ${response.status}`);
+          completedApis += 1;
+          setSubmissionProgress((completedApis / totalApis) * 100);
+          return response;
+        } catch (error: any) {
+          console.error(`Failed to process ${api.name}:`, error.response?.data || error.message || error);
+          failedApis.push(api.name);
+          completedApis += 1;
+          setSubmissionProgress((completedApis / totalApis) * 100);
+          return null;
         }
-        await Promise.all([
-          generateFeedback(),
-          handleQuestionAnalysis(),
-          handleSoftSkills(),
-          handleStrengths(),
-          handleTechnicalScore(),
-          handleInterviewStatus(),
-          handleBatchInterviewAnalysis(),
-          sendThankYouMail(),
-          // handleProctoring(),
-        ]);
-        navigate('/signin');
-      } else {
-        setCode('');
-        setCurrentQuestionIndex((prev) => prev + 1);
-        setTimeLeft(300);
-        setTranscript('');
-        setInterimTranscript('');
+      });
+
+      await Promise.all(apiPromises);
+
+      setLoadingMessage('All processing complete, redirecting...');
+      setSubmissionProgress(100);
+
+      if (failedApis.length > 0) {
+        setErrorMessage(`Some processes failed: ${failedApis.join(', ')}. Redirecting to sign-in page.`);
       }
-    } catch (error) {
-      console.error('Error in handleConfirmAction:', error);
-    } finally {
-      dispatch(loaderOff());
-      setLoading(false);
-    }
-  };
- 
-  const handleExit = async () => {
-    if (recordingId) {
-      await handleRecordingSubmit();
-    }
-    try {
-      await axios.post(
-        `https://api.dyte.io/v2/meetings/${meetingId}/active-session/kick-all`,
-        null,
-        { auth: { username: '955e223b-76a8-4c24-a9c6-ecbfea717290', password: '26425221301ce90b9244' } }
-      );
-      // Disable audio and video
-      if (meeting) {
-        meeting.self.disableAudio();
-        meeting.self.disableVideo();
-      }
+
+      console.log('Attempting navigation to /signin');
       navigate('/signin');
-    } catch (error) {
-      console.error('Error kicking session:', error);
+    } catch (error: any) {
+      console.error('Unexpected error during submission:', error.message || error);
+      setErrorMessage(`Unexpected error during submission: ${error.message}. Redirecting to sign-in page.`);
+      setSubmissionProgress(100);
+      navigate('/signin');
     } finally {
-      dispatch(loaderOff());
-      setLoading(false);
+      setIsSubmitting(false);
+      setLoadingMessage('');
+      setSubmissionProgress(0);
     }
   };
- 
-  const handleUpload = () => {
-    fileInputRef.current?.click();
-  };
- 
+
+  const handleEditorChange = (value: string | undefined) => setCode(value || '');
+  const handleUpload = () => fileInputRef.current?.click();
+
   const handleFileChange = async (event: React.ChangeEvent<HTMLInputElement>) => {
     const file = event.target.files?.[0];
     if (!file) return;
@@ -556,107 +676,12 @@ export default function InterviewAttend() {
         { headers: { 'Content-Type': 'multipart/form-data' } }
       );
       alert(t('fileUploadSuccessfully'));
-    } catch (error) {
-      console.error('Upload failed:', error);
+    } catch (error: any) {
+      console.error('Upload failed:', error.message || error);
       alert(t('uploadFailed'));
     }
   };
- 
-  const handleVolumeUp = () => {
-    if (audioRef.current) {
-      audioRef.current.volume = Math.min(audioRef.current.volume + 0.1, 1);
-    }
-  };
- 
-  const handleEditorChange = (value: string | undefined) => {
-    setCode(value || '');
-  };
- 
-  // Effects
-  useEffect(() => {
-    if (window.speechSynthesis.onvoiceschanged !== undefined) {
-      window.speechSynthesis.onvoiceschanged = loadVoices;
-    }
-    loadVoices();
-  }, []);
- 
-  useEffect(() => {
-    readQuestion(currentQuestionIndex);
-    return () => {
-      if (speechInstance) {
-        window.speechSynthesis.cancel();
-        speechInstance = null;
-      }
-    };
-  }, [currentQuestionIndex, liveParticipant]);
- 
-  useEffect(() => {
-    const setupMeeting = async () => {
-      if (!authToken) {
-        setLoading(false);
-        return;
-      }
-      try {
-        await initMeeting({ authToken, defaults: { audio: true, video: true } });
-        setLoading(false);
-      } catch (error) {
-        console.error('Failed to initialize Dyte meeting:', error);
-        setLoading(false);
-      } finally {
-        dispatch(loaderOff());
-      }
-    };
-    setupMeeting();
-    generateQuestions();
-  }, [authToken, objId]);
- 
-  useEffect(() => {
-    if (initialConditionMet && authToken && !recordingId && questionGenerated.length > 0) {
-      startRecording();
-    }
-  }, [initialConditionMet, authToken, recordingId, questionGenerated]);
- 
-  useEffect(() => {
-    const intervalId = setInterval(checkSessionStatus, 3000);
-    return () => clearInterval(intervalId);
-  }, [meetingId]);
- 
-  useEffect(() => {
-    if (warning) setOpenWarning(true);
-  }, [warning]);
- 
-  useEffect(() => {
-    if (timeLeft <= 0 && !hasTriggeredNext) {
-      handleNextQuestion();
-      setHasTriggeredNext(true);
-    }
-    const timer = setInterval(() => {
-      setTimeLeft((prev) => prev - 1);
-    }, 1000);
-    return () => clearInterval(timer);
-  }, [timeLeft, hasTriggeredNext]);
- 
-  useEffect(() => {
-    setTimeLeft(300);
-    setHasTriggeredNext(false);
-  }, [currentQuestionIndex]);
- 
-  useEffect(() => {
-    document.body.style.overflow = 'hidden';
-    return () => {
-      document.body.style.overflow = 'unset';
-    };
-  }, []);
- 
-  useEffect(() => {
-    window.history.pushState(null, '', window.location.href);
-    const onPopState = () => {
-      window.history.pushState(null, '', window.location.href);
-    };
-    window.addEventListener('popstate', onPopState);
-    return () => window.removeEventListener('popstate', onPopState);
-  }, []);
- 
+
   useEffect(() => {
     const handleClickOutside = (event: MouseEvent) => {
       if (showEditor && editorRef.current && !editorRef.current.contains(event.target as Node)) {
@@ -666,172 +691,396 @@ export default function InterviewAttend() {
     document.addEventListener('mousedown', handleClickOutside);
     return () => document.removeEventListener('mousedown', handleClickOutside);
   }, [showEditor]);
- 
-  // Speech Recognition
-  useEffect(() => {
-    if (liveParticipant > 0 && !isReadingQuestion) {
-      const SpeechRecognition = (window as any).SpeechRecognition || (window as any).webkitSpeechRecognition;
-      if (!SpeechRecognition) {
-        setTranscript('Speech recognition not supported');
-        return;
-      }
-      const mic = new SpeechRecognition();
-      mic.continuous = true;
-      mic.interimResults = true;
-      mic.lang = selectedLanguage === 'ar' ? 'ar-EG' : 'en-US';
-      mic.onresult = (event: any) => {
-        let interim = '';
-        let final = '';
-        for (let i = 0; i < event.results.length; i++) {
-          const transcriptPart = event.results[i][0].transcript;
-          if (event.results[i].isFinal) {
-            final += transcriptPart + ' ';
-          } else {
-            interim += transcriptPart;
-          }
-        }
-        setTranscript(final);
-        setInterimTranscript(interim);
-      };
-      mic.onerror = (event: any) => {
-        setTranscript('Error in speech recognition');
-      };
-      mic.start();
-      return () => mic.stop();
-    }
-  }, [liveParticipant, currentQuestionIndex, isReadingQuestion, selectedLanguage]);
- 
+
   return (
-    <div style={{ minHeight: '100vh', background: '#000000', padding: '20px', overflow: 'auto' }}>
-      {loading ? (
-        <div style={{ position: 'fixed', top: 0, left: 0, height: '100vh', width: '100%', background: 'rgba(255, 255, 255, 0.8)', display: 'flex', justifyContent: 'center', alignItems: 'center', zIndex: 9999 }}>
-          <CircularProgress size={50} style={{ color: '#0284C7' }} />
+    <div style={{ position: "relative", height: "100vh", backgroundColor: "black", overflow: "hidden" }}>
+      {(isUploading || isSubmitting || isProcessingQuestion || loadingMessage) && (
+        <ProfessionalLoader
+          message={loadingMessage || 'Processing'}
+          progress={isSubmitting ? submissionProgress : uploadProgress > 0 ? uploadProgress : undefined}
+        />
+      )}
+
+      {/* Two Column Layout */}
+      <div style={{
+        display: "flex",
+        height: "100vh",
+        backgroundColor: "black"
+      }}>
+
+        {/* First Column - React Media Recorder Video */}
+        <div style={{
+          flex: "0 0 55%",
+          position: "relative",
+          backgroundColor: "black"
+        }}>
+          <video
+            ref={videoRef}
+            autoPlay
+            muted
+            playsInline
+            style={{
+              width: "100%",
+              height: "100%",
+              objectFit: "cover",
+              backgroundColor: "black"
+            }}
+          />
         </div>
-      ) : (
-        <Grid container spacing={2}>
-          <Grid item lg={9} style={{ display: 'flex', flexDirection: 'column', height: '100vh', alignItems: 'center' }}>
-            <DyteUiProvider meeting={meeting}>
-              <DyteGrid meeting={meeting} style={{ width: '100%', height: showEditor ? '60vh' : '100vh' }} />
-            </DyteUiProvider>
-            {showEditor && (
-              <Box ref={editorRef} sx={{ width: '60%', height: '45vh', bgcolor: 'background.paper', borderRadius: '8px', boxShadow: 24, p: 1, display: 'flex', flexDirection: 'column' }}>
-                <Editor
-                  height="100%"
-                  width="100%"
-                  language="javascript"
-                  value={code}
-                  onChange={handleEditorChange}
-                  theme="vs-light"
-                  options={{ fontSize: 16, minimap: { enabled: true }, automaticLayout: true, contextmenu: false }}
-                />
-              </Box>
-            )}
-          </Grid>
-          <Grid item lg={3} style={{ padding: '30px 10px 5px 10px' }}>
+
+        {/* Second Column - Video, Questions, and Buttons */}
+        <div style={{
+          flex: "0 0 45%",
+          display: "flex",
+          flexDirection: "column",
+          backgroundColor: "black",
+          padding: "1rem"
+        }}>
+
+          {/* Row 1: Lip Sync Video */}
+          <div style={{
+            flex: "0 0 200px",
+            display: "flex",
+
+            marginBottom: "1rem"
+          }}>
             <video
-              ref={videoRef}
-              width="100%"
-              height="auto"
+              ref={lipSyncVideoRef}
+
               muted
-              style={{ borderRadius: '10px', backgroundColor: 'transparent', boxShadow: '0 4px 8px rgba(0, 0, 0, 0.2)', zIndex: 1, maxHeight: '300px', minWidth: '200px', width: '100%' }}
+              style={{
+                width: '90%',       // full width
+                height: '200px',     // fixed height
+                backgroundColor: 'transparent',
+                borderRadius: '16px',
+                boxShadow: '0 8px 32px rgba(0,0,0,0.3)',
+                objectFit: 'cover'   // keeps video aspect ratio and fills
+              }}
             >
-              <source src={`${process.env.PUBLIC_URL}assets/static/images/20240913132119-119 (online-video-cutter.com).mp4`} type="video/mp4" />
+              <source
+                src={`${process.env.PUBLIC_URL}/assets/static/images/20240913132119-119 (online-video-cutter.com).mp4`}
+                type="video/mp4"
+              />
             </video>
-            {initialConditionMet && (
-              <div style={{ background: '#263D4A', backdropFilter: 'blur(12px)', marginTop: '10px', width: '100%', height: '250px', borderRadius: '8px', padding: '11px 6px' }}>
-                <Box sx={{ display: 'flex', justifyContent: 'space-between' }}>
-                  <Typography style={{ fontWeight: 'bold', fontSize: '16px', marginBottom: '10px', color: '#FFFFFF' }}>
-                    {t('question')} {convertNumberToArabic(currentQuestionIndex + 1)}
-                  </Typography>
-                  <Typography style={{ fontSize: '16px', fontWeight: 700, fontFamily: 'SF Pro Display', color: '#0284C7' }}>
-                    ⏱ {formatTime(timeLeft)}
-                  </Typography>
-                </Box>
-                <Typography style={{ fontSize: '12px', color: '#FFFFFF', fontFamily: 'Inter', letterSpacing: '0%', fontWeight: 400 }}>
-                  {questionGenerated[currentQuestionIndex]}
+          </div>
+
+          {/* Row 2: Questions Section */}
+          <div style={{
+            flex: "1",
+            marginBottom: "1rem"
+          }}>
+            <div style={{
+              background: "rgba(0,0,0,0.7)",
+              padding: "1rem",
+              borderRadius: "16px",
+              backdropFilter: 'blur(10px)',
+              border: '1px solid rgba(255,255,255,0.1)',
+              height: "70%",
+              color: "white",
+              width: "85%"
+            }}>
+              <div style={{ display: 'flex', alignItems: 'center', marginBottom: '0.5rem' }}>
+                <Typography variant="h6" style={{ fontWeight: 'bold', marginRight: '1rem' }}>
+                  Question {currentQuestion + 1}/{questions.length}
+                </Typography>
+                {uploadStatus[currentQuestion] ? (
+                  <CheckCircle style={{ color: '#4caf50', fontSize: '24px' }} />
+                ) : (
+                  <div style={{ display: 'flex', alignItems: 'center' }}>
+                    <MicIcon style={{ color: status === 'recording' ? '#f44336' : '#fff', fontSize: '20px', marginRight: '0.5rem' }} />
+                    {status === 'recording' && <div style={{ width: '8px', height: '8px', backgroundColor: '#f44336', borderRadius: '50%', animation: 'pulse 1s infinite' }} />}
+                  </div>
+                )}
+              </div>
+              <Typography variant="body1" style={{ marginBottom: '1rem', lineHeight: '1.4' }}>
+                {isVideoReady && questions[currentQuestion]?.question ? questions[currentQuestion].question : "Waiting for webcam to initialize..."}
+              </Typography>
+              <div style={{
+                background: 'rgba(255,255,255,0.1)',
+                padding: '1rem',
+                borderRadius: '8px',
+                minHeight: '80px',
+                display: 'none'
+              }}>
+                <Typography variant="body2" style={{ fontWeight: 'bold', marginBottom: '0.5rem' }}>
+                  Your Answer:
+                </Typography>
+                <Typography variant="body2" style={{ fontStyle: transcript || interimTranscript ? 'normal' : 'italic' }}>
+                  {transcript || interimTranscript || 'Start speaking to see your answer here...'}
                 </Typography>
               </div>
-            )}
-            {initialConditionMet && (
-              <div style={{ display: 'flex', flexWrap: 'wrap', gap: '12px', padding: '30px 0 20px 0px', width: '100%' }}>
-                <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', gap: '20px', flexWrap: 'nowrap', width: '100%' }}>
-                  <IconButton sx={{ backgroundColor: '#0284C7', color: '#fff', width: '32px', height: '32px', pointerEvents: 'none', opacity: 0.5 }}>
-                    <MicIcon />
-                  </IconButton>
-                  <IconButton sx={{ backgroundColor: '#0284C7', color: '#fff', width: '32px', height: '32px', pointerEvents: 'none', opacity: 0.5 }}>
-                    <VideocamIcon />
-                  </IconButton>
-                  <IconButton sx={{ backgroundColor: '#0284C7', color: '#fff', width: '32px', height: '32px' }} onClick={handleVolumeUp}>
-                    <VolumeUpIcon />
-                  </IconButton>
-                  <IconButton sx={{ backgroundColor: '#0284C7', color: '#fff', width: '32px', height: '32px' }} onClick={() => setShowEditor(true)}>
-                    <CodeIcon />
-                  </IconButton>
-                  <input type="file" ref={fileInputRef} style={{ display: 'none' }} onChange={handleFileChange} />
-                  <IconButton sx={{ backgroundColor: '#0284C7', color: '#fff', width: '30px', height: '30px' }} onClick={handleUpload}>
-                    <AttachFileIcon />
-                  </IconButton>
-                </div>
-              </div>
-            )}
-            {initialConditionMet && (
-              <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', gap: '12px', flexWrap: 'nowrap', width: '100%' }}>
+            </div>
+          </div>
+
+          {/* Row 3: Control Buttons */}
+          <div style={{
+            flex: "0 0 auto",
+            display: 'flex',
+            flexDirection: 'column',
+            width:"90%",
+            padding:'5px'
+          }}>
+
+
+            {/* Main Action Buttons Row */}
+            <div style={{
+              display: 'flex',
+              gap: "1rem",
+              justifyContent: 'center'
+            }}>
+              <IconButton sx={{ backgroundColor: '#0284C7', color: '#fff', width: '35px', height: '35px', pointerEvents: 'none', opacity: 0.5 }}>
+                <MicIcon />
+              </IconButton>
+              <IconButton sx={{ backgroundColor: '#0284C7', color: '#fff', width: '35px', height: '35px', pointerEvents: 'none', opacity: 0.5 }}>
+                <VideocamIcon />
+              </IconButton>
+              {/* <IconButton sx={{ backgroundColor: '#0284C7', color: '#fff', width: '35px', height: '35px' }}>
+                <VolumeUpIcon />
+              </IconButton> */}
+              <IconButton sx={{ backgroundColor: '#0284C7', color: '#fff', width: '35px', height: '35px' }} onClick={() => setShowEditor(true)}>
+                <CodeIcon />
+              </IconButton>
+              <input type="file" ref={fileInputRef} style={{ display: 'none' }} onChange={handleFileChange} />
+              <IconButton sx={{ backgroundColor: '#0284C7', color: '#fff', width: '35px', height: '35px' }} onClick={handleUpload}>
+                <AttachFileIcon />
+              </IconButton>
+              {currentQuestion === questions.length - 1 ? (
                 <Button
-                  style={{ borderRadius: '8px', backgroundColor: '#000', color: '#fff', border: '1px solid #fff', padding: '6px 16px', fontWeight: 500, textTransform: 'none', width: '50%' }}
+                  onClick={() => setOpenSubmitDialog(true)}
+                  variant="contained"
+                  disabled={isUploading || isSubmitting || isProcessingQuestion || !isVideoReady}
+                  style={{
+                    backgroundColor: '#4caf50',
+                    color: 'white',
+
+                    display: "flex",
+                    alignItems: "center",
+                    justifyContent: "center",
+                    padding: "10px 15px",
+                    borderRadius: "8px",
+                    fontWeight: "bold",
+                    minWidth: "150px",
+                  }}
+                >
+                  {isUploading || isSubmitting || isProcessingQuestion ? (
+                    <div style={{ display: 'flex', alignItems: 'center' }}>
+                      <CircularProgress size={20} style={{ marginRight: '8px', color: 'white' }} />
+                      Processing...
+                    </div>
+                  ) : (
+                    "Submit Interview"
+                  )}
+                </Button>
+              ) : (
+                <Button
                   onClick={handleNextQuestion}
+                  variant="contained"
+                  disabled={isUploading || isSubmitting || isProcessingQuestion || !isVideoReady}
+                  style={{
+                    backgroundColor: '#2196f3',
+                    display: "flex",
+                    alignItems: "center",
+                    justifyContent: "center",
+                    padding: "12px 15px",
+                    borderRadius: "8px",
+                    fontWeight: "bold",
+                    minWidth: "150px",
+                  }}
                 >
-                  {currentQuestionIndex === questionGenerated.length - 1 ? t('submitBtn') : t('nextQuestion')}
+                  {isUploading || isSubmitting || isProcessingQuestion ? (
+                    <div style={{ display: 'flex', alignItems: 'center' }}>
+                      <CircularProgress size={20} style={{ marginRight: '8px', color: 'white' }} />
+                      Processing...
+                    </div>
+                  ) : (
+                    "Next Question"
+                  )}
                 </Button>
-                <Button
-                  style={{ borderRadius: '8px', backgroundColor: '#0284C7', color: '#fff', padding: '6px 16px', fontWeight: '500', textTransform: 'none', width: '50%' }}
-                  onClick={handleSubmit}
-                >
-                  {t('endInterview')}
-                </Button>
-              </div>
-            )}
-          </Grid>
-          <Dialog open={showPopup} onClose={() => setShowPopup(false)}>
-            <DialogContent>
-              <DialogContentText style={{ color: '#0284C7' }}>{t('beforeAttending')}</DialogContentText>
-            </DialogContent>
-            <DialogActions>
+              )}
+
               <Button
-                onClick={() => {
-                  setShowPopup(false);
+                onClick={() => setOpenSubmitDialog(true)}
+                variant="outlined"
+                disabled={isUploading || isSubmitting || isProcessingQuestion || !isVideoReady}
+                style={{
+                  backgroundColor: '#2196f3',
+                  display: "flex",
+                  alignItems: "center",
+                  justifyContent: "center",
+                  padding: "10px 15px",
+                  borderRadius: "8px",
+                  fontWeight: "bold",
+                  minWidth: "150px",
+                  color:"#fff"
                 }}
-                style={{ background: '#0284C7', color: '#FFFFFF', textTransform: 'none' }}
               >
-                {t('okBtn')}
+                {isUploading || isSubmitting || isProcessingQuestion ? (
+                  <div style={{ display: 'flex', alignItems: 'center' }}>
+                    <CircularProgress size={16} style={{ marginRight: '8px', color: '#ff9800' }} />
+                    Processing...
+                  </div>
+                ) : (
+                  "End Interview"
+                )}
               </Button>
-            </DialogActions>
-          </Dialog>
-          <Dialog open={openConfirmDialog} onClose={() => setOpenConfirmDialog(false)}>
-            <DialogTitle>{t('confirm Submission')}</DialogTitle>
-            <DialogContent>
-              <DialogContentText>
-                {confirmAction === 'submit' || currentQuestionIndex === questionGenerated.length - 1
-                  ? t('submitFinalConfirmation')
-                  : t('submitQuestionConfirmation')}
-              </DialogContentText>
-            </DialogContent>
-            <DialogActions>
-              <Button onClick={() => setOpenConfirmDialog(false)} style={{ background: '#0284C7', color: '#E8F1FF', textTransform: 'none' }}>
-                {t('cancelButton')}
-              </Button>
-              <Button onClick={handleConfirmAction} style={{ background: '#0284C7', color: '#FFFFFF', textTransform: 'none' }}>
-                {t('confirmBtn')}
-              </Button>
-            </DialogActions>
-          </Dialog>
-          <Snackbar open={openWarning} autoHideDuration={5000} onClose={() => setOpenWarning(false)} anchorOrigin={{ vertical: 'top', horizontal: 'center' }}>
-            <Alert onClose={() => setOpenWarning(false)} severity="warning" sx={{ width: '100%' }}>
-              {warning}
-            </Alert>
-          </Snackbar>
-        </Grid>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      {/* Code Editor Modal */}
+      {showEditor && (
+        <Box
+          ref={editorRef}
+          sx={{
+            position: 'absolute',
+            top: '50%',
+            left: '50%',
+            transform: 'translate(-50%, -50%)',
+            width: '60%',
+            height: '45vh',
+            bgcolor: 'background.paper',
+            borderRadius: '12px',
+            boxShadow: '0 20px 40px rgba(0,0,0,0.3)',
+            p: 1,
+            border: '1px solid rgba(255,255,255,0.2)',
+            zIndex: 4
+          }}
+        >
+          <Editor
+            height="100%"
+            width="100%"
+            language="javascript"
+            value={code}
+            onChange={handleEditorChange}
+            theme="vs-dark"
+          />
+        </Box>
       )}
+
+      {/* Dialog for Next Question */}
+      <Dialog
+        open={openNextDialog}
+        onClose={() => setOpenNextDialog(false)}
+        PaperProps={{
+          style: {
+            borderRadius: '16px',
+            padding: '8px',
+            zIndex: 5
+          }
+        }}
+      >
+        <DialogTitle style={{ textAlign: 'center', fontWeight: 'bold' }}>
+          Proceed to Next Question
+        </DialogTitle>
+        <DialogContent style={{ textAlign: 'center', padding: '20px' }}>
+          <Typography variant="body1">
+            Are you ready to move to the next question? Your current answer will be saved.
+          </Typography>
+        </DialogContent>
+        <DialogActions style={{ justifyContent: 'center', padding: '16px' }}>
+          <Button
+            onClick={() => setOpenNextDialog(false)}
+            variant="outlined"
+            style={{ marginRight: '12px' }}
+          >
+            Cancel
+          </Button>
+          <Button
+            onClick={handleDialogYes}
+            variant="contained"
+            disabled={isUploading || isSubmitting || isProcessingQuestion || !isVideoReady}
+            style={{ backgroundColor: '#2196f3' }}
+          >
+            {isUploading || isSubmitting || isProcessingQuestion ? (
+              <CircularProgress size={24} style={{ color: 'white' }} />
+            ) : (
+              "Yes, Continue"
+            )}
+          </Button>
+        </DialogActions>
+      </Dialog>
+
+      {/* Dialog for Submit Interview */}
+      <Dialog
+        open={openSubmitDialog}
+        onClose={() => setOpenSubmitDialog(false)}
+        PaperProps={{
+          style: {
+            borderRadius: '16px',
+            padding: '8px',
+            zIndex: 5
+          }
+        }}
+      >
+        <DialogTitle style={{ textAlign: 'center', fontWeight: 'bold' }}>
+          Submit Interview
+        </DialogTitle>
+        <DialogContent style={{ textAlign: 'center', padding: '20px' }}>
+          <Typography variant="body1" style={{ marginBottom: '16px' }}>
+            Are you sure you want to submit your interview? This action cannot be undone.
+          </Typography>
+          <Typography variant="body2" color="textSecondary">
+            We will process your responses and send you feedback via email.
+          </Typography>
+        </DialogContent>
+        <DialogActions style={{ justifyContent: 'center', padding: '16px' }}>
+          <Button
+            onClick={() => setOpenSubmitDialog(false)}
+            variant="outlined"
+            style={{ marginRight: '12px' }}
+          >
+            Cancel
+          </Button>
+          <Button
+            onClick={handleSubmitInterview}
+            variant="contained"
+            disabled={isUploading || isSubmitting || isProcessingQuestion || !isVideoReady}
+            style={{ backgroundColor: '#4caf50' }}
+          >
+            {isUploading || isSubmitting || isProcessingQuestion ? (
+              <CircularProgress size={24} style={{ color: 'white' }} />
+            ) : (
+              "Submit Interview"
+            )}
+          </Button>
+        </DialogActions>
+      </Dialog>
+
+      {/* Error Message Snackbar */}
+      <Snackbar
+        open={!!errorMessage}
+        autoHideDuration={6000}
+        onClose={() => setErrorMessage(null)}
+        anchorOrigin={{ vertical: 'top', horizontal: 'center' }}
+      >
+        <Alert
+          severity="error"
+          onClose={() => setErrorMessage(null)}
+          style={{ borderRadius: '12px', zIndex: 6 }}
+        >
+          {errorMessage}
+        </Alert>
+      </Snackbar>
+
+      {/* CSS Animation */}
+      <style>{`
+        @keyframes pulse {
+          0% { opacity: 1; }
+          50% { opacity: 0.5; }
+          100% { opacity: 1; }
+        }
+      `}</style>
     </div>
   );
-}
- 
+};
+
+const InterviewAttend: React.FC = () => (
+  <ReactMediaRecorder
+    video
+    audio
+    render={(props: ReactMediaRecorderRenderProps) => <RecorderView {...props} />}
+  />
+);
+
+export default InterviewAttend;

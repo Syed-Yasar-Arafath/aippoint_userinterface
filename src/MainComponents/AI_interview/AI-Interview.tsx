@@ -675,7 +675,8 @@ const RecorderView: React.FC<ReactMediaRecorderRenderProps> = ({
         formData,
         { headers: { 'Content-Type': 'multipart/form-data' } }
       );
-      alert(t('fileUploadSuccessfully'));
+      // alert(t('fileUploadSuccessfully'));
+      alert('File uploaded successfully');
     } catch (error: any) {
       console.error('Upload failed:', error.message || error);
       alert(t('uploadFailed'));

@@ -598,13 +598,15 @@ function CodingSection({ status, startRecording, stopRecording, previewStream, m
 
   const preventPaste = (e: ClipboardEvent) => {
     e.preventDefault();
-    alert(t('pastingIsDisabled'));
+    // alert(t('pastingIsDisabled'));
+    alert('Pasting is disabled')
   };
 
   const preventCopyCut = (e: KeyboardEvent) => {
     if ((e.ctrlKey || e.metaKey) && ['c', 'v', 'x'].includes(e.key.toLowerCase())) {
       e.preventDefault();
-      alert(t('cutCopyPasteRestricted'));
+      // alert(t('cutCopyPasteRestricted'));
+      alert('Cut, Copy and Paste are restricted')
     }
   };
 
@@ -694,7 +696,8 @@ function CodingSection({ status, startRecording, stopRecording, previewStream, m
 
   const SendThankYouMail = async () => {
     if (!meetingId) {
-      alert(t('pleaseProvideValidMeetingId'));
+      // alert(t('pleaseProvideValidMeetingId'));
+      alert('Please provide valid meeting id')
       return;
     }
     try {
@@ -1104,7 +1107,8 @@ function CodingSection({ status, startRecording, stopRecording, previewStream, m
                   selectedLanguage,
                 )}
               </span>{' '}
-              {t('timeLeftAlertMessage')}
+              {/* {t('timeLeftAlertMessage')} */}
+              Time Left
             </span>
           )}
         </Grid>
@@ -1147,7 +1151,8 @@ function CodingSection({ status, startRecording, stopRecording, previewStream, m
                   )
                 : '00:00'}
             </span>{' '}
-            {t('codeSubmitAlertMessage')}
+            {/* {t('codeSubmitAlertMessage')} */}
+            Code Submit
           </Typography>
           <div
             style={{
@@ -1234,7 +1239,8 @@ function CodingSection({ status, startRecording, stopRecording, previewStream, m
               marginBottom: '20px'
             }}
           >
-            {t('skipQuestionAlertMessage')}
+            {/* {t('skipQuestionAlertMessage')} */}
+            Skip Question
           </Typography>
           <div
             style={{

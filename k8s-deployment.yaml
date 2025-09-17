@@ -1,26 +1,26 @@
-apiVersion: apps/v1
-kind: Deployment
-metadata:
-  name: aippoint-ui
-spec:
-  replicas: 1
-  selector:
-    matchLabels:
-      app: aippoint-ui
-  template:
-    metadata:
-      labels:
-        app: aippoint-ui
-    spec:
-      containers:
-        - name: aippoint-ui
-          image: gcr.io/deployments-449806/aippoint-ui:latest 
-          imagePullPolicy: Always # Will be replaced with timestamp by Jenkins
-          ports:
-            - containerPort: 80
-          envFrom:
-            - secretRef:
-                name: prod-env  
-      imagePullSecrets:
-        - name: gcr-secret   # Use Docker registry secret for GCR access
+# apiVersion: apps/v1
+# kind: Deployment
+# metadata:
+#   name: aippoint-ui
+# spec:
+#   replicas: 1
+#   selector:
+#     matchLabels:
+#       app: aippoint-ui
+#   template:
+#     metadata:
+#       labels:
+#         app: aippoint-ui
+#     spec:
+#       containers:
+#         - name: aippoint-ui
+#           image: gcr.io/deployments-449806/aippoint-ui:latest 
+#           imagePullPolicy: Always # Will be replaced with timestamp by Jenkins
+#           ports:
+#             - containerPort: 80
+#           envFrom:
+#             - secretRef:
+#                 name: prod-env  
+#       imagePullSecrets:
+#         - name: gcr-secret   # Use Docker registry secret for GCR access
  
